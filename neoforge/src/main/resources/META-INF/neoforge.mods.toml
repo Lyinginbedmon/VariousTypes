@@ -1,0 +1,38 @@
+modLoader = "javafml"
+loaderVersion = "[2,)"
+#issueTrackerURL = ""
+license = "Insert License Here"
+
+[[mods]]
+modId = "vartypes"
+version = "${version}"
+displayName = "Various Types"
+authors = "Me!"
+description = '''
+This is an example description! Tell everyone what your mod is about!
+'''
+#logoFile = ""
+
+[[dependencies.vartypes]]
+modId = "neoforge"
+type = "required"
+versionRange = "[20.6,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.vartypes]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.20.6,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.vartypes]]
+modId = "architectury"
+type = "required"
+versionRange = "[12.1.2,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[mixins]]
+config = "vartypes.mixins.json"
