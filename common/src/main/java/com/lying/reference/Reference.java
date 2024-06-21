@@ -1,5 +1,8 @@
 package com.lying.reference;
 
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+
 public class Reference
 {
 	public static class ModInfo
@@ -9,6 +12,10 @@ public class Reference
 		public static final String MOD_PREFIX	= MOD_ID + ":";
 		
 		public static final String VERSION	= "1.0";
+		
+		public static Identifier prefix(String name) { return new Identifier(MOD_ID, name); }
+		public static Text translate(String prefix, String suffix) { return Text.translatable(prefix + "." + MOD_ID + "." + suffix); }
+		public static Text translate(String prefix, String suffix, Object[] args) { return Text.translatable(prefix + "." + MOD_ID + "." + suffix, args); }
 	}
 	
 	public static class Values

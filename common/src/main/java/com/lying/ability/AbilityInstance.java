@@ -50,7 +50,7 @@ public class AbilityInstance
 			}
 			catch (Exception exception)
 			{
-				VariousTypes.LOGGER.warn("Failed to parse abiilty custom name {}", (Object)s, (Object)exception);
+				VariousTypes.LOGGER.warn("Failed to parse ability custom name {}", (Object)s, (Object)exception);
 			}
 		}
 		return ability.name(this);

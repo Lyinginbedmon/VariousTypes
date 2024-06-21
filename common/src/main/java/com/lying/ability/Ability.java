@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 
 /** A distinct gameplay-modifying property */
-public abstract class Ability
+public class Ability
 {
 	private final Identifier registryName;
 	

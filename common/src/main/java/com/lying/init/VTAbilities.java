@@ -6,9 +6,10 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Supplier;
+import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
-import com.lying.reference.Reference;
+import com.lying.reference.Reference.ModInfo;
 
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
@@ -17,8 +18,15 @@ public class VTAbilities
 {
 	private static final Map<Identifier, Supplier<Ability>> ABILITIES = new HashMap<>();
 	
+	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new Ability(prefix("night_vision")));
+	public static final Supplier<Ability> SWIM		= register("swim", () -> new Ability(prefix("swim")));
+	public static final Supplier<Ability> FLY		= register("fly", () -> new Ability(prefix("fly")));
+	public static final Supplier<Ability> BURROW	= register("burrow", () -> new Ability(prefix("burrow")));
+	public static final Supplier<Ability> TELEPORT	= register("teleport", () -> new Ability(prefix("teleport")));
+	public static final Supplier<Ability> GHOSTLY	= register("ghostly", () -> new Ability(prefix("ghostly")));
+	
 	/** An ability that does nothing but which can be given a custom map name */
-	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(withName("dummy"))
+	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"))
 	{
 		public Identifier mapName(AbilityInstance instance)
 		{
@@ -28,15 +36,15 @@ public class VTAbilities
 		}
 	});
 	
-	private static Identifier withName(String name) { return new Identifier(Reference.ModInfo.MOD_ID, name); }
+	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	
 	public static Supplier<Ability> register(String name, Supplier<Ability> ability)
 	{
-		ABILITIES.put(withName(name), ability);
+		ABILITIES.put(prefix(name), ability);
 		return ability;
 	}
 	
-	public static void init() { }
+	public static void init() { VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities"); }
 	
 	@Nullable
 	public static Ability get(Identifier registryName)

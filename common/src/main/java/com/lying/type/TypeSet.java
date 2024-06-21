@@ -12,8 +12,9 @@ import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.type.Type.Tier;
 
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of unique types */
@@ -31,10 +32,10 @@ public class TypeSet
 	
 	public TypeSet copy() { return new TypeSet(types.toArray(new Type[0])); }
 	
-	public NbtList writeToNbt()
+	public NbtList writeToNbt(DynamicRegistryManager manager)
 	{
 		NbtList list = new NbtList();
-		types.forEach(type -> list.add(NbtString.of(type.registryName().toString())));
+		types.forEach(type -> list.add(type.writeToNbt(new NbtCompound(), manager)));
 		return list;
 	}
 	
@@ -43,9 +44,14 @@ public class TypeSet
 		TypeSet set = new TypeSet();
 		for(int i=0; i<list.size(); i++)
 		{
-			Type inst = VTTypes.get(new Identifier(list.getString(i)));
+			NbtCompound data = list.getCompound(i);
+			Type inst = VTTypes.get(new Identifier(data.getString("Type")));
 			if(inst != null)
+			{
+				data.remove("Type");
+				inst.read(data);
 				set.add(inst);
+			}
 		}
 		return set;
 	}
@@ -76,7 +82,7 @@ public class TypeSet
 	
 	public boolean contains(Type typeIn)
 	{
-		return types.contains(typeIn);
+		return types.stream().anyMatch(type -> type.listID().equals(typeIn.listID()));
 	}
 	
 	public boolean containsAny(Type... typesIn)
@@ -87,9 +93,10 @@ public class TypeSet
 		return false;
 	}
 	
+	/** Adds the given type if it does not already exist in the set and is mutually compatible with all others */
 	public boolean add(Type typeIn)
 	{
-		return types.stream().allMatch(type -> type.compatibleWith(typeIn)) ? types.add(typeIn) : false;
+		return !contains(typeIn) && types.stream().allMatch(type -> type.compatibleWith(typeIn) && typeIn.compatibleWith(type)) ? types.add(typeIn) : false;
 	}
 	
 	public boolean remove(Type typeIn)

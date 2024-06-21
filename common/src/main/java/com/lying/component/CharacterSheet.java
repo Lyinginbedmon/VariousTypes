@@ -11,18 +11,23 @@ import com.google.common.collect.Lists;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilitySet;
+import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.species.SpeciesRegistry;
 import com.lying.template.Template;
 import com.lying.template.TemplateRegistry;
 import com.lying.type.TypeSet;
+import com.lying.utility.ServerBus;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
 public class CharacterSheet
 {
@@ -31,9 +36,11 @@ public class CharacterSheet
 	private TypeSet customTypes = new TypeSet();
 	private AbilitySet customAbilities = new AbilitySet();
 	
-	private TypeSet types = new TypeSet();
-	private Species species = null;
+	private RegistryKey<World> home = World.OVERWORLD;
+	private Species species = SpeciesRegistry.get(Reference.ModInfo.prefix("human"));
 	private List<Template> templates = Lists.newArrayList();
+	
+	private TypeSet types = new TypeSet();
 	private AbilitySet abilities;
 	
 	public CharacterSheet(LivingEntity ownerIn)
@@ -44,16 +51,14 @@ public class CharacterSheet
 	public CharacterSheet copy(LivingEntity ownerIn)
 	{
 		CharacterSheet clone = new CharacterSheet(ownerIn);
-		clone.customTypes = customTypes.copy();
-		clone.customAbilities = customAbilities;
-		clone.types = types.copy();
-		clone.templates = templates;
-		clone.abilities = abilities;
+		clone.readFromNbt(this.writeToNbt(new NbtCompound()));
 		return clone;
 	}
 	
 	public NbtCompound writeToNbt(NbtCompound compound)
 	{
+		compound.putString("Home", home.getValue().toString());
+		
 		if(species != null)
 			compound.putString("Species", species.registryName().toString());
 		
@@ -65,7 +70,7 @@ public class CharacterSheet
 		}
 		
 		if(!customTypes.isEmpty())
-			compound.put("CustomTypes", customTypes.writeToNbt());
+			compound.put("CustomTypes", customTypes.writeToNbt(owner.getWorld().getRegistryManager()));
 		
 		if(!customAbilities.isEmpty())
 			compound.put("CustomAbilities", customAbilities.writeToNbt());
@@ -75,6 +80,8 @@ public class CharacterSheet
 	
 	public void readFromNbt(NbtCompound compound)
 	{
+		home = RegistryKey.of(RegistryKeys.WORLD, new Identifier(compound.getString("Home")));
+		
 		if(compound.contains("Species", NbtElement.STRING_TYPE))
 			species = SpeciesRegistry.get(new Identifier(compound.getString("Species")));
 		
@@ -96,6 +103,13 @@ public class CharacterSheet
 			customAbilities = AbilitySet.readFromNbt(compound.getList("CustomAbilities", NbtElement.COMPOUND_TYPE));
 		
 		buildSheet();
+	}
+	
+	public void setHomeDimension(RegistryKey<World> world) { home = world; }
+	
+	public RegistryKey<World> getHome()
+	{
+		return species == null ? home : species.homeDimension();
 	}
 	
 	public void setSpecies(@Nullable Species speciesIn)
@@ -131,7 +145,7 @@ public class CharacterSheet
 		buildSheet();
 	}
 	
-	public TypeSet getTypes() { return types; }
+	public TypeSet getTypes() { return types.copy(); }
 	
 	public AbilitySet getAbilities() { return abilities; }
 	
@@ -158,19 +172,7 @@ public class CharacterSheet
 		for(Template template : templates)
 			template.applyTypeOperations(types);
 		
-		AbilitySet abilities = species.abilities().copy();
-		
-		// Add abilities from types
-		types.abilities().forEach(inst -> abilities.add(inst.copy()));
-		
-		// Apply templates to abilities
-		for(Template template : templates)
-			template.applyAbilityOperations(abilities);
-		
-		// Add all custom abilities
-		if(!customAbilities.isEmpty())
-			customAbilities.abilities().forEach(inst -> abilities.add(inst.copy()));
-		
+		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(owner, home, types);
 		this.types = types;
 	}
 	
