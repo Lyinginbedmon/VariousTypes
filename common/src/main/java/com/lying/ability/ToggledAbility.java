@@ -1,8 +1,17 @@
 package com.lying.ability;
 
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
+
 public abstract class ToggledAbility extends ActivatedAbility
 {
-	public NbtCompound initialiseNBT(NBTCompound data)
+	public ToggledAbility(Identifier regName)
+	{
+		super(regName);
+	}
+	
+	public NbtCompound initialiseNBT(NbtCompound data)
 	{
 		data.putBoolean("IsActive", false);
 		return data;
@@ -12,7 +21,7 @@ public abstract class ToggledAbility extends ActivatedAbility
 	{
 		NbtCompound mem = instance.memory();
 		mem.putBoolean("IsActive", !isActive(instance));
-		mem.setMemory(mem);
+		instance.setMemory(mem);
 	}
 	
 	public boolean isActive(AbilityInstance instance)
