@@ -10,7 +10,9 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
+import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilitySet;
+import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.species.SpeciesRegistry;
@@ -21,6 +23,7 @@ import com.lying.type.TypeSet;
 import com.lying.utility.ServerBus;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -41,9 +44,9 @@ public class CharacterSheet
 	private Species species = SpeciesRegistry.get(Reference.ModInfo.prefix("human"));
 	private List<Template> templates = Lists.newArrayList();
 	
-	private ActionHandler actions = ActionHandler.of();
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities;
+	private ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 	
 	public CharacterSheet(LivingEntity ownerIn)
 	{
@@ -195,8 +198,11 @@ public class CharacterSheet
 		if(!customAbilities.isEmpty())
 			customAbilities.abilities().forEach(inst -> abilities.add(inst.copy()));
 		
+		// Rebuild actions, including what fluids are breathable
 		this.abilities = abilities;
 		buildActions();
+		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
+			this.abilities.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(actions, inst));
 	}
 	
 	public void buildActions()
@@ -205,6 +211,8 @@ public class CharacterSheet
 		types.contents().forEach(type -> type.actions().stack(actions, this.types));
 		ServerBus.GET_ACTIONS_EVENT.invoker().affectActions(actions, types);
 	}
+	
+	public boolean isAbleToBreathe(Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || actions.canBreathe(fluid); }
 	
 	public boolean addCustomAbility(Ability ability)
 	{

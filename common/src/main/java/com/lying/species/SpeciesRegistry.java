@@ -20,7 +20,7 @@ public class SpeciesRegistry
 	private static final Map<Identifier, Supplier<Species>> DEFAULTS = new HashMap<>();
 	
 	public static final Supplier<Species> HUMAN = register(prefix("human"), () -> Species.Builder.of(prefix("human"))
-			.setTypes(VTTypes.HUMAN.get(), VTTypes.MUINTIR).build());
+			.setTypes(VTTypes.HUMAN.get(), VTTypes.LINN).build());
 	
 	// Enderman
 	public static final Supplier<Species> CRIOCH = register(prefix("crioch"), () -> Species.Builder.of(prefix("crioch"))

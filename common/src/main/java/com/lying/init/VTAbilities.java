@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
+import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityInstance;
 import com.lying.reference.Reference.ModInfo;
 
@@ -18,13 +19,14 @@ public class VTAbilities
 {
 	private static final Map<Identifier, Supplier<Ability>> ABILITIES = new HashMap<>();
 	
+	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", () -> new AbilityBreathing.Allow(prefix("breathe_in_fluid")));
+	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", () -> new AbilityBreathing.Deny(prefix("suffocate_in_fluid")));
 	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new Ability(prefix("night_vision")));
-	public static final Supplier<Ability> SWIM		= register("swim", () -> new Ability(prefix("swim")));
-	public static final Supplier<Ability> FLY		= register("fly", () -> new Ability(prefix("fly")));
-	public static final Supplier<Ability> BURROW	= register("burrow", () -> new Ability(prefix("burrow")));
-	public static final Supplier<Ability> TELEPORT	= register("teleport", () -> new Ability(prefix("teleport")));
-	public static final Supplier<Ability> GHOSTLY	= register("ghostly", () -> new Ability(prefix("ghostly")));
-	public static final Supplier<Ability> BREATHE_FLUID	= register("breathe_fluid", () -> new Ability(prefix("breathe_fluid")));
+	public static final Supplier<Ability> SWIM			= register("swim", () -> new Ability(prefix("swim")));
+	public static final Supplier<Ability> FLY			= register("fly", () -> new Ability(prefix("fly")));
+	public static final Supplier<Ability> BURROW		= register("burrow", () -> new Ability(prefix("burrow")));
+	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new Ability(prefix("teleport")));
+	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new Ability(prefix("ghostly")));
 	
 	/** An ability that does nothing but which can be given a custom map name */
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"))

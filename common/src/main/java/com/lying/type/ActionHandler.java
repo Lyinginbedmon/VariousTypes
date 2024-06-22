@@ -9,13 +9,13 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 import net.minecraft.fluid.Fluid;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.util.Identifier;
 
 public class ActionHandler
 {
 	/** The set of actions most commonly available to creatures */
-	public static final ActionHandler STANDARD_SET = ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.SLEEP.get(), Action.REGEN.get());
+	public static final ActionHandler STANDARD_SET = ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.SLEEP.get(), Action.REGEN.get()).allowBreathe(Fluids.EMPTY);
 	public static final ActionHandler REGEN_ONLY = ActionHandler.of(Action.REGEN.get());
 	public static final ActionHandler NONE = new ActionHandler();
 	
@@ -24,6 +24,7 @@ public class ActionHandler
 	
 	/** Unique list of actions */
 	private final Map<Identifier, Action> activeActions = new HashMap<>();
+	private final List<Fluid> breathableFluids = Lists.newArrayList();
 	
 	private ActionHandler() { }
 	
@@ -32,6 +33,7 @@ public class ActionHandler
 		ActionHandler handler = new ActionHandler();
 		handler.operations.addAll(operations);
 		handler.activeActions.putAll(activeActions);
+		handler.breathableFluids.addAll(breathableFluids);
 		return handler;
 	}
 	
@@ -39,6 +41,7 @@ public class ActionHandler
 	{
 		operations.clear();
 		activeActions.clear();
+		breathableFluids.clear();
 	}
 	
 	public static ActionHandler of(Action... actionsIn)
@@ -69,9 +72,23 @@ public class ActionHandler
 	
 	public boolean cannot(Action action) { return !can(action); }
 	
-	public boolean canBreathe(RegistryKey<Fluid> fluid)
+	public boolean canBreathe(Fluid fluid)
 	{
-		return can(Action.BREATHE.get());
+		return can(Action.BREATHE.get()) && (breathableFluids.isEmpty() && fluid == Fluids.EMPTY || breathableFluids.contains(fluid));
+	}
+	
+	public ActionHandler allowBreathe(Fluid fluid)
+	{
+		if(!breathableFluids.contains(fluid))
+			breathableFluids.add(fluid);
+		return this;
+	}
+	
+	public ActionHandler denyBreathe(Fluid fluid)
+	{
+		if(breathableFluids.contains(fluid))
+			breathableFluids.remove(fluid);
+		return this;
 	}
 	
 	public void stack(ActionHandler handler, TypeSet types)
