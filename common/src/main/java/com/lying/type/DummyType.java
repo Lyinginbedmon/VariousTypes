@@ -1,10 +1,7 @@
 package com.lying.type;
 
-import java.util.function.Function;
-
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
@@ -20,9 +17,9 @@ public class DummyType extends Type
 	protected Identifier listID;
 	protected Text displayName = null;
 	
-	protected DummyType(Identifier nameIn, Tier tierIn, AbilitySet abilitiesIn, Predicate<Type> compIn, Identifier listID, @Nullable Text displayNameIn)
+	protected DummyType(Identifier nameIn, Identifier listID, @Nullable Text displayNameIn)
 	{
-		super(nameIn, tierIn, abilitiesIn, compIn);
+		super(nameIn, Tier.SUBTYPE, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
 		listID = nameIn;
 		displayName = displayNameIn;
 		data.putString("ID", listID.toString());
@@ -30,7 +27,7 @@ public class DummyType extends Type
 	
 	public static DummyType create(Identifier listID, @Nullable Text displayName)
 	{
-		return new DummyType(VTTypes.DUMMY.get().registryName(), Tier.SUBTYPE, new AbilitySet(), Predicates.alwaysTrue(), listID, displayName);
+		return new DummyType(VTTypes.DUMMY.get().registryName(), listID, displayName);
 	}
 	
 	public Identifier listID() { return listID; }
@@ -68,27 +65,22 @@ public class DummyType extends Type
 	
 	public static class Builder extends Type.Builder
 	{
-		private static final Function<Builder, Type> BUILD = builder -> 
-		{
-			DummyType type = new DummyType(builder.name, builder.tier, builder.abilities, builder.compCheck, builder.spoofName, builder.display);
-			return type;
-		};
 		protected Text display;
 		protected Identifier spoofName;
 		
-		protected Builder(Identifier nameIn, Tier tierIn)
+		protected Builder(Identifier nameIn)
 		{
-			super(nameIn, tierIn);
+			super(nameIn, Tier.SUBTYPE);
 		}
 		
-		public static Builder of(Identifier nameIn, Tier tierIn)
+		public static Builder of(Identifier nameIn)
 		{
-			return of(nameIn, tierIn, nameIn, null);
+			return of(nameIn, nameIn, null);
 		}
 		
-		public static Builder of(Identifier nameIn, Tier tierIn, Identifier idIn, Text displayIn)
+		public static Builder of(Identifier nameIn, Identifier idIn, Text displayIn)
 		{
-			Builder builder = new Builder(nameIn, tierIn);
+			Builder builder = new Builder(nameIn);
 			builder.spoofName = idIn;
 			builder.display = displayIn;
 			return builder;
@@ -96,7 +88,7 @@ public class DummyType extends Type
 		
 		public Type build()
 		{
-			return build(BUILD);
+			return new DummyType(name, spoofName, display);
 		}
 	}
 }

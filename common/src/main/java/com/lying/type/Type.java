@@ -2,9 +2,9 @@ package com.lying.type;
 
 import java.util.Collection;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.apache.commons.lang3.function.Consumers;
+import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -26,14 +26,16 @@ public class Type
 {
 	protected final Identifier registryName;
 	protected final Tier tier;
-	protected final AbilitySet defaultAbilities;
+	protected final ActionHandler actions;
+	protected final AbilitySet abilities;
 	protected final Predicate<Type> compatibilityCheck;
 	
-	protected Type(Identifier nameIn, Tier tierIn, AbilitySet abilitiesIn, Predicate<Type> compIn)
+	protected Type(Identifier nameIn, Tier tierIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
 	{
 		registryName = nameIn;
 		tier = tierIn;
-		defaultAbilities = abilitiesIn.copy();
+		actions = actionsIn.copy();
+		abilities = abilitiesIn.copy();
 		compatibilityCheck = compIn;
 	}
 	
@@ -46,7 +48,10 @@ public class Type
 	
 	public Text displayName(DynamicRegistryManager manager) { return Text.translatable("type."+registryName.getNamespace()+"."+registryName.getPath()); }
 	
-	public final Collection<AbilityInstance> abilities() { return this.defaultAbilities.abilities(); }
+	public final Collection<AbilityInstance> abilities() { return abilities.abilities(); }
+	
+	@Nullable
+	public final ActionHandler actions() { return actions.copy(); }
 	
 	public boolean compatibleWith(Type other) { return compatibilityCheck.apply(other); }
 	
@@ -69,20 +74,37 @@ public class Type
 	
 	public static class Builder
 	{
-		protected Identifier name;
-		protected Tier tier;
+		protected final Identifier name;
+		protected final Tier tier;
 		protected final AbilitySet abilities = new AbilitySet();
+		protected ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 		protected Predicate<Type> compCheck = Predicates.alwaysTrue();
 		
 		protected Builder(Identifier nameIn, Tier tierIn)
 		{
 			name = nameIn;
 			tier = tierIn;
+			switch(tier)
+			{
+				case SUBTYPE:
+					actions = ActionHandler.of();
+					break;
+				case SUPERTYPE:
+				default:
+					actions = ActionHandler.STANDARD_SET.copy();
+					break;
+			}
 		}
 		
 		public static Builder of(Identifier nameIn, Tier tierIn)
 		{
 			return new Builder(nameIn, tierIn);
+		}
+		
+		public Builder setActions(ActionHandler handler)
+		{
+			actions = handler.copy();
+			return this;
 		}
 		
 		public Builder addAbility(Ability ability)
@@ -104,12 +126,7 @@ public class Type
 		
 		public Type build()
 		{
-			return build(builder -> new Type(builder.name, builder.tier, builder.abilities, builder.compCheck));
-		}
-		
-		protected <T extends Builder> Type build(Function<T, Type> supplier)
-		{
-			return new Type(name, tier, abilities, compCheck);
+			return new Type(name, tier, abilities, actions, compCheck);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.lying.utility;
 
 import com.lying.init.VTTypes;
+import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
 
 import dev.architectury.event.Event;
@@ -17,6 +18,14 @@ public class ServerBus
 	public interface GetTypesEvent
 	{
 		void affectTypes(LivingEntity entity, RegistryKey<World> homeDimension, TypeSet types);
+	}
+	
+	public static final Event<GetActionsEvent> GET_ACTIONS_EVENT = EventFactory.createLoop(GetActionsEvent.class);
+	
+	@FunctionalInterface
+	public interface GetActionsEvent
+	{
+		void affectActions(ActionHandler handler, TypeSet types);
 	}
 	
 	public static void init()

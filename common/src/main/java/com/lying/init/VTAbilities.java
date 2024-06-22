@@ -24,6 +24,7 @@ public class VTAbilities
 	public static final Supplier<Ability> BURROW	= register("burrow", () -> new Ability(prefix("burrow")));
 	public static final Supplier<Ability> TELEPORT	= register("teleport", () -> new Ability(prefix("teleport")));
 	public static final Supplier<Ability> GHOSTLY	= register("ghostly", () -> new Ability(prefix("ghostly")));
+	public static final Supplier<Ability> BREATHE_FLUID	= register("breathe_fluid", () -> new Ability(prefix("breathe_fluid")));
 	
 	/** An ability that does nothing but which can be given a custom map name */
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"))

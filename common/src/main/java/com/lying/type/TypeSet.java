@@ -93,6 +93,15 @@ public class TypeSet
 		return false;
 	}
 	
+	/** Returns a list of all types in this set, in order of supertype -> subtype */
+	public List<Type> contents()
+	{
+		List<Type> types = Lists.newArrayList();
+		for(Tier tier : Tier.values())
+			this.types.stream().filter(type -> type.tier() == tier).forEach(type -> types.add(type));
+		return types;
+	}
+	
 	/** Adds the given type if it does not already exist in the set and is mutually compatible with all others */
 	public boolean add(Type typeIn)
 	{

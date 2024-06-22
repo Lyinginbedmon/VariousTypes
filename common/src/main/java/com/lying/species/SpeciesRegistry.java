@@ -39,6 +39,6 @@ public class SpeciesRegistry
 	@Nullable
 	public static Species get(Identifier registryName)
 	{
-		return SPECIES.getOrDefault(registryName, null);
+		return SPECIES.getOrDefault(registryName, HUMAN.get());
 	}
 }

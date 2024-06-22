@@ -5,12 +5,17 @@ import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.reference.Reference.ModInfo;
+import com.lying.type.Action;
+import com.lying.type.ActionHandler;
+import com.lying.type.ActionHandler.Operation;
 import com.lying.type.DummyType;
 import com.lying.type.Type;
 import com.lying.type.Type.Tier;
+import com.lying.type.TypeSet;
 
 import net.minecraft.util.Identifier;
 
@@ -18,26 +23,37 @@ public class VTTypes
 {
 	private static final Map<Identifier, Supplier<Type>> TYPES = new HashMap<>();
 	
+	private static final Predicate<TypeSet> IS_OTHALL = types -> types.contains(VTTypes.OTHALL.get());
+	
 	public static final Supplier<Type> ANIMAL	= register("animal", () -> Type.Builder.of(prefix("animal"), Tier.SUPERTYPE).build());
 	public static final Supplier<Type> ADUAIN	= register("aduain", () -> Type.Builder.of(prefix("aduain"), Tier.SUPERTYPE)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> ARTHROPOD	= register("arthropod", () -> Type.Builder.of(prefix("arthropod"), Tier.SUPERTYPE)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> CONSTRUCT	= register("construct", () -> Type.Builder.of(prefix("construct"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> DRAGON	= register("dragon", () -> Type.Builder.of(prefix("dragon"), Tier.SUPERTYPE)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> ELEMENT	= register("element", () -> Type.Builder.of(prefix("element"), Tier.SUPERTYPE).build());
+	public static final Supplier<Type> ELEMENT	= register("element", () -> Type.Builder.of(prefix("element"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.REGEN_ONLY).build());
 	public static final Supplier<Type> FAE		= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).build());
 	public static final Supplier<Type> HUMAN	= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).build());
-	public static final Supplier<Type> OOZE		= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).build());
+	public static final Supplier<Type> OOZE		= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get())).build());
 	public static final Supplier<Type> OTHALL	= register("othall", () -> Type.Builder.of(prefix("othall"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.REGEN.get()))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> PLANT	= register("plant", () -> Type.Builder.of(prefix("plant"), Tier.SUPERTYPE).build());
+	public static final Supplier<Type> PLANT	= register("plant", () -> Type.Builder.of(prefix("plant"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.SLEEP.get(), Action.REGEN.get())).build());
 	public static final Supplier<Type> UNDEAD	= register("undead", () -> Type.Builder.of(prefix("undead"), Tier.SUPERTYPE)
+			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	
-	public static final Supplier<Type> NATIVE	= register("native", () -> Type.Builder.of(prefix("native"), Tier.SUBTYPE).build());
+	public static final Supplier<Type> NATIVE	= register("native", () -> Type.Builder.of(prefix("native"), Tier.SUBTYPE)
+			.setActions(ActionHandler.of()
+				.add(Operation.add(IS_OTHALL, Action.EAT.get()))
+				.add(Operation.add(IS_OTHALL, Action.SLEEP.get()))).build());
 	public static final Supplier<Type> OTHAKIN	= register("othakin", () -> Type.Builder.of(prefix("othakin"), Tier.SUBTYPE).build());
 	public static final Supplier<Type> ALTERED	= register("altered", () -> Type.Builder.of(prefix("altered"), Tier.SUBTYPE).build());
 	public static final Supplier<Type> AIR		= register("air", () -> Type.Builder.of(prefix("air"), Tier.SUBTYPE)
@@ -52,7 +68,8 @@ public class VTTypes
 	public static final Supplier<Type> SPECTRAL	= register("spectral", () -> Type.Builder.of(prefix("spectral"), Tier.SUBTYPE)
 			.addAbility(VTAbilities.GHOSTLY.get()).build());
 	
-	public static final Supplier<Type> DUMMY	= register("dummy", () -> DummyType.Builder.of(prefix("dummy"), Tier.SUBTYPE).build());
+	/** */
+	public static final Supplier<Type> DUMMY	= register("dummy", () -> DummyType.Builder.of(prefix("dummy")).build());
 	
 	public static final Type GOBLINOID	= dummyType("goblinoid");
 	public static final Type MUINTIR	= dummyType("muintir");	// Villagers

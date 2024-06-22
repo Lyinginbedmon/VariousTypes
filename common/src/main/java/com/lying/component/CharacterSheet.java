@@ -16,6 +16,7 @@ import com.lying.species.Species;
 import com.lying.species.SpeciesRegistry;
 import com.lying.template.Template;
 import com.lying.template.TemplateRegistry;
+import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
 import com.lying.utility.ServerBus;
 
@@ -40,6 +41,7 @@ public class CharacterSheet
 	private Species species = SpeciesRegistry.get(Reference.ModInfo.prefix("human"));
 	private List<Template> templates = Lists.newArrayList();
 	
+	private ActionHandler actions = ActionHandler.of();
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities;
 	
@@ -157,6 +159,7 @@ public class CharacterSheet
 		// Types are calculated first for efficiency-sake
 		buildTypes();
 		buildAbilities();
+		buildActions();
 	}
 	
 	public void buildTypes()
@@ -174,6 +177,7 @@ public class CharacterSheet
 		
 		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(owner, home, types);
 		this.types = types;
+		buildActions();
 	}
 	
 	public void buildAbilities()
@@ -192,6 +196,14 @@ public class CharacterSheet
 			customAbilities.abilities().forEach(inst -> abilities.add(inst.copy()));
 		
 		this.abilities = abilities;
+		buildActions();
+	}
+	
+	public void buildActions()
+	{
+		actions.clear();
+		types.contents().forEach(type -> type.actions().stack(actions, this.types));
+		ServerBus.GET_ACTIONS_EVENT.invoker().affectActions(actions, types);
 	}
 	
 	public boolean addCustomAbility(Ability ability)
