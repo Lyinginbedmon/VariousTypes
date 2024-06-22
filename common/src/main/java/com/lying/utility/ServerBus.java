@@ -1,5 +1,6 @@
 package com.lying.utility;
 
+import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
@@ -20,12 +21,16 @@ public class ServerBus
 		void affectTypes(LivingEntity entity, RegistryKey<World> homeDimension, TypeSet types);
 	}
 	
-	public static final Event<GetActionsEvent> GET_ACTIONS_EVENT = EventFactory.createLoop(GetActionsEvent.class);
+	/**
+	 * Called by CharacterSheet after actions are reconstructed to allow abilities to affect them.<br>
+	 * This is called after Types are applied and after AbilityBreathing abilities are accounted for.
+	 */
+	public static final Event<RebuildActionsEvent> AFTER_REBUILD_ACTIONS_EVENT = EventFactory.createLoop(RebuildActionsEvent.class);
 	
 	@FunctionalInterface
-	public interface GetActionsEvent
+	public interface RebuildActionsEvent
 	{
-		void affectActions(ActionHandler handler, TypeSet types);
+		void affectActions(ActionHandler handler, AbilitySet abilities, LivingEntity owner);
 	}
 	
 	public static void init()

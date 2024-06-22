@@ -64,7 +64,6 @@ public class VTTypes
 			.addAbility(VTAbilities.BURROW.get()).build());
 	public static final Supplier<Type> FIRE				= register("fire", () -> Type.Builder.of(prefix("fire"), Tier.SUBTYPE).build());
 	public static final Supplier<Type> WATER			= register("water", () -> Type.Builder.of(prefix("water"), Tier.SUBTYPE)
-			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())
 			.addAbility(VTAbilities.SWIM.get()).build());
 	public static final Supplier<Type> AQUATIC			= register("aquatic", () -> Type.Builder.of(prefix("aquatic"), Tier.SUBTYPE)

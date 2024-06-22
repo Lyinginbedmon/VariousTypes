@@ -26,6 +26,8 @@ public class ActionHandler
 	private final Map<Identifier, Action> activeActions = new HashMap<>();
 	private final List<Fluid> breathableFluids = Lists.newArrayList();
 	
+	private boolean isDirty = false;
+	
 	private ActionHandler() { }
 	
 	public ActionHandler copy()
@@ -42,6 +44,7 @@ public class ActionHandler
 		operations.clear();
 		activeActions.clear();
 		breathableFluids.clear();
+		isDirty = false;
 	}
 	
 	public static ActionHandler of(Action... actionsIn)
@@ -51,6 +54,11 @@ public class ActionHandler
 			handler.operations.add(Operation.add(action));
 		return handler;
 	}
+	
+	public void markDirty() { isDirty = true; }
+	
+	/** Returns true if this handler needs to be recalculated in a CharacterSheet */
+	public boolean isDirty() { return isDirty; }
 	
 	public ActionHandler add(Operation operation)
 	{

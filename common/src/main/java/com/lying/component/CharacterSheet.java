@@ -18,6 +18,7 @@ import com.lying.species.Species;
 import com.lying.species.SpeciesRegistry;
 import com.lying.template.Template;
 import com.lying.template.TemplateRegistry;
+import com.lying.type.Action;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
 import com.lying.utility.ServerBus;
@@ -114,7 +115,7 @@ public class CharacterSheet
 	
 	public RegistryKey<World> getHome()
 	{
-		return species == null ? home : species.homeDimension();
+		return species == null || !species.hasConfiguredHome() ? home : species.homeDimension();
 	}
 	
 	public void setSpecies(@Nullable Species speciesIn)
@@ -133,6 +134,7 @@ public class CharacterSheet
 		templates.add(templateIn);
 		templateIn.applyTypeOperations(types);
 		buildAbilities();
+		buildActions();
 	}
 	
 	public void removeTemplate(@NotNull Template templateIn)
@@ -159,14 +161,18 @@ public class CharacterSheet
 	/** Constructs the types and abilities from scratch */
 	public void buildSheet()
 	{
-		// Types are calculated first for efficiency-sake
+		// Types are calculated first, before abilities, for efficiency-sake
 		buildTypes();
 		buildAbilities();
-		buildActions();
+		
+		if(actions.isDirty())
+			buildActions();
 	}
 	
+	/** Constructs the types based on species, custom types, and applied templates */
 	public void buildTypes()
 	{
+		// Source initial types from species, if any
 		TypeSet types = species == null ? new TypeSet() : species.types().copy();
 		
 		// Apply all custom types
@@ -180,9 +186,11 @@ public class CharacterSheet
 		
 		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(owner, home, types);
 		this.types = types;
-		buildActions();
+		this.actions.markDirty();
 	}
 	
+	
+	/** Constructs available abilities based on types, species, applied templates, and custom abilities */
 	public void buildAbilities()
 	{
 		AbilitySet abilities = species == null ? new AbilitySet() : species.abilities().copy();
@@ -200,17 +208,22 @@ public class CharacterSheet
 		
 		// Rebuild actions, including what fluids are breathable
 		this.abilities = abilities;
-		buildActions();
-		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
-			this.abilities.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(actions, inst));
+		this.actions.markDirty();
 	}
 	
+	/** Constructs enabled actions based on types and abilities, incl. determining what fluids are breathable */
 	public void buildActions()
 	{
 		actions.clear();
 		types.contents().forEach(type -> type.actions().stack(actions, this.types));
-		ServerBus.GET_ACTIONS_EVENT.invoker().affectActions(actions, types);
+		
+		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
+			this.abilities.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(actions, inst));
+		
+		ServerBus.AFTER_REBUILD_ACTIONS_EVENT.invoker().affectActions(actions, abilities, owner);
 	}
+	
+	public boolean hasAction(Action action) { return actions.can(action); }
 	
 	public boolean isAbleToBreathe(Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || actions.canBreathe(fluid); }
 	

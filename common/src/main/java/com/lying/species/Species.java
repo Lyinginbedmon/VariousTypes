@@ -33,6 +33,8 @@ public class Species
 	
 	public RegistryKey<World> homeDimension() { return homeDim; }
 	
+	public boolean hasConfiguredHome() { return homeDim != null; }
+	
 	public TypeSet types() { return types.copy(); }
 	
 	public AbilitySet abilities() { return abilities.copy(); }
@@ -41,7 +43,7 @@ public class Species
 	{
 		private Identifier id;
 		
-		private RegistryKey<World> homeDim = World.OVERWORLD;
+		private RegistryKey<World> homeDim = null;
 		private TypeSet types = new TypeSet();
 		private AbilitySet abilities = new AbilitySet();
 		

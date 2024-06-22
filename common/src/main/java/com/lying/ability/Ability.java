@@ -37,6 +37,9 @@ public class Ability
 	
 	public Text name(AbilityInstance instance) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+"."+registryName.getPath()); }
 	
+	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
+	public void registerEventHandlers() { }
+	
 	/**
 	 * Where a specific ability instance originates<br>
 	 * This determines which ability is retained if two or more share the same map name

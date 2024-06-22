@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
+import com.lying.ability.AbilityAmphibious;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityInstance;
 import com.lying.reference.Reference.ModInfo;
@@ -21,6 +22,7 @@ public class VTAbilities
 	
 	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", () -> new AbilityBreathing.Allow(prefix("breathe_in_fluid")));
 	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", () -> new AbilityBreathing.Deny(prefix("suffocate_in_fluid")));
+	public static final Supplier<Ability> AMPHIBIOUS		= register("amphibious", () -> new AbilityAmphibious(prefix("amphibious")));
 	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new Ability(prefix("night_vision")));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new Ability(prefix("swim")));
 	public static final Supplier<Ability> FLY			= register("fly", () -> new Ability(prefix("fly")));
@@ -47,7 +49,11 @@ public class VTAbilities
 		return ability;
 	}
 	
-	public static void init() { VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities"); }
+	public static void init()
+	{
+		ABILITIES.values().forEach(entry -> entry.get().registerEventHandlers());
+		VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities");
+	}
 	
 	@Nullable
 	public static Ability get(Identifier registryName)
