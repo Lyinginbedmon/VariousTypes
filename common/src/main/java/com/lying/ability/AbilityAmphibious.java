@@ -1,5 +1,6 @@
 package com.lying.ability;
 
+import com.lying.data.VTTags;
 import com.lying.init.VTAbilities;
 import com.lying.utility.ServerBus;
 
@@ -19,7 +20,7 @@ public class AbilityAmphibious extends Ability
 		{
 			// Adds the ability to breathe air after it may have been denied by other breathing abilities
 			if(!handler.canBreathe(Fluids.EMPTY) && abilities.hasAbility(VTAbilities.AMPHIBIOUS.get().registryName()))
-				handler.allowBreathe(Fluids.EMPTY);
+				handler.allowBreathe(VTTags.AIR);
 		});
 	}
 }

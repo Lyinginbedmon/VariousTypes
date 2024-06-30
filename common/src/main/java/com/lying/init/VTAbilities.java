@@ -24,11 +24,17 @@ public class VTAbilities
 	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", () -> new AbilityBreathing.Deny(prefix("suffocate_in_fluid")));
 	public static final Supplier<Ability> AMPHIBIOUS		= register("amphibious", () -> new AbilityAmphibious(prefix("amphibious")));
 	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new Ability(prefix("night_vision")));
+	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new Ability(prefix("sculk_sight")));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new Ability(prefix("swim")));
+	public static final Supplier<Ability> CLIMB			= register("climb", () -> new Ability(prefix("climb")));
 	public static final Supplier<Ability> FLY			= register("fly", () -> new Ability(prefix("fly")));
 	public static final Supplier<Ability> BURROW		= register("burrow", () -> new Ability(prefix("burrow")));
-	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new Ability(prefix("teleport")));
-	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new Ability(prefix("ghostly")));
+	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new Ability(prefix("teleport")));	// LoS teleport
+	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new Ability(prefix("ghostly")));	// Incorporeal
+	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun")));
+	public static final Supplier<Ability> CRITPROOF		= register("critproof", () -> new Ability(prefix("critproof")));	// Immune to critical hits
+	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic")));	// Immune to poison
+	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new Ability(prefix("regeneration")));
 	
 	/** An ability that does nothing but which can be given a custom map name */
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"))

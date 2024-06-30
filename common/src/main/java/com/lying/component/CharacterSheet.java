@@ -223,6 +223,8 @@ public class CharacterSheet
 		ServerBus.AFTER_REBUILD_ACTIONS_EVENT.invoker().affectActions(actions, abilities, owner);
 	}
 	
+	public ActionHandler getActions() { return actions; }
+	
 	public boolean hasAction(Action action) { return actions.can(action); }
 	
 	public boolean isAbleToBreathe(Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || actions.canBreathe(fluid); }

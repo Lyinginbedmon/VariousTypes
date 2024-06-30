@@ -16,11 +16,14 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.lying.fabric.ExampleModFabric"
+      "com.lying.fabric.VariousTypesFabric"
     ],
     "client": [
-      "com.lying.fabric.client.ExampleModFabricClient"
-    ]
+      "com.lying.fabric.client.VariousTypesFabricClient"
+    ],
+	"fabric-datagen": [
+		"com.lying.fabric.data.VTDataGenerators"
+	]
   },
   "mixins": [
     "vartypes.mixins.json"

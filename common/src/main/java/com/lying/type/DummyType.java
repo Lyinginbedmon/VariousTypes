@@ -17,10 +17,10 @@ public class DummyType extends Type
 	protected Identifier listID;
 	protected Text displayName = null;
 	
-	protected DummyType(Identifier nameIn, Identifier listID, @Nullable Text displayNameIn)
+	protected DummyType(Identifier nameIn, Identifier listIDIn, @Nullable Text displayNameIn)
 	{
 		super(nameIn, Tier.SUBTYPE, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
-		listID = nameIn;
+		listID = listIDIn;
 		displayName = displayNameIn;
 		data.putString("ID", listID.toString());
 	}

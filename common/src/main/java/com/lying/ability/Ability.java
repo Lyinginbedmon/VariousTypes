@@ -32,10 +32,12 @@ public class Ability
 	
 	public Identifier mapName(AbilityInstance instance) { return registryName(); }
 	
+	public boolean isHidden(AbilityInstance instance) { return false; }
+	
 	/** Sets the initial values of any necessary memory values */
 	protected NbtCompound initialiseNBT(NbtCompound data) { return data; }
 	
-	public Text name(AbilityInstance instance) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+"."+registryName.getPath()); }
+	public Text displayName(AbilityInstance instance) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+"."+registryName.getPath()); }
 	
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }

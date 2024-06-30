@@ -6,6 +6,9 @@
   "client": [
   ],
   "mixins": [
+	"EntityMixin",
+	"LivingEntityMixin",
+	"DamageEnchantmentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

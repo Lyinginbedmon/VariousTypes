@@ -3,6 +3,7 @@ package com.lying.type;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -25,10 +26,12 @@ public class TypeSet
 	public TypeSet(Type... typesIn)
 	{
 		for(Type type : typesIn)
-			types.add(type);
+			add(type);
 	}
 	
 	public boolean isEmpty() { return types.isEmpty(); }
+	
+	public void clear() { types.clear(); }
 	
 	public TypeSet copy() { return new TypeSet(types.toArray(new Type[0])); }
 	
@@ -105,12 +108,22 @@ public class TypeSet
 	/** Adds the given type if it does not already exist in the set and is mutually compatible with all others */
 	public boolean add(Type typeIn)
 	{
-		return !contains(typeIn) && types.stream().allMatch(type -> type.compatibleWith(typeIn) && typeIn.compatibleWith(type)) ? types.add(typeIn) : false;
+		return typeIn != null && !contains(typeIn) && types.stream().allMatch(type -> type.compatibleWith(typeIn) && typeIn.compatibleWith(type)) ? types.add(typeIn) : false;
 	}
 	
 	public boolean remove(Type typeIn)
 	{
 		return types.remove(typeIn);
+	}
+	
+	public void removeAll(Collection<Type> typesIn)
+	{
+		types.removeAll(typesIn);
+	}
+	
+	public void removeIf(Predicate<Type> condition)
+	{
+		types.removeIf(condition);
 	}
 	
 	/**

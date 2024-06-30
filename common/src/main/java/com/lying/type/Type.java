@@ -48,7 +48,15 @@ public class Type
 	
 	public Text displayName(DynamicRegistryManager manager) { return Text.translatable("type."+registryName.getNamespace()+"."+registryName.getPath()); }
 	
-	public final Collection<AbilityInstance> abilities() { return abilities.abilities(); }
+	/**
+	 * Returns a collection ability instances compiled both from this type itself and from the action handler.
+	 */
+	public final Collection<AbilityInstance> abilities()
+	{
+		AbilitySet fullMap = abilities.copy();
+		this.actions.abilities().forEach(ability -> fullMap.add(ability));
+		return fullMap.abilities();
+	}
 	
 	@Nullable
 	public final ActionHandler actions() { return actions.copy(); }

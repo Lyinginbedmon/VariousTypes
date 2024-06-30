@@ -13,9 +13,9 @@ import com.lying.init.VTAbilities;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
 
 /** A unique instance of a given ability */
 public class AbilityInstance
@@ -39,23 +39,6 @@ public class AbilityInstance
 		dataModifier.accept(memory);
 	}
 	
-	public Text displayName(World world)
-	{
-		if(display.contains("CustomName", NbtElement.COMPOUND_TYPE))
-		{
-			String s = display.getString("CustomName");
-			try
-			{
-				return (Text)Text.Serialization.fromJson((String)s, world.getRegistryManager());
-			}
-			catch (Exception exception)
-			{
-				VariousTypes.LOGGER.warn("Failed to parse ability custom name {}", (Object)s, (Object)exception);
-			}
-		}
-		return ability.name(this);
-	}
-	
 	/** The variable map name for this specific ability instance */
 	public Identifier mapName() { return ability.mapName(this); }
 	
@@ -65,7 +48,24 @@ public class AbilityInstance
 	
 	public void clearDisplay() { display = new NbtCompound(); }
 	
-	public void setDisplayName(Text component, World world) { display.putString("Name", Text.Serialization.toJsonString((Text)component, world.getRegistryManager())); }
+	public void setDisplayName(Text component, DynamicRegistryManager manager) { display.putString("Name", Text.Serialization.toJsonString((Text)component, manager)); }
+	
+	public Text displayName(DynamicRegistryManager world)
+	{
+		if(display.contains("CustomName", NbtElement.COMPOUND_TYPE))
+		{
+			String s = display.getString("CustomName");
+			try
+			{
+				return (Text)Text.Serialization.fromJson((String)s, world);
+			}
+			catch (Exception exception)
+			{
+				VariousTypes.LOGGER.warn("Failed to parse ability custom name {}", (Object)s, (Object)exception);
+			}
+		}
+		return ability.displayName(this);
+	}
 	
 	public NbtCompound writeToNbt(NbtCompound compound)
 	{

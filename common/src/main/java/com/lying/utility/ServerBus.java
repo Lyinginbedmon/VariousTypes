@@ -1,5 +1,7 @@
 package com.lying.utility;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.type.ActionHandler;
@@ -18,7 +20,7 @@ public class ServerBus
 	@FunctionalInterface
 	public interface GetTypesEvent
 	{
-		void affectTypes(LivingEntity entity, RegistryKey<World> homeDimension, TypeSet types);
+		void affectTypes(LivingEntity entity, @Nullable RegistryKey<World> homeDimension, TypeSet types);
 	}
 	
 	/**
@@ -37,8 +39,11 @@ public class ServerBus
 	{
 		GET_TYPES_EVENT.register((entity, home, types) -> 
 		{
+			if(types.contains(VTTypes.NATIVE.get()) || types.contains(VTTypes.OTHAKIN.get()))
+				return;
+			
 			// Automatically add NATIVE or OTHAKIN depending on relation to home dimension
-			types.add(entity.getWorld().getRegistryKey() == home ? VTTypes.NATIVE.get() : VTTypes.OTHAKIN.get());
+			types.add(home == null || home == entity.getWorld().getRegistryKey() ? VTTypes.NATIVE.get() : VTTypes.OTHAKIN.get());
 		});
 	}
 }

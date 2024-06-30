@@ -1,5 +1,6 @@
 package com.lying.type;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -28,6 +29,8 @@ public class Action
 		ACTIONS.put(nameIn, actionIn);
 		return actionIn;
 	}
+	
+	public static Collection<Supplier<Action>> actions() { return ACTIONS.values(); }
 	
 	@Nullable
 	public static Action get(Identifier name)
