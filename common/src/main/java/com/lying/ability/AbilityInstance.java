@@ -1,14 +1,15 @@
 package com.lying.ability;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.init.VTAbilities;
+import com.lying.utility.LoreDisplay;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -23,7 +24,7 @@ public class AbilityInstance
 	private final Ability ability;
 	private final AbilitySource source;
 	private boolean locked = false;
-	private NbtCompound display = new NbtCompound();
+	private Optional<LoreDisplay> display = Optional.empty();
 	private NbtCompound memory;
 	
 	public AbilityInstance(Ability abilityIn, AbilitySource sourceIn)
@@ -44,36 +45,27 @@ public class AbilityInstance
 	
 	public AbilitySource source() { return source; }
 	
-	public void setDisplay(NbtCompound compound) { display = compound; }
+	public void setDisplay(LoreDisplay compound) { display = Optional.of(compound); }
 	
-	public void clearDisplay() { display = new NbtCompound(); }
-	
-	public void setDisplayName(Text component, DynamicRegistryManager manager) { display.putString("Name", Text.Serialization.toJsonString((Text)component, manager)); }
+	public void setDisplayName(Text component)
+	{
+		display = Optional.of(new LoreDisplay(component, Optional.empty()));
+	}
 	
 	public Text displayName(DynamicRegistryManager world)
 	{
-		if(display.contains("CustomName", NbtElement.COMPOUND_TYPE))
-		{
-			String s = display.getString("CustomName");
-			try
-			{
-				return (Text)Text.Serialization.fromJson((String)s, world);
-			}
-			catch (Exception exception)
-			{
-				VariousTypes.LOGGER.warn("Failed to parse ability custom name {}", (Object)s, (Object)exception);
-			}
-		}
+		if(display.isPresent())
+			return display.get().title();
 		return ability.displayName(this);
 	}
 	
-	public NbtCompound writeToNbt(NbtCompound compound)
+	public NbtCompound writeToNbt(NbtCompound compound, DynamicRegistryManager manager)
 	{
 		compound.putString("Ability", ability.registryName().toString());
 		compound.putString("Source", source.asString());
 		
-		if(!display.isEmpty())
-			compound.put("Display", display);
+		if(display.isPresent())
+			compound.putString("Display", display.get().toJson(manager).toString());
 		
 		if(isReadOnly())
 			compound.putBoolean("ReadOnly", true);
@@ -108,8 +100,8 @@ public class AbilityInstance
 		AbilitySource source = AbilitySource.fromName(data.getString("Source"));
 		AbilityInstance instance = ability.instance(source);
 		
-		if(data.contains("Display", NbtElement.COMPOUND_TYPE))
-			instance.setDisplay(data.getCompound("Display"));
+//		if(data.contains("Display", NbtElement.COMPOUND_TYPE))
+//			instance.setDisplay(new JsonObject(data.getString("Display")));	// FIXME Identify nbt -> JSON to load LoreDisplay
 		
 		if(data.contains("ReadOnly") && data.getBoolean("ReadOnly"))
 			instance.lock();
@@ -120,7 +112,7 @@ public class AbilityInstance
 		return instance;
 	}
 	
-	public static AbilityInstance readFromJson(JsonObject data)
+	public static AbilityInstance readFromJson(JsonObject data, DynamicRegistryManager manager)
 	{
 		Ability ability = data.has("Ability") ? VTAbilities.get(new Identifier(data.get("Ability").getAsString())) : null;
 		if(ability == null)
@@ -130,7 +122,7 @@ public class AbilityInstance
 		AbilityInstance instance = ability.instance(source);
 		
 		if(data.has("Display"))
-			instance.display = tryParseNbt(data.get("Display"));
+			instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display"), manager));
 		
 		if(data.has("ReadOnly") && data.get("ReadOnly").getAsBoolean())
 			instance.lock();

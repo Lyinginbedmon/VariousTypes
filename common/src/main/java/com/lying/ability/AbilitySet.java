@@ -12,6 +12,7 @@ import com.google.gson.JsonElement;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of ability instances */
@@ -80,10 +81,10 @@ public class AbilitySet
 	
 	public Collection<AbilityInstance> abilities() { return abilities.values(); }
 	
-	public NbtList writeToNbt()
+	public NbtList writeToNbt(DynamicRegistryManager manager)
 	{
 		NbtList list = new NbtList();
-		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound())));
+		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound(), manager)));
 		return list;
 	}
 	
@@ -106,12 +107,12 @@ public class AbilitySet
 		return list;
 	}
 	
-	public static AbilitySet readFromJson(JsonArray list)
+	public static AbilitySet readFromJson(JsonArray list, DynamicRegistryManager manager)
 	{
 		AbilitySet set = new AbilitySet();
 		for(JsonElement entry : list.asList())
 		{
-			AbilityInstance inst = AbilityInstance.readFromJson(entry.getAsJsonObject());
+			AbilityInstance inst = AbilityInstance.readFromJson(entry.getAsJsonObject(), manager);
 			if(inst != null)
 				set.add(inst);
 		}

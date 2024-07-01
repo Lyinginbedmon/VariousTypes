@@ -8,6 +8,7 @@ import com.google.gson.JsonObject;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 public abstract class AbilityOperation extends Operation
@@ -39,9 +40,9 @@ public abstract class AbilityOperation extends Operation
 			return data;
 		}
 		
-		protected void read(JsonObject data)
+		protected void read(JsonObject data, DynamicRegistryManager manager)
 		{
-			ability = AbilityInstance.readFromJson(data.getAsJsonObject("Ability"));
+			ability = AbilityInstance.readFromJson(data.getAsJsonObject("Ability"), manager);
 		}
 	}
 	
@@ -67,8 +68,8 @@ public abstract class AbilityOperation extends Operation
 			data.add("Abilities", list);
 			return data;
 		}
-		
-		protected void read(JsonObject data)
+
+		protected void read(JsonObject data, DynamicRegistryManager manager)
 		{
 			mapNames.clear();
 			JsonArray list = data.getAsJsonArray("Abilities");
@@ -99,8 +100,8 @@ public abstract class AbilityOperation extends Operation
 			data.add("Abilities", list);
 			return data;
 		}
-		
-		protected void read(JsonObject data)
+
+		protected void read(JsonObject data, DynamicRegistryManager manager)
 		{
 			registryNames.clear();
 			JsonArray list = data.getAsJsonArray("Abilities");

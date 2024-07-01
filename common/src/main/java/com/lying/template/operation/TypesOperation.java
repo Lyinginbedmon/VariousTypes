@@ -9,6 +9,7 @@ import com.lying.init.VTTypes;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 public abstract class TypesOperation extends Operation
@@ -33,8 +34,8 @@ public abstract class TypesOperation extends Operation
 		data.add("Types", list);
 		return data;
 	}
-	
-	protected void read(JsonObject data)
+
+	protected void read(JsonObject data, DynamicRegistryManager manager)
 	{
 		types.clear();
 		if(data.has("Types"))

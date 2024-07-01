@@ -6,6 +6,7 @@ import com.lying.init.VTTypes;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 public class OperationReplaceTypes extends TypesOperation
@@ -31,10 +32,10 @@ public class OperationReplaceTypes extends TypesOperation
 		
 		return data;
 	}
-	
-	protected void read(JsonObject data)
+
+	protected void read(JsonObject data, DynamicRegistryManager manager)
 	{
-		super.read(data);
+		super.read(data, manager);
 		targets.clear();
 		if(data.has("Targets"))
 		{

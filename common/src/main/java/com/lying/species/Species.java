@@ -1,5 +1,6 @@
 package com.lying.species;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.function.Consumers;
@@ -11,11 +12,14 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilitySet;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
+import com.lying.utility.LoreDisplay;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -23,17 +27,24 @@ import net.minecraft.world.World;
 public class Species
 {
 	private final Identifier id;
+	private LoreDisplay display;
+	
 	private int power;
 	private RegistryKey<World> homeDim;
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities = new AbilitySet();
 	
-	private Species(Identifier idIn)
+	private Species(Identifier idIn, LoreDisplay displayIn)
 	{
 		id = idIn;
+		display = displayIn;
 	}
 	
 	public Identifier registryName() { return id; }
+	
+	public LoreDisplay display() { return display; }
+	
+	public Text displayName() { return display.title(); }
 	
 	public int power() { return power; }
 	
@@ -45,22 +56,28 @@ public class Species
 	
 	public AbilitySet abilities() { return abilities.copy(); }
 	
-	public JsonObject writeToJson()
+	public JsonObject writeToJson(DynamicRegistryManager manager)
 	{
 		JsonObject obj = new JsonObject();
+		obj.add("Display", display.toJson(manager));
+		
 		if(power > 0)
 			obj.addProperty("Power", power);
 		if(homeDim != null)
 			obj.addProperty("Home", homeDim.getValue().toString());
-		obj.add("Types", types.writeToJson());
-		obj.add("Abilities", abilities.writeToJson());
+		if(!types.isEmpty())
+			obj.add("Types", types.writeToJson());
+		if(!abilities.isEmpty())
+			obj.add("Abilities", abilities.writeToJson());
 		
 		return obj;
 	}
 	
-	public void readFromJson(JsonObject data)
+	public void readFromJson(JsonObject data, DynamicRegistryManager manager)
 	{
 		clear();
+		
+		display = LoreDisplay.fromJson(data.get("Display"), manager);
 		
 		if(data.has("Power"))
 			power = data.get("Power").getAsInt();
@@ -72,7 +89,7 @@ public class Species
 			types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
 		
 		if(data.has("Abilities"))
-			abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray());
+			abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), manager);
 	}
 	
 	public void clear()
@@ -86,6 +103,10 @@ public class Species
 	public static class Builder
 	{
 		private Identifier id;
+		
+		private Text displayName;
+		private Optional<Text> displayDesc = Optional.empty();
+		
 		private int power = 0;
 		private RegistryKey<World> homeDim = null;
 		private TypeSet types = new TypeSet();
@@ -93,12 +114,25 @@ public class Species
 		
 		protected Builder(Identifier idIn)
 		{
-			this.id = idIn;
+			id = idIn;
+			displayName = Text.translatable("species."+idIn.getNamespace()+"."+idIn.getPath());
 		}
 		
 		public static Builder of(Identifier idIn)
 		{
 			return new Builder(idIn);
+		}
+		
+		public Builder display(Text nameIn)
+		{
+			displayName = nameIn;
+			return this;
+		}
+		
+		public Builder description(Text descIn)
+		{
+			displayDesc = Optional.of(descIn);
+			return this;
 		}
 		
 		public Builder power(int powerIn)
@@ -134,7 +168,7 @@ public class Species
 		
 		public Species build()
 		{
-			Species species = new Species(id);
+			Species species = new Species(id, new LoreDisplay(displayName, displayDesc));
 			species.power = power;
 			species.homeDim = homeDim;
 			species.types = types;

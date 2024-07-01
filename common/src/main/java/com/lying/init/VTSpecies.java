@@ -66,7 +66,7 @@ public class VTSpecies implements ReloadListener<Map<Identifier, JsonObject>>
 			for(Entry<Identifier, JsonObject> prep : data.entrySet())
 			{
 				Species species = Species.Builder.of(prep.getKey()).build();
-				species.readFromJson(prep.getValue());
+				species.readFromJson(prep.getValue(), null);	// FIXME Identify DynamicRegistryManager input value
 				SpeciesRegistry.add(species);
 			}
 		});

@@ -15,6 +15,7 @@ import com.lying.type.DummyType;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 /** Something this template does to the creature when it is applied*/
@@ -98,17 +99,17 @@ public class Operation
 	protected JsonObject write(JsonObject data) { return data; }
 	
 	@Nullable
-	public static Operation readFromJson(JsonObject data)
+	public static Operation readFromJson(JsonObject data, DynamicRegistryManager manager)
 	{
 		Operation op = get(new Identifier(data.get("Name").getAsString()));
 		if(op == null)
 			return null;
 		data.remove("Name");
-		op.read(data);
+		op.read(data, manager);
 		return op;
 	}
 	
-	protected void read(JsonObject data) { }
+	protected void read(JsonObject data, DynamicRegistryManager manager) { }
 	
 	public void applyToTypes(TypeSet typeSet) { }
 	

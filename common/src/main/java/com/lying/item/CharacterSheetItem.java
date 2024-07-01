@@ -30,11 +30,11 @@ public class CharacterSheetItem extends Item
 			CharacterSheet sheet = opt.get();
 			user.sendMessage(Text.literal("Power: "+sheet.power()));
 			if(sheet.hasSpecies())
-				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().registryName().toString())));
+				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().display().title().getString())));
 			if(!sheet.getAppliedTemplates().isEmpty())
 			{
 				user.sendMessage(Text.literal("Templates:"));
-				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(Text.literal(tem.registryName().toString()))));
+				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(Text.literal(tem.display().title().getString()))));
 			}
 			
 			user.sendMessage(Text.literal("Creature types:"));

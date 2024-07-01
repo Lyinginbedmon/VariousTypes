@@ -24,7 +24,7 @@ public class VTSpeciesProvider implements DataProvider
 	public CompletableFuture<?> run(DataWriter dataWriter)
 	{
 		List<CompletableFuture<?>> futures = Lists.newArrayList();
-		SpeciesRegistry.defaultSpecies().forEach(supplier -> futures.add(DataProvider.writeToPath(dataWriter, supplier.get().writeToJson(), this.path.resolveJson(supplier.get().registryName()))));
+//		SpeciesRegistry.defaultSpecies().forEach(supplier -> futures.add(DataProvider.writeToPath(dataWriter, supplier.get().writeToJson(), this.path.resolveJson(supplier.get().registryName()))));
 		return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 	}
 	

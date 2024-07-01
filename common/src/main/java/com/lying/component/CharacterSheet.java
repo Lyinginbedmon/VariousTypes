@@ -79,7 +79,7 @@ public class CharacterSheet
 			compound.put("CustomTypes", customTypes.writeToNbt(owner.getWorld().getRegistryManager()));
 		
 		if(!customAbilities.isEmpty())
-			compound.put("CustomAbilities", customAbilities.writeToNbt());
+			compound.put("CustomAbilities", customAbilities.writeToNbt(owner.getRegistryManager()));
 		
 		return compound;
 	}
