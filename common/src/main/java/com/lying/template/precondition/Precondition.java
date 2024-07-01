@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonObject;
 import com.lying.component.CharacterSheet;
+import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference.ModInfo;
 
@@ -28,7 +29,14 @@ public abstract class Precondition
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getTypes().contains(VTTypes.UNDEAD.get()); }
 	});
 	
-	public static final Supplier<Precondition> HAS_TYPE	= register(prefix("has_type"), () -> new IsTypeCondition(prefix("has_type")));
+	public static final Supplier<Precondition> PHYSICAL		= register(prefix("physical"), () -> new Precondition(prefix("physical"))
+	{
+		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getAbilities().hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
+	});
+	
+	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_types"), () -> new TypeCondition.All(prefix("has_all_types")));
+	public static final Supplier<Precondition> HAS_ANY_TYPE	= register(prefix("has_any_types"), () -> new TypeCondition.All(prefix("has_any_types")));
+	public static final Supplier<Precondition> HAS_NO_TYPE	= register(prefix("has_no_types"), () -> new TypeCondition.All(prefix("has_no_types")));
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	

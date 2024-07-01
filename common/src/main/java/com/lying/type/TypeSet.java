@@ -80,7 +80,7 @@ public class TypeSet
 	
 	public void forEach(Consumer<Type> actionIn)
 	{
-		types.forEach(actionIn);
+		contents().forEach(actionIn);
 	}
 	
 	public boolean contains(Type typeIn)
@@ -101,7 +101,14 @@ public class TypeSet
 	{
 		List<Type> types = Lists.newArrayList();
 		for(Tier tier : Tier.values())
-			this.types.stream().filter(type -> type.tier() == tier).forEach(type -> types.add(type));
+			types.addAll(ofTier(tier));
+		return types;
+	}
+	
+	public List<Type> ofTier(Tier tier)
+	{
+		List<Type> types = Lists.newArrayList();
+		this.types.stream().filter(type -> type.tier() == tier).forEach(type -> types.add(type));
 		return types;
 	}
 	
@@ -109,6 +116,12 @@ public class TypeSet
 	public boolean add(Type typeIn)
 	{
 		return typeIn != null && !contains(typeIn) && types.stream().allMatch(type -> type.compatibleWith(typeIn) && typeIn.compatibleWith(type)) ? types.add(typeIn) : false;
+	}
+	
+	public void addAll(Type... typesIn)
+	{
+		for(Type type : typesIn)
+			add(type);
 	}
 	
 	public boolean remove(Type typeIn)

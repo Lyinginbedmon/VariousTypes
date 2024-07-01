@@ -7,7 +7,9 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonObject;
+import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilitySet;
+import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 import com.lying.type.DummyType;
 import com.lying.type.Type.Tier;
@@ -41,15 +43,25 @@ public class Operation
 		public void applyToTypes(TypeSet typeSet) { typeSet.removeIf(type -> type instanceof DummyType); }
 	});
 	
+	public static final Supplier<Operation> ADD_TYPES				= register(prefix("add_types"), () -> new TypesOperation.Add(prefix("add_types")));
+	
+	public static final Supplier<Operation> REMOVE_TYPES			= register(prefix("remove_types"), () -> new TypesOperation.Remove(prefix("remove_types")));
+	
+	public static final Supplier<Operation> SET_TYPES				= register(prefix("set_types"), () -> new TypesOperation.Set(prefix("set_types")));
+	
+	/** If target types are present, remove them and add the given types */
+	public static final Supplier<Operation> REPLACE_TYPES			= register(prefix("replace_types"), () -> new OperationReplaceTypes(prefix("set_types"), new TypeSet()));
+	
+	public static final Supplier<Operation> ADD_ABILITY				= register(prefix("add_ability"), () -> new AbilityOperation.Add(prefix("add_ability"), VTAbilities.DUMMY.get().instance(AbilitySource.MISC)));
+	
+	/** Remove all abilities of the given map name */
+	public static final Supplier<Operation> REMOVE_ABILITY			= register(prefix("remove_ability"), () -> new AbilityOperation.Remove(prefix("remove_ability")));
+	
+	/** Remove all abilities of the same registry name */
+	public static final Supplier<Operation> REMOVE_ALL_ABILITY		= register(prefix("remove_all_ability"), () -> new AbilityOperation.RemoveAll(prefix("remove_all_ability")));
+	
 	/*
-	 * Add types
-	 * Remove types
-	 * Replace types
-	 * 
 	 * Set home dimension
-	 * 
-	 * Add ability
-	 * Remove ability(s)
 	 */
 	
 	private static Supplier<Operation> register(Identifier nameIn, Supplier<Operation> supplierIn)

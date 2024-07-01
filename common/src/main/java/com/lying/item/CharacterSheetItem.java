@@ -28,6 +28,15 @@ public class CharacterSheetItem extends Item
 		{
 			user.sendMessage(Text.literal("Retrieved character sheet"));
 			CharacterSheet sheet = opt.get();
+			user.sendMessage(Text.literal("Power: "+sheet.power()));
+			if(sheet.hasSpecies())
+				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().registryName().toString())));
+			if(!sheet.getAppliedTemplates().isEmpty())
+			{
+				user.sendMessage(Text.literal("Templates:"));
+				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(Text.literal(tem.registryName().toString()))));
+			}
+			
 			user.sendMessage(Text.literal("Creature types:"));
 			sheet.getTypes().forEach(type -> user.sendMessage(Text.literal(" * ").append(type.displayName(world.getRegistryManager()))));
 			user.sendMessage(Text.literal("Actions:"));

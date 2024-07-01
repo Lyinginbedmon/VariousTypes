@@ -42,11 +42,13 @@ public class AbilitySet
 		return false;
 	}
 	
+	/** Remove any ability with the given map name */
 	public boolean remove(Identifier mapName)
 	{
 		return abilities.remove(mapName) != null;
 	}
 	
+	/** Remove all abilities of the given registry name */
 	public void removeAll(Identifier registryName)
 	{
 		if(!remove(registryName))

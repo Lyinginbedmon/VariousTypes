@@ -37,6 +37,8 @@ public class Template
 	
 	public List<Operation> operations() { return operations; }
 	
+	public int power() { return power; }
+	
 	public boolean validFor(CharacterSheet sheet, LivingEntity owner) { return preconditions.stream().allMatch(condition -> condition.isValidFor(sheet, owner)); }
 	
 	public void applyTypeOperations(TypeSet typeSet) { operations.forEach(operation -> operation.applyToTypes(typeSet)); }

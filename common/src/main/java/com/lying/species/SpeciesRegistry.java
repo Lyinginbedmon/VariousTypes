@@ -41,6 +41,9 @@ public class SpeciesRegistry
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get()).build());
 	
 	// Lizardfolk
+	public static final Supplier<Species> MUCKIE	= register(prefix("muckie"), () -> Species.Builder.of(prefix("muckie"))
+			.power(1)
+			.setTypes(VTTypes.HUMAN.get(), VTTypes.REPTILIAN.get()).build());
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	

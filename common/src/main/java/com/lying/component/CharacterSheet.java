@@ -124,6 +124,10 @@ public class CharacterSheet
 		buildSheet();
 	}
 	
+	public boolean hasSpecies() { return species != null; }
+	
+	public Species getSpecies() { return species; }
+	
 	public boolean hasTemplate(@NotNull Template templateIn) { return templates.stream().anyMatch(temp -> temp.registryName().equals(templateIn.registryName())); }
 	
 	public void addTemplate(@NotNull Template templateIn)
@@ -152,11 +156,25 @@ public class CharacterSheet
 		buildSheet();
 	}
 	
+	public List<Template> getAppliedTemplates() { return templates; }
+	
+	public int power()
+	{
+		int power = 0;
+		
+		if(species != null)
+			power += species.power();
+		
+		if(!templates.isEmpty())
+			for(Template tem : templates)
+				power += tem.power();
+		
+		return power;
+	}
+	
 	public TypeSet getTypes() { return types.copy(); }
 	
 	public AbilitySet getAbilities() { return abilities; }
-	
-	public List<Template> getAppliedTemplates() { return templates; }
 	
 	/** Constructs the types and abilities from scratch */
 	public void buildSheet()
