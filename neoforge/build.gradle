@@ -7,6 +7,26 @@ architectury {
     neoForge()
 }
 
+def generatedResources = file("src/generated")
+
+loom
+{
+	runs
+	{
+		commonDatagen
+		{
+			data()
+			programArgs(
+				"--mod", "vartypes",
+				"--all",
+				"--output", project(":common").file("src/generated/resources").absolutePath,
+				"--existing", file("src/main/resources").absolutePath,
+				"--existing", project(":common").file("src/main/resources").absolutePath
+			)
+		}
+	}
+}
+
 configurations {
     common {
         canBeResolved = true
