@@ -88,15 +88,15 @@ public class Operation
 	
 	public Identifier registryName() { return registryName; }
 	
-	public JsonObject writeToJson()
+	public final JsonObject writeToJson(DynamicRegistryManager manager)
 	{
 		JsonObject data = new JsonObject();
 		data.addProperty("Name", registryName().toString());
-		write(data);
+		write(data, manager);
 		return data;
 	}
 	
-	protected JsonObject write(JsonObject data) { return data; }
+	protected JsonObject write(JsonObject data, DynamicRegistryManager manager) { return data; }
 	
 	@Nullable
 	public static Operation readFromJson(JsonObject data, DynamicRegistryManager manager)

@@ -1,0 +1,23 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:is_living"
+    }
+  ],
+  "ID": "vartypes:zombie",
+  "Operations": [
+    {
+      "Name": "vartypes:lose_dummy_subtypes"
+    },
+    {
+      "Name": "vartypes:lose_supertypes"
+    },
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        "vartypes:undead"
+      ]
+    }
+  ],
+  "Power": 1
+}

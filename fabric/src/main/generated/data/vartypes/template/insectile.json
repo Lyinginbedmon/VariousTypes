@@ -1,0 +1,29 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:is_living"
+    },
+    {
+      "Name": "vartypes:has_all_types",
+      "Types": [
+        "vartypes:human"
+      ]
+    }
+  ],
+  "ID": "vartypes:insectile",
+  "Operations": [
+    {
+      "Name": "vartypes:lose_supertypes"
+    },
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        "vartypes:aduain"
+      ]
+    },
+    {
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

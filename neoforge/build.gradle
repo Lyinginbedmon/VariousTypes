@@ -15,6 +15,7 @@ loom
 	{
 		commonDatagen
 		{
+			processResources
 			data()
 			programArgs(
 				"--mod", "vartypes",

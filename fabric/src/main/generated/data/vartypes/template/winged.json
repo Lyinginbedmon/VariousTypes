@@ -1,0 +1,19 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:has_any_types",
+      "Types": [
+        "vartypes:animal",
+        "vartypes:human",
+        "vartypes:arthropod"
+      ]
+    }
+  ],
+  "ID": "vartypes:winged",
+  "Operations": [
+    {
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

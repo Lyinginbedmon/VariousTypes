@@ -8,6 +8,8 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
@@ -73,6 +75,13 @@ public class Type
 	protected void write(NbtCompound data, DynamicRegistryManager manager) { }
 	
 	public void read(NbtCompound data) { }
+	
+	public JsonElement writeToJson(DynamicRegistryManager manager)
+	{
+		return new JsonPrimitive(registryName().toString());
+	}
+	
+	// TODO Implement reading a type from Json
 	
 	public static enum Tier
 	{

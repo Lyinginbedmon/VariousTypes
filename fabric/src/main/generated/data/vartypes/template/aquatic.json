@@ -1,0 +1,17 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:is_living"
+    }
+  ],
+  "ID": "vartypes:aquatic",
+  "Operations": [
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        "vartypes:aquatic"
+      ]
+    }
+  ],
+  "Power": 1
+}

@@ -21,13 +21,13 @@ public class OperationReplaceTypes extends TypesOperation
 	
 	public static OperationReplaceTypes of(TypeSet targets, Type... typesIn) { return new OperationReplaceTypes(Operation.REPLACE_TYPES.get().registryName(), targets, typesIn); }
 	
-	protected JsonObject write(JsonObject data)
+	protected JsonObject write(JsonObject data, DynamicRegistryManager manager)
 	{
-		super.write(data);
+		super.write(data, manager);
 		
 		JsonArray list = new JsonArray();
 		for(Type type : targets.contents())
-			list.add(type.registryName().toString());
+			list.add(type.writeToJson(manager));
 		data.add("Targets", list);
 		
 		return data;

@@ -1,0 +1,9 @@
+{
+  "Home": "minecraft:the_nether",
+  "Types": [
+    "vartypes:human",
+    {
+      "ID": "vartypes:orkin"
+    }
+  ]
+}

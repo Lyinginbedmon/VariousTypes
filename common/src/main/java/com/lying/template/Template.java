@@ -58,7 +58,7 @@ public class Template
 	{
 		JsonObject data = new JsonObject();
 		data.addProperty("ID",  registryName().toString());
-		data.add("Display", display.toJson(manager));
+//		data.add("Display", display.toJson(manager));
 		
 		if(power > 0)
 			data.addProperty("Power", power);
@@ -66,13 +66,14 @@ public class Template
 		if(!preconditions.isEmpty())
 		{
 			JsonArray list = new JsonArray();
-			preconditions.forEach(condition -> list.add(condition.writeToJson()));
+			preconditions.forEach(condition -> list.add(condition.writeToJson(manager)));
 			data.add("Conditions", list);
 		}
 		
 		if(!operations.isEmpty())
 		{
 			JsonArray list = new JsonArray();
+			operations.forEach(operation -> list.add(operation.writeToJson(manager)));
 			data.add("Operations", list);
 		}
 		

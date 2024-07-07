@@ -59,14 +59,14 @@ public class Species
 	public JsonObject writeToJson(DynamicRegistryManager manager)
 	{
 		JsonObject obj = new JsonObject();
-		obj.add("Display", display.toJson(manager));
+//		obj.add("Display", display.toJson(manager));
 		
 		if(power > 0)
 			obj.addProperty("Power", power);
 		if(homeDim != null)
 			obj.addProperty("Home", homeDim.getValue().toString());
 		if(!types.isEmpty())
-			obj.add("Types", types.writeToJson());
+			obj.add("Types", types.writeToJson(manager));
 		if(!abilities.isEmpty())
 			obj.add("Abilities", abilities.writeToJson());
 		

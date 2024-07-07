@@ -1,0 +1,36 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:is_living"
+    },
+    {
+      "Name": "vartypes:has_all_types",
+      "Types": [
+        "vartypes:human"
+      ]
+    },
+    {
+      "Name": "vartypes:has_no_types",
+      "Types": [
+        {
+          "ID": "vartypes:reptilian"
+        }
+      ]
+    }
+  ],
+  "ID": "vartypes:reptilian",
+  "Operations": [
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        {
+          "ID": "vartypes:reptilian"
+        }
+      ]
+    },
+    {
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

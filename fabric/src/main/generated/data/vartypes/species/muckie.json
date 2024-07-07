@@ -1,0 +1,9 @@
+{
+  "Power": 1,
+  "Types": [
+    "vartypes:human",
+    {
+      "ID": "vartypes:reptilian"
+    }
+  ]
+}

@@ -59,10 +59,10 @@ public class TypeSet
 		return set;
 	}
 	
-	public JsonArray writeToJson()
+	public JsonArray writeToJson(DynamicRegistryManager manager)
 	{
 		JsonArray list = new JsonArray();
-		types.forEach(inst -> list.add(inst.registryName().toString()));
+		types.forEach(inst -> list.add(inst.writeToJson(manager)));
 		return list;
 	}
 	

@@ -3,6 +3,8 @@ package com.lying.type;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Predicates;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 
@@ -61,6 +63,15 @@ public class DummyType extends Type
 			catch (Exception exception) { }
 		}
 		return displayName = name;
+	}
+	
+	public JsonElement writeToJson(DynamicRegistryManager manager)
+	{
+		JsonObject obj = new JsonObject();
+		obj.addProperty("ID", listID.toString());
+//		if(displayName != null)
+//			obj.add("DisplayName", displayName.toJson(manager));
+		return obj;
 	}
 	
 	public static class Builder extends Type.Builder

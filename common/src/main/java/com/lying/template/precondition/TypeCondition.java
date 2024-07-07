@@ -10,6 +10,7 @@ import com.lying.init.VTTypes;
 import com.lying.type.Type;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 public abstract class TypeCondition extends Precondition
@@ -28,10 +29,10 @@ public abstract class TypeCondition extends Precondition
 		return types.isEmpty() || types.stream().allMatch(type -> sheet.getTypes().contains(type));
 	}
 	
-	protected JsonObject write(JsonObject data)
+	protected JsonObject write(JsonObject data, DynamicRegistryManager manager)
 	{
 		JsonArray list = new JsonArray();
-		types.forEach(type -> list.add(type.registryName().toString()));
+		types.forEach(type -> list.add(type.writeToJson(manager)));
 		data.add("Types", list);
 		return data;
 	}

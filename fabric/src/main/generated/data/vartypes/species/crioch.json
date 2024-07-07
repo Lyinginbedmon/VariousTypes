@@ -1,0 +1,12 @@
+{
+  "Abilities": [
+    {
+      "Ability": "vartypes:teleport",
+      "Source": "species"
+    }
+  ],
+  "Home": "minecraft:the_end",
+  "Types": [
+    "vartypes:othall"
+  ]
+}

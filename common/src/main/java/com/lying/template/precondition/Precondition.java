@@ -13,6 +13,7 @@ import com.lying.init.VTTypes;
 import com.lying.reference.Reference.ModInfo;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.util.Identifier;
 
 /** A requirement that must be met prior to applying this template during character creation */
@@ -61,15 +62,15 @@ public abstract class Precondition
 	
 	public abstract boolean isValidFor(CharacterSheet sheet, LivingEntity owner);
 	
-	public JsonObject writeToJson()
+	public final JsonObject writeToJson(DynamicRegistryManager manager)
 	{
 		JsonObject data = new JsonObject();
 		data.addProperty("Name", registryName.toString());
-		write(data);
+		write(data, manager);
 		return data;
 	}
 	
-	protected JsonObject write(JsonObject data) { return data; }
+	protected JsonObject write(JsonObject data, DynamicRegistryManager manager) { return data; }
 	
 	public static Precondition readFromJson(JsonObject data)
 	{

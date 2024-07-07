@@ -26,11 +26,11 @@ public abstract class TypesOperation extends Operation
 	
 	public abstract void applyToTypes(TypeSet typeSet);
 	
-	protected JsonObject write(JsonObject data)
+	protected JsonObject write(JsonObject data, DynamicRegistryManager manager)
 	{
 		JsonArray list = new JsonArray();
 		for(Type type : types)
-			list.add(type.registryName().toString());
+			list.add(type.writeToJson(manager));
 		data.add("Types", list);
 		return data;
 	}
