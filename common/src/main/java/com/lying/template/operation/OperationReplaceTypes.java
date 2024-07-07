@@ -7,6 +7,7 @@ import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 public class OperationReplaceTypes extends TypesOperation
@@ -21,18 +22,13 @@ public class OperationReplaceTypes extends TypesOperation
 	
 	public static OperationReplaceTypes of(TypeSet targets, Type... typesIn) { return new OperationReplaceTypes(Operation.REPLACE_TYPES.get().registryName(), targets, typesIn); }
 	
-	protected JsonObject write(JsonObject data, DynamicRegistryManager manager)
+	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		super.write(data, manager);
-		
-		JsonArray list = new JsonArray();
-		for(Type type : targets.contents())
-			list.add(type.writeToJson(manager));
-		data.add("Targets", list);
-		
+		data.add("Targets", targets.writeToJson(manager));
 		return data;
 	}
-
+	
 	protected void read(JsonObject data, DynamicRegistryManager manager)
 	{
 		super.read(data, manager);

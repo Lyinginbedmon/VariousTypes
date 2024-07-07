@@ -1,7 +1,15 @@
 {
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.human"
+    }
+  },
   "Types": [
     "vartypes:human",
     {
+      "DisplayName": {
+        "translate": "subtype.vartypes.linn"
+      },
       "ID": "vartypes:linn"
     }
   ]

@@ -1,17 +1,15 @@
 {
   "Conditions": [
-    {
-      "Name": "vartypes:is_living"
-    }
+    "vartypes:is_living"
   ],
-  "ID": "vartypes:zombie",
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.zombie"
+    }
+  },
   "Operations": [
-    {
-      "Name": "vartypes:lose_dummy_subtypes"
-    },
-    {
-      "Name": "vartypes:lose_supertypes"
-    },
+    "vartypes:lose_dummy_subtypes",
+    "vartypes:lose_supertypes",
     {
       "Name": "vartypes:add_types",
       "Types": [

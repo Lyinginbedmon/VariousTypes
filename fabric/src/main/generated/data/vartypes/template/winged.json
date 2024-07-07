@@ -9,9 +9,17 @@
       ]
     }
   ],
-  "ID": "vartypes:winged",
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.winged"
+    }
+  },
   "Operations": [
     {
+      "Ability": {
+        "Ability": "vartypes:fly",
+        "Source": "template"
+      },
       "Name": "vartypes:add_ability"
     }
   ],

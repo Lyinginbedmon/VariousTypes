@@ -9,7 +9,8 @@ import org.slf4j.LoggerFactory;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTItems;
-import com.lying.init.VTSpecies;
+import com.lying.init.VTSpeciesRegistry;
+import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 import com.lying.utility.ServerBus;
@@ -26,7 +27,8 @@ public class VariousTypes
     {
     	VTAbilities.init();
     	VTTypes.init();
-    	VTSpecies.init();
+    	VTSpeciesRegistry.init();
+    	VTTemplateRegistry.init();
     	VTItems.init();
     	ServerBus.init();
     }

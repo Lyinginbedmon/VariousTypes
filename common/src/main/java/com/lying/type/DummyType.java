@@ -1,25 +1,36 @@
 package com.lying.type;
 
-import org.jetbrains.annotations.Nullable;
+import java.util.Optional;
 
 import com.google.common.base.Predicates;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryOps;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 public class DummyType extends Type
 {
+	public static final Codec<DummyType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Identifier.CODEC.fieldOf("ID").forGetter(DummyType::listID), 
+			TextCodecs.CODEC.optionalFieldOf("DisplayName").forGetter(DummyType::customName))
+				.apply(instance, (a, b)-> DummyType.create(a, b)));
+	
 	protected NbtCompound data = new NbtCompound();
 	protected Identifier listID;
-	protected Text displayName = null;
+	protected Optional<Text> displayName = null;
 	
-	protected DummyType(Identifier nameIn, Identifier listIDIn, @Nullable Text displayNameIn)
+	protected DummyType(Identifier nameIn, Identifier listIDIn, Optional<Text> displayNameIn)
 	{
 		super(nameIn, Tier.SUBTYPE, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
 		listID = listIDIn;
@@ -27,7 +38,7 @@ public class DummyType extends Type
 		data.putString("ID", listID.toString());
 	}
 	
-	public static DummyType create(Identifier listID, @Nullable Text displayName)
+	public static DummyType create(Identifier listID, Optional<Text> displayName)
 	{
 		return new DummyType(VTTypes.DUMMY.get().registryName(), listID, displayName);
 	}
@@ -49,8 +60,8 @@ public class DummyType extends Type
 	
 	public Text displayName(DynamicRegistryManager manager)
 	{
-		if(displayName != null)
-			return displayName;
+		if(customName().isPresent())
+			return customName().get();
 		
 		Text name = super.displayName(manager);
 		if(data.contains("DisplayName"))
@@ -62,21 +73,26 @@ public class DummyType extends Type
 			}
 			catch (Exception exception) { }
 		}
-		return displayName = name;
+		return name;
 	}
 	
-	public JsonElement writeToJson(DynamicRegistryManager manager)
+	public Optional<Text> customName() { return this.displayName; }
+	
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
-		JsonObject obj = new JsonObject();
-		obj.addProperty("ID", listID.toString());
-//		if(displayName != null)
-//			obj.add("DisplayName", displayName.toJson(manager));
-		return obj;
+		RegistryOps<JsonElement> registryops = manager.getOps(JsonOps.INSTANCE);
+		return CODEC.encodeStart(registryops, this).getOrThrow();
+	}
+	
+	public static DummyType fromJson(JsonObject obj, RegistryWrapper.WrapperLookup manager)
+	{
+		RegistryOps<JsonElement> registryops = manager.getOps(JsonOps.INSTANCE);
+		return CODEC.decode(registryops, obj).getOrThrow().getFirst();
 	}
 	
 	public static class Builder extends Type.Builder
 	{
-		protected Text display;
+		protected Text display = null;
 		protected Identifier spoofName;
 		
 		protected Builder(Identifier nameIn)
@@ -99,7 +115,7 @@ public class DummyType extends Type
 		
 		public Type build()
 		{
-			return new DummyType(name, spoofName, display);
+			return new DummyType(name, spoofName, display == null ? Optional.empty() : Optional.of(display));
 		}
 	}
 }

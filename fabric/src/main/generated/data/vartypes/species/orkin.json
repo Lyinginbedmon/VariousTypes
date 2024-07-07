@@ -1,8 +1,16 @@
 {
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.orkin"
+    }
+  },
   "Home": "minecraft:the_nether",
   "Types": [
     "vartypes:human",
     {
+      "DisplayName": {
+        "translate": "subtype.vartypes.orkin"
+      },
       "ID": "vartypes:orkin"
     }
   ]

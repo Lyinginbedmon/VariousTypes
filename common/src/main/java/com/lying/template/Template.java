@@ -15,7 +15,7 @@ import com.lying.type.TypeSet;
 import com.lying.utility.LoreDisplay;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -54,11 +54,10 @@ public class Template
 	
 	public void applyAbilityOperations(AbilitySet abilitySet) { operations.forEach(operation -> operation.applyToAbilities(abilitySet)); }
 	
-	public JsonObject writeToJson(DynamicRegistryManager manager)
+	public JsonObject writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		JsonObject data = new JsonObject();
-		data.addProperty("ID",  registryName().toString());
-//		data.add("Display", display.toJson(manager));
+		data.add("Display", display.toJson(manager));
 		
 		if(power > 0)
 			data.addProperty("Power", power);
@@ -80,9 +79,9 @@ public class Template
 		return data;
 	}
 	
-	public static Template readFromJson(JsonObject data, DynamicRegistryManager manager)
+	public static Template readFromJson(Identifier registryName, JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
-		Builder builder = Builder.of(new Identifier(data.get("ID").getAsString()));
+		Builder builder = Builder.of(registryName);
 		
 		LoreDisplay display = LoreDisplay.fromJson(data.get("Display"), manager);
 		builder.display(display.title());

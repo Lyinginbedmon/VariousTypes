@@ -3,6 +3,7 @@ package com.lying.init;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -98,7 +99,7 @@ public class VTTypes
 	public static final Supplier<Type> REPTILIAN	= dummyType("reptilian");
 	public static final Supplier<Type> VERDINE		= dummyType("verdine");	// Elves
 	
-	private static final Supplier<Type> dummyType(String name) { return () -> DummyType.create(prefix(name), ModInfo.translate("subtype", name)); }
+	private static final Supplier<Type> dummyType(String name) { return () -> DummyType.create(prefix(name), Optional.of(ModInfo.translate("subtype", name))); }
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	

@@ -1,8 +1,6 @@
 {
   "Conditions": [
-    {
-      "Name": "vartypes:is_living"
-    },
+    "vartypes:is_living",
     {
       "Name": "vartypes:has_all_types",
       "Types": [
@@ -13,22 +11,36 @@
       "Name": "vartypes:has_no_types",
       "Types": [
         {
+          "DisplayName": {
+            "translate": "subtype.vartypes.reptilian"
+          },
           "ID": "vartypes:reptilian"
         }
       ]
     }
   ],
-  "ID": "vartypes:reptilian",
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.reptilian"
+    }
+  },
   "Operations": [
     {
       "Name": "vartypes:add_types",
       "Types": [
         {
+          "DisplayName": {
+            "translate": "subtype.vartypes.reptilian"
+          },
           "ID": "vartypes:reptilian"
         }
       ]
     },
     {
+      "Ability": {
+        "Ability": "vartypes:night_vision",
+        "Source": "template"
+      },
       "Name": "vartypes:add_ability"
     }
   ],

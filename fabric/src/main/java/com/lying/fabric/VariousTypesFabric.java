@@ -2,15 +2,14 @@ package com.lying.fabric;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.init.VTSpeciesRegistry;
+import com.lying.init.VTTemplateRegistry;
 import com.lying.species.Species;
-import com.lying.species.SpeciesRegistry;
 import com.lying.template.Template;
-import com.lying.template.TemplateRegistry;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.EntityType;
@@ -35,28 +34,30 @@ public final class VariousTypesFabric implements ModInitializer
         		CharacterSheet sheet = new CharacterSheet(ent);
         		
         		Random rand = ent.getRandom();
-        		List<Supplier<Species>> randomSpecies = Lists.newArrayList();
-        		randomSpecies.addAll(SpeciesRegistry.defaultSpecies());
-        		sheet.setSpecies(randomSpecies.get(rand.nextInt(randomSpecies.size())).get());
+        		List<Species> randomSpecies = Lists.newArrayList();
+        		randomSpecies.addAll(VTSpeciesRegistry.getAll());
+        		if(!randomSpecies.isEmpty())
+        			sheet.setSpecies(randomSpecies.get(rand.nextInt(randomSpecies.size())).registryName());
         		
-        		List<Supplier<Template>> randomTemplates = Lists.newArrayList();
-        		randomTemplates.addAll(TemplateRegistry.defaultTemplates());
-        		for(int i=0; i<rand.nextBetween(1, 3); i++)
-        		{
-        			List<Supplier<Template>> candidates = Lists.newArrayList();
-        			candidates.addAll(randomTemplates);
-        			
-        			while(!candidates.isEmpty())
-        			{
-        				Supplier<Template> candidate = candidates.get(rand.nextInt(candidates.size()));
-        				if(candidate.get().validFor(sheet, ent))
-        				{
-        					sheet.addTemplate(candidate.get());
-        					break;
-        				}
-        				candidates.remove(candidate);
-        			}
-        		}
+        		List<Template> randomTemplates = Lists.newArrayList();
+        		randomTemplates.addAll(VTTemplateRegistry.instance().getAll());
+        		if(!randomTemplates.isEmpty())
+	        		for(int i=0; i<rand.nextBetween(1, 3); i++)
+	        		{
+	        			List<Template> candidates = Lists.newArrayList();
+	        			candidates.addAll(randomTemplates);
+	        			
+	        			while(!candidates.isEmpty())
+	        			{
+	        				Template candidate = candidates.get(rand.nextInt(candidates.size()));
+	        				if(candidate.validFor(sheet, ent))
+	        				{
+	        					sheet.addTemplate(candidate.registryName());
+	        					break;
+	        				}
+	        				candidates.remove(candidate);
+	        			}
+	        		}
         		
         		return Optional.of(sheet);
         	}

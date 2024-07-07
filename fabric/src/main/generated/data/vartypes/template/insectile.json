@@ -1,8 +1,6 @@
 {
   "Conditions": [
-    {
-      "Name": "vartypes:is_living"
-    },
+    "vartypes:is_living",
     {
       "Name": "vartypes:has_all_types",
       "Types": [
@@ -10,11 +8,13 @@
       ]
     }
   ],
-  "ID": "vartypes:insectile",
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.insectile"
+    }
+  },
   "Operations": [
-    {
-      "Name": "vartypes:lose_supertypes"
-    },
+    "vartypes:lose_supertypes",
     {
       "Name": "vartypes:add_types",
       "Types": [
@@ -22,6 +22,10 @@
       ]
     },
     {
+      "Ability": {
+        "Ability": "vartypes:climb",
+        "Source": "template"
+      },
       "Name": "vartypes:add_ability"
     }
   ],

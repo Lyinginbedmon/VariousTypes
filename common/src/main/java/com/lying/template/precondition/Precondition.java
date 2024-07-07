@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
@@ -13,7 +14,7 @@ import com.lying.init.VTTypes;
 import com.lying.reference.Reference.ModInfo;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 /** A requirement that must be met prior to applying this template during character creation */
@@ -25,12 +26,12 @@ public abstract class Precondition
 	 * Has certain ability
 	 * From certain dimension
 	 */
-	public static final Supplier<Precondition> IS_LIVING	= register(prefix("is_living"), () -> new Precondition(prefix("is_living")) 
+	public static final Supplier<Precondition> IS_LIVING	= register(prefix("is_living"), () -> new SimpleCondition(prefix("is_living")) 
 	{
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getTypes().contains(VTTypes.UNDEAD.get()); }
 	});
 	
-	public static final Supplier<Precondition> PHYSICAL		= register(prefix("physical"), () -> new Precondition(prefix("physical"))
+	public static final Supplier<Precondition> PHYSICAL		= register(prefix("physical"), () -> new SimpleCondition(prefix("physical"))
 	{
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getAbilities().hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
 	});
@@ -62,15 +63,7 @@ public abstract class Precondition
 	
 	public abstract boolean isValidFor(CharacterSheet sheet, LivingEntity owner);
 	
-	public final JsonObject writeToJson(DynamicRegistryManager manager)
-	{
-		JsonObject data = new JsonObject();
-		data.addProperty("Name", registryName.toString());
-		write(data, manager);
-		return data;
-	}
-	
-	protected JsonObject write(JsonObject data, DynamicRegistryManager manager) { return data; }
+	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	
 	public static Precondition readFromJson(JsonObject data)
 	{

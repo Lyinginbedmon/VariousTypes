@@ -5,11 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.jetbrains.annotations.Nullable;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.lying.VariousTypes;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference.ModInfo;
@@ -17,13 +12,8 @@ import com.lying.reference.Reference.ModInfo;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public class SpeciesRegistry
+public class SpeciesDefaults
 {
-	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
-	public static final String FILE_PATH = "species";
-	
-	private static final Map<Identifier, Species> SPECIES = new HashMap<>();
-	
 	private static final Map<Identifier, Supplier<Species>> DEFAULTS = new HashMap<>();
 	
 	public static final Supplier<Species> HUMAN = register(prefix("human"), () -> Species.Builder.of(prefix("human"))
@@ -53,19 +43,5 @@ public class SpeciesRegistry
 		return species;
 	}
 	
-	public static void clear() { SPECIES.clear(); }
-	
-	public static void add(Species species)
-	{
-		SPECIES.put(species.registryName(), species);
-		VariousTypes.LOGGER.info(" # Loaded species "+species.registryName().toString()+" # ");
-	}
-	
 	public static Collection<Supplier<Species>> defaultSpecies() { return DEFAULTS.values(); }
-	
-	@Nullable
-	public static Species get(Identifier registryName)
-	{
-		return SPECIES.getOrDefault(registryName, HUMAN.get());
-	}
 }

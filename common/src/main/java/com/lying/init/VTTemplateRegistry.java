@@ -1,0 +1,109 @@
+package com.lying.init;
+
+import java.io.Reader;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+
+import com.google.common.base.Predicates;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.lying.VariousTypes;
+import com.lying.data.ReloadListener;
+import com.lying.reference.Reference;
+import com.lying.template.Template;
+
+import dev.architectury.registry.ReloadListenerRegistry;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.resource.Resource;
+import net.minecraft.resource.ResourceManager;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
+import net.minecraft.util.profiler.Profiler;
+
+public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonObject>>
+{
+	private static VTTemplateRegistry INSTANCE;
+	
+	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
+	public static final String FILE_PATH = "template";
+	private WrapperLookup wrapperLookup = null;
+	
+	private final Map<Identifier, Template> TEMPLATES = new HashMap<>();
+	
+	public static VTTemplateRegistry instance() { return INSTANCE; }
+	
+	public void setLookup(WrapperLookup lookup) { this.wrapperLookup = lookup; }
+	
+	public void clear() { TEMPLATES.clear(); }
+	
+	private void add(Template template)
+	{
+		TEMPLATES.put(template.registryName(), template);
+		VariousTypes.LOGGER.info(" # Loaded template "+template.registryName().toString()+" # ");
+	}
+	
+	public Optional<Template> get(Identifier registryName)
+	{
+		return TEMPLATES.containsKey(registryName) ? Optional.of(TEMPLATES.get(registryName)) : Optional.empty();
+	}
+	
+	public Collection<Template> getAll() { return TEMPLATES.values(); }
+	
+	public Identifier getId() { return Reference.ModInfo.prefix("template"); }
+	
+	public static void init()
+	{
+		INSTANCE = new VTTemplateRegistry();
+		ReloadListenerRegistry.register(ResourceType.SERVER_DATA, INSTANCE, INSTANCE.getId());
+	}
+	
+	public CompletableFuture<Map<Identifier, JsonObject>> load(ResourceManager manager, Profiler profiler, Executor executor)
+	{
+		return CompletableFuture.supplyAsync(() -> 
+		{
+			VariousTypes.LOGGER.info(" # Loading VT templates...");
+			Map<Identifier, JsonObject> objects = new HashMap<>();
+			manager.findAllResources(FILE_PATH, Predicates.alwaysTrue()).forEach((fileName,fileSet) -> 
+			{
+				// The datapack source this species came from
+				String namespace = fileName.getNamespace();
+				
+				// The filename of this species, to be used as registry name
+				// TODO Tidy this up using regex
+				String fullPath = fileName.getPath();
+				fullPath = fullPath.substring(fullPath.lastIndexOf('/') + 1);
+				if(fullPath.endsWith(".json"))
+					fullPath = fullPath.substring(0, fullPath.length() - 5);
+				Identifier registryID = new Identifier(namespace, fullPath);
+				
+				Resource file = fileSet.getFirst();
+				try
+				{
+					objects.put(registryID, JsonHelper.deserialize(GSON, (Reader)file.getReader(), JsonObject.class));
+				}
+				catch(Exception e) { VariousTypes.LOGGER.error("Error while loading template "+fileName.toString()); }
+			});
+			return objects;
+		});
+	}
+	
+	public CompletableFuture<Void> apply(Map<Identifier, JsonObject> data, ResourceManager manager, Profiler profiler, Executor executor)
+	{
+		return CompletableFuture.runAsync(() -> 
+		{
+			clear();
+			
+			if(wrapperLookup != null)
+				for(Entry<Identifier, JsonObject> prep : data.entrySet())
+					add(Template.readFromJson(prep.getKey(), prep.getValue(), wrapperLookup));	// FIXME Identify WrapperLookup input value to read from JSON
+					;
+		});
+	}
+}

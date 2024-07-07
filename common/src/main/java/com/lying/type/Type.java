@@ -12,11 +12,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
+import com.lying.init.VTTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -76,12 +78,21 @@ public class Type
 	
 	public void read(NbtCompound data) { }
 	
-	public JsonElement writeToJson(DynamicRegistryManager manager)
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		return new JsonPrimitive(registryName().toString());
 	}
 	
-	// TODO Implement reading a type from Json
+	@Nullable
+	public static Type readFromJson(JsonElement entry, RegistryWrapper.WrapperLookup manager)
+	{
+		// Only Dummy types are stored as JsonObjects, due to their memory requirements
+		if(entry.isJsonObject())
+			return DummyType.fromJson(entry.getAsJsonObject(), manager);
+		else if(entry.isJsonPrimitive())
+			return VTTypes.get(new Identifier(entry.getAsString()));
+		return null;
+	}
 	
 	public static enum Tier
 	{

@@ -17,8 +17,8 @@ import com.lying.utility.LoreDisplay;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -56,40 +56,42 @@ public class Species
 	
 	public AbilitySet abilities() { return abilities.copy(); }
 	
-	public JsonObject writeToJson(DynamicRegistryManager manager)
+	public JsonObject writeToJson(RegistryWrapper.WrapperLookup lookup)
 	{
 		JsonObject obj = new JsonObject();
-//		obj.add("Display", display.toJson(manager));
+		obj.add("Display", display.toJson(lookup));
 		
 		if(power > 0)
 			obj.addProperty("Power", power);
 		if(homeDim != null)
 			obj.addProperty("Home", homeDim.getValue().toString());
 		if(!types.isEmpty())
-			obj.add("Types", types.writeToJson(manager));
+			obj.add("Types", types.writeToJson(lookup));
 		if(!abilities.isEmpty())
 			obj.add("Abilities", abilities.writeToJson());
 		
 		return obj;
 	}
 	
-	public void readFromJson(JsonObject data, DynamicRegistryManager manager)
+	public static Species readFromJson(Identifier registryName, JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
-		clear();
+		Species builder = Builder.of(registryName).build();
 		
-		display = LoreDisplay.fromJson(data.get("Display"), manager);
+		builder.display = LoreDisplay.fromJson(data.get("Display"), manager);
 		
 		if(data.has("Power"))
-			power = data.get("Power").getAsInt();
+			builder.power = data.get("Power").getAsInt();
 		
 		if(data.has("Home"))
-			homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+			builder.homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		
 		if(data.has("Types"))
-			types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
+			builder.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray(), manager);
 		
 		if(data.has("Abilities"))
-			abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), manager);
+			builder.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), manager);
+		
+		return builder;
 	}
 	
 	public void clear()

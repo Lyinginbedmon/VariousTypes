@@ -10,9 +10,10 @@ import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
-public abstract class TypesOperation extends Operation
+public abstract class TypesOperation extends ConfigurableOperation
 {
 	protected final List<Type> types = Lists.newArrayList();
 	
@@ -26,7 +27,7 @@ public abstract class TypesOperation extends Operation
 	
 	public abstract void applyToTypes(TypeSet typeSet);
 	
-	protected JsonObject write(JsonObject data, DynamicRegistryManager manager)
+	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
 		for(Type type : types)

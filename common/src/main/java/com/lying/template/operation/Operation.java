@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilitySet;
@@ -15,31 +16,31 @@ import com.lying.type.DummyType;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 /** Something this template does to the creature when it is applied*/
-public class Operation
+public abstract class Operation
 {
 	private static final Map<Identifier, Supplier<Operation>> OPERATIONS = new HashMap<>();
 	
-	public static final Supplier<Operation> LOSE_ALL_TYPES			= register(prefix("lose_all_types"), () -> new Operation(prefix("lose_all_types")) 
+	public static final Supplier<Operation> LOSE_ALL_TYPES			= register(prefix("lose_all_types"), () -> new SimpleOperation(prefix("lose_all_types")) 
 	{
 		public void applyToTypes(TypeSet typeSet) { typeSet.clear(); }
 	});
 	
-	public static final Supplier<Operation> LOSE_SUPERTYPES			= register(prefix("lose_supertypes"), () -> new Operation(prefix("lose_supertypes")) 
+	public static final Supplier<Operation> LOSE_SUPERTYPES			= register(prefix("lose_supertypes"), () -> new SimpleOperation(prefix("lose_supertypes")) 
 	{
 		public void applyToTypes(TypeSet typeSet) { typeSet.removeIf(type -> type.tier() == Tier.SUPERTYPE); }
 	});
 	
-	public static final Supplier<Operation> LOSE_SUBTYPES			= register(prefix("lose_subtypes"), () -> new Operation(prefix("lose_subtypes")) 
+	public static final Supplier<Operation> LOSE_SUBTYPES			= register(prefix("lose_subtypes"), () -> new SimpleOperation(prefix("lose_subtypes")) 
 	{
 		public void applyToTypes(TypeSet typeSet) { typeSet.removeIf(type -> type.tier() == Tier.SUBTYPE); }
 	});
 	
 	/** Remove flavour subtypes */
-	public static final Supplier<Operation> LOSE_DUMMY_SUBTYPES		= register(prefix("lose_dummy_subtypes"), () -> new Operation(prefix("lose_dummy_subtypes")) 
+	public static final Supplier<Operation> LOSE_DUMMY_SUBTYPES		= register(prefix("lose_dummy_subtypes"), () -> new SimpleOperation(prefix("lose_dummy_subtypes")) 
 	{
 		public void applyToTypes(TypeSet typeSet) { typeSet.removeIf(type -> type instanceof DummyType); }
 	});
@@ -88,18 +89,10 @@ public class Operation
 	
 	public Identifier registryName() { return registryName; }
 	
-	public final JsonObject writeToJson(DynamicRegistryManager manager)
-	{
-		JsonObject data = new JsonObject();
-		data.addProperty("Name", registryName().toString());
-		write(data, manager);
-		return data;
-	}
-	
-	protected JsonObject write(JsonObject data, DynamicRegistryManager manager) { return data; }
+	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	
 	@Nullable
-	public static Operation readFromJson(JsonObject data, DynamicRegistryManager manager)
+	public static Operation readFromJson(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		Operation op = get(new Identifier(data.get("Name").getAsString()));
 		if(op == null)
@@ -109,7 +102,7 @@ public class Operation
 		return op;
 	}
 	
-	protected void read(JsonObject data, DynamicRegistryManager manager) { }
+	protected void read(JsonObject data, RegistryWrapper.WrapperLookup manager) { }
 	
 	public void applyToTypes(TypeSet typeSet) { }
 	

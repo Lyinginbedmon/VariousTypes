@@ -1,10 +1,12 @@
 {
   "Conditions": [
-    {
-      "Name": "vartypes:is_living"
-    }
+    "vartypes:is_living"
   ],
-  "ID": "vartypes:aquatic",
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.aquatic"
+    }
+  },
   "Operations": [
     {
       "Name": "vartypes:add_types",

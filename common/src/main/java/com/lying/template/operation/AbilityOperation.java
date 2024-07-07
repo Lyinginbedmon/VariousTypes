@@ -5,13 +5,15 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
-public abstract class AbilityOperation extends Operation
+public abstract class AbilityOperation extends ConfigurableOperation
 {
 	protected AbilityOperation(Identifier nameIn)
 	{
@@ -34,14 +36,18 @@ public abstract class AbilityOperation extends Operation
 		
 		public void applyToAbilities(AbilitySet abilitySet) { abilitySet.add(ability.copy()); }
 		
-		protected JsonObject write(JsonObject data)
+		protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 		{
-			data.add("Ability", ability.writeToJson());
+			JsonObject ab = ability.writeToJson();
+			ab.remove("Source");
+			data.add("Ability", ab);
 			return data;
 		}
 		
 		protected void read(JsonObject data, DynamicRegistryManager manager)
 		{
+			JsonObject info = data.getAsJsonObject("Ability");
+			info.addProperty("Source", AbilitySource.TEMPLATE.asString());
 			ability = AbilityInstance.readFromJson(data.getAsJsonObject("Ability"), manager);
 		}
 	}
@@ -61,14 +67,14 @@ public abstract class AbilityOperation extends Operation
 		
 		public void applyToAbilities(AbilitySet abilitySet) { mapNames.forEach(name -> abilitySet.remove(name)); }
 		
-		protected JsonObject write(JsonObject data)
+		protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 		{
 			JsonArray list = new JsonArray();
 			mapNames.forEach(name -> list.add(name.toString()));
 			data.add("Abilities", list);
 			return data;
 		}
-
+		
 		protected void read(JsonObject data, DynamicRegistryManager manager)
 		{
 			mapNames.clear();
@@ -93,7 +99,7 @@ public abstract class AbilityOperation extends Operation
 		
 		public void applyToAbilities(AbilitySet abilitySet) { registryNames.forEach(name -> abilitySet.removeAll(name)); }
 		
-		protected JsonObject write(JsonObject data)
+		protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 		{
 			JsonArray list = new JsonArray();
 			registryNames.forEach(name -> list.add(name.toString()));

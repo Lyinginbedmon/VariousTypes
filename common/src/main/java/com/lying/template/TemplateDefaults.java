@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
@@ -14,15 +12,13 @@ import com.lying.reference.Reference.ModInfo;
 import com.lying.template.operation.AbilityOperation;
 import com.lying.template.operation.Operation;
 import com.lying.template.operation.TypesOperation;
-import com.lying.template.precondition.TypeCondition;
 import com.lying.template.precondition.Precondition;
+import com.lying.template.precondition.TypeCondition;
 
 import net.minecraft.util.Identifier;
 
-public class TemplateRegistry
+public class TemplateDefaults
 {
-	private static final Map<Identifier, Template> TEMPLATES = new HashMap<>();
-	
 	private static final Map<Identifier, Supplier<Template>> DEFAULTS = new HashMap<>();
 	
 	public static final Supplier<Template> AQUATIC		= register(prefix("aquatic"), () -> Template.Builder.of(prefix("aquatic"))
@@ -75,12 +71,6 @@ public class TemplateRegistry
 	{
 		DEFAULTS.put(name, template);
 		return template;
-	}
-	
-	@Nullable
-	public static Template get(Identifier registryName)
-	{
-		return TEMPLATES.getOrDefault(registryName, null);
 	}
 	
 	public static Collection<Supplier<Template>> defaultTemplates() { return DEFAULTS.values(); }

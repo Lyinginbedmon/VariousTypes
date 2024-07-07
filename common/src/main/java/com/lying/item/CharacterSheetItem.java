@@ -30,15 +30,19 @@ public class CharacterSheetItem extends Item
 			CharacterSheet sheet = opt.get();
 			user.sendMessage(Text.literal("Power: "+sheet.power()));
 			if(sheet.hasSpecies())
-				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().display().title().getString())));
+				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().get().display().title().getString())));
 			if(!sheet.getAppliedTemplates().isEmpty())
 			{
 				user.sendMessage(Text.literal("Templates:"));
 				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(Text.literal(tem.display().title().getString()))));
 			}
 			
-			user.sendMessage(Text.literal("Creature types:"));
-			sheet.getTypes().forEach(type -> user.sendMessage(Text.literal(" * ").append(type.displayName(world.getRegistryManager()))));
+			if(!sheet.getTypes().isEmpty())
+			{
+				user.sendMessage(Text.literal("Creature types:"));
+				sheet.getTypes().forEach(type -> user.sendMessage(Text.literal(" * ").append(type.displayName(world.getRegistryManager()))));
+			}
+			
 			user.sendMessage(Text.literal("Actions:"));
 			Action.actions().forEach(action -> 
 			{
@@ -52,12 +56,16 @@ public class CharacterSheetItem extends Item
 				user.sendMessage(Text.literal("Breathable fluids:"));
 				sheet.getActions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
 			}
-			user.sendMessage(Text.literal("Abilities:"));
-			sheet.getAbilities().abilities().forEach(inst ->
+			
+			if(!sheet.getAbilities().isEmpty())
 			{
-				if(!inst.ability().isHidden(inst))
-					user.sendMessage(Text.literal(" * ").append(inst.displayName(world.getRegistryManager())));
-			});
+				user.sendMessage(Text.literal("Abilities:"));
+				sheet.getAbilities().abilities().forEach(inst ->
+				{
+					if(!inst.ability().isHidden(inst))
+						user.sendMessage(Text.literal(" * ").append(inst.displayName(world.getRegistryManager())));
+				});
+			}
 		}
 		return TypedActionResult.success(user.getStackInHand(hand), world.isClient());
 	}

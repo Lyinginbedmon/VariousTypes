@@ -15,6 +15,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -79,7 +80,7 @@ public class AbilityInstance
 	public JsonObject writeToJson()
 	{
 		JsonObject json = new JsonObject();
-		json.addProperty("Ability", ability.registryName().toString());
+		json.addProperty("Name", ability.registryName().toString());
 		json.addProperty("Source", source.asString());
 		if(!display.isEmpty())
 			json.addProperty("Display", display.toString());
@@ -112,7 +113,7 @@ public class AbilityInstance
 		return instance;
 	}
 	
-	public static AbilityInstance readFromJson(JsonObject data, DynamicRegistryManager manager)
+	public static AbilityInstance readFromJson(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		Ability ability = data.has("Ability") ? VTAbilities.get(new Identifier(data.get("Ability").getAsString())) : null;
 		if(ability == null)
@@ -168,7 +169,7 @@ public class AbilityInstance
 	public final AbilityInstance copy()
 	{
 		AbilityInstance clone = new AbilityInstance(ability, source);
-		clone.memory = this.memory;
+		clone.setMemory(memory());
 		return clone;
 	}
 }

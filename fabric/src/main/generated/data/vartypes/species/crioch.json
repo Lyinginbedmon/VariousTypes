@@ -5,6 +5,11 @@
       "Source": "species"
     }
   ],
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.crioch"
+    }
+  },
   "Home": "minecraft:the_end",
   "Types": [
     "vartypes:othall"

@@ -1,6 +1,7 @@
 package com.lying.component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.function.Consumers;
@@ -13,11 +14,11 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSpeciesRegistry;
+import com.lying.init.VTTemplateRegistry;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
-import com.lying.species.SpeciesRegistry;
 import com.lying.template.Template;
-import com.lying.template.TemplateRegistry;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
@@ -42,11 +43,13 @@ public class CharacterSheet
 	private AbilitySet customAbilities = new AbilitySet();
 	
 	private RegistryKey<World> home = World.OVERWORLD;
-	private Species species = SpeciesRegistry.get(Reference.ModInfo.prefix("human"));
-	private List<Template> templates = Lists.newArrayList();
+	
+	// Species and templates are stored as IDs so we can retain them even if the datapack changes
+	private Identifier speciesID = Reference.ModInfo.prefix("human");
+	private List<Identifier> templateIDs = Lists.newArrayList();
 	
 	private TypeSet types = new TypeSet();
-	private AbilitySet abilities;
+	private AbilitySet abilities = new AbilitySet();
 	private ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 	
 	public CharacterSheet(LivingEntity ownerIn)
@@ -65,13 +68,13 @@ public class CharacterSheet
 	{
 		compound.putString("Home", home.getValue().toString());
 		
-		if(species != null)
-			compound.putString("Species", species.registryName().toString());
+		if(speciesID != null)
+			compound.putString("Species", speciesID.toString());
 		
-		if(!templates.isEmpty())
+		if(!templateIDs.isEmpty())
 		{
 			NbtList list = new NbtList();
-			templates.forEach(template -> list.add(NbtString.of(template.registryName().toString())));
+			templateIDs.forEach(template -> list.add(NbtString.of(template.toString())));
 			compound.put("Templates", list);
 		}
 		
@@ -89,16 +92,17 @@ public class CharacterSheet
 		home = RegistryKey.of(RegistryKeys.WORLD, new Identifier(compound.getString("Home")));
 		
 		if(compound.contains("Species", NbtElement.STRING_TYPE))
-			species = SpeciesRegistry.get(new Identifier(compound.getString("Species")));
+			speciesID = new Identifier(compound.getString("Species"));
 		
+		templateIDs.clear();
 		if(compound.contains("Templates", NbtElement.LIST_TYPE))
 		{
 			NbtList list = compound.getList("Templates", NbtElement.STRING_TYPE);
 			for(int i=0; i<list.size(); i++)
 			{
-				Template template = TemplateRegistry.get(new Identifier(list.getString(i)));
-				if(template != null)
-					templates.add(template);
+				Identifier name = new Identifier(list.getString(i));
+				if(!hasTemplate(name))
+					templateIDs.add(name);
 			}
 		}
 		
@@ -115,38 +119,40 @@ public class CharacterSheet
 	
 	public RegistryKey<World> getHome()
 	{
-		return species == null || !species.hasConfiguredHome() ? home : species.homeDimension();
+		return !hasSpecies() || !getSpecies().get().hasConfiguredHome() ? home : getSpecies().get().homeDimension();
 	}
 	
-	public void setSpecies(@Nullable Species speciesIn)
+	public void setSpecies(@Nullable Identifier registryNameIn)
 	{
-		species = speciesIn;
+		speciesID = registryNameIn == null ? null : registryNameIn;
 		buildSheet();
 	}
 	
-	public boolean hasSpecies() { return species != null; }
+	public boolean hasSpecies() { return getSpecies().isPresent(); }
 	
-	public Species getSpecies() { return species; }
+	public Optional<Species> getSpecies() { return VTSpeciesRegistry.get(speciesID); }
 	
-	public boolean hasTemplate(@NotNull Template templateIn) { return templates.stream().anyMatch(temp -> temp.registryName().equals(templateIn.registryName())); }
+	public boolean hasTemplate(@NotNull Template templateIn) { return hasTemplate(templateIn.registryName()); }
 	
-	public void addTemplate(@NotNull Template templateIn)
+	public boolean hasTemplate(@NotNull Identifier registryName) { return templateIDs.contains(registryName); }
+	
+	public void addTemplate(@NotNull Identifier registryName)
 	{
-		if(hasTemplate(templateIn))
+		if(hasTemplate(registryName))
 			return;
 		
-		templates.add(templateIn);
-		templateIn.applyTypeOperations(types);
+		templateIDs.add(registryName);
+		// templateIn.applyTypeOperations(types);
 		buildAbilities();
 		buildActions();
 	}
 	
-	public void removeTemplate(@NotNull Template templateIn)
+	public void removeTemplate(@NotNull Identifier registryName)
 	{
-		if(!hasTemplate(templateIn))
+		if(!hasTemplate(registryName))
 			return;
 		
-		templates.remove(templateIn);
+		templateIDs.remove(registryName);
 		buildSheet();
 	}
 	
@@ -156,17 +162,23 @@ public class CharacterSheet
 		buildSheet();
 	}
 	
-	public List<Template> getAppliedTemplates() { return templates; }
+	public List<Template> getAppliedTemplates()
+	{
+		List<Template> templates = Lists.newArrayList();
+		for(Identifier id : templateIDs)
+			VTTemplateRegistry.instance().get(id).ifPresent(tem -> templates.add(tem));
+		return templates;
+	}
 	
 	public int power()
 	{
 		int power = 0;
 		
-		if(species != null)
-			power += species.power();
+		if(hasSpecies())
+			power += getSpecies().get().power();
 		
-		if(!templates.isEmpty())
-			for(Template tem : templates)
+		if(!templateIDs.isEmpty())
+			for(Template tem : getAppliedTemplates())
 				power += tem.power();
 		
 		return power;
@@ -191,7 +203,7 @@ public class CharacterSheet
 	public void buildTypes()
 	{
 		// Source initial types from species, if any
-		TypeSet types = species == null ? new TypeSet() : species.types().copy();
+		TypeSet types = !hasSpecies() ? new TypeSet() : getSpecies().get().types().copy();
 		
 		// Apply all custom types
 		// XXX How should custom types be applied? Replace, merge, overrule all, etc.?
@@ -199,7 +211,7 @@ public class CharacterSheet
 			types = customTypes.copy();
 		
 		// Apply templates to types
-		for(Template template : templates)
+		for(Template template : getAppliedTemplates())
 			template.applyTypeOperations(types);
 		
 		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(owner, home, types);
@@ -211,13 +223,13 @@ public class CharacterSheet
 	/** Constructs available abilities based on types, species, applied templates, and custom abilities */
 	public void buildAbilities()
 	{
-		AbilitySet abilities = species == null ? new AbilitySet() : species.abilities().copy();
+		AbilitySet abilities = !hasSpecies() ? new AbilitySet() : getSpecies().get().abilities().copy();
 		
 		// Add abilities from types
 		types.abilities().forEach(inst -> abilities.add(inst.copy()));
 		
 		// Apply templates to abilities
-		for(Template template : templates)
+		for(Template template : getAppliedTemplates())
 			template.applyAbilityOperations(abilities);
 		
 		// Add all custom abilities

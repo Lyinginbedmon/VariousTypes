@@ -16,6 +16,7 @@ import com.lying.type.Type.Tier;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of unique types */
@@ -59,19 +60,19 @@ public class TypeSet
 		return set;
 	}
 	
-	public JsonArray writeToJson(DynamicRegistryManager manager)
+	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
 		types.forEach(inst -> list.add(inst.writeToJson(manager)));
 		return list;
 	}
 	
-	public static TypeSet readFromJson(JsonArray list)
+	public static TypeSet readFromJson(JsonArray list, RegistryWrapper.WrapperLookup manager)
 	{
 		TypeSet set = new TypeSet();
 		for(JsonElement entry : list.asList())
 		{
-			Type inst = VTTypes.get(new Identifier(entry.getAsString()));
+			Type inst = Type.readFromJson(entry, manager);
 			if(inst != null)
 				set.add(inst);
 		}
