@@ -79,11 +79,11 @@ public class Template
 		return data;
 	}
 	
-	public static Template readFromJson(Identifier registryName, JsonObject data, RegistryWrapper.WrapperLookup manager)
+	public static Template readFromJson(Identifier registryName, JsonObject data)
 	{
 		Builder builder = Builder.of(registryName);
 		
-		LoreDisplay display = LoreDisplay.fromJson(data.get("Display"), manager);
+		LoreDisplay display = LoreDisplay.fromJson(data.get("Display"));
 		builder.display(display.title());
 		if(display.description().isPresent())
 			builder.description(display.description().get());
@@ -96,7 +96,7 @@ public class Template
 			JsonArray list = data.getAsJsonArray("Conditions");
 			for(JsonElement element : list.asList())
 			{
-				Precondition condition = Precondition.readFromJson(element.getAsJsonObject());
+				Precondition condition = Precondition.readFromJson(element);
 				if(condition != null)
 					builder.condition(condition);
 			}
@@ -107,9 +107,9 @@ public class Template
 			JsonArray list = data.getAsJsonArray("Operations");
 			for(JsonElement element : list.asList())
 			{
-				Operation condition = Operation.readFromJson(element.getAsJsonObject(), manager);
-				if(condition != null)
-					builder.operation(condition);
+				Operation operation = Operation.readFromJson(element);
+				if(operation != null)
+					builder.operation(operation);
 			}
 		}
 		

@@ -19,7 +19,6 @@ import com.lying.reference.Reference;
 import com.lying.species.Species;
 
 import dev.architectury.registry.ReloadListenerRegistry;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
@@ -29,24 +28,21 @@ import net.minecraft.util.profiler.Profiler;
 
 public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObject>>
 {
-	public static VTSpeciesRegistry INSTANCE;
+	private static VTSpeciesRegistry INSTANCE;
 	
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 	public static final String FILE_PATH = "species";
-	private WrapperLookup wrapperLookup = null;
 	
 	private static final Map<Identifier, Species> SPECIES = new HashMap<>();
 	
 	public static VTSpeciesRegistry instance() { return INSTANCE; }
-	
-	public void setLookup(WrapperLookup lookup) { this.wrapperLookup = lookup; System.out.println("Species lookup set"); }
 	
 	public static void clear() { SPECIES.clear(); }
 	
 	private static void add(Species species)
 	{
 		SPECIES.put(species.registryName(), species);
-		VariousTypes.LOGGER.info(" # Loaded species "+species.registryName().toString()+" # ");
+		VariousTypes.LOGGER.info(" #  Loaded species "+species.registryName().toString());
 	}
 	
 	public static Optional<Species> get(Identifier registryName)
@@ -68,7 +64,6 @@ public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObj
 	{
 		return CompletableFuture.supplyAsync(() -> 
 		{
-			VariousTypes.LOGGER.info(" # Loading VT species...");
 			Map<Identifier, JsonObject> objects = new HashMap<>();
 			manager.findAllResources(FILE_PATH, Predicates.alwaysTrue()).forEach((fileName,fileSet) -> 
 			{
@@ -98,11 +93,10 @@ public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObj
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
+			VariousTypes.LOGGER.info(" # Loading VT species...");
 			clear();
-			if(wrapperLookup != null)
-				for(Entry<Identifier, JsonObject> prep : data.entrySet())
-					add(Species.readFromJson(prep.getKey(), prep.getValue(), wrapperLookup))	// FIXME Identify WrapperLookup input value to read from JSON
-					;
+			for(Entry<Identifier, JsonObject> prep : data.entrySet())
+				add(Species.readFromJson(prep.getKey(), prep.getValue()));
 		});
 	}
 }

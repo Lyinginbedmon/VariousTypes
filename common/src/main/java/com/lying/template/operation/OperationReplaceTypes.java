@@ -1,12 +1,11 @@
 package com.lying.template.operation;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.lying.init.VTTypes;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
@@ -29,16 +28,16 @@ public class OperationReplaceTypes extends TypesOperation
 		return data;
 	}
 	
-	protected void read(JsonObject data, DynamicRegistryManager manager)
+	protected void read(JsonObject data)
 	{
-		super.read(data, manager);
+		super.read(data);
 		targets.clear();
 		if(data.has("Targets"))
 		{
 			JsonArray list = data.getAsJsonArray("Targets");
-			for(int i=0; i<list.size(); i++)
+			for(JsonElement entry : list.asList())
 			{
-				Type type = VTTypes.get(new Identifier(list.get(i).getAsString()));
+				Type type = Type.readFromJson(entry);
 				if(type != null)
 					targets.add(type);
 			}
@@ -58,6 +57,6 @@ public class OperationReplaceTypes extends TypesOperation
 		}
 		
 		if(shouldReplace)
-			typeSet.addAll(this.types.toArray(new Type[0]));
+			typeSet.addAll(this.types.contents().toArray(new Type[0]));
 	}
 }

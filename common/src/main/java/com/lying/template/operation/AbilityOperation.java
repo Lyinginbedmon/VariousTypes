@@ -9,7 +9,6 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
@@ -38,17 +37,19 @@ public abstract class AbilityOperation extends ConfigurableOperation
 		
 		protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 		{
-			JsonObject ab = ability.writeToJson();
+			JsonObject ab = ability.writeToJson(manager);
 			ab.remove("Source");
 			data.add("Ability", ab);
 			return data;
 		}
 		
-		protected void read(JsonObject data, DynamicRegistryManager manager)
+		protected void read(JsonObject data)
 		{
 			JsonObject info = data.getAsJsonObject("Ability");
 			info.addProperty("Source", AbilitySource.TEMPLATE.asString());
-			ability = AbilityInstance.readFromJson(data.getAsJsonObject("Ability"), manager);
+			ability = AbilityInstance.readFromJson(info);
+			if(ability == null)
+				throw new NullPointerException();
 		}
 	}
 	
@@ -75,7 +76,7 @@ public abstract class AbilityOperation extends ConfigurableOperation
 			return data;
 		}
 		
-		protected void read(JsonObject data, DynamicRegistryManager manager)
+		protected void read(JsonObject data)
 		{
 			mapNames.clear();
 			JsonArray list = data.getAsJsonArray("Abilities");
@@ -106,8 +107,8 @@ public abstract class AbilityOperation extends ConfigurableOperation
 			data.add("Abilities", list);
 			return data;
 		}
-
-		protected void read(JsonObject data, DynamicRegistryManager manager)
+		
+		protected void read(JsonObject data)
 		{
 			registryNames.clear();
 			JsonArray list = data.getAsJsonArray("Abilities");

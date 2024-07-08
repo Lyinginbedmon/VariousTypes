@@ -1,7 +1,7 @@
 {
   "Abilities": [
     {
-      "Ability": "vartypes:teleport",
+      "Name": "vartypes:teleport",
       "Source": "species"
     }
   ],

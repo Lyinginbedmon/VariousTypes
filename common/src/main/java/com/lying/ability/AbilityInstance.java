@@ -77,13 +77,13 @@ public class AbilityInstance
 		return compound;
 	}
 	
-	public JsonObject writeToJson()
+	public JsonObject writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("Name", ability.registryName().toString());
 		json.addProperty("Source", source.asString());
 		if(!display.isEmpty())
-			json.addProperty("Display", display.toString());
+			json.add("Display", display.get().toJson(manager));
 		if(isReadOnly())
 			json.addProperty("ReadOnly", true);
 		if(!memory.isEmpty())
@@ -113,17 +113,18 @@ public class AbilityInstance
 		return instance;
 	}
 	
-	public static AbilityInstance readFromJson(JsonObject data, RegistryWrapper.WrapperLookup manager)
+	public static AbilityInstance readFromJson(JsonObject data)
 	{
-		Ability ability = data.has("Ability") ? VTAbilities.get(new Identifier(data.get("Ability").getAsString())) : null;
-		if(ability == null)
-			return null;
+		if(!data.has("Name"))
+			throw new NullPointerException();
+		
+		Ability ability = VTAbilities.get(new Identifier(data.get("Name").getAsString()));
 		
 		AbilitySource source = AbilitySource.fromName(data.get("Source").getAsString());
 		AbilityInstance instance = ability.instance(source);
 		
 		if(data.has("Display"))
-			instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display"), manager));
+			instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display")));
 		
 		if(data.has("ReadOnly") && data.get("ReadOnly").getAsBoolean())
 			instance.lock();

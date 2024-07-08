@@ -4,9 +4,9 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.component.CharacterSheet;
-import com.lying.init.VTTypes;
 import com.lying.type.Type;
 
 import net.minecraft.entity.LivingEntity;
@@ -41,9 +41,9 @@ public abstract class TypeCondition extends ConfigurableCondition
 	{
 		types.clear();
 		JsonArray list = data.getAsJsonArray("Types");
-		for(int i=0; i<list.size(); i++)
+		for(JsonElement entry : list.asList())
 		{
-			Type type = VTTypes.get(new Identifier(list.get(i).getAsString()));
+			Type type = Type.readFromJson(entry);
 			if(type != null)
 				types.add(type);
 		}

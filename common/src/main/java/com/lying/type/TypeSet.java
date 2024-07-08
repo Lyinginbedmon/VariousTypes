@@ -34,7 +34,7 @@ public class TypeSet
 	
 	public void clear() { types.clear(); }
 	
-	public TypeSet copy() { return new TypeSet(types.toArray(new Type[0])); }
+	public TypeSet copy() { return (new TypeSet()).addAll(this); }
 	
 	public NbtList writeToNbt(DynamicRegistryManager manager)
 	{
@@ -67,12 +67,12 @@ public class TypeSet
 		return list;
 	}
 	
-	public static TypeSet readFromJson(JsonArray list, RegistryWrapper.WrapperLookup manager)
+	public static TypeSet readFromJson(JsonArray list)
 	{
 		TypeSet set = new TypeSet();
 		for(JsonElement entry : list.asList())
 		{
-			Type inst = Type.readFromJson(entry, manager);
+			Type inst = Type.readFromJson(entry);
 			if(inst != null)
 				set.add(inst);
 		}
@@ -123,6 +123,12 @@ public class TypeSet
 	{
 		for(Type type : typesIn)
 			add(type);
+	}
+	
+	public TypeSet addAll(TypeSet typesIn)
+	{
+		typesIn.contents().forEach(type -> add(type));
+		return this;
 	}
 	
 	public boolean remove(Type typeIn)

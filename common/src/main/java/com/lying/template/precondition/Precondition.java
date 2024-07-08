@@ -31,14 +31,14 @@ public abstract class Precondition
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getTypes().contains(VTTypes.UNDEAD.get()); }
 	});
 	
-	public static final Supplier<Precondition> PHYSICAL		= register(prefix("physical"), () -> new SimpleCondition(prefix("physical"))
+	public static final Supplier<Precondition> PHYSICAL		= register(prefix("is_physical"), () -> new SimpleCondition(prefix("is_physical"))
 	{
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.getAbilities().hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
 	});
 	
-	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_types"), () -> new TypeCondition.All(prefix("has_all_types")));
-	public static final Supplier<Precondition> HAS_ANY_TYPE	= register(prefix("has_any_types"), () -> new TypeCondition.All(prefix("has_any_types")));
-	public static final Supplier<Precondition> HAS_NO_TYPE	= register(prefix("has_no_types"), () -> new TypeCondition.All(prefix("has_no_types")));
+	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_of_types"), () -> new TypeCondition.All(prefix("has_all_of_types")));
+	public static final Supplier<Precondition> HAS_ANY_TYPE	= register(prefix("has_any_of_types"), () -> new TypeCondition.All(prefix("has_any_of_types")));
+	public static final Supplier<Precondition> HAS_NO_TYPE	= register(prefix("has_none_of_types"), () -> new TypeCondition.All(prefix("has_none_of_types")));
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	
@@ -65,14 +65,20 @@ public abstract class Precondition
 	
 	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	
-	public static Precondition readFromJson(JsonObject data)
+	public static Precondition readFromJson(JsonElement value)
 	{
-		Precondition condition = get(new Identifier(data.get("Name").getAsString()));
-		if(condition == null)
-			return null;
-		data.remove("Name");
-		condition.read(data);
-		return condition;
+		if(value.isJsonObject())
+		{
+			JsonObject data = value.getAsJsonObject();
+			Precondition condition = get(new Identifier(data.get("Name").getAsString()));
+			if(condition == null)
+				return null;
+			data.remove("Name");
+			condition.read(data);
+			return condition;
+		}
+		
+		return get(new Identifier(value.getAsString()));
 	}
 	
 	protected void read(JsonObject data) { }

@@ -1,0 +1,26 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:has_any_of_types",
+      "Types": [
+        "vartypes:human",
+        "vartypes:othall",
+        "vartypes:dragon"
+      ]
+    }
+  ],
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.siar"
+    }
+  },
+  "Operations": [
+    {
+      "Name": "vartypes:set_types",
+      "Types": [
+        "vartypes:undead"
+      ]
+    }
+  ],
+  "Power": 4
+}

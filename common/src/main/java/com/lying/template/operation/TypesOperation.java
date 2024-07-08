@@ -1,54 +1,40 @@
 package com.lying.template.operation;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.lying.init.VTTypes;
+import com.lying.VariousTypes;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 public abstract class TypesOperation extends ConfigurableOperation
 {
-	protected final List<Type> types = Lists.newArrayList();
+	protected final TypeSet types = new TypeSet();
 	
 	protected TypesOperation(Identifier nameIn, Type... typesIn)
 	{
 		super(nameIn);
 		for(Type type : typesIn)
-			if(!types.contains(type))
-				types.add(type);
+			types.add(type);
 	}
 	
 	public abstract void applyToTypes(TypeSet typeSet);
 	
 	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
-		JsonArray list = new JsonArray();
-		for(Type type : types)
-			list.add(type.writeToJson(manager));
-		data.add("Types", list);
+		data.add("Types", types.writeToJson(manager));
 		return data;
 	}
-
-	protected void read(JsonObject data, DynamicRegistryManager manager)
+	
+	protected void read(JsonObject data)
 	{
 		types.clear();
 		if(data.has("Types"))
-		{
-			JsonArray list = data.getAsJsonArray("Types");
-			for(int i=0; i<list.size(); i++)
-			{
-				Type type = VTTypes.get(new Identifier(list.get(i).getAsString()));
-				if(type != null)
-					types.add(type);
-			}
-		}
+			types.addAll(TypeSet.readFromJson(data.getAsJsonArray("Types")));
+		
+		if(types.isEmpty())
+			VariousTypes.LOGGER.warn("Loaded empty types operation in a template, is this correct?");
 	}
 	
 	public static class Add extends TypesOperation
@@ -93,7 +79,7 @@ public abstract class TypesOperation extends ConfigurableOperation
 		public void applyToTypes(TypeSet typeSet)
 		{
 			typeSet.clear();
-			this.types.forEach(type -> typeSet.add(type));
+			typeSet.addAll(this.types);
 		}
 	}
 }

@@ -101,19 +101,19 @@ public class AbilitySet
 		return set;
 	}
 	
-	public JsonArray writeToJson()
+	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
-		abilities().forEach(inst -> list.add(inst.writeToJson()));
+		abilities().forEach(inst -> list.add(inst.writeToJson(manager)));
 		return list;
 	}
 	
-	public static AbilitySet readFromJson(JsonArray list, RegistryWrapper.WrapperLookup manager)
+	public static AbilitySet readFromJson(JsonArray list)
 	{
 		AbilitySet set = new AbilitySet();
 		for(JsonElement entry : list.asList())
 		{
-			AbilityInstance inst = AbilityInstance.readFromJson(entry.getAsJsonObject(), manager);
+			AbilityInstance inst = AbilityInstance.readFromJson(entry.getAsJsonObject());
 			if(inst != null)
 				set.add(inst);
 		}

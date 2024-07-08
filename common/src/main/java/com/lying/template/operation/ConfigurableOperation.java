@@ -21,5 +21,5 @@ public abstract class ConfigurableOperation extends Operation
 		return data;
 	}
 	
-	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager) { return data; }
+	protected abstract JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager);
 }

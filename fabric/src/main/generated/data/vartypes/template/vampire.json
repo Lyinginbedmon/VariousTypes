@@ -1,24 +1,25 @@
 {
   "Conditions": [
-    "vartypes:is_living",
     {
-      "Name": "vartypes:has_all_of_types",
+      "Name": "vartypes:has_any_of_types",
       "Types": [
-        "vartypes:human"
+        "vartypes:human",
+        "vartypes:othall",
+        "vartypes:dragon"
       ]
     }
   ],
   "Display": {
     "Title": {
-      "translate": "template.vartypes.insectile"
+      "translate": "template.vartypes.vampire"
     }
   },
   "Operations": [
-    "vartypes:lose_supertypes",
     {
-      "Name": "vartypes:add_types",
+      "Name": "vartypes:set_types",
       "Types": [
-        "vartypes:aduain"
+        "vartypes:undead",
+        "vartypes:altered"
       ]
     },
     {
@@ -28,5 +29,5 @@
       "Name": "vartypes:add_ability"
     }
   ],
-  "Power": 2
+  "Power": 8
 }

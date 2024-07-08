@@ -84,10 +84,9 @@ public class DummyType extends Type
 		return CODEC.encodeStart(registryops, this).getOrThrow();
 	}
 	
-	public static DummyType fromJson(JsonObject obj, RegistryWrapper.WrapperLookup manager)
+	public static DummyType fromJson(JsonObject obj)
 	{
-		RegistryOps<JsonElement> registryops = manager.getOps(JsonOps.INSTANCE);
-		return CODEC.decode(registryops, obj).getOrThrow().getFirst();
+		return CODEC.parse(JsonOps.INSTANCE, obj).getOrThrow();
 	}
 	
 	public static class Builder extends Type.Builder

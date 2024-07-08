@@ -1,6 +1,13 @@
 {
   "Conditions": [
-    "vartypes:is_living"
+    "vartypes:is_living",
+    {
+      "Name": "vartypes:has_none_of_types",
+      "Types": [
+        "vartypes:ooze",
+        "vartypes:aduain"
+      ]
+    }
   ],
   "Display": {
     "Title": {

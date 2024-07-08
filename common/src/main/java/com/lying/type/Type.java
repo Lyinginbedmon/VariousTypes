@@ -84,11 +84,11 @@ public class Type
 	}
 	
 	@Nullable
-	public static Type readFromJson(JsonElement entry, RegistryWrapper.WrapperLookup manager)
+	public static Type readFromJson(JsonElement entry)
 	{
 		// Only Dummy types are stored as JsonObjects, due to their memory requirements
 		if(entry.isJsonObject())
-			return DummyType.fromJson(entry.getAsJsonObject(), manager);
+			return DummyType.fromJson(entry.getAsJsonObject());
 		else if(entry.isJsonPrimitive())
 			return VTTypes.get(new Identifier(entry.getAsString()));
 		return null;

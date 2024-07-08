@@ -68,16 +68,16 @@ public class Species
 		if(!types.isEmpty())
 			obj.add("Types", types.writeToJson(lookup));
 		if(!abilities.isEmpty())
-			obj.add("Abilities", abilities.writeToJson());
+			obj.add("Abilities", abilities.writeToJson(lookup));
 		
 		return obj;
 	}
 	
-	public static Species readFromJson(Identifier registryName, JsonObject data, RegistryWrapper.WrapperLookup manager)
+	public static Species readFromJson(Identifier registryName, JsonObject data)
 	{
 		Species builder = Builder.of(registryName).build();
 		
-		builder.display = LoreDisplay.fromJson(data.get("Display"), manager);
+		builder.display = LoreDisplay.fromJson(data.get("Display"));
 		
 		if(data.has("Power"))
 			builder.power = data.get("Power").getAsInt();
@@ -86,10 +86,10 @@ public class Species
 			builder.homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		
 		if(data.has("Types"))
-			builder.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray(), manager);
+			builder.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
 		
 		if(data.has("Abilities"))
-			builder.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), manager);
+			builder.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray());
 		
 		return builder;
 	}

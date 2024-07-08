@@ -142,7 +142,7 @@ public class CharacterSheet
 			return;
 		
 		templateIDs.add(registryName);
-		// templateIn.applyTypeOperations(types);
+		VTTemplateRegistry.instance().get(registryName).ifPresent(tem -> tem.applyTypeOperations(types));
 		buildAbilities();
 		buildActions();
 	}
@@ -215,7 +215,7 @@ public class CharacterSheet
 			template.applyTypeOperations(types);
 		
 		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(owner, home, types);
-		this.types = types;
+		this.types = types.copy();
 		this.actions.markDirty();
 	}
 	

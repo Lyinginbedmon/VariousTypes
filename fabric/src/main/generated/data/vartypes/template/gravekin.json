@@ -4,22 +4,23 @@
     {
       "Name": "vartypes:has_none_of_types",
       "Types": [
-        "vartypes:aquatic"
+        "vartypes:ooze",
+        "vartypes:aduain"
       ]
     }
   ],
   "Display": {
     "Title": {
-      "translate": "template.vartypes.aquatic"
+      "translate": "template.vartypes.gravekin"
     }
   },
   "Operations": [
+    "vartypes:lose_supertypes",
     {
       "Name": "vartypes:add_types",
       "Types": [
-        "vartypes:aquatic"
+        "vartypes:undead"
       ]
     }
-  ],
-  "Power": 1
+  ]
 }

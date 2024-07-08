@@ -19,7 +19,6 @@ import com.lying.reference.Reference;
 import com.lying.template.Template;
 
 import dev.architectury.registry.ReloadListenerRegistry;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
@@ -33,20 +32,17 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 	public static final String FILE_PATH = "template";
-	private WrapperLookup wrapperLookup = null;
 	
 	private final Map<Identifier, Template> TEMPLATES = new HashMap<>();
 	
 	public static VTTemplateRegistry instance() { return INSTANCE; }
-	
-	public void setLookup(WrapperLookup lookup) { this.wrapperLookup = lookup; }
 	
 	public void clear() { TEMPLATES.clear(); }
 	
 	private void add(Template template)
 	{
 		TEMPLATES.put(template.registryName(), template);
-		VariousTypes.LOGGER.info(" # Loaded template "+template.registryName().toString()+" # ");
+		VariousTypes.LOGGER.info(" #  Loaded template "+template.registryName().toString());
 	}
 	
 	public Optional<Template> get(Identifier registryName)
@@ -68,7 +64,6 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	{
 		return CompletableFuture.supplyAsync(() -> 
 		{
-			VariousTypes.LOGGER.info(" # Loading VT templates...");
 			Map<Identifier, JsonObject> objects = new HashMap<>();
 			manager.findAllResources(FILE_PATH, Predicates.alwaysTrue()).forEach((fileName,fileSet) -> 
 			{
@@ -98,12 +93,10 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
+			VariousTypes.LOGGER.info(" # Loading VT templates...");
 			clear();
-			
-			if(wrapperLookup != null)
-				for(Entry<Identifier, JsonObject> prep : data.entrySet())
-					add(Template.readFromJson(prep.getKey(), prep.getValue(), wrapperLookup));	// FIXME Identify WrapperLookup input value to read from JSON
-					;
+			for(Entry<Identifier, JsonObject> prep : data.entrySet())
+				add(Template.readFromJson(prep.getKey(), prep.getValue()));
 		});
 	}
 }

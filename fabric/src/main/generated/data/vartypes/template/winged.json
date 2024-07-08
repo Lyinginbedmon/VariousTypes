@@ -1,7 +1,7 @@
 {
   "Conditions": [
     {
-      "Name": "vartypes:has_any_types",
+      "Name": "vartypes:has_any_of_types",
       "Types": [
         "vartypes:animal",
         "vartypes:human",
@@ -17,8 +17,7 @@
   "Operations": [
     {
       "Ability": {
-        "Ability": "vartypes:fly",
-        "Source": "template"
+        "Name": "vartypes:fly"
       },
       "Name": "vartypes:add_ability"
     }

@@ -92,17 +92,23 @@ public abstract class Operation
 	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	
 	@Nullable
-	public static Operation readFromJson(JsonObject data, RegistryWrapper.WrapperLookup manager)
+	public static Operation readFromJson(JsonElement value)
 	{
-		Operation op = get(new Identifier(data.get("Name").getAsString()));
-		if(op == null)
-			return null;
-		data.remove("Name");
-		op.read(data, manager);
-		return op;
+		if(value.isJsonObject())
+		{
+			JsonObject data = value.getAsJsonObject();
+			Operation op = get(new Identifier(data.get("Name").getAsString()));
+			if(op == null)
+				return null;
+			
+			data.remove("Name");
+			op.read(data);
+			return op;
+		}
+		return get(new Identifier(value.getAsString()));
 	}
 	
-	protected void read(JsonObject data, RegistryWrapper.WrapperLookup manager) { }
+	protected void read(JsonObject data) { }
 	
 	public void applyToTypes(TypeSet typeSet) { }
 	

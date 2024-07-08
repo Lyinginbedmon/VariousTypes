@@ -24,13 +24,18 @@ public class TemplateDefaults
 	public static final Supplier<Template> AQUATIC		= register(prefix("aquatic"), () -> Template.Builder.of(prefix("aquatic"))
 			.power(1)
 			.condition(Precondition.IS_LIVING.get())
+			.condition(TypeCondition.None.of(VTTypes.AQUATIC.get()))
 			.operation(TypesOperation.Add.of(VTTypes.AQUATIC.get())).build());
-//	public static final Supplier<Template> DLUITH		= register(prefix("dluith"), () -> Template.Builder.of(prefix("dluith"))	// Half-Aberration
-//			.condition(Precondition.IS_LIVING.get()).build());
-//	public static final Supplier<Template> GRAVEKIN		= register(prefix("gravekin"), () -> Template.Builder.of(prefix("gravekin"))	// Necropolitan
-//			.power(0)
-//			.condition(Precondition.IS_LIVING.get())
-//			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get())).build());
+	public static final Supplier<Template> DLUITH		= register(prefix("dluith"), () -> Template.Builder.of(prefix("dluith"))	// Half-Aberration
+			.condition(Precondition.IS_LIVING.get())
+			.condition(TypeCondition.None.of(VTTypes.ADUAIN.get()))
+			.operation(TypesOperation.Add.of(VTTypes.ADUAIN.get())).build());
+	public static final Supplier<Template> GRAVEKIN		= register(prefix("gravekin"), () -> Template.Builder.of(prefix("gravekin"))	// Necropolitan
+			.power(0)
+			.condition(Precondition.IS_LIVING.get())
+			.condition(TypeCondition.None.of(VTTypes.OOZE.get(), VTTypes.ADUAIN.get()))
+			.operation(Operation.LOSE_SUPERTYPES.get())
+			.operation(TypesOperation.Add.of(VTTypes.UNDEAD.get())).build());
 	public static final Supplier<Template> INSECTILE	= register(prefix("insectile"), () -> Template.Builder.of(prefix("insectile"))
 			.power(2)
 			.condition(Precondition.IS_LIVING.get())
@@ -38,10 +43,10 @@ public class TemplateDefaults
 			.operation(Operation.LOSE_SUPERTYPES.get())
 			.operation(TypesOperation.Add.of(VTTypes.ADUAIN.get()))
 			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get().instance(AbilitySource.TEMPLATE))).build());
-//	public static final Supplier<Template> SIAR			= register(prefix("siar"), () -> Template.Builder.of(prefix("siar"))	// Lich
-//			.power(4)
-//			.condition(Precondition.IS_LIVING.get())
-//			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get())).build());
+	public static final Supplier<Template> SIAR			= register(prefix("siar"), () -> Template.Builder.of(prefix("siar"))	// Lich
+			.power(4)
+			.condition(TypeCondition.Any.of(VTTypes.HUMAN.get(), VTTypes.OTHALL.get(), VTTypes.DRAGON.get()))
+			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get())).build());
 	public static final Supplier<Template> REPTILIAN	= register(prefix("reptilian"), () -> Template.Builder.of(prefix("reptilian"))
 			.power(2)
 			.condition(Precondition.IS_LIVING.get())
@@ -49,11 +54,11 @@ public class TemplateDefaults
 			.condition(TypeCondition.None.of(VTTypes.REPTILIAN.get()))
 			.operation(TypesOperation.Add.of(VTTypes.REPTILIAN.get()))
 			.operation(AbilityOperation.Add.of(VTAbilities.NIGHT_VISION.get().instance(AbilitySource.TEMPLATE))).build());
-//	public static final Supplier<Template> VAMPIRE		= register(prefix("vampire"), () -> Template.Builder.of(prefix("vampire"))
-//			.power(8)
-//			.condition(Precondition.IS_LIVING.get())
-//			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get(), VTTypes.ALTERED.get()))
-//			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get().instance(AbilitySource.TEMPLATE))).build());
+	public static final Supplier<Template> VAMPIRE		= register(prefix("vampire"), () -> Template.Builder.of(prefix("vampire"))
+			.power(8)
+			.condition(TypeCondition.Any.of(VTTypes.HUMAN.get(), VTTypes.OTHALL.get(), VTTypes.DRAGON.get()))
+			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get(), VTTypes.ALTERED.get()))
+			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get().instance(AbilitySource.TEMPLATE))).build());
 	public static final Supplier<Template> WINGED		= register(prefix("winged"), () -> Template.Builder.of(prefix("winged"))
 			.power(2)
 			.condition(TypeCondition.Any.of(VTTypes.ANIMAL.get(), VTTypes.HUMAN.get(), VTTypes.ARTHROPOD.get()))
@@ -61,6 +66,7 @@ public class TemplateDefaults
 	public static final Supplier<Template> ZOMBIE		= register(prefix("zombie"), () -> Template.Builder.of(prefix("zombie"))
 			.power(1)
 			.condition(Precondition.IS_LIVING.get())
+			.condition(TypeCondition.None.of(VTTypes.OOZE.get(), VTTypes.ADUAIN.get()))
 			.operation(Operation.LOSE_DUMMY_SUBTYPES.get())
 			.operation(Operation.LOSE_SUPERTYPES.get())
 			.operation(TypesOperation.Add.of(VTTypes.UNDEAD.get())).build());

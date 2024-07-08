@@ -37,8 +37,8 @@ public class LoreDisplay
 		return LoreDisplay.CODEC.encodeStart(registryOps, this).getOrThrow();
 	}
 	
-	public static LoreDisplay fromJson(JsonElement obj, RegistryWrapper.WrapperLookup manager)
+	public static LoreDisplay fromJson(JsonElement obj)
 	{
-		return CODEC.decode(manager.getOps(JsonOps.INSTANCE), obj).getOrThrow().getFirst();
+		return CODEC.parse(JsonOps.INSTANCE, obj).getOrThrow();
 	}
 }

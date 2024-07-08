@@ -1,9 +1,20 @@
 package com.lying.mixin;
 
+import java.util.Optional;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import com.lying.VariousTypes;
+import com.lying.component.CharacterSheet;
+import com.lying.type.Action;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.tag.TagKey;
@@ -51,4 +62,22 @@ public class EntityMixin
 	
 	@Shadow
 	public DamageSources getDamageSources() { return null; }
+	
+	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
+	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
+	{
+		Entity ent = (Entity)(Object)this;
+		if(!(ent instanceof LivingEntity))
+			return;
+		
+		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)ent);
+		if(sheet.isEmpty())
+			return;
+		
+		DamageSources sources = getDamageSources();
+		if(source == sources.drown())
+			ci.setReturnValue(!sheet.get().hasAction(Action.BREATHE.get()));
+		if(source == sources.starve())
+			ci.setReturnValue(!sheet.get().hasAction(Action.EAT.get()));
+	}
 }
