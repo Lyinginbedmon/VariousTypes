@@ -1,0 +1,26 @@
+{
+  "Conditions": [
+    {
+      "Name": "vartypes:has_any_of_types",
+      "Types": [
+        "vartypes:animal",
+        "vartypes:human",
+        "vartypes:arthropod"
+      ]
+    }
+  ],
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.winged"
+    }
+  },
+  "Operations": [
+    {
+      "Ability": {
+        "Name": "vartypes:fly"
+      },
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

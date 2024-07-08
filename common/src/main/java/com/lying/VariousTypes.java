@@ -1,6 +1,7 @@
 package com.lying;
 
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.slf4j.Logger;
@@ -21,7 +22,8 @@ public class VariousTypes
 {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.ModInfo.MOD_ID);
     
-    private static Function<LivingEntity, Optional<CharacterSheet>> getSheetFunc = (ent) -> Optional.empty();
+    private static Optional<Function<LivingEntity, Optional<CharacterSheet>>> getSheetFunc = Optional.empty();
+    private static Optional<BiConsumer<LivingEntity,CharacterSheet>> setSheetFunc = Optional.empty();
     
     public static void commonInit()
     {
@@ -35,11 +37,21 @@ public class VariousTypes
     
     public static Optional<CharacterSheet> getSheet(LivingEntity entity)
     {
-    	return getSheetFunc.apply(entity);
+    	return getSheetFunc.isPresent() ? getSheetFunc.get().apply(entity) : Optional.empty();
     }
     
-    public static void setGetSheetFunc(Function<LivingEntity, Optional<CharacterSheet>> funcIn)
+    public static void setSheet(LivingEntity entity, CharacterSheet sheet)
     {
-    	getSheetFunc = funcIn;
+    	setSheetFunc.ifPresent(func -> func.accept(entity, sheet));
+    }
+    
+    public static void getSheetFunc(Function<LivingEntity, Optional<CharacterSheet>> funcIn)
+    {
+    	getSheetFunc = Optional.of(funcIn);
+    }
+    
+    public static void setSheetFunc(BiConsumer<LivingEntity,CharacterSheet> funcIn)
+    {
+    	setSheetFunc = Optional.of(funcIn);
     }
 }

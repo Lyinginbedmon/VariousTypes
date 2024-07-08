@@ -5,7 +5,7 @@ license = "Insert License Here"
 
 [[mods]]
 modId = "vartypes"
-version = "${version}"
+version = "1.0.0"
 displayName = "Various Types"
 authors = "Me!"
 description = '''

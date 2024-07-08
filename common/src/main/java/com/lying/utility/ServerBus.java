@@ -1,5 +1,7 @@
 package com.lying.utility;
 
+import java.util.Optional;
+
 import org.jetbrains.annotations.Nullable;
 
 import com.lying.ability.AbilitySet;
@@ -20,7 +22,7 @@ public class ServerBus
 	@FunctionalInterface
 	public interface GetTypesEvent
 	{
-		void affectTypes(LivingEntity entity, @Nullable RegistryKey<World> homeDimension, TypeSet types);
+		void affectTypes(Optional<LivingEntity> entity, @Nullable RegistryKey<World> homeDimension, TypeSet types);
 	}
 	
 	/**
@@ -32,7 +34,7 @@ public class ServerBus
 	@FunctionalInterface
 	public interface RebuildActionsEvent
 	{
-		void affectActions(ActionHandler handler, AbilitySet abilities, LivingEntity owner);
+		void affectActions(ActionHandler handler, AbilitySet abilities, Optional<LivingEntity> owner);
 	}
 	
 	public static void init()
@@ -43,7 +45,7 @@ public class ServerBus
 				return;
 			
 			// Automatically add NATIVE or OTHAKIN depending on relation to home dimension
-			types.add(home == null || home == entity.getWorld().getRegistryKey() ? VTTypes.NATIVE.get() : VTTypes.OTHAKIN.get());
+			entity.ifPresent(ent -> types.add(home == null || home == ent.getWorld().getRegistryKey() ? VTTypes.NATIVE.get() : VTTypes.OTHAKIN.get()));
 		});
 	}
 }

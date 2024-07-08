@@ -56,7 +56,7 @@ public class LivingEntityMixin extends EntityMixin
 		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)(Object)this);
 		if(sheet.isEmpty())
 			return;
-		else if(sheet.get().getTypes().contains(VTTypes.UNDEAD.get()))
+		else if(sheet.get().types().contains(VTTypes.UNDEAD.get()))
 			ci.setReturnValue(true);
 	}
 	
@@ -64,7 +64,7 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$tickMovement(final CallbackInfo ci)
 	{
 		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)(Object)this);
-		if(sheet.isPresent() && sheet.get().getAbilities().hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+		if(sheet.isPresent() && sheet.get().abilities().hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 		{
 			ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
 			if(!helmet.isEmpty())

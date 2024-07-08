@@ -1,0 +1,17 @@
+{
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.muckie"
+    }
+  },
+  "Power": 1,
+  "Types": [
+    "vartypes:human",
+    {
+      "DisplayName": {
+        "translate": "subtype.vartypes.reptilian"
+      },
+      "ID": "vartypes:reptilian"
+    }
+  ]
+}

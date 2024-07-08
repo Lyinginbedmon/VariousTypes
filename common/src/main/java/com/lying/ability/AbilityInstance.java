@@ -16,6 +16,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.StringNbtReader;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -60,7 +61,7 @@ public class AbilityInstance
 		return ability.displayName(this);
 	}
 	
-	public NbtCompound writeToNbt(NbtCompound compound, DynamicRegistryManager manager)
+	public NbtCompound writeToNbt(NbtCompound compound, WrapperLookup manager)
 	{
 		compound.putString("Ability", ability.registryName().toString());
 		compound.putString("Source", source.asString());

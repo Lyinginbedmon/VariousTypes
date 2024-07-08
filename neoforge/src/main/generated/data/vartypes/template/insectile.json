@@ -1,0 +1,32 @@
+{
+  "Conditions": [
+    "vartypes:is_living",
+    {
+      "Name": "vartypes:has_all_of_types",
+      "Types": [
+        "vartypes:human"
+      ]
+    }
+  ],
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.insectile"
+    }
+  },
+  "Operations": [
+    "vartypes:lose_supertypes",
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        "vartypes:aduain"
+      ]
+    },
+    {
+      "Ability": {
+        "Name": "vartypes:climb"
+      },
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

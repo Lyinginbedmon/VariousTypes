@@ -12,13 +12,14 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
-import com.lying.init.VTTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.init.VTTypes;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -67,14 +68,14 @@ public class Type
 	
 	public boolean compatibleWith(Type other) { return compatibilityCheck.apply(other); }
 	
-	public final NbtCompound writeToNbt(NbtCompound data, DynamicRegistryManager manager)
+	public final NbtCompound writeToNbt(NbtCompound data, WrapperLookup manager)
 	{
 		data.putString("Type", registryName.toString());
 		write(data, manager);
 		return data;
 	}
 	
-	protected void write(NbtCompound data, DynamicRegistryManager manager) { }
+	protected void write(NbtCompound data, WrapperLookup manager) { }
 	
 	public void read(NbtCompound data) { }
 	

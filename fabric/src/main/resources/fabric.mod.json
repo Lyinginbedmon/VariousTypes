@@ -23,6 +23,14 @@
     ],
 	"fabric-datagen": [
 		"com.lying.fabric.data.VTDataGenerators"
+	],
+	"cardinal-components": [
+		"com.lying.fabric.component.VTComponents"
+	]
+  },
+  "custom": {
+	"cardinal-components": [
+		"vartypes:character_sheet"
 	]
   },
   "mixins": [

@@ -26,7 +26,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 	
 	public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 	{
-		return types.isEmpty() || types.stream().allMatch(type -> sheet.getTypes().contains(type));
+		return types.isEmpty() || types.stream().allMatch(type -> sheet.types().contains(type));
 	}
 	
 	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
@@ -60,7 +60,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().allMatch(type -> sheet.getTypes().contains(type));
+			return types.isEmpty() || types.stream().allMatch(type -> sheet.types().contains(type));
 		}
 	}
 	
@@ -75,7 +75,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().anyMatch(type -> sheet.getTypes().contains(type));
+			return types.isEmpty() || types.stream().anyMatch(type -> sheet.types().contains(type));
 		}
 	}
 	
@@ -90,7 +90,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().noneMatch(type -> sheet.getTypes().contains(type));
+			return types.isEmpty() || types.stream().noneMatch(type -> sheet.types().contains(type));
 		}
 	}
 }

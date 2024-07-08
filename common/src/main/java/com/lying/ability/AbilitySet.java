@@ -12,8 +12,8 @@ import com.google.gson.JsonElement;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of ability instances */
@@ -82,7 +82,7 @@ public class AbilitySet
 	
 	public Collection<AbilityInstance> abilities() { return abilities.values(); }
 	
-	public NbtList writeToNbt(DynamicRegistryManager manager)
+	public NbtList writeToNbt(WrapperLookup manager)
 	{
 		NbtList list = new NbtList();
 		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound(), manager)));

@@ -15,8 +15,8 @@ import com.lying.type.Type.Tier;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of unique types */
@@ -36,7 +36,7 @@ public class TypeSet
 	
 	public TypeSet copy() { return (new TypeSet()).addAll(this); }
 	
-	public NbtList writeToNbt(DynamicRegistryManager manager)
+	public NbtList writeToNbt(WrapperLookup manager)
 	{
 		NbtList list = new NbtList();
 		types.forEach(type -> list.add(type.writeToNbt(new NbtCompound(), manager)));
