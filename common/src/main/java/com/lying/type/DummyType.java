@@ -69,7 +69,7 @@ public class DummyType extends Type
 			String s = data.getString("DisplayName");
 			try
 			{
-				name = (Text)Text.Serialization.fromJson((String)s, manager);
+				name = Text.Serialization.fromJson(s, manager);
 			}
 			catch (Exception exception) { }
 		}

@@ -1,5 +1,9 @@
 package com.lying.item;
 
+import static com.lying.utility.VTUtils.describeSpecies;
+import static com.lying.utility.VTUtils.describeTemplate;
+import static com.lying.utility.VTUtils.describeType;
+
 import java.util.Optional;
 
 import com.lying.VariousTypes;
@@ -26,21 +30,20 @@ public class CharacterSheetItem extends Item
 		Optional<CharacterSheet> opt = VariousTypes.getSheet(user);
 		if(opt.isPresent() && !world.isClient())
 		{
-			user.sendMessage(Text.literal("Retrieved character sheet"));
 			CharacterSheet sheet = opt.get();
 			user.sendMessage(Text.literal("Power: "+sheet.power()));
 			if(sheet.hasASpecies())
-				user.sendMessage(Text.literal("Species: ").append(Text.literal(sheet.getSpecies().get().display().title().getString())));
+				user.sendMessage(Text.literal("Species: ").append(describeSpecies(sheet.getSpecies().get())));
 			if(!sheet.getAppliedTemplates().isEmpty())
 			{
 				user.sendMessage(Text.literal("Templates:"));
-				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(Text.literal(tem.display().title().getString()))));
+				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(describeTemplate(tem))));
 			}
 			
 			if(!sheet.types().isEmpty())
 			{
 				user.sendMessage(Text.literal("Creature types:"));
-				sheet.types().forEach(type -> user.sendMessage(Text.literal(" * ").append(type.displayName(world.getRegistryManager()))));
+				sheet.types().forEach(type -> user.sendMessage(Text.literal(" * ").append(describeType(type, world.getRegistryManager()))));
 			}
 			
 			user.sendMessage(Text.literal("Actions:"));
@@ -57,7 +60,7 @@ public class CharacterSheetItem extends Item
 				sheet.actions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
 			}
 			
-			if(!sheet.abilities().isEmpty())
+			if(!sheet.abilities().isEmpty() && sheet.abilities().abilities().stream().anyMatch(inst -> !inst.ability().isHidden(inst)))
 			{
 				user.sendMessage(Text.literal("Abilities:"));
 				sheet.abilities().abilities().forEach(inst ->

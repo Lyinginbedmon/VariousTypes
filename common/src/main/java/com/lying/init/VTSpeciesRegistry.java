@@ -33,24 +33,26 @@ public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObj
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 	public static final String FILE_PATH = "species";
 	
-	private static final Map<Identifier, Species> SPECIES = new HashMap<>();
+	private final Map<Identifier, Species> SPECIES = new HashMap<>();
 	
 	public static VTSpeciesRegistry instance() { return INSTANCE; }
 	
-	public static void clear() { SPECIES.clear(); }
+	public void clear() { SPECIES.clear(); }
 	
-	private static void add(Species species)
+	private void add(Species species)
 	{
 		SPECIES.put(species.registryName(), species);
 		VariousTypes.LOGGER.info(" #  Loaded species "+species.registryName().toString());
 	}
 	
-	public static Optional<Species> get(Identifier registryName)
+	public Optional<Species> get(Identifier registryName)
 	{
 		return SPECIES.containsKey(registryName) ? Optional.of(SPECIES.get(registryName)) : Optional.empty();
 	}
 	
-	public static Collection<Species> getAll() { return SPECIES.values(); }
+	public Collection<Species> getAll() { return SPECIES.values(); }
+	
+	public Collection<Identifier> getAllIDs() { return SPECIES.keySet(); }
 	
 	public Identifier getId() { return Reference.ModInfo.prefix("species"); }
 	

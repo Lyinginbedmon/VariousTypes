@@ -40,6 +40,8 @@ public class Template
 	
 	public Identifier registryName() { return registryName; }
 	
+	public Text displayName() { return display.title(); }
+	
 	public List<Precondition> preconditions() { return preconditions; }
 	
 	public List<Operation> operations() { return operations; }

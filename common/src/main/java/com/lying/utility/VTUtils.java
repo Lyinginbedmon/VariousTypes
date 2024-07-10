@@ -1,6 +1,8 @@
 package com.lying.utility;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.lying.component.CharacterSheet;
@@ -8,8 +10,15 @@ import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.species.Species;
 import com.lying.template.Template;
+import com.lying.type.Type;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
 public class VTUtils
@@ -23,25 +32,28 @@ public class VTUtils
 		
 		// Pick a random species
 		List<Species> randomSpecies = Lists.newArrayList();
-		randomSpecies.addAll(VTSpeciesRegistry.getAll());
+		randomSpecies.addAll(VTSpeciesRegistry.instance().getAll());
 		randomSpecies.removeIf(species -> species.power() > power);
 		if(!randomSpecies.isEmpty())
 			sheet.setSpecies(randomSpecies.get(rand.nextInt(randomSpecies.size())).registryName());
 		
-		// Pick a random arrangement of valid templates
-		List<Template> candidates = getValidTemplatesFor(sheet, ent);
-		candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
-		while(!candidates.isEmpty() && sheet.power() < power)
+		if(sheet.power() < power)
 		{
-			Template candidate = candidates.get(rand.nextInt(candidates.size()));
-			if(candidate.validFor(sheet, ent))
-			{
-				sheet.addTemplate(candidate.registryName());
-				break;
-			}
-			
-			candidates = getValidTemplatesFor(sheet, ent);
+			// Pick a random arrangement of valid templates
+			List<Template> candidates = getValidTemplatesFor(sheet, ent);
 			candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
+			while(!candidates.isEmpty() && sheet.power() < power)
+			{
+				Template candidate = candidates.get(rand.nextInt(candidates.size()));
+				if(candidate.validFor(sheet, ent))
+				{
+					sheet.addTemplate(candidate.registryName());
+					break;
+				}
+				
+				candidates = getValidTemplatesFor(sheet, ent);
+				candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
+			}
 		}
 		
 		return sheet;
@@ -53,5 +65,41 @@ public class VTUtils
 		templates.addAll(VTTemplateRegistry.instance().getAll());
 		templates.removeIf(tem -> sheet.hasTemplate(tem.registryName()) || !tem.validFor(sheet, owner));
 		return templates;
+	}
+	
+	public static int stringComparator(String name1, String name2)
+	{
+		List<String> names = Lists.newArrayList(name1, name2);
+		Collections.sort(names);
+		int ind1 = names.indexOf(name1);
+		int ind2 = names.indexOf(name2);
+		return ind1 > ind2 ? 1 : ind1 < ind2 ? -1 : 0;
+	}
+	
+	public static Text describeSpecies(Species spec)
+	{
+		return describe(spec.displayName(), spec.registryName(), spec.display().description());
+	}
+	
+	public static Text describeTemplate(Template spec)
+	{
+		return describe(spec.displayName(), spec.registryName(), spec.display().description());
+	}
+	
+	public static Text describeType(Type type, DynamicRegistryManager manager)
+	{
+		return describe(type.displayName(manager), type.listID(), Optional.empty());
+	}
+	
+	private static Text describe(Text display, Identifier regName, Optional<Text> desc)
+	{
+		MutableText tooltip = Text.empty().append(display.copy().formatted(Formatting.BOLD)).append("\n");
+		MutableText registry = Text.literal(regName.toString()).formatted(Formatting.DARK_GRAY);
+		if(desc.isPresent())
+			tooltip.append(desc.get().copy().formatted(Formatting.ITALIC, Formatting.GRAY)).append("\n").append(registry);
+		else
+			tooltip.append(registry);
+		HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip);
+		return display.copy().styled(style -> style.withHoverEvent(hover));
 	}
 }

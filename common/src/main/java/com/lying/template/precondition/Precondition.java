@@ -37,8 +37,8 @@ public abstract class Precondition
 	});
 	
 	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_of_types"), () -> new TypeCondition.All(prefix("has_all_of_types")));
-	public static final Supplier<Precondition> HAS_ANY_TYPE	= register(prefix("has_any_of_types"), () -> new TypeCondition.All(prefix("has_any_of_types")));
-	public static final Supplier<Precondition> HAS_NO_TYPE	= register(prefix("has_none_of_types"), () -> new TypeCondition.All(prefix("has_none_of_types")));
+	public static final Supplier<Precondition> HAS_ANY_TYPE	= register(prefix("has_any_of_types"), () -> new TypeCondition.Any(prefix("has_any_of_types")));
+	public static final Supplier<Precondition> HAS_NO_TYPE	= register(prefix("has_none_of_types"), () -> new TypeCondition.None(prefix("has_none_of_types")));
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	

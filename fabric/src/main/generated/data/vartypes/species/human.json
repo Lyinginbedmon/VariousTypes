@@ -1,5 +1,8 @@
 {
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.human.desc"
+    },
     "Title": {
       "translate": "species.vartypes.human"
     }

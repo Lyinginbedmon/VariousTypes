@@ -3,10 +3,13 @@ package com.lying.fabric;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
+import com.lying.component.CharacterSheet;
 import com.lying.fabric.component.VTComponents;
+import com.lying.utility.XPlatHandler;
 
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 
 public final class VariousTypesFabric implements ModInitializer
 {
@@ -19,8 +22,17 @@ public final class VariousTypesFabric implements ModInitializer
 		// Run our common setup.
 		VariousTypes.commonInit();
 		
-		// Populate helper functions
-		VariousTypes.getSheetFunc(ent -> ent.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(VTComponents.CHARACTER_SHEET.get(ent)));
-		VariousTypes.setSheetFunc((ent,sheet) -> VariousTypes.getSheet(ent).ifPresent(sheet2 -> sheet2.clone(sheet)));
+		VariousTypes.setPlatHandler(new XPlatHandler() 
+		{
+			public Optional<CharacterSheet> getSheet(LivingEntity entity)
+			{
+				return entity.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(VTComponents.CHARACTER_SHEET.get(entity));
+			}
+			
+			public void setSheet(LivingEntity entity, CharacterSheet sheet)
+			{
+				VTComponents.CHARACTER_SHEET.sync(entity);
+			}
+		});
 	}
 }

@@ -7,8 +7,10 @@ import java.util.function.Supplier;
 
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
+import com.lying.reference.Reference;
 import com.lying.reference.Reference.ModInfo;
 
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -17,6 +19,7 @@ public class SpeciesDefaults
 	private static final Map<Identifier, Supplier<Species>> DEFAULTS = new HashMap<>();
 	
 	public static final Supplier<Species> HUMAN = register(prefix("human"), () -> Species.Builder.of(prefix("human"))
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".human.desc"))
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.LINN.get()).build());
 	
 	// Enderman

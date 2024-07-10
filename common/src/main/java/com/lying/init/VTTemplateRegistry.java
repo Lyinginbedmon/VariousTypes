@@ -52,6 +52,8 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	
 	public Collection<Template> getAll() { return TEMPLATES.values(); }
 	
+	public Collection<Identifier> getAllIDs() { return TEMPLATES.keySet(); }
+	
 	public Identifier getId() { return Reference.ModInfo.prefix("template"); }
 	
 	public static void init()

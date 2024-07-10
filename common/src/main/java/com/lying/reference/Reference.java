@@ -15,7 +15,7 @@ public class Reference
 		
 		public static Identifier prefix(String name) { return new Identifier(MOD_ID, name); }
 		public static Text translate(String prefix, String suffix) { return Text.translatable(prefix + "." + MOD_ID + "." + suffix); }
-		public static Text translate(String prefix, String suffix, Object[] args) { return Text.translatable(prefix + "." + MOD_ID + "." + suffix, args); }
+		public static Text translate(String prefix, String suffix, Object... args) { return Text.translatable(prefix + "." + MOD_ID + "." + suffix, args); }
 	}
 	
 	public static class Values

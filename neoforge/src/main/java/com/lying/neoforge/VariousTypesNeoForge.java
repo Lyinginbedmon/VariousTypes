@@ -3,10 +3,13 @@ package com.lying.neoforge;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
+import com.lying.component.CharacterSheet;
 import com.lying.neoforge.component.PlayerSheetHandler;
 import com.lying.reference.Reference;
+import com.lying.utility.XPlatHandler;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -28,7 +31,17 @@ public final class VariousTypesNeoForge
 		VariousTypes.commonInit();
 		ATTACHMENTS.register(modContainer.getEventBus());
 		
-		VariousTypes.getSheetFunc(ent -> ent.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(ent.getData(HANDLER).setOwner(ent)));
-		VariousTypes.setSheetFunc((ent,sheet) -> ent.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(ent)));
+		VariousTypes.setPlatHandler(new XPlatHandler() 
+		{
+			public Optional<CharacterSheet> getSheet(LivingEntity entity)
+			{
+				return entity.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(entity.getData(HANDLER).setOwner(entity));
+			}
+			
+			public void setSheet(LivingEntity entity, CharacterSheet sheet)
+			{
+				entity.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(entity));
+			}
+		});
 	}
 }

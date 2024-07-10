@@ -69,20 +69,24 @@ public class CharacterSheet
 	public CharacterSheet copy(@Nullable LivingEntity ownerIn)
 	{
 		CharacterSheet clone = new CharacterSheet(ownerIn);
-		clone.clone(this);
+		clone.clone(this, false);
 		return clone;
 	}
 	
 	/** Repopulates the values of this sheet with those of the given sheet, without modifying the owner */
-	public void clone(CharacterSheet sheet)
+	public void clone(CharacterSheet sheet, boolean rebuild)
 	{
 		clear(false);
 		speciesID = sheet.speciesID;
 		templateIDs.addAll(sheet.templateIDs);
 		customTypes.addAll(sheet.customTypes);
 		sheet.customAbilities.abilities().forEach(inst -> customAbilities.add(inst));
-		buildSheet();
-		markDirty();
+		
+		if(rebuild)
+		{
+			buildSheet();
+			markDirty();
+		}
 	}
 	
 	public boolean hasOwner() { return owner.isPresent(); }
@@ -155,9 +159,10 @@ public class CharacterSheet
 		customAbilities.clear();
 		
 		if(rebuild)
+		{
 			buildSheet();
-		
-		markDirty();
+			markDirty();
+		}
 	}
 	
 	public void setHomeDimension(RegistryKey<World> world)
@@ -174,6 +179,7 @@ public class CharacterSheet
 		return (!hasASpecies() || !getSpecies().get().hasConfiguredHome()) ? home : getSpecies().get().homeDimension();
 	}
 	
+	/** Returns true if this sheet is using an identifiable species (ie. a registry name that exists in the active datapack) */
 	public boolean hasASpecies() { return getSpecies().isPresent(); }
 	
 	public void setSpecies(@Nullable Identifier registryNameIn)
@@ -181,14 +187,22 @@ public class CharacterSheet
 		if(registryNameIn == speciesID)
 			return;
 		
-		speciesID = registryNameIn == null ? null : registryNameIn;
+		speciesID = registryNameIn;
 		buildSheet();
 		markDirty();
 	}
 	
-	public Optional<Species> getSpecies() { return VTSpeciesRegistry.get(speciesID); }
+	public Optional<Species> getSpecies() { return VTSpeciesRegistry.instance().get(speciesID); }
 	
-	public boolean isSpecies(Identifier registryName) { return speciesID == registryName; }
+	public boolean isSpecies(Identifier registryName)
+	{
+		if(registryName == null)
+			return speciesID == null;
+		else if(speciesID == null)
+			return registryName == null;
+		else
+			return speciesID.equals(registryName);
+	}
 	
 	public boolean hasTemplate(@NotNull Template templateIn) { return hasTemplate(templateIn.registryName()); }
 	
@@ -212,6 +226,16 @@ public class CharacterSheet
 			return;
 		
 		templateIDs.remove(registryName);
+		buildSheet();
+		markDirty();
+	}
+	
+	public void clearTemplates()
+	{
+		if(templateIDs.isEmpty())
+			return;
+		
+		templateIDs.clear();
 		buildSheet();
 		markDirty();
 	}
