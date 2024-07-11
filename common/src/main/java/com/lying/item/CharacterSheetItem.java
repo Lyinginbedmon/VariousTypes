@@ -1,19 +1,17 @@
 package com.lying.item;
 
-import static com.lying.utility.VTUtils.describeSpecies;
-import static com.lying.utility.VTUtils.describeTemplate;
-import static com.lying.utility.VTUtils.describeType;
-
 import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
-import com.lying.type.Action;
+import com.lying.screen.CharacterSheetScreenHandler;
 
+import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
@@ -30,45 +28,47 @@ public class CharacterSheetItem extends Item
 		Optional<CharacterSheet> opt = VariousTypes.getSheet(user);
 		if(opt.isPresent() && !world.isClient())
 		{
-			CharacterSheet sheet = opt.get();
-			user.sendMessage(Text.literal("Power: "+sheet.power()));
-			if(sheet.hasASpecies())
-				user.sendMessage(Text.literal("Species: ").append(describeSpecies(sheet.getSpecies().get())));
-			if(!sheet.getAppliedTemplates().isEmpty())
-			{
-				user.sendMessage(Text.literal("Templates:"));
-				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(describeTemplate(tem))));
-			}
+			MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), user.getDisplayName()));
 			
-			if(!sheet.types().isEmpty())
-			{
-				user.sendMessage(Text.literal("Creature types:"));
-				sheet.types().forEach(type -> user.sendMessage(Text.literal(" * ").append(describeType(type, world.getRegistryManager()))));
-			}
-			
-			user.sendMessage(Text.literal("Actions:"));
-			Action.actions().forEach(action -> 
-			{
-				if(sheet.actions().can(action.get()))
-					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.can_action", action.get().translate())));
-				else
-					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.cannot_action", action.get().translate())));
-			});
-			if(sheet.actions().can(Action.BREATHE.get()))
-			{
-				user.sendMessage(Text.literal("Breathable fluids:"));
-				sheet.actions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
-			}
-			
-			if(!sheet.abilities().isEmpty() && sheet.abilities().abilities().stream().anyMatch(inst -> !inst.ability().isHidden(inst)))
-			{
-				user.sendMessage(Text.literal("Abilities:"));
-				sheet.abilities().abilities().forEach(inst ->
-				{
-					if(!inst.ability().isHidden(inst))
-						user.sendMessage(Text.literal(" * ").append(inst.displayName(world.getRegistryManager())));
-				});
-			}
+//			CharacterSheet sheet = opt.get();
+//			user.sendMessage(Text.literal("Power: "+sheet.power()));
+//			if(sheet.hasASpecies())
+//				user.sendMessage(Text.literal("Species: ").append(describeSpecies(sheet.getSpecies().get())));
+//			if(!sheet.getAppliedTemplates().isEmpty())
+//			{
+//				user.sendMessage(Text.literal("Templates:"));
+//				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(describeTemplate(tem))));
+//			}
+//			
+//			if(!sheet.types().isEmpty())
+//			{
+//				user.sendMessage(Text.literal("Creature types:"));
+//				sheet.types().forEach(type -> user.sendMessage(Text.literal(" * ").append(describeType(type, world.getRegistryManager()))));
+//			}
+//			
+//			user.sendMessage(Text.literal("Actions:"));
+//			Action.actions().forEach(action -> 
+//			{
+//				if(sheet.actions().can(action.get()))
+//					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.can_action", action.get().translate())));
+//				else
+//					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.cannot_action", action.get().translate())));
+//			});
+//			if(sheet.actions().can(Action.BREATHE.get()))
+//			{
+//				user.sendMessage(Text.literal("Breathable fluids:"));
+//				sheet.actions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
+//			}
+//			
+//			if(!sheet.abilities().isEmpty() && sheet.abilities().abilities().stream().anyMatch(inst -> !inst.ability().isHidden(inst)))
+//			{
+//				user.sendMessage(Text.literal("Abilities:"));
+//				sheet.abilities().abilities().forEach(inst ->
+//				{
+//					if(!inst.ability().isHidden(inst))
+//						user.sendMessage(Text.literal(" * ").append(inst.displayName(world.getRegistryManager())));
+//				});
+//			}
 		}
 		return TypedActionResult.success(user.getStackInHand(hand), world.isClient());
 	}

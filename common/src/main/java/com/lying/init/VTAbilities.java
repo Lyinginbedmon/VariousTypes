@@ -1,5 +1,7 @@
 package com.lying.init;
 
+import static com.lying.reference.Reference.ModInfo.prefix;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +13,6 @@ import com.lying.ability.Ability;
 import com.lying.ability.AbilityAmphibious;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityInstance;
-import com.lying.reference.Reference.ModInfo;
 
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
@@ -46,8 +47,6 @@ public class VTAbilities
 			return super.registryName();
 		}
 	});
-	
-	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	
 	public static Supplier<Ability> register(String name, Supplier<Ability> ability)
 	{

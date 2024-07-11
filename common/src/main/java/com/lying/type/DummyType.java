@@ -32,7 +32,7 @@ public class DummyType extends Type
 	
 	protected DummyType(Identifier nameIn, Identifier listIDIn, Optional<Text> displayNameIn)
 	{
-		super(nameIn, Tier.SUBTYPE, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
+		super(nameIn, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
 		listID = listIDIn;
 		displayName = displayNameIn;
 		data.putString("ID", listID.toString());

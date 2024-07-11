@@ -9,6 +9,7 @@ import com.lying.command.VTCommands;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTItems;
+import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
@@ -36,6 +37,7 @@ public class VariousTypes
     	VTTypes.init();
     	VTSpeciesRegistry.init();
     	VTTemplateRegistry.init();
+    	VTScreenHandlerTypes.init();
     	VTItems.init();
     	VTCommands.init();
     	ServerBus.init();
