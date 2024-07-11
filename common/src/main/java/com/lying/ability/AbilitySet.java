@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -81,6 +82,18 @@ public class AbilitySet
 	}
 	
 	public Collection<AbilityInstance> abilities() { return abilities.values(); }
+	
+	/** Returns a subset of abilities that are not hidden from displays */
+	public List<AbilityInstance> allNonHidden()
+	{
+		List<AbilityInstance> abilities = Lists.newArrayList();
+		abilities().forEach(inst -> 
+		{
+			if(!inst.ability().isHidden(inst))
+				abilities.add(inst);
+		});
+		return abilities;
+	}
 	
 	public NbtList writeToNbt(WrapperLookup manager)
 	{

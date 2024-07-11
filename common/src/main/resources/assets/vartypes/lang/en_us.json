@@ -62,7 +62,7 @@
 	"ability.vartypes.burrow": "Burrow",
 	"ability.vartypes.teleport": "Teleport",
 	"ability.vartypes.ghostly": "Ghostly",
-	"ability.vartypes.burn_in_sun": "Burns in sunlight",
+	"ability.vartypes.burn_in_sun": "Sunburn",
 	"ability.vartypes.critproof": "Critproof",
 	"ability.vartypes.mithridatic": "Mithraditic",
 	"ability.vartypes.regeneration": "Regeneration",
@@ -83,5 +83,7 @@
 	"command.vartypes.species.apply.failed": "%s is already a %s",
 	"command.vartypes.species.remove.success": "Removed %s species from %s",
 	"command.vartypes.species.remove.failed": "%s is already not a %s",
-	"command.vartypes.randomize.success": "Randomized %s's character sheet"
+	"command.vartypes.randomize.success": "Randomized %s's character sheet",
+	"gui.vartypes.typeset": "%s (%s)",
+	"gui.vartypes.templates": "%s templates"
 }

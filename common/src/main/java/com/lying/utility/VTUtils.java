@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.joml.Vector2i;
+
+import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSpeciesRegistry;
@@ -101,5 +104,26 @@ public class VTUtils
 			tooltip.append(registry);
 		HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip);
 		return display.copy().styled(style -> style.withHoverEvent(hover));
+	}
+	
+	public static <T extends Object> MutableText listToString(List<T> set, Function<T,Text> getter, String bridge)
+	{
+		MutableText string = Text.empty();
+		for(int i=0; i<set.size(); i++)
+		{
+			string.append(getter.apply(set.get(i)));
+			if(i < set.size() - 1)
+				string.append(bridge);
+		}
+		return string;
+	}
+	
+	/** Rotates a 2D vector clockwise */
+	public static Vector2i rotateDegrees2D(Vector2i vec, double degrees)
+	{
+		double rads = Math.toRadians(degrees);
+		double cos = Math.cos(rads);
+		double sin = Math.sin(rads);
+		return new Vector2i((int)(vec.x * cos - vec.y * sin), (int)(vec.x * sin + vec.y * cos));
 	}
 }

@@ -1,5 +1,6 @@
 package com.lying.ability;
 
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -10,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.init.VTAbilities;
 import com.lying.utility.LoreDisplay;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -41,6 +43,9 @@ public class AbilityInstance
 		this(abilityIn, sourceIn);
 		dataModifier.accept(memory);
 	}
+	
+	/** Returns a comparator for sorting abilities alphabetically by their display name */
+	public static Comparator<AbilityInstance> sortFunc(DynamicRegistryManager manager) { return (a, b) -> VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()); }
 	
 	/** The variable map name for this specific ability instance */
 	public Identifier mapName() { return ability.mapName(this); }

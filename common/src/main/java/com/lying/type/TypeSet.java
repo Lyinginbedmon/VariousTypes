@@ -1,6 +1,9 @@
 package com.lying.type;
 
+import static com.lying.utility.VTUtils.listToString;
+
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -11,12 +14,16 @@ import com.google.gson.JsonElement;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
+import com.lying.reference.Reference;
 import com.lying.type.Type.Tier;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of unique types */
@@ -28,6 +35,30 @@ public class TypeSet
 	{
 		for(Type type : typesIn)
 			add(type);
+	}
+	
+	/** Returns a formatted view of the contents of this TypeSet */
+	public Text display(DynamicRegistryManager manager)
+	{
+		MutableText[] vars = new MutableText[Tier.values().length];
+		for(Tier tier : Tier.values())
+		{
+			List<Type> types = ofTier(tier);
+			switch(types.size())
+			{
+				case 0:
+					break;
+				case 1:
+					vars[tier.ordinal()] = types.get(0).displayName(manager).copy();
+					break;
+				default:
+					Collections.sort(types, Type.sortFunc(manager));
+					vars[tier.ordinal()] = listToString(types, type -> type.displayName(manager), tier.ordinal() == 0 ? " " : ", ");
+					break;
+			}
+		}
+		
+		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : Reference.ModInfo.translate("gui", "typeset", vars);
 	}
 	
 	public boolean isEmpty() { return types.isEmpty(); }

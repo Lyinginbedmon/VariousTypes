@@ -1,6 +1,7 @@
 package com.lying.type;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.function.Consumers;
@@ -16,6 +17,7 @@ import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.DynamicRegistryManager;
@@ -56,6 +58,9 @@ public class Type
 		abilities = abilitiesIn.copy();
 		compatibilityCheck = compIn;
 	}
+	
+	/** Returns a comparator for sorting types alphabetically by their display name */
+	public static Comparator<Type> sortFunc(DynamicRegistryManager manager) { return (a, b) -> VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()); }
 	
 	public final Identifier registryName() { return registryName; }
 	
