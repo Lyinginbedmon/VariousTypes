@@ -16,7 +16,6 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
-import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
@@ -32,35 +31,38 @@ import net.minecraft.util.Identifier;
  */
 public class Type
 {
-	public static final int DEFAULT_COLOR = 0xFFFFFF;
-	public static final Identifier DEFAULT_TEX = Reference.ModInfo.prefix("textures/gui/sheet/human.png");
+	public static final int DEFAULT_COLOR = 0x236EF5;
 	
 	protected final Identifier registryName;
 	protected final Tier tier;
 	protected final int colour;
-	protected final Identifier sheetTexture;
 	protected final ActionHandler actions;
 	protected final AbilitySet abilities;
 	protected final Predicate<Type> compatibilityCheck;
 	
 	protected Type(Identifier nameIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
 	{
-		this(nameIn, Tier.SUBTYPE, DEFAULT_COLOR, DEFAULT_TEX, abilitiesIn, actionsIn, compIn);
+		this(nameIn, Tier.SUBTYPE, DEFAULT_COLOR, abilitiesIn, actionsIn, compIn);
 	}
 	
-	protected Type(Identifier nameIn, Tier tierIn, int colourIn, Identifier sheetTex, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
+	protected Type(Identifier nameIn, Tier tierIn, int colourIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
 	{
 		registryName = nameIn;
 		tier = tierIn;
 		colour = colourIn;
-		sheetTexture = sheetTex;
 		actions = actionsIn.copy();
 		abilities = abilitiesIn.copy();
 		compatibilityCheck = compIn;
 	}
 	
 	/** Returns a comparator for sorting types alphabetically by their display name */
-	public static Comparator<Type> sortFunc(DynamicRegistryManager manager) { return (a, b) -> VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()); }
+	public static Comparator<Type> sortFunc(DynamicRegistryManager manager)
+	{
+		return (a, b) -> 
+			a.tier() == b.tier() ? 
+				VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()) : 
+				(int)Math.signum(a.tier().ordinal() - b.tier().ordinal());
+	}
 	
 	public final Identifier registryName() { return registryName; }
 	
@@ -70,8 +72,6 @@ public class Type
 	public final Tier tier() { return this.tier; }
 	
 	public final int color() { return this.colour; }
-	
-	public final Identifier sheetBackground() { return this.sheetTexture; }
 	
 	public Text displayName(DynamicRegistryManager manager) { return Text.translatable("type."+registryName.getNamespace()+"."+registryName.getPath()); }
 	
@@ -128,7 +128,6 @@ public class Type
 		protected final Identifier name;
 		protected final Tier tier;
 		protected int colour = DEFAULT_COLOR;
-		protected Identifier texture = DEFAULT_TEX;
 		protected final AbilitySet abilities = new AbilitySet();
 		protected ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 		protected Predicate<Type> compCheck = Predicates.alwaysTrue();
@@ -154,10 +153,9 @@ public class Type
 			return new Builder(nameIn, tierIn);
 		}
 		
-		public Builder display(int colorIn, Identifier textureIn)
+		public Builder display(int colorIn)
 		{
 			colour = colorIn;
-			texture = textureIn;
 			return this;
 		}
 		
@@ -192,7 +190,7 @@ public class Type
 					return new Type(name, abilities, actions, compCheck);
 				default:
 				case SUPERTYPE:
-					return new Type(name, tier, colour, texture, abilities, actions, compCheck);
+					return new Type(name, tier, colour, abilities, actions, compCheck);
 			}
 		}
 	}

@@ -7,7 +7,9 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
@@ -27,13 +29,20 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 
 import dev.architectury.event.events.common.CommandRegistrationEvent;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionOptions;
 
 public class VTCommands
 {
@@ -60,6 +69,27 @@ public class VTCommands
 		{
 			dispatcher.register(literal(Reference.ModInfo.MOD_ID).requires(source -> source.hasPermissionLevel(2))
 					.then(literal("list")
+						.then(literal("homes")
+							.executes(context -> 
+							{
+								ServerCommandSource source = context.getSource();
+								Registry<DimensionOptions> registry = source.getServer().getCombinedDynamicRegistries().getCombinedRegistryManager().get(RegistryKeys.DIMENSION);
+								Map<Identifier, RegistryKey<World>> worlds = new HashMap<>();
+								for(Map.Entry<RegistryKey<DimensionOptions>, DimensionOptions> entry : registry.getEntrySet())
+								{
+									RegistryKey<DimensionOptions> option = entry.getKey();
+									RegistryKey<World> dimKey = RegistryKey.of(RegistryKeys.WORLD, option.getValue());
+									worlds.put(option.getValue(), dimKey);
+								}
+								List<Identifier> set = Lists.newArrayList();
+								set.addAll(worlds.keySet());
+								if(set.isEmpty())
+									throw FAILED_NO_OPTIONS.create();
+								source.sendFeedback(() -> translate("command","list.homes.success", registry.size()), true);
+								Collections.sort(set, (spec1, spec2) -> VTUtils.stringComparator(spec1.toString(), spec2.toString()));
+								set.forEach(spec -> source.sendMessage(Text.literal(" * ").append(spec.toString())));
+								return Math.min(set.size(), 15);
+							}))
 						.then(literal("species")
 							.executes(context -> 
 							{
@@ -68,7 +98,7 @@ public class VTCommands
 								set.addAll(VTSpeciesRegistry.instance().getAll());
 								if(set.isEmpty())
 									throw FAILED_NO_OPTIONS.create();
-								source.sendFeedback(() -> Text.literal(set.size()+" available species"), true);
+								source.sendFeedback(() -> translate("command","list.species.success", set.size()), true);
 								Collections.sort(set, (spec1, spec2) -> VTUtils.stringComparator(spec1.displayName().getString(), spec2.displayName().getString()));
 								set.forEach(spec -> source.sendMessage(Text.literal(" * ").append(describeSpecies(spec))));
 								return Math.min(set.size(), 15);
@@ -81,7 +111,7 @@ public class VTCommands
 								set.addAll(VTTemplateRegistry.instance().getAll());
 								if(set.isEmpty())
 									throw FAILED_NO_OPTIONS.create();
-								source.sendFeedback(() -> Text.literal(set.size()+" available templates"), true);
+								source.sendFeedback(() -> translate("command","list.templates.success", set.size()), true);
 								Collections.sort(set, (tem1, tem2) -> VTUtils.stringComparator(tem1.displayName().getString(), tem2.displayName().getString()));
 								set.forEach(tem -> source.sendMessage(Text.literal(" * ").append(describeTemplate(tem))));
 								return Math.min(set.size(), 15);
@@ -92,7 +122,7 @@ public class VTCommands
 								{
 									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
 									VariousTypes.getSheet(player).ifPresent(sheet -> sheet.clear(true));
-									context.getSource().sendFeedback(() -> Text.literal("Character sheet reset"), true);
+									context.getSource().sendFeedback(() -> translate("command","reset.success", player.getDisplayName()), true);
 									return 15;
 								}))
 						.then(literal("randomize")
@@ -100,6 +130,21 @@ public class VTCommands
 							.then(argument("power", IntegerArgumentType.integer(0))
 								.executes(context -> tryRandomize(EntityArgumentType.getPlayer(context, PLAYER), IntegerArgumentType.getInteger(context, "power"), context.getSource()))))
 						.then(literal("get")
+							.then(literal("home")
+								.executes(context ->
+								{
+									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+									if(sheetOpt.isEmpty())
+										throw FAILED_GENERIC.create();
+									
+									String home = sheetOpt.get().homeDimension().getValue().toString();
+									if(sheetOpt.get().customHome().isPresent())
+										context.getSource().sendFeedback(() -> translate("command", "get.home.success.custom", player.getDisplayName(), home), true);
+									else
+										context.getSource().sendFeedback(() -> translate("command", "get.home.success", player.getDisplayName(), home), true);
+									return 15;
+								}))
 							.then(literal("species")
 								.executes(context -> 
 								{
@@ -109,7 +154,7 @@ public class VTCommands
 										throw FAILED_GENERIC.create();
 									else if(!sheetOpt.get().hasASpecies())
 										throw FAILED_NO_SPECIES.create();
-									context.getSource().sendFeedback(() -> Text.literal("Species: ").append(describeSpecies(sheetOpt.get().getSpecies().get())), false);
+									context.getSource().sendFeedback(() -> translate("command","get.species.success", player.getDisplayName(), describeSpecies(sheetOpt.get().getSpecies().get())), true);
 									return 15;
 								}))
 							.then(literal("templates")
@@ -123,11 +168,31 @@ public class VTCommands
 									if((templates = sheetOpt.get().getAppliedTemplates()).isEmpty())
 										throw FAILED_NO_TEMPLATES.create();
 									
-									context.getSource().sendFeedback(() -> Text.literal(templates.size()+" applied templates:"), false);
+									context.getSource().sendFeedback(() -> translate("command","get.templates.success",player.getDisplayName(),templates.size()), true);
 									templates.forEach(tem -> context.getSource().sendFeedback(() -> Text.literal(" * ").append(describeTemplate(tem)), false));
 									return 15;
 								})))
 						.then(literal("apply")
+							.then(literal("home")
+								.then(argument("dimension", DimensionArgumentType.dimension())
+									.executes(context -> 
+									{
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										ServerWorld world = null;
+										try
+										{
+											world = DimensionArgumentType.getDimensionArgument(context, "dimension");
+										}
+										catch(Exception e) { }
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || world == null)
+											throw FAILED_GENERIC.create();
+										
+										RegistryKey<World> dim = world.getRegistryKey();
+										sheetOpt.get().setHomeDimension(dim);
+										context.getSource().sendFeedback(() -> translate("command", "apply.home.success", player.getDisplayName(), dim.getValue().toString()), true);
+										return 15;
+									})))
 							.then(literal("species")
 								.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
 									.executes(context -> 
@@ -158,6 +223,35 @@ public class VTCommands
 									.then(argument("force", BoolArgumentType.bool())
 										.executes(context -> tryApplyTemplate(EntityArgumentType.getPlayer(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), BoolArgumentType.getBool(context, "force"), context.getSource()))))))
 						.then(literal("remove")
+							.then(literal("home")
+								.executes(context -> 
+								{
+									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+									if(sheetOpt.isEmpty())
+										throw FAILED_GENERIC.create();
+									
+									sheetOpt.get().clearHomeDimension();
+									context.getSource().sendFeedback(() -> translate("command","home.clear.success",player.getDisplayName(), sheetOpt.get().homeDimension().getValue().toString()), true);
+									return 15;
+								})
+								.then(argument("dimension", DimensionArgumentType.dimension())
+									.executes(context -> 
+									{
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										ServerWorld world = null;
+										try
+										{
+											world = DimensionArgumentType.getDimensionArgument(context, "dimension");
+										}
+										catch(Exception e) { }
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || sheetOpt.get().customHome().isEmpty() || world == null || !world.getRegistryKey().equals(sheetOpt.get().customHome().get()))
+											throw FAILED_GENERIC.create();
+										
+										context.getSource().sendFeedback(() -> translate("command","home.remove.success", player.getDisplayName(), sheetOpt.get().homeDimension().getValue().toString()), true);
+										return 15;
+									})))
 							.then(literal("species")
 								.executes(context -> 
 								{

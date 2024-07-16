@@ -38,7 +38,10 @@ import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-/** General data management class for handling species & templates of a specific entity */
+/**
+ * General data management class for handling species & templates of a specific entity
+ * @author Lying
+ */
 public class CharacterSheet
 {
 	private static final Identifier DEFAULT_SPECIES = Reference.ModInfo.prefix("human");
@@ -48,7 +51,7 @@ public class CharacterSheet
 	private TypeSet customTypes = new TypeSet();
 	private AbilitySet customAbilities = new AbilitySet();
 	
-	private RegistryKey<World> home = DEFAULT_HOME;
+	private Optional<RegistryKey<World>> home = Optional.empty();
 	
 	// Species and templates are stored as IDs so we can retain them even if the datapack changes
 	private Identifier speciesID = DEFAULT_SPECIES;
@@ -101,7 +104,8 @@ public class CharacterSheet
 	
 	public NbtCompound writeSheetToNbt(NbtCompound compound, WrapperLookup registryOps)
 	{
-		compound.putString("Home", home.getValue().toString());
+		if(home.isPresent())
+			compound.putString("CustomHome", home.get().getValue().toString());
 		
 		if(speciesID != null)
 			compound.putString("Species", speciesID.toString());
@@ -125,7 +129,8 @@ public class CharacterSheet
 	public void readSheetFromNbt(NbtCompound compound)
 	{
 		clear(false);
-		home = RegistryKey.of(RegistryKeys.WORLD, new Identifier(compound.getString("Home")));
+		if(compound.contains("CustomHome", NbtElement.STRING_TYPE))
+			home = Optional.of(RegistryKey.of(RegistryKeys.WORLD, new Identifier(compound.getString("CustomHome"))));
 		
 		if(compound.contains("Species", NbtElement.STRING_TYPE))
 			speciesID = new Identifier(compound.getString("Species"));
@@ -152,7 +157,7 @@ public class CharacterSheet
 	
 	public void clear(boolean rebuild)
 	{
-		home = DEFAULT_HOME;
+		home = Optional.empty();
 		speciesID = DEFAULT_SPECIES;
 		templateIDs.clear();
 		customTypes.clear();
@@ -167,16 +172,34 @@ public class CharacterSheet
 	
 	public void setHomeDimension(RegistryKey<World> world)
 	{
-		if(world == home)
+		if(home.isPresent() && world == home.get())
 			return;
 		
-		home = world;
+		home = Optional.of(world);
 		markDirty();
 	}
 	
+	public void clearHomeDimension()
+	{
+		if(!home.isPresent())
+			return;
+		
+		home = Optional.empty();
+		markDirty();
+	}
+	
+	public Optional<RegistryKey<World>> customHome() { return home; }
+	
 	public RegistryKey<World> homeDimension()
 	{
-		return (!hasASpecies() || !getSpecies().get().hasConfiguredHome()) ? home : getSpecies().get().homeDimension();
+		if(home.isPresent())
+			return home.get();
+		
+		RegistryKey<World> home = DEFAULT_HOME;
+		if(hasASpecies() && getSpecies().get().hasConfiguredHome())
+			home = getSpecies().get().homeDimension();
+		
+		return home;
 	}
 	
 	/** Returns true if this sheet is using an identifiable species (ie. a registry name that exists in the active datapack) */
@@ -301,7 +324,7 @@ public class CharacterSheet
 		for(Template template : getAppliedTemplates())
 			template.applyTypeOperations(types);
 		
-		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), home, types);
+		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), homeDimension(), types);
 		this.types = types.copy();
 		this.actions.markDirty();
 	}

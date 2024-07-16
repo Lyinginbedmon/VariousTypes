@@ -7,6 +7,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
+import com.lying.utility.LoreDisplay;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -16,31 +17,30 @@ import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 public class DummyType extends Type
 {
 	public static final Codec<DummyType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Identifier.CODEC.fieldOf("ID").forGetter(DummyType::listID), 
-			TextCodecs.CODEC.optionalFieldOf("DisplayName").forGetter(DummyType::customName))
+			LoreDisplay.CODEC.fieldOf("Display").forGetter(DummyType::display))
 				.apply(instance, (a, b)-> DummyType.create(a, b)));
 	
 	protected NbtCompound data = new NbtCompound();
 	protected Identifier listID;
 	protected Optional<Text> displayName = null;
+	protected LoreDisplay display;
 	
-	protected DummyType(Identifier nameIn, Identifier listIDIn, Optional<Text> displayNameIn)
+	protected DummyType(Identifier nameIn, Identifier listIDIn, LoreDisplay displayIn)
 	{
 		super(nameIn, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
 		listID = listIDIn;
-		displayName = displayNameIn;
-		data.putString("ID", listID.toString());
+		display = displayIn;
 	}
 	
-	public static DummyType create(Identifier listID, Optional<Text> displayName)
+	public static DummyType create(Identifier listID, LoreDisplay displayIn)
 	{
-		return new DummyType(VTTypes.DUMMY.get().registryName(), listID, displayName);
+		return new DummyType(VTTypes.DUMMY.get().registryName(), listID, displayIn);
 	}
 	
 	public Identifier listID() { return listID; }
@@ -60,23 +60,10 @@ public class DummyType extends Type
 	
 	public Text displayName(DynamicRegistryManager manager)
 	{
-		if(customName().isPresent())
-			return customName().get();
-		
-		Text name = super.displayName(manager);
-		if(data.contains("DisplayName"))
-		{
-			String s = data.getString("DisplayName");
-			try
-			{
-				name = Text.Serialization.fromJson(s, manager);
-			}
-			catch (Exception exception) { }
-		}
-		return name;
+		return display.title();
 	}
 	
-	public Optional<Text> customName() { return this.displayName; }
+	public LoreDisplay display() { return display; }
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
@@ -91,8 +78,10 @@ public class DummyType extends Type
 	
 	public static class Builder extends Type.Builder
 	{
-		protected Text display = null;
 		protected Identifier spoofName;
+		
+		private Text displayName;
+		private Optional<Text> displayDesc = Optional.empty();
 		
 		protected Builder(Identifier nameIn)
 		{
@@ -108,13 +97,13 @@ public class DummyType extends Type
 		{
 			Builder builder = new Builder(nameIn);
 			builder.spoofName = idIn;
-			builder.display = displayIn;
+			builder.displayName = displayIn;
 			return builder;
 		}
 		
 		public Type build()
 		{
-			return new DummyType(name, spoofName, display == null ? Optional.empty() : Optional.of(display));
+			return new DummyType(name, spoofName, new LoreDisplay(displayName, displayDesc));
 		}
 	}
 }

@@ -12,6 +12,10 @@ import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.text.TextCodecs;
 
+/**
+ * A self-contained object for holding displayed text information.
+ * @author Lying
+ */
 public class LoreDisplay
 {
 	public static final Codec<LoreDisplay> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -20,6 +24,11 @@ public class LoreDisplay
 				.apply(instance, LoreDisplay::new));
 	private final Text title;
 	private final Optional<Text> description;
+	
+	public LoreDisplay(Text title)
+	{
+		this(title, Optional.empty());
+	}
 	
 	public LoreDisplay(Text title, Optional<Text> description)
 	{

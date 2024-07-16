@@ -96,14 +96,18 @@ public class VTUtils
 	
 	private static Text describe(Text display, Identifier regName, Optional<Text> desc)
 	{
+		return display.copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, makeTooltip(display, regName, desc))));
+	}
+	
+	public static Text makeTooltip(Text display, Identifier regName, Optional<Text> desc)
+	{
 		MutableText tooltip = Text.empty().append(display.copy().formatted(Formatting.BOLD)).append("\n");
 		MutableText registry = Text.literal(regName.toString()).formatted(Formatting.DARK_GRAY);
 		if(desc.isPresent())
 			tooltip.append(desc.get().copy().formatted(Formatting.ITALIC, Formatting.GRAY)).append("\n").append(registry);
 		else
 			tooltip.append(registry);
-		HoverEvent hover = new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip);
-		return display.copy().styled(style -> style.withHoverEvent(hover));
+		return tooltip;
 	}
 	
 	public static <T extends Object> MutableText listToString(List<T> set, Function<T,Text> getter, String bridge)

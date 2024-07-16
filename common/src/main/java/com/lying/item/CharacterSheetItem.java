@@ -4,20 +4,25 @@ import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.reference.Reference;
 import com.lying.screen.CharacterSheetScreenHandler;
 
 import dev.architectury.registry.menu.MenuRegistry;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 public class CharacterSheetItem extends Item
 {
+	public static final int USAGE_COOLDOWN = Reference.Values.TICKS_PER_SECOND / 2;
+	
 	public CharacterSheetItem(Settings settings)
 	{
 		super(settings);
@@ -25,51 +30,45 @@ public class CharacterSheetItem extends Item
 	
 	public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand)
 	{
+		ItemStack stackInHand = user.getStackInHand(hand);
+		if(user.getItemCooldownManager().isCoolingDown(stackInHand.getItem()))
+			return TypedActionResult.consume(stackInHand);
+		
+		user.getItemCooldownManager().set(stackInHand.getItem(), USAGE_COOLDOWN);
 		Optional<CharacterSheet> opt = VariousTypes.getSheet(user);
-		if(opt.isPresent() && !world.isClient())
+		if(opt.isPresent())
 		{
-			MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), user.getDisplayName()));
-			
-//			CharacterSheet sheet = opt.get();
-//			user.sendMessage(Text.literal("Power: "+sheet.power()));
-//			if(sheet.hasASpecies())
-//				user.sendMessage(Text.literal("Species: ").append(describeSpecies(sheet.getSpecies().get())));
-//			if(!sheet.getAppliedTemplates().isEmpty())
-//			{
-//				user.sendMessage(Text.literal("Templates:"));
-//				sheet.getAppliedTemplates().forEach(tem -> user.sendMessage(Text.literal(" * ").append(describeTemplate(tem))));
-//			}
-//			
-//			if(!sheet.types().isEmpty())
-//			{
-//				user.sendMessage(Text.literal("Creature types:"));
-//				sheet.types().forEach(type -> user.sendMessage(Text.literal(" * ").append(describeType(type, world.getRegistryManager()))));
-//			}
-//			
-//			user.sendMessage(Text.literal("Actions:"));
-//			Action.actions().forEach(action -> 
-//			{
-//				if(sheet.actions().can(action.get()))
-//					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.can_action", action.get().translate())));
-//				else
-//					user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.cannot_action", action.get().translate())));
-//			});
-//			if(sheet.actions().can(Action.BREATHE.get()))
-//			{
-//				user.sendMessage(Text.literal("Breathable fluids:"));
-//				sheet.actions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
-//			}
-//			
-//			if(!sheet.abilities().isEmpty() && sheet.abilities().abilities().stream().anyMatch(inst -> !inst.ability().isHidden(inst)))
-//			{
-//				user.sendMessage(Text.literal("Abilities:"));
-//				sheet.abilities().abilities().forEach(inst ->
-//				{
-//					if(!inst.ability().isHidden(inst))
-//						user.sendMessage(Text.literal(" * ").append(inst.displayName(world.getRegistryManager())));
-//				});
-//			}
+			if(!world.isClient())
+				MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), user.getDisplayName()));
+			return TypedActionResult.success(stackInHand, world.isClient());
 		}
-		return TypedActionResult.success(user.getStackInHand(hand), world.isClient());
+		else
+		{
+			if(world.isClient())
+				user.sendMessage(Reference.ModInfo.translate("gui","no_character_sheet", user.getDisplayName()));
+			return TypedActionResult.consume(stackInHand);
+		}
+	}
+	
+	public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand)
+	{
+		ItemStack stackInHand = user.getStackInHand(hand);
+		if(user.getItemCooldownManager().isCoolingDown(stackInHand.getItem()))
+			return ActionResult.CONSUME;
+		
+		user.getItemCooldownManager().set(stackInHand.getItem(), USAGE_COOLDOWN);
+		Optional<CharacterSheet> opt = VariousTypes.getSheet(entity);
+		if(opt.isPresent())
+		{
+			if(!user.getWorld().isClient())
+				MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), entity.getDisplayName()));
+			return ActionResult.SUCCESS;
+		}
+		else
+		{
+			if(user.getWorld().isClient())
+				user.sendMessage(Reference.ModInfo.translate("gui", "no_character_sheet", entity.getDisplayName()));
+			return ActionResult.CONSUME;
+		}
 	}
 }

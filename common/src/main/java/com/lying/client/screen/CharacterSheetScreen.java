@@ -1,6 +1,7 @@
 package com.lying.client.screen;
 
 import static com.lying.reference.Reference.ModInfo.translate;
+import static com.lying.utility.VTUtils.rotateDegrees2D;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,19 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.joml.Vector2i;
 
+import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.component.CharacterSheet;
+import com.lying.reference.Reference;
 import com.lying.screen.CharacterSheetScreenHandler;
 import com.lying.species.Species;
 import com.lying.template.Template;
+import com.lying.type.Action;
 import com.lying.type.ActionHandler;
+import com.lying.type.Type;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
-import com.lying.utility.VTUtils;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -33,7 +38,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHandler>
@@ -43,6 +50,7 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 	private PlayerEntity player;
 	private final DynamicRegistryManager manager;
 	
+	private DetailObject detailObject = null;
 	private ButtonWidget typeButton, speciesButton, templatesButton;
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
 	
@@ -82,22 +90,53 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		int spacing = 100;
 		
 		int leftX = midX - spacing;
-		addDrawable(typeButton = ButtonWidget.builder(Text.empty(), (button) -> {}).dimensions(leftX - 45 - 22, midY - 90, 45, 45).build());
-		addDrawable(speciesButton = ButtonWidget.builder(Text.empty(), (button) -> {}).dimensions(leftX - 90, midY - 90 + 50, 90, 30).build());
-		addDrawable(templatesButton = ButtonWidget.builder(Text.empty(), (button) -> {}).dimensions(leftX - 90, midY - 90 + 85, 90, 30).build());
+		addDrawableChild(typeButton = ButtonWidget.builder(Text.empty(), (button) -> 
+		{
+			List<Type> typeList = types.contents();
+			typeList.sort(Type.sortFunc(player.getRegistryManager()));
+			detailObject = listToDetail(typeList, type -> type.displayName(player.getRegistryManager()), Type::registryName, type -> Optional.empty());
+			setFocused(null);
+		}).dimensions(leftX - 45 - 22, midY - 90, 45, 45).build());
+		addDrawableChild(speciesButton = ButtonWidget.builder(Text.empty(), (button) -> 
+		{
+			Species spec = species.get();
+			detailObject = new DetailObject(objToDetail(spec, Species::displayName, Species::registryName, obj -> obj.display().description()));
+			setFocused(null);
+		}).dimensions(leftX - 90, midY - 90 + 50, 90, 30).build());
+		addDrawableChild(templatesButton = ButtonWidget.builder(Text.empty(), (button) -> 
+		{
+			detailObject = listToDetail(templates, Template::displayName, Template::registryName, tem -> tem.display().description());
+			setFocused(null);
+		}).dimensions(leftX - 90, midY - 90 + 85, 90, 30).build());
 		
 		for(int i=0; i<abilityButtons.length; i++)
-			addDrawable(abilityButtons[i] = ButtonWidget.builder(Text.empty(), (button) -> {}).dimensions(midX + spacing, midY - 70 + i * 35, 90, 30).build());
+			addDrawableChild(abilityButtons[i] = ButtonWidget.builder(Text.empty(), (button) -> { detailObject = null; }).dimensions(midX + spacing, midY - 70 + i * 35, 90, 30).build());
 		
+		List<Action> actions = Lists.newArrayList();
+		Action.actions().forEach(action -> actions.add(action.get()));
+		Collections.sort(actions, Action.SORT);
 		Vector2i offset = new Vector2i(0, 95);
-		for(double deg : new Double[] {-30D, -12.5D, 12.5D, 30D})
-			addActionButton(offset, deg, midX, midY);
+		Double[] deg = new Double[] {-30D, -12.5D, 12.5D, 30D};
+		for(int i=0; i<deg.length; i++)
+			addActionButton(actions.get(i), offset, deg[i], midX, midY);
 	}
 	
-	private void addActionButton(Vector2i offset, double degrees, int midX, int midY)
+	private void addActionButton(Action action, Vector2i offset, double degrees, int midX, int midY)
 	{
-		Vector2i vec = VTUtils.rotateDegrees2D(offset, degrees);
-		addDrawable(ButtonWidget.builder(Text.empty(), (button) -> {}).dimensions(midX + vec.x - 10, midY + vec.y - 10, 20, 20).build());
+		Vector2i vec = rotateDegrees2D(offset, degrees);
+		addDrawableChild(ButtonWidget.builder(Text.empty(), (button) -> 
+		{
+			if(actions.can(action))
+			{
+				List<MutableText> entries = Lists.newArrayList();
+				entries.add(Text.translatable("action.vartypes.can_action", action.translate()));
+				if(action.equals(Action.BREATHE.get()))
+					actions.canBreatheIn().forEach(fluid -> entries.add(Text.literal(" * ").append(fluid.id().getPath())));
+				detailObject = new DetailObject(entries.toArray(new MutableText[0]));
+			}
+			else
+				detailObject = new DetailObject(Text.translatable("action.vartypes.cannot_action", action.translate()));
+		}).dimensions(midX + vec.x - 10, midY + vec.y - 10, 20, 20).build());
 	}
 	
 	public void render(DrawContext context, int mouseX, int mouseY, float delta)
@@ -148,10 +187,14 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		}
 	}
 	
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	{
+		this.detailObject = null;
+		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
 	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta)
 	{
-//		renderBackgroundTexture(context, sheet.types().ofTier(Tier.SUPERTYPE).stream().findFirst().get().sheetBackground(), 0, 0, 0, 0, width, height);
-//		renderVignette(context);
 		applyBlur(delta);
 		renderDarkening(context);
 		drawBackground(context, delta, mouseX, mouseY);
@@ -170,7 +213,10 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		context.drawCenteredTextWithShadow(textRenderer, ownerName, midX, midY - 100, 0xFFFFFF);
 		context.drawCenteredTextWithShadow(textRenderer, Text.literal(String.valueOf(power)), midX, midY + 90, 0xFFFFFF);
 		
-		ownerStats.ifPresent(stats -> stats.render(context, midX, midY));
+		ownerStats.ifPresent(stats -> stats.render(context, midX + 90, midY - 60, midX + 90, midY - 60));
+		
+		if(detailObject != null)
+			detailObject.render(context, midX, midY);
 	}
 	
 	public void renderVignette(DrawContext context)
@@ -205,35 +251,30 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		InventoryScreen.drawEntity(context, renderX - (width / 2), renderY - (height / 2), renderX + (width / 2), renderY + (height / 2), size, 0.0625f, mouseX, mouseY, sheet.getOwner().get());
 	}
 	
-//	private void renderActions(DrawContext context)
-//	{
-//		user.sendMessage(Text.literal("Actions:"));
-//		Action.actions().forEach(action -> 
-//		{
-//			if(sheet.actions().can(action.get()))
-//				user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.can_action", action.get().translate())));
-//			else
-//				user.sendMessage(Text.literal(" * ").append(Text.translatable("action.vartypes.cannot_action", action.get().translate())));
-//		});
-//		if(sheet.actions().can(Action.BREATHE.get()))
-//		{
-//			user.sendMessage(Text.literal("Breathable fluids:"));
-//			sheet.actions().canBreatheIn().forEach(fluid -> user.sendMessage(Text.literal(" ~").append(Text.literal(fluid.id().getPath()))));
-//		}
-//	}
+	private <T extends Object> MutableText[] objToDetail(T obj, Function<T,Text> nameGetter, Function<T,Identifier> regGetter, Function<T,Optional<Text>> descGetter)
+	{
+		List<MutableText> entries = Lists.newArrayList();
+		entries.add(nameGetter.apply(obj).copy().formatted(Formatting.BOLD));
+		descGetter.apply(obj).ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+		if(client.options.advancedItemTooltips || player.isCreative())
+			entries.add(Text.literal(regGetter.apply(obj).toString()).copy().formatted(Formatting.DARK_GRAY));
+		return entries.toArray(new MutableText[0]);
+	}
 	
-//	private void renderAbilities(DrawContext context)
-//	{
-//		if(!sheet.abilities().isEmpty() && sheet.abilities().abilities().stream().anyMatch(inst -> !inst.ability().isHidden(inst)))
-//		{
-//			user.sendMessage(Text.literal("Abilities:"));
-//			sheet.abilities().abilities().forEach(inst ->
-//			{
-//				if(!inst.ability().isHidden(inst))
-//					user.sendMessage(Text.literal(" * ").append(inst.displayName(player.getRegistryManager())));
-//			});
-//		}
-//	}
+	private <T extends Object> DetailObject listToDetail(List<T> set, Function<T,Text> nameGetter, Function<T,Identifier> regGetter, Function<T,Optional<Text>> descGetter)
+	{
+		List<MutableText> entries = Lists.newArrayList();
+		for(int i=0; i<set.size(); i++)
+		{
+			T type = set.get(i);
+			for(MutableText entry : objToDetail(type, nameGetter, regGetter, descGetter))
+				entries.add(entry);
+			
+			if(i < set.size() - 1)
+				entries.add(Text.empty());
+		}
+		return new DetailObject(entries.toArray(new MutableText[0]));
+	}
 	
 	/** Stores cached statistics about the character sheet's owner */
 	private class OwnerStats
@@ -251,17 +292,17 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		
 		// HAS - Health, Armour, Speed
 		// TODO Display current attack damage as well?
-		public void render(DrawContext context, int midX, int midY)
+		public void render(DrawContext context, int textX, int textY, int iconX, int iconY)
 		{
 			for(Entry<Stat, Integer> entry : stats.entrySet())
-				drawStatEntry(context, entry.getKey(), entry.getValue(), midX + 90, midY - 60);
+				drawStatEntry(context, entry.getKey(), entry.getValue(), textX, textY, iconX, iconY);
 		}
 		
-		private void drawStatEntry(DrawContext context, Stat stat, int value, int x, int y)
+		private void drawStatEntry(DrawContext context, Stat stat, int value, int textX, int textY, int iconX, int iconY)
 		{
 			Text text = Text.of(String.valueOf(value));
-			context.drawText(textRenderer, text, x - textRenderer.getWidth(text), y + stat.index * 10, 0xFFFFFF, false);
-			context.drawText(textRenderer, stat.name().substring(0, 1).toUpperCase(), x + 1, y + stat.index * 10, 0xFFFFFF, false);
+			context.drawText(textRenderer, text, textX - textRenderer.getWidth(text), textY + stat.index * 10, 0xFFFFFF, false);
+			context.drawTexture(stat.iconTex, iconX, iconY - 1 + stat.index * 10, 0, 0, 9, 9, 9, 9);
 		}
 		
 		private enum Stat
@@ -271,12 +312,29 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			SPEED(2);
 			
 			private final int index;
+			private final Identifier iconTex;
 			
 			private Stat(int renderIndex)
 			{
 				index = renderIndex;
+				iconTex = Reference.ModInfo.prefix("textures/gui/sheet/stat_"+name().toLowerCase()+".png");
 			}
-			
+		}
+	}
+	
+	private class DetailObject
+	{
+		private final List<Text> entries = Lists.newArrayList();
+		
+		public DetailObject(MutableText... entriesIn)
+		{
+			for(MutableText text : entriesIn)
+				entries.add(text);
+		}
+		
+		public void render(DrawContext context, int x, int y)
+		{
+			context.drawTooltip(textRenderer, entries, Optional.empty(), x, y);
 		}
 	}
 }
