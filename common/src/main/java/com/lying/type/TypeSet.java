@@ -1,6 +1,7 @@
 package com.lying.type;
 
 import static com.lying.utility.VTUtils.listToString;
+import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import com.google.gson.JsonElement;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
-import com.lying.reference.Reference;
 import com.lying.type.Type.Tier;
 
 import net.minecraft.nbt.NbtCompound;
@@ -58,7 +58,7 @@ public class TypeSet
 			}
 		}
 		
-		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : Reference.ModInfo.translate("gui", "typeset", vars);
+		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : translate("gui", "typeset", vars);
 	}
 	
 	public boolean isEmpty() { return types.isEmpty(); }

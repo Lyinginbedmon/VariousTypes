@@ -25,6 +25,11 @@ public class LoreDisplay
 	private final Text title;
 	private final Optional<Text> description;
 	
+	public LoreDisplay()
+	{
+		this(Text.empty());
+	}
+	
 	public LoreDisplay(Text title)
 	{
 		this(title, Optional.empty());

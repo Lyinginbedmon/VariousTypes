@@ -8,8 +8,10 @@
   "Types": [
     "vartypes:human",
     {
-      "DisplayName": {
-        "translate": "subtype.vartypes.reptilian"
+      "Display": {
+        "Title": {
+          "translate": "subtype.vartypes.reptilian"
+        }
       },
       "ID": "vartypes:reptilian"
     }

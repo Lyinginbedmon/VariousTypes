@@ -10,8 +10,13 @@
   "Types": [
     "vartypes:human",
     {
-      "DisplayName": {
-        "translate": "subtype.vartypes.linn"
+      "Display": {
+        "Description": {
+          "translate": "subtype.vartypes.linn.desc"
+        },
+        "Title": {
+          "translate": "subtype.vartypes.linn"
+        }
       },
       "ID": "vartypes:linn"
     }

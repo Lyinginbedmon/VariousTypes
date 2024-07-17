@@ -2,6 +2,7 @@ package com.lying.type;
 
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.function.Consumers;
@@ -16,6 +17,7 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
+import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
@@ -36,20 +38,23 @@ public class Type
 	protected final Identifier registryName;
 	protected final Tier tier;
 	protected final int colour;
+	protected final LoreDisplay display;
+	
 	protected final ActionHandler actions;
 	protected final AbilitySet abilities;
 	protected final Predicate<Type> compatibilityCheck;
 	
-	protected Type(Identifier nameIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
+	protected Type(Identifier nameIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn, LoreDisplay displayIn)
 	{
-		this(nameIn, Tier.SUBTYPE, DEFAULT_COLOR, abilitiesIn, actionsIn, compIn);
+		this(nameIn, Tier.SUBTYPE, DEFAULT_COLOR, abilitiesIn, actionsIn, compIn, displayIn);
 	}
 	
-	protected Type(Identifier nameIn, Tier tierIn, int colourIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn)
+	protected Type(Identifier nameIn, Tier tierIn, int colourIn, AbilitySet abilitiesIn, ActionHandler actionsIn, Predicate<Type> compIn, LoreDisplay displayIn)
 	{
 		registryName = nameIn;
 		tier = tierIn;
 		colour = colourIn;
+		display = displayIn;
 		actions = actionsIn.copy();
 		abilities = abilitiesIn.copy();
 		compatibilityCheck = compIn;
@@ -73,7 +78,9 @@ public class Type
 	
 	public final int color() { return this.colour; }
 	
-	public Text displayName(DynamicRegistryManager manager) { return Text.translatable("type."+registryName.getNamespace()+"."+registryName.getPath()); }
+	public Text displayName(DynamicRegistryManager manager) { return display.title(); }
+	
+	public Optional<Text> description() { return display.description(); }
 	
 	/**
 	 * Returns a collection ability instances compiled both from this type itself and from the action handler.
@@ -132,10 +139,14 @@ public class Type
 		protected ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 		protected Predicate<Type> compCheck = Predicates.alwaysTrue();
 		
+		protected Text title;
+		protected Optional<Text> description = Optional.empty();
+		
 		protected Builder(Identifier nameIn, Tier tierIn)
 		{
 			name = nameIn;
 			tier = tierIn;
+			title = Text.translatable("type."+nameIn.getNamespace()+"."+nameIn.getPath());
 			switch(tier)
 			{
 				case SUBTYPE:
@@ -144,6 +155,7 @@ public class Type
 				case SUPERTYPE:
 				default:
 					actions = ActionHandler.STANDARD_SET.copy();
+					description = Optional.of(Text.translatable("type."+nameIn.getNamespace()+"."+nameIn.getPath()+".desc"));
 					break;
 			}
 		}
@@ -153,9 +165,15 @@ public class Type
 			return new Builder(nameIn, tierIn);
 		}
 		
-		public Builder display(int colorIn)
+		public Builder colour(int colorIn)
 		{
 			colour = colorIn;
+			return this;
+		}
+		
+		public Builder description(Text desc)
+		{
+			description = desc == null ? Optional.empty() : Optional.of(desc);
 			return this;
 		}
 		
@@ -187,10 +205,10 @@ public class Type
 			switch(tier)
 			{
 				case SUBTYPE:
-					return new Type(name, abilities, actions, compCheck);
+					return new Type(name, abilities, actions, compCheck, new LoreDisplay(title, description));
 				default:
 				case SUPERTYPE:
-					return new Type(name, tier, colour, abilities, actions, compCheck);
+					return new Type(name, tier, colour, abilities, actions, compCheck, new LoreDisplay(title, description));
 			}
 		}
 	}

@@ -56,7 +56,7 @@ public class AbilityInstance
 	
 	public void setDisplayName(Text component)
 	{
-		display = Optional.of(new LoreDisplay(component, Optional.empty()));
+		display = Optional.of(new LoreDisplay(component, display.isPresent() ? display.get().description() : Optional.empty()));
 	}
 	
 	public Text displayName(DynamicRegistryManager world)
@@ -64,6 +64,17 @@ public class AbilityInstance
 		if(display.isPresent())
 			return display.get().title();
 		return ability.displayName(this);
+	}
+	
+	public Optional<Text> description(DynamicRegistryManager world)
+	{
+		if(display.isPresent())
+		{
+			LoreDisplay lore = display.get();
+			if(lore.description().isPresent())
+				return lore.description();
+		}
+		return ability.description(this);
 	}
 	
 	public NbtCompound writeToNbt(NbtCompound compound, WrapperLookup manager)

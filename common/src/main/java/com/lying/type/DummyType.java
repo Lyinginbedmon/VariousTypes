@@ -28,12 +28,11 @@ public class DummyType extends Type
 	
 	protected NbtCompound data = new NbtCompound();
 	protected Identifier listID;
-	protected Optional<Text> displayName = null;
 	protected LoreDisplay display;
 	
 	protected DummyType(Identifier nameIn, Identifier listIDIn, LoreDisplay displayIn)
 	{
-		super(nameIn, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue());
+		super(nameIn, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue(), new LoreDisplay());
 		listID = listIDIn;
 		display = displayIn;
 	}
@@ -55,13 +54,11 @@ public class DummyType extends Type
 	{
 		listID = new Identifier(data.getString("ID"));
 		data = compound;
-		displayName = null;
 	}
 	
-	public Text displayName(DynamicRegistryManager manager)
-	{
-		return display.title();
-	}
+	public Text displayName(DynamicRegistryManager manager) { return display.title(); }
+	
+	public Optional<Text> description() { return display.description(); }
 	
 	public LoreDisplay display() { return display; }
 	

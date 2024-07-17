@@ -121,8 +121,11 @@ public class VTCommands
 								.executes(context -> 
 								{
 									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
-									VariousTypes.getSheet(player).ifPresent(sheet -> sheet.clear(true));
-									context.getSource().sendFeedback(() -> translate("command","reset.success", player.getDisplayName()), true);
+									VariousTypes.getSheet(player).ifPresent(sheet -> 
+									{
+										sheet.clear(true);
+										context.getSource().sendFeedback(() -> translate("command","reset.success", player.getDisplayName()), true);
+									});
 									return 15;
 								}))
 						.then(literal("randomize")
@@ -130,6 +133,18 @@ public class VTCommands
 							.then(argument("power", IntegerArgumentType.integer(0))
 								.executes(context -> tryRandomize(EntityArgumentType.getPlayer(context, PLAYER), IntegerArgumentType.getInteger(context, "power"), context.getSource()))))
 						.then(literal("get")
+							.then(literal("power")
+								.executes(context -> 
+								{
+									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+									if(sheetOpt.isEmpty())
+										throw FAILED_GENERIC.create();
+									
+									int power = sheetOpt.get().power();
+									context.getSource().sendFeedback(() -> translate("command", "get.power.success", player.getDisplayName(), power), true);
+									return Math.min(power, 15);
+								}))
 							.then(literal("home")
 								.executes(context ->
 								{
@@ -189,8 +204,11 @@ public class VTCommands
 											throw FAILED_GENERIC.create();
 										
 										RegistryKey<World> dim = world.getRegistryKey();
-										sheetOpt.get().setHomeDimension(dim);
-										context.getSource().sendFeedback(() -> translate("command", "apply.home.success", player.getDisplayName(), dim.getValue().toString()), true);
+										sheetOpt.ifPresent(sheet -> 
+										{
+											sheet.setHomeDimension(dim);
+											context.getSource().sendFeedback(() -> translate("command", "apply.home.success", player.getDisplayName(), dim.getValue().toString()), true);
+										});
 										return 15;
 									})))
 							.then(literal("species")
@@ -230,9 +248,12 @@ public class VTCommands
 									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
-									
-									sheetOpt.get().clearHomeDimension();
-									context.getSource().sendFeedback(() -> translate("command","home.clear.success",player.getDisplayName(), sheetOpt.get().homeDimension().getValue().toString()), true);
+									else
+										sheetOpt.ifPresent(sheet -> 
+										{
+											sheet.clearHomeDimension();
+											context.getSource().sendFeedback(() -> translate("command","home.clear.success", player.getDisplayName(), sheet.homeDimension().getValue().toString()), true);
+										});
 									return 15;
 								})
 								.then(argument("dimension", DimensionArgumentType.dimension())
@@ -263,8 +284,11 @@ public class VTCommands
 										throw FAILED_NO_SPECIES.create();
 									
 									Text oldSpecies = describeSpecies(sheetOpt.get().getSpecies().get());
-									sheetOpt.get().setSpecies(null);
-									context.getSource().sendFeedback(() -> translate("command", "species.remove.success", oldSpecies, player.getDisplayName()), true);
+									sheetOpt.ifPresent(sheet -> 
+									{
+										sheet.setSpecies(null);
+										context.getSource().sendFeedback(() -> translate("command", "species.remove.success", oldSpecies, player.getDisplayName()), true);
+									});
 									return 15;
 								})
 								.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
@@ -283,8 +307,11 @@ public class VTCommands
 										else if(!sheetOpt.get().isSpecies(species))
 											throw new SimpleCommandExceptionType(translate("command","species.remove.failed", player.getDisplayName(), speciesName)).create();
 										
-										sheetOpt.get().setSpecies(null);
-										context.getSource().sendFeedback(() -> translate("command", "species.remove.success", speciesName, player.getDisplayName()), true);
+										sheetOpt.ifPresent(sheet -> 
+										{
+											sheet.setSpecies(null);
+											context.getSource().sendFeedback(() -> translate("command", "species.remove.success", speciesName, player.getDisplayName()), true);
+										});
 										return 15;
 									})))
 							.then(literal("template")

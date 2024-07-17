@@ -8,8 +8,10 @@
   "Types": [
     "vartypes:human",
     {
-      "DisplayName": {
-        "translate": "subtype.vartypes.orkin"
+      "Display": {
+        "Title": {
+          "translate": "subtype.vartypes.orkin"
+        }
       },
       "ID": "vartypes:orkin"
     }

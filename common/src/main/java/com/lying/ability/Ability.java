@@ -1,8 +1,10 @@
 package com.lying.ability;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
+import java.util.Optional;
 import java.util.function.Consumer;
 
-import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
@@ -37,7 +39,9 @@ public class Ability
 	/** Sets the initial values of any necessary memory values */
 	protected NbtCompound initialiseNBT(NbtCompound data) { return data; }
 	
-	public Text displayName(AbilityInstance instance) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+"."+registryName.getPath()); }
+	public Text displayName(AbilityInstance instance) { return translate("ability",registryName.getPath()); }
+	
+	public Optional<Text> description(AbilityInstance instance) { return Optional.of(translate("ability", registryName.getPath()+".desc")); }
 	
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }
