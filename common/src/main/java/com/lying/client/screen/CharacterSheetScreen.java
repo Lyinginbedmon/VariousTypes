@@ -18,8 +18,8 @@ import org.joml.Vector2i;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
-import com.lying.ability.ActivatedAbility;
 import com.lying.client.VariousTypesClient;
+import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
@@ -32,10 +32,10 @@ import com.lying.type.Type;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
@@ -43,6 +43,7 @@ import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -56,37 +57,54 @@ import net.minecraft.util.Util;
 
 public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHandler>
 {
-	private PlayerEntity player;
-	private final DynamicRegistryManager manager;
+	private static final PlayerEntity player = MinecraftClient.getInstance().player;
+	private static final DynamicRegistryManager manager = player.getRegistryManager();
 	
 	private DetailObject detailObject = null;
+	private int detailHeight = 0;
+	private int scrollAmount = 0;
+	
 	private TypeButtonWidget typeButton;
 	private ButtonWidget speciesButton, templatesButton;
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
 	
 	private final CharacterSheet sheet;
+	private final Optional<LivingEntity> sheetOwner;
 	private final int power;
 	private final Optional<OwnerStats> ownerStats;
 	private final Optional<Species> species;
 	private final List<Template> templates;
 	private final TypeSet types;
 	private final ActionHandler actions;
+	
 	private final List<AbilityInstance> abilities;
+	private final int abilityPages;
 	private int abilityPage = 0;
 	
 	public CharacterSheetScreen(CharacterSheetScreenHandler handler, PlayerInventory inventory, Text title)
 	{
+		this(VariousTypes.getSheet(inventory.player).get(), handler, inventory, title);
+	}
+	
+	protected CharacterSheetScreen(CharacterSheet sheetIn, CharacterSheetScreenHandler handler, PlayerInventory inventory, Text title)
+	{
 		super(handler, inventory, title);
-		player = inventory.player;
-		manager = player.getRegistryManager();
-		sheet = VariousTypes.getSheet(player).get();
-		ownerStats = sheet.hasOwner() ? Optional.of(new OwnerStats(sheet.getOwner().get())) : Optional.empty();
+		
+		sheet = sheetIn;
+		sheetOwner = sheet.getOwner();
+		if(sheet.getOwner().isPresent())
+			ownerStats = Optional.of(new OwnerStats(sheet.getOwner().get()));
+		else
+			ownerStats = Optional.empty();
+		
 		power = sheet.power();
 		species = sheet.getSpecies();
 		templates = sheet.getAppliedTemplates();
+		
 		types = sheet.types().copy();
 		actions = sheet.actions().copy();
 		abilities = sheet.abilities().allNonHidden();
+		abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
 		if(abilities.size() > 1)
 			Collections.sort(abilities, AbilityInstance.sortFunc(manager));
 	}
@@ -103,28 +121,41 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		addDrawableChild(typeButton = new TypeButtonWidget(leftX - 45 - 22, midY - 90, types.ofTier(Tier.SUPERTYPE).stream().findFirst().get().displayName(manager), (button) -> 
 		{
 			List<Type> typeList = types.contents();
-			typeList.sort(Type.sortFunc(player.getRegistryManager()));
-			
-			Batch[] batches = new Batch[typeList.size()];
-			for(int i=0; i<typeList.size(); i++)
-				batches[i] = new Batch(objToDetail(typeList.get(i), type -> type.displayName(player.getRegistryManager()), Type::registryName, Type::description));
-			detailObject = new DetailObject(batches);
+			typeList.sort(Type.sortFunc(manager));
+			setDetail(listToDetail(typeList, this::typeToDetail));
 			setFocused(null);
 		}));
 		addDrawableChild(speciesButton = ButtonWidget.builder(Text.empty(), (button) -> 
 		{
 			Species spec = species.get();
-			detailObject = new DetailObject(objToDetail(spec, Species::displayName, Species::registryName, obj -> obj.display().description()));
+			setDetail(new DetailObject(speciesToDetail(spec)));
 			setFocused(null);
 		}).dimensions(leftX - 90, midY - 90 + 50, 90, 30).build());
 		addDrawableChild(templatesButton = ButtonWidget.builder(Text.empty(), (button) -> 
 		{
-			detailObject = listToDetail(templates, Template::displayName, Template::registryName, tem -> tem.display().description());
+			setDetail(listToDetail(templates, this::templateToDetail));
 			setFocused(null);
 		}).dimensions(leftX - 90, midY - 90 + 85, 90, 30).build());
 		
 		for(int i=0; i<abilityButtons.length; i++)
 			addDrawableChild(abilityButtons[i] = makeAbilityButton(i, midX + spacing, midY - 70 + i * 35));
+		
+		if(abilityPages > 1)
+		{
+			addDrawableChild(ButtonWidget.builder(Text.literal("<"), (button) -> {
+				if(abilityPage == 0) return;
+				abilityPage -= Math.signum(abilityPage);
+				updateButtons();
+				setFocused(null);
+				}).dimensions(midX + spacing, midY - 90, 15, 15).build());
+			
+			addDrawableChild(ButtonWidget.builder(Text.literal(">"), (button) -> {
+				if(abilityPage >= abilityPages - 1) return;
+				abilityPage = Math.min(abilityPage + 1, abilityPages - 1);
+				updateButtons();
+				setFocused(null);
+				}).dimensions(midX + spacing + 90 - 15, midY - 90, 15, 15).build());
+		}
 		
 		List<Action> actions = Lists.newArrayList();
 		Action.actions().forEach(action -> actions.add(action.get()));
@@ -134,6 +165,50 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		for(int i=0; i<deg.length; i++)
 			addActionButton(actions.get(i), offset, deg[i], midX, midY);
 		
+		initializeButtons();
+	}
+	
+	private ButtonWidget makeAbilityButton(int index, int x, int y)
+	{
+		return ButtonWidget.builder(Text.empty(), (button) -> 
+		{
+			int i = index + (abilityPage * abilityButtons.length);
+			if(i < abilities.size())
+				setDetail(new DetailObject(abilityToDetail(abilities.get(i))));
+			setFocused(null);
+		}).dimensions(x, y, 90, 30).build();
+	}
+	
+	private void addActionButton(Action action, Vector2i offset, double degrees, int midX, int midY)
+	{
+		Vector2i vec = rotateDegrees2D(offset, degrees);
+		Consumer<PressableWidget> consumer;
+		if(actions.can(action))
+			consumer = (button) -> 
+			{
+				List<MutableText> entries = Lists.newArrayList();
+				entries.add(Text.translatable("action.vartypes.can_action", action.translated()));
+				if(action.equals(Action.BREATHE.get()))
+					actions.canBreatheIn().forEach(fluid -> entries.add(Text.literal(" * ").append(fluid.id().getPath())));
+				action.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+				setDetail(new DetailObject(entries.toArray(new MutableText[0])));
+				setFocused(null);
+			};
+		else
+			consumer = (button) -> 
+			{
+				List<MutableText> entries = Lists.newArrayList();
+				entries.add(Text.translatable("action.vartypes.cannot_action", action.translated()));
+				action.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+				setDetail(new DetailObject(entries.toArray(new MutableText[0])));
+				setFocused(null);
+			};
+		
+		addDrawableChild(new ActionButtonWidget(action, actions.can(action), midX + vec.x - 10, midY + vec.y - 10, consumer));
+	}
+	
+	private void initializeButtons()
+	{
 		Type supertype = types.ofTier(Tier.SUPERTYPE).stream().findFirst().get();
 		typeButton.updateSupertype(supertype);
 		typeButton.setTooltip(Tooltip.of(types.display(manager)));
@@ -160,48 +235,6 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		updateButtons();
 	}
 	
-	private ButtonWidget makeAbilityButton(int index, int x, int y)
-	{
-		return ButtonWidget.builder(Text.empty(), (button) -> 
-		{
-			int i = index + (abilityPage * abilityButtons.length);
-			if(i < abilities.size())
-				detailObject = new DetailObject(abilityToDetail(abilities.get(i)));
-		}).dimensions(x, y, 90, 30).build();
-	}
-	
-	private void addActionButton(Action action, Vector2i offset, double degrees, int midX, int midY)
-	{
-		Vector2i vec = rotateDegrees2D(offset, degrees);
-		Consumer<PressableWidget> consumer;
-		if(actions.can(action))
-			consumer = (button) -> 
-			{
-				List<MutableText> entries = Lists.newArrayList();
-				entries.add(Text.translatable("action.vartypes.can_action", action.translated()));
-				if(action.equals(Action.BREATHE.get()))
-					actions.canBreatheIn().forEach(fluid -> entries.add(Text.literal(" * ").append(fluid.id().getPath())));
-				action.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
-				detailObject = new DetailObject(entries.toArray(new MutableText[0]));
-			};
-		else
-			consumer = (button) -> 
-			{
-				List<MutableText> entries = Lists.newArrayList();
-				entries.add(Text.translatable("action.vartypes.cannot_action", action.translated()));
-				action.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
-				detailObject = new DetailObject(entries.toArray(new MutableText[0]));
-			};
-		
-		addDrawableChild(new ActionButtonWidget(action, actions.can(action), midX + vec.x - 10, midY + vec.y - 10, consumer));
-	}
-	
-	public void render(DrawContext context, int mouseX, int mouseY, float delta)
-	{
-		updateButtons();
-		super.render(context, mouseX, mouseY, delta);
-	}
-	
 	private void updateButtons()
 	{
 		for(int i=0; i<abilityButtons.length; i++)
@@ -218,8 +251,18 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 	
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
 	{
-		this.detailObject = null;
+		setDetail(null);
 		return super.mouseClicked(mouseX, mouseY, button);
+	}
+	
+	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
+	{
+		if(detailObject != null)
+		{
+			scrollAmount += verticalAmount * textRenderer.fontHeight;
+			return true;
+		}
+		return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 	}
 	
 	public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta)
@@ -231,7 +274,11 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 	
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY)
 	{
-		renderOwner(context, mouseX, mouseY);
+		sheetOwner.ifPresent(owner -> 
+		{
+			if(owner.getType() == EntityType.PLAYER)
+				VTUtilsClient.renderDemoEntity((PlayerEntity)owner, context, mouseX, mouseY, width / 2, height / 2);
+		});
 	}
 	
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY)
@@ -241,63 +288,86 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		Text ownerName = sheet.getOwner().get().getDisplayName();
 		context.drawCenteredTextWithShadow(textRenderer, ownerName, midX, midY - 100, 0xFFFFFF);
 		context.drawCenteredTextWithShadow(textRenderer, Text.literal(String.valueOf(power)), midX, midY + 90, 0xFFFFFF);
-		
+		if(abilityPages > 1)
+			context.drawCenteredTextWithShadow(textRenderer, Text.literal((1 + abilityPage) + " / " + abilityPages), midX + 145, midY - 85, 0xFFFFFF);
 		ownerStats.ifPresent(stats -> stats.render(context, midX + 90, midY - 60, midX + 90, midY - 60));
 		
 		if(detailObject != null)
-			detailObject.render(context, midX, midY, Math.min(400, context.getScaledWindowWidth() / 2));
+		{
+			int maxWidth = Math.min(400, context.getScaledWindowWidth() / 2);
+			detailHeight = detailObject.totalHeight(maxWidth);
+			int detailY = midY;
+			if(detailHeight > context.getScaledWindowHeight())
+			{
+				scrollAmount = (int)Math.clamp(scrollAmount, -detailHeight + (int)(backgroundHeight * 0.75), 0);
+				detailY = scrollAmount;
+			}
+			else
+				detailY = midY - detailHeight / 2;
+			
+			detailObject.render(context, midX, detailY, maxWidth);
+		}
 	}
 	
-	private void renderOwner(DrawContext context, int mouseX, int mouseY)
+	public void setDetail(DetailObject obj)
 	{
-		// TODO Exchange for animated biped model using same player skin
-		if(!sheet.hasOwner())
-			return;
-		
-		int renderX = width / 2;
-		int renderY = height / 2;
-		
-		int width = 200;
-		int height = 200;
-		int size = 80;
-		InventoryScreen.drawEntity(context, renderX - (width / 2), renderY - (height / 2), renderX + (width / 2), renderY + (height / 2), size, 0.0625f, mouseX, mouseY, sheet.getOwner().get());
+		detailObject = obj;
+		scrollAmount = 0;
+	}
+	
+	private MutableText[] typeToDetail(Type type)
+	{
+		List<MutableText> entries = Lists.newArrayList();
+		entries.add(type.displayName(manager).copy().formatted(Formatting.BOLD));
+		type.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+		type.abilities().forEach(inst -> 
+		{
+			if(!inst.ability().isHidden(inst))
+				entries.add(Text.literal(" * ").append(inst.displayName(manager)));
+		});
+		if(client.options.advancedItemTooltips || player.isCreative())
+			entries.add(Text.literal(type.listID().toString()).copy().formatted(Formatting.DARK_GRAY));
+		return entries.toArray(new MutableText[0]);
+	}
+	
+	private MutableText[] speciesToDetail(Species species)
+	{
+		List<MutableText> entries = Lists.newArrayList();
+		entries.add(species.displayName().copy().formatted(Formatting.BOLD));
+		species.display().description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+		species.abilities().allNonHidden().forEach(inst -> entries.add(Text.literal(" * ").append(inst.displayName(manager))));
+		if(client.options.advancedItemTooltips || player.isCreative())
+			entries.add(Text.literal(species.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
+		return entries.toArray(new MutableText[0]);
+	}
+	
+	private MutableText[] templateToDetail(Template template)
+	{
+		List<MutableText> entries = Lists.newArrayList();
+		entries.add(template.displayName().copy().formatted(Formatting.BOLD));
+		template.display().description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
+		template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe(manager))));
+		if(client.options.advancedItemTooltips || player.isCreative())
+			entries.add(Text.literal(template.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
+		return entries.toArray(new MutableText[0]);
 	}
 	
 	private MutableText[] abilityToDetail(AbilityInstance instance)
 	{
 		List<MutableText> entries = Lists.newArrayList();
 		entries.add(instance.displayName(manager).copy().formatted(Formatting.BOLD));
-		if(instance.ability() instanceof ActivatedAbility)
-			entries.add(translate("gui", "activated_ability").copy());
+		entries.add(instance.ability().type().translate().copy());
 		instance.description(manager).ifPresent(text -> entries.add(text.copy().formatted(Formatting.GRAY)));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(instance.mapName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);
 	}
 	
-	private <T extends Object> MutableText[] objToDetail(T obj, Function<T,Text> nameGetter, Function<T,Identifier> regGetter, Function<T,Optional<Text>> descGetter)
+	private <T extends Object> DetailObject listToDetail(List<T> set, Function<T,MutableText[]> provider)
 	{
-		List<MutableText> entries = Lists.newArrayList();
-		entries.add(nameGetter.apply(obj).copy().formatted(Formatting.BOLD));
-		descGetter.apply(obj).ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
-		if(client.options.advancedItemTooltips || player.isCreative())
-			entries.add(Text.literal(regGetter.apply(obj).toString()).copy().formatted(Formatting.DARK_GRAY));
-		return entries.toArray(new MutableText[0]);
-	}
-	
-	private <T extends Object> DetailObject listToDetail(List<T> set, Function<T,Text> nameGetter, Function<T,Identifier> regGetter, Function<T,Optional<Text>> descGetter)
-	{
-		List<MutableText> entries = Lists.newArrayList();
-		for(int i=0; i<set.size(); i++)
-		{
-			T type = set.get(i);
-			for(MutableText entry : objToDetail(type, nameGetter, regGetter, descGetter))
-				entries.add(entry);
-			
-			if(i < set.size() - 1)
-				entries.add(Text.empty());
-		}
-		return new DetailObject(entries.toArray(new MutableText[0]));
+		List<Batch> entries = Lists.newArrayList();
+		set.forEach(entry -> entries.add(new Batch(provider.apply(entry))));
+		return new DetailObject(entries.toArray(new Batch[0]));
 	}
 	
 	/** Stores cached statistics about the character sheet's owner */
@@ -388,9 +458,9 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			TooltipComponent comp;
 			MatrixStack matrices = context.getMatrices();
 			matrices.push();
-				context.draw(() -> TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y - (backgroundHeight / 2), backgroundWidth, backgroundHeight, 400));
+				context.draw(() -> TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y, backgroundWidth, backgroundHeight, 400));
 				matrices.translate(0, 0, 400);
-				int textY = y - (backgroundHeight / 2) + (PADDING / 2);
+				int textY = y + (PADDING / 2);
 				int textWidth = (backgroundWidth - PADDING);
 				for(TooltipComponent text : entries)
 				{
@@ -435,18 +505,19 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		
 		public void render(DrawContext context, int x, int y, int maxEntryWidth)
 		{
-			int totalHeight = (entries.size() - 1) * SPACING;
-			for(Batch batch : entries)
-				totalHeight += batch.backgroundHeight(maxEntryWidth);
-			
-			y -= totalHeight / 2;
 			for(Batch batch : entries)
 			{
-				int height = batch.backgroundHeight(maxEntryWidth);
-				y += height / 2;
 				batch.render(context, x, y, maxEntryWidth);
-				y += (height / 2) + SPACING;
+				y += batch.backgroundHeight(maxEntryWidth) + SPACING;
 			}
+		}
+		
+		public int totalHeight(int maxEntryWidth)
+		{
+			int height = SPACING * (entries.size() - 1);
+			for(Batch batch : entries)
+				height += batch.backgroundHeight(maxEntryWidth);
+			return height;
 		}
 	}
 	
@@ -493,7 +564,6 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			float b = (float)(colour & 0xFF) / 255F;
 			
 			context.drawTexturedQuad(isHovered() ? TEXTURE_HOVERED : TEXTURE, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, r, g, b, 1F);
-			
 			context.drawCenteredTextWithShadow(textRenderer, getMessage(), getX() + getWidth() / 2, getY() + getHeight() / 2 - textRenderer.fontHeight / 2, 0xFFFFFF);
 		}
 	}

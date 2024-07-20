@@ -1,5 +1,6 @@
 package com.lying.client;
 
+import com.lying.client.screen.CharacterCreationScreen;
 import com.lying.client.screen.CharacterSheetScreen;
 import com.lying.init.VTScreenHandlerTypes;
 
@@ -15,6 +16,7 @@ public class VariousTypesClient
 		ClientBus.init();
 		
 		MenuRegistry.registerScreenFactory(VTScreenHandlerTypes.CHARACTER_SCREEN_HANDLER.get(), CharacterSheetScreen::new);
+		MenuRegistry.registerScreenFactory(VTScreenHandlerTypes.CREATION_SCREEN_HANDLER.get(), CharacterCreationScreen::new);
 	}
 	
 	public static enum TextAlign implements StringIdentifiable

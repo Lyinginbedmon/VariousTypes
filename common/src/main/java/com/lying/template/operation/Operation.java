@@ -16,7 +16,9 @@ import com.lying.type.DummyType;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /** Something this template does to the creature when it is applied*/
@@ -24,6 +26,7 @@ public abstract class Operation
 {
 	private static final Map<Identifier, Supplier<Operation>> OPERATIONS = new HashMap<>();
 	
+	/** Completely clears the existing typeset */
 	public static final Supplier<Operation> LOSE_ALL_TYPES			= register(prefix("lose_all_types"), () -> new SimpleOperation(prefix("lose_all_types")) 
 	{
 		public void applyToTypes(TypeSet typeSet) { typeSet.clear(); }
@@ -45,15 +48,19 @@ public abstract class Operation
 		public void applyToTypes(TypeSet typeSet) { typeSet.removeIf(type -> type instanceof DummyType); }
 	});
 	
+	/** Adds one or more types */
 	public static final Supplier<Operation> ADD_TYPES				= register(prefix("add_types"), () -> new TypesOperation.Add(prefix("add_types")));
 	
+	/** Removes one or more types */
 	public static final Supplier<Operation> REMOVE_TYPES			= register(prefix("remove_types"), () -> new TypesOperation.Remove(prefix("remove_types")));
 	
+	/** Completely overrides any existing typeset with the given typeset */
 	public static final Supplier<Operation> SET_TYPES				= register(prefix("set_types"), () -> new TypesOperation.Set(prefix("set_types")));
 	
 	/** If target types are present, remove them and add the given types */
-	public static final Supplier<Operation> REPLACE_TYPES			= register(prefix("replace_types"), () -> new OperationReplaceTypes(prefix("set_types"), new TypeSet()));
+	public static final Supplier<Operation> REPLACE_TYPES			= register(prefix("replace_types"), () -> new OperationReplaceTypes(prefix("replace_types"), new TypeSet()));
 	
+	/** Adds one or more ability instances */
 	public static final Supplier<Operation> ADD_ABILITY				= register(prefix("add_ability"), () -> new AbilityOperation.Add(prefix("add_ability"), VTAbilities.DUMMY.get().instance(AbilitySource.MISC)));
 	
 	/** Remove all abilities of the given map name */
@@ -88,6 +95,8 @@ public abstract class Operation
 	}
 	
 	public Identifier registryName() { return registryName; }
+	
+	public Text describe(DynamicRegistryManager manager) { return Text.translatable("operation."+registryName.getNamespace()+"."+registryName.getPath()); }
 	
 	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	

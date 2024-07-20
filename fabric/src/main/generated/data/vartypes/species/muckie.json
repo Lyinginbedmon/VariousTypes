@@ -1,4 +1,8 @@
 {
+  "Abilities": [
+    "vartypes:deep_breath"
+  ],
+  "Background": "vartypes:textures/gui/sheet/creator_shipwreck.png",
   "Display": {
     "Title": {
       "translate": "species.vartypes.muckie"

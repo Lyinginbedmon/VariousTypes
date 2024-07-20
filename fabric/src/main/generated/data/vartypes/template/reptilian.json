@@ -22,6 +22,9 @@
     }
   ],
   "Display": {
+    "Description": {
+      "translate": "template.vartypes.reptilian.desc"
+    },
     "Title": {
       "translate": "template.vartypes.reptilian"
     }
@@ -41,9 +44,11 @@
       ]
     },
     {
-      "Ability": {
-        "Name": "vartypes:night_vision"
-      },
+      "Ability": [
+        "vartypes:night_vision",
+        "vartypes:natural_armour",
+        "vartypes:deep_breath"
+      ],
       "Name": "vartypes:add_ability"
     }
   ],

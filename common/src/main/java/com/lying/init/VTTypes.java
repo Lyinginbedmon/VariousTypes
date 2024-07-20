@@ -82,7 +82,7 @@ public class VTTypes
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.SWIM.get()).build());
-	public static final Supplier<Type> AQUATIC			= register("aquatic", () -> Type.Builder.of(prefix("aquatic"), Tier.SUBTYPE)
+	public static final Supplier<Type> AQUATIC			= register("aquatic", () -> Type.Builder.of(prefix("aquatic"), Tier.SUBTYPE).description(ModInfo.translate("type", "aquatic.desc"))
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())
 			.addAbility(VTAbilities.SUFFOCATE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.SWIM.get()).build());
@@ -93,10 +93,10 @@ public class VTTypes
 	public static final Supplier<Type> DUMMY	= register("dummy", () -> DummyType.Builder.of(prefix("dummy")).build());
 	
 	public static final Supplier<Type> GOBLINOID	= dummyType("goblinoid");
-	public static final Supplier<Type> LINN			= dummyTypeWithDesc("linn");	// Players
-	public static final Supplier<Type> MUINTIR		= dummyTypeWithDesc("muintir");	// Villagers
-	public static final Supplier<Type> NAIMHDE		= dummyTypeWithDesc("naimhde");	// Illagers
-	public static final Supplier<Type> ORKIN		= dummyType("orkin");	// Piglins
+	public static final Supplier<Type> LINN			= dummyTypeWithDesc("linn");
+	public static final Supplier<Type> MUINTIR		= dummyTypeWithDesc("muintir");
+	public static final Supplier<Type> NAIMHDE		= dummyTypeWithDesc("naimhde");
+	public static final Supplier<Type> ORKIN		= dummyTypeWithDesc("orkin");
 	public static final Supplier<Type> REPTILIAN	= dummyType("reptilian");
 	public static final Supplier<Type> VERDINE		= dummyType("verdine");	// Elves
 	

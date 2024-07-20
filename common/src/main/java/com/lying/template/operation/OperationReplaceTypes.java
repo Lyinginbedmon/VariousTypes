@@ -6,7 +6,9 @@ import com.google.gson.JsonObject;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class OperationReplaceTypes extends TypesOperation
@@ -17,6 +19,11 @@ public class OperationReplaceTypes extends TypesOperation
 	{
 		super(nameIn, typesIn);
 		targets.addAll(toReplace.contents().toArray(new Type[0]));
+	}
+	
+	public Text describe(DynamicRegistryManager manager)
+	{
+		return Text.translatable("operation.vartypes.replace_types", targets.asNameList(manager), types.asNameList(manager));
 	}
 	
 	public static OperationReplaceTypes of(TypeSet targets, Type... typesIn) { return new OperationReplaceTypes(Operation.REPLACE_TYPES.get().registryName(), targets, typesIn); }

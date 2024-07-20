@@ -5,7 +5,9 @@ import com.lying.VariousTypes;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public abstract class TypesOperation extends ConfigurableOperation
@@ -44,6 +46,11 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
+		public Text describe(DynamicRegistryManager manager)
+		{
+			return Text.translatable("operation.vartypes.add_types", types.asNameList(manager));
+		}
+		
 		public static Add of(Type... typesIn) { return new Add(Operation.ADD_TYPES.get().registryName(), typesIn); }
 		
 		public void applyToTypes(TypeSet typeSet)
@@ -59,6 +66,11 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
+		public Text describe(DynamicRegistryManager manager)
+		{
+			return Text.translatable("operation.vartypes.lose_types", types.asNameList(manager));
+		}
+		
 		public static Remove of(Type... typesIn) { return new Remove(Operation.REMOVE_TYPES.get().registryName(), typesIn); }
 		
 		public void applyToTypes(TypeSet typeSet)
@@ -72,6 +84,11 @@ public abstract class TypesOperation extends ConfigurableOperation
 		public Set(Identifier nameIn, Type... typesIn)
 		{
 			super(nameIn, typesIn);
+		}
+		
+		public Text describe(DynamicRegistryManager manager)
+		{
+			return Text.translatable("operation.vartypes.set_types", types.display(manager));
 		}
 		
 		public static Set of(Type... typesIn) { return new Set(Operation.SET_TYPES.get().registryName(), typesIn); }

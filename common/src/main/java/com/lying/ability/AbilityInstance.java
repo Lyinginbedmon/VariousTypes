@@ -8,7 +8,9 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.lying.ability.Ability.AbilitySource;
+import com.lying.ability.Ability.AbilityType;
 import com.lying.init.VTAbilities;
 import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
@@ -45,14 +47,22 @@ public class AbilityInstance
 	}
 	
 	/** Returns a comparator for sorting abilities alphabetically by their display name */
-	public static Comparator<AbilityInstance> sortFunc(DynamicRegistryManager manager) { return (a, b) -> VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()); }
+	public static Comparator<AbilityInstance> sortFunc(DynamicRegistryManager manager)
+	{
+		return (a, b) -> {
+			int comparison;
+			return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()) : comparison;
+			};
+	}
 	
 	/** The variable map name for this specific ability instance */
 	public Identifier mapName() { return ability.mapName(this); }
 	
 	public AbilitySource source() { return source; }
 	
-	public void setDisplay(LoreDisplay compound) { display = Optional.of(compound); }
+	public void setDisplay(LoreDisplay displayIn) { display = Optional.of(displayIn); }
+	
+	public Optional<LoreDisplay> display() { return display; }
 	
 	public void setDisplayName(Text component)
 	{
@@ -94,17 +104,23 @@ public class AbilityInstance
 		return compound;
 	}
 	
-	public JsonObject writeToJson(RegistryWrapper.WrapperLookup manager)
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
 		JsonObject json = new JsonObject();
 		json.addProperty("Name", ability.registryName().toString());
-		json.addProperty("Source", source.asString());
-		if(!display.isEmpty())
-			json.add("Display", display.get().toJson(manager));
-		if(isReadOnly())
-			json.addProperty("ReadOnly", true);
+		if(!vitalOnly)
+		{
+			json.addProperty("Source", source.asString());
+			if(!display.isEmpty())
+				json.add("Display", display.get().toJson(manager));
+			if(isReadOnly())
+				json.addProperty("ReadOnly", true);
+		}
 		if(!memory.isEmpty())
 			json.addProperty("Memory", memory.toString());
+		
+		if(json.size() == 1)
+			return new JsonPrimitive(ability.registryName().toString());
 		return json;
 	}
 	
@@ -130,26 +146,36 @@ public class AbilityInstance
 		return instance;
 	}
 	
-	public static AbilityInstance readFromJson(JsonObject data)
+	public static AbilityInstance readFromJson(JsonElement element, AbilitySource forceSource)
 	{
-		if(!data.has("Name"))
-			throw new NullPointerException();
-		
-		Ability ability = VTAbilities.get(new Identifier(data.get("Name").getAsString()));
-		
-		AbilitySource source = AbilitySource.fromName(data.get("Source").getAsString());
-		AbilityInstance instance = ability.instance(source);
-		
-		if(data.has("Display"))
-			instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display")));
-		
-		if(data.has("ReadOnly") && data.get("ReadOnly").getAsBoolean())
-			instance.lock();
-		
-		if(data.has("Memory"))
-			instance.memory = tryParseNbt(data.get("Memory"));
-		
-		return instance;
+		if(element.isJsonObject())
+		{
+			JsonObject data = element.getAsJsonObject();
+			if(!data.has("Name"))
+				throw new NullPointerException();
+			
+			Ability ability = VTAbilities.get(new Identifier(data.get("Name").getAsString()));
+			
+			AbilitySource source = forceSource == null ? AbilitySource.fromName(data.get("Source").getAsString()) : forceSource;
+			AbilityInstance instance = ability.instance(source);
+			
+			if(data.has("Display"))
+				instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display")));
+			
+			if(data.has("ReadOnly") && data.get("ReadOnly").getAsBoolean())
+				instance.lock();
+			
+			if(data.has("Memory"))
+				instance.memory = tryParseNbt(data.get("Memory"));
+			
+			return instance;
+		}
+		else
+		{
+			Ability ability = VTAbilities.get(new Identifier(element.getAsString()));
+			AbilitySource source = forceSource == null ? AbilitySource.MISC : forceSource;
+			return ability.instance(source);
+		}
 	}
 	
 	private static NbtCompound tryParseNbt(JsonElement element)
@@ -163,7 +189,7 @@ public class AbilityInstance
 	
 	/**
 	 * Returns true if this ability instance is immutable.<br>
-	 * This usually indicates that it is a default model.
+	 * This usually indicates that it is a default model not to be directly utilised.
 	 */
 	public boolean isReadOnly() { return locked; }
 	

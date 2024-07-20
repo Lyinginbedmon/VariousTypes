@@ -28,6 +28,7 @@ import net.minecraft.util.profiler.Profiler;
 
 public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObject>>
 {
+	public static final Identifier DEFAULT_SPECIES = new Identifier("vartypes:human");
 	private static VTSpeciesRegistry INSTANCE;
 	
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();

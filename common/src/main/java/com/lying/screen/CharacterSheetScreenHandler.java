@@ -16,5 +16,4 @@ public class CharacterSheetScreenHandler extends ScreenHandler
 	public ItemStack quickMove(PlayerEntity var1, int var2) { return ItemStack.EMPTY; }
 	
 	public boolean canUse(PlayerEntity var1) { return true; }
-	
 }

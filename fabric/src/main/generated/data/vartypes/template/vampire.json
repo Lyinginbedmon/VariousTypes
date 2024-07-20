@@ -23,9 +23,10 @@
       ]
     },
     {
-      "Ability": {
-        "Name": "vartypes:climb"
-      },
+      "Ability": [
+        "vartypes:climb",
+        "vartypes:burn_in_sun"
+      ],
       "Name": "vartypes:add_ability"
     }
   ],

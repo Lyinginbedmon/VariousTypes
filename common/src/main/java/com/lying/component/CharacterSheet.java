@@ -24,7 +24,7 @@ import com.lying.template.Template;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
-import com.lying.utility.ServerBus;
+import com.lying.utility.ServerEvents.SheetEvents;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
@@ -60,6 +60,7 @@ public class CharacterSheet
 	// These values represent the information the character is currently working on
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities = new AbilitySet();
+	private AbilitySet activatedAbilities = new AbilitySet();
 	private ActionHandler actions = ActionHandler.STANDARD_SET.copy();
 	
 	public CharacterSheet(@Nullable LivingEntity ownerIn)
@@ -296,6 +297,8 @@ public class CharacterSheet
 	
 	public AbilitySet abilities() { return abilities; }
 	
+	public AbilitySet activatedAbilities() { return activatedAbilities; }
+	
 	public ActionHandler actions() { return actions.copy(); }
 	
 	/** Constructs the types and abilities from scratch */
@@ -324,7 +327,7 @@ public class CharacterSheet
 		for(Template template : getAppliedTemplates())
 			template.applyTypeOperations(types);
 		
-		ServerBus.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), homeDimension(), types);
+		SheetEvents.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), homeDimension(), types);
 		this.types = types.copy();
 		this.actions.markDirty();
 	}
@@ -350,6 +353,8 @@ public class CharacterSheet
 		this.actions.markDirty();
 		
 		this.onAbilitiesRebuilt();
+		
+		this.abilities.mergeActivated(this.activatedAbilities);
 	}
 	
 	protected void onAbilitiesRebuilt() { }
@@ -363,7 +368,7 @@ public class CharacterSheet
 		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
 			this.abilities.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(actions, inst));
 		
-		ServerBus.AFTER_REBUILD_ACTIONS_EVENT.invoker().affectActions(actions, abilities, getOwner());
+		SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.invoker().affectActions(actions, abilities, getOwner());
 	}
 	
 	public boolean hasAction(Action action) { return actions.can(action); }

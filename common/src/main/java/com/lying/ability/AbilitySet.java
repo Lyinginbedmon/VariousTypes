@@ -10,6 +10,8 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.lying.ability.Ability.AbilitySource;
+import com.lying.ability.Ability.AbilityType;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -66,6 +68,30 @@ public class AbilitySet
 		}
 	}
 	
+	/**
+	 * Ensures the given set has all abilities of this set and none outside of it, without modifying the actual abilities.<br>
+	 * Used to create an AbilitySet that can be acted upon by user input.
+	 */
+	public void mergeActivated(AbilitySet activeSet)
+	{
+		// Add every ability I have that they don't
+		for(Entry<Identifier, AbilityInstance> entry : activatedAbilities().entrySet())
+			if(!activeSet.hasAbilityInstance(entry.getKey()))
+				activeSet.add(entry.getValue().copy());
+		
+		// Remove every ability they have that I don't
+		for(Entry<Identifier, AbilityInstance> entry : activeSet.activatedAbilities().entrySet())
+			if(!hasAbilityInstance(entry.getKey()))
+				activeSet.remove(entry.getKey());
+	}
+	
+	protected Map<Identifier, AbilityInstance> activatedAbilities()
+	{
+		Map<Identifier, AbilityInstance> activatedAbilities = new HashMap<>();
+		abilities.values().stream().filter(inst -> inst.ability().type() != AbilityType.PASSIVE).forEach(inst -> activatedAbilities.put(inst.mapName(), inst));
+		return activatedAbilities;
+	}
+	
 	public boolean hasAbility(Identifier registryName)
 	{
 		return abilities.values().stream().anyMatch(instance -> instance.ability().registryName().equals(registryName));
@@ -114,19 +140,19 @@ public class AbilitySet
 		return set;
 	}
 	
-	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager)
+	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
 		JsonArray list = new JsonArray();
-		abilities().forEach(inst -> list.add(inst.writeToJson(manager)));
+		abilities().forEach(inst -> list.add(inst.writeToJson(manager, vitalOnly)));
 		return list;
 	}
 	
-	public static AbilitySet readFromJson(JsonArray list)
+	public static AbilitySet readFromJson(JsonArray list, AbilitySource forceSource)
 	{
 		AbilitySet set = new AbilitySet();
 		for(JsonElement entry : list.asList())
 		{
-			AbilityInstance inst = AbilityInstance.readFromJson(entry.getAsJsonObject());
+			AbilityInstance inst = AbilityInstance.readFromJson(entry, forceSource);
 			if(inst != null)
 				set.add(inst);
 		}

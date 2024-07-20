@@ -2,6 +2,8 @@ package com.lying.fabric;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
+
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.fabric.component.VTComponents;
@@ -24,9 +26,12 @@ public final class VariousTypesFabric implements ModInitializer
 		
 		VariousTypes.setPlatHandler(new XPlatHandler() 
 		{
-			public Optional<CharacterSheet> getSheet(LivingEntity entity)
+			public Optional<CharacterSheet> getSheet(@NotNull LivingEntity entity)
 			{
-				return entity.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(VTComponents.CHARACTER_SHEET.get(entity));
+				return
+						entity.getType() != EntityType.PLAYER ?
+							Optional.empty() :
+							Optional.of(VTComponents.CHARACTER_SHEET.get(entity));
 			}
 			
 			public void setSheet(LivingEntity entity, CharacterSheet sheet)

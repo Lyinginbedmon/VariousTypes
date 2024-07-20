@@ -22,6 +22,10 @@
       "Types": [
         "vartypes:undead"
       ]
+    },
+    {
+      "Ability": "vartypes:natural_armour",
+      "Name": "vartypes:add_ability"
     }
   ],
   "Power": 1

@@ -16,9 +16,7 @@
   },
   "Operations": [
     {
-      "Ability": {
-        "Name": "vartypes:fly"
-      },
+      "Ability": "vartypes:fly",
       "Name": "vartypes:add_ability"
     }
   ],

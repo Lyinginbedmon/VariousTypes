@@ -1,5 +1,7 @@
 package com.lying.species;
 
+import static com.lying.reference.Reference.ModInfo.prefix;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -26,18 +28,30 @@ import net.minecraft.world.World;
 /** A configurable package of types and abilities applied to a creature */
 public class Species
 {
+	public static final Identifier BACKING_DEFAULT = prefix("textures/gui/sheet/creator_default.png");
+	public static final Identifier BACKING_BASTION = prefix("textures/gui/sheet/creator_bastion.png");
+	public static final Identifier BACKING_END_CITY = prefix("textures/gui/sheet/creator_end_city.png");
+	public static final Identifier BACKING_END_ISLAND = prefix("textures/gui/sheet/creator_end_island.png");
+	public static final Identifier BACKING_END_PORTAL = prefix("textures/gui/sheet/creator_end_portal.png");
+	public static final Identifier BACKING_MINESHAFT = prefix("textures/gui/sheet/creator_mineshaft.png");
+	public static final Identifier BACKING_SHIPWRECK = prefix("textures/gui/sheet/creator_shipwreck.png");
+	public static final Identifier BACKING_STRONGHOLD = prefix("textures/gui/sheet/creator_stronghold.png");
+	public static final Identifier BACKING_TRIAL = prefix("textures/gui/sheet/creator_trial.png");
+	
 	private final Identifier id;
 	private LoreDisplay display;
+	private Optional<Identifier> creatorBacking;
 	
 	private int power;
 	private RegistryKey<World> homeDim;
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities = new AbilitySet();
 	
-	private Species(Identifier idIn, LoreDisplay displayIn)
+	private Species(Identifier idIn, LoreDisplay displayIn, Optional<Identifier> textureIn)
 	{
 		id = idIn;
 		display = displayIn;
+		creatorBacking = textureIn;
 	}
 	
 	public Identifier registryName() { return id; }
@@ -45,6 +59,8 @@ public class Species
 	public LoreDisplay display() { return display; }
 	
 	public Text displayName() { return display.title(); }
+	
+	public Identifier creatorBackground() { return creatorBacking.isPresent() ? creatorBacking.get() : BACKING_DEFAULT; }
 	
 	public int power() { return power; }
 	
@@ -60,6 +76,7 @@ public class Species
 	{
 		JsonObject obj = new JsonObject();
 		obj.add("Display", display.toJson(lookup));
+		creatorBacking.ifPresent(tex -> obj.addProperty("Background", tex.toString()));
 		
 		if(power > 0)
 			obj.addProperty("Power", power);
@@ -68,30 +85,34 @@ public class Species
 		if(!types.isEmpty())
 			obj.add("Types", types.writeToJson(lookup));
 		if(!abilities.isEmpty())
-			obj.add("Abilities", abilities.writeToJson(lookup));
+			obj.add("Abilities", abilities.writeToJson(lookup, true));
 		
 		return obj;
 	}
 	
 	public static Species readFromJson(Identifier registryName, JsonObject data)
 	{
-		Species builder = Builder.of(registryName).build();
+		Species.Builder builder = Builder.of(registryName);
 		
-		builder.display = LoreDisplay.fromJson(data.get("Display"));
+		if(data.has("Background"))
+			builder.texture(new Identifier(data.get("Background").getAsString()));
+		
+		Species species = builder.build();
+		species.display = LoreDisplay.fromJson(data.get("Display"));
 		
 		if(data.has("Power"))
-			builder.power = data.get("Power").getAsInt();
+			species.power = data.get("Power").getAsInt();
 		
 		if(data.has("Home"))
-			builder.homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+			species.homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		
 		if(data.has("Types"))
-			builder.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
+			species.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
 		
 		if(data.has("Abilities"))
-			builder.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray());
+			species.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), AbilitySource.SPECIES);
 		
-		return builder;
+		return species;
 	}
 	
 	public void clear()
@@ -108,6 +129,7 @@ public class Species
 		
 		private Text displayName;
 		private Optional<Text> displayDesc = Optional.empty();
+		private Optional<Identifier> creatorTexture = Optional.empty();
 		
 		private int power = 0;
 		private RegistryKey<World> homeDim = null;
@@ -134,6 +156,12 @@ public class Species
 		public Builder description(Text descIn)
 		{
 			displayDesc = Optional.of(descIn);
+			return this;
+		}
+		
+		public Builder texture(Identifier textureIn)
+		{
+			creatorTexture = Optional.of(textureIn);
 			return this;
 		}
 		
@@ -170,7 +198,7 @@ public class Species
 		
 		public Species build()
 		{
-			Species species = new Species(id, new LoreDisplay(displayName, displayDesc));
+			Species species = new Species(id, new LoreDisplay(displayName, displayDesc), creatorTexture);
 			species.power = power;
 			species.homeDim = homeDim;
 			species.types = types;

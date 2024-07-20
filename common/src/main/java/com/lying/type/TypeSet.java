@@ -61,6 +61,25 @@ public class TypeSet
 		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : translate("gui", "typeset", vars);
 	}
 	
+	public Text asNameList(DynamicRegistryManager manager)
+	{
+		List<Type> typeList = contents();
+		typeList.sort(Type.sortFunc(manager));
+		
+		MutableText name = null;
+		if(typeList.isEmpty())
+			name = Text.empty();
+		else
+		{
+			name = typeList.get(0).displayName(manager).copy();
+			if(typeList.size() > 1)
+				for(int i=1; i<typeList.size(); i++)
+					name = name.append(", ").append(typeList.get(i).displayName(manager));
+		}
+		
+		return name;
+	}
+	
 	public boolean isEmpty() { return types.isEmpty(); }
 	
 	public void clear() { types.clear(); }

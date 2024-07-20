@@ -10,22 +10,31 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
+import com.lying.ability.AbilitySet;
+import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
+import com.lying.utility.ServerEvents.LivingEvents;
+import com.lying.utility.ServerEvents.Result;
 
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin extends EntityMixin
 {
+	@Shadow
+	private Optional<BlockPos> climbingPos = Optional.empty();
+	
 	@Shadow
 	public ItemStack getEquippedStack(EquipmentSlot slot) { return ItemStack.EMPTY; }
 	
@@ -44,9 +53,11 @@ public class LivingEntityMixin extends EntityMixin
 	@Shadow
 	public boolean damage(DamageSource source, float amount) { return false; }
 	
+	/** Functionally repurposed as "next air somewhere you can't breathe" */
 	@Shadow
 	public int getNextAirUnderwater(int air) { return air - 1; }
 	
+	/** Functionally repurposed as "next air somewhere you can breathe" */
 	@Shadow
 	public int getNextAirOnLand(int air) { return air + 4; }
 	
@@ -63,64 +74,118 @@ public class LivingEntityMixin extends EntityMixin
 	@Inject(method = "tickMovement()V", at = @At("RETURN"))
 	private void vt$tickMovement(final CallbackInfo ci)
 	{
-		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)(Object)this);
-		if(sheet.isPresent() && sheet.get().abilities().hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
-			if(!helmet.isEmpty())
+			if(sheet.abilities().hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 			{
-				if(helmet.isDamageable())
+				ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
+				if(!helmet.isEmpty())
 				{
-					helmet.setDamage(helmet.getDamage() + random.nextInt(2));
-					if(helmet.getDamage() >= helmet.getMaxDamage())
+					if(helmet.isDamageable())
 					{
-						sendEquipmentBreakStatus(EquipmentSlot.HEAD);
-						equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY);
+						helmet.setDamage(helmet.getDamage() + random.nextInt(2));
+						if(helmet.getDamage() >= helmet.getMaxDamage())
+						{
+							sendEquipmentBreakStatus(EquipmentSlot.HEAD);
+							equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY);
+						}
 					}
 				}
+				else
+					setOnFireFor(8);
 			}
-			else
-				setOnFireFor(8);
-		}
+		});
 	}
 	
 	@Inject(method = "canBreatheInWater()Z", at = @At("HEAD"), cancellable = true)
 	private void vt$canBreatheInWater(final CallbackInfoReturnable<Boolean> ci)
 	{
 		LivingEntity living = (LivingEntity)(Object)this;
-		Optional<CharacterSheet> sheet = VariousTypes.getSheet(living);
-		if(sheet.isPresent() && sheet.get().isAbleToBreathe(Fluids.WATER, StatusEffectUtil.hasWaterBreathing(living)))
-			ci.setReturnValue(true);
+		VariousTypes.getSheet(living).ifPresent(sheet -> 
+		{
+			if(sheet.isAbleToBreathe(Fluids.WATER, StatusEffectUtil.hasWaterBreathing(living)))
+				ci.setReturnValue(true);
+		});
+	}
+	
+	@Inject(method = "baseTick()V", at = @At("HEAD"))
+	private void vt$baseTickHead(final CallbackInfo ci)
+	{
+		LivingEntity living = (LivingEntity)(Object)this;
+		VariousTypes.getSheet(living).ifPresent(sheet -> ((EntityMixin)(Object)living).shouldSkipAir = true);
 	}
 	
 	@Inject(method = "baseTick()V", at = @At("TAIL"))
-	private void vt$baseTick(final CallbackInfo ci)
+	private void vt$baseTickTail(final CallbackInfo ci)
 	{
 		LivingEntity living = (LivingEntity)(Object)this;
-		Optional<CharacterSheet> sheet = VariousTypes.getSheet(living);
-		if(sheet.isEmpty())
-			return;
-		
-		// FIXME Prevent baseTick from stalling air loss w/ original breath handling
-		if(!sheet.get().isAbleToBreathe(fluidAtEyes().getFluid(), StatusEffectUtil.hasWaterBreathing(living)))
+		VariousTypes.getSheet(living).ifPresent(sheet -> 
 		{
-			// Decline air meter
-			setAir(getNextAirUnderwater(getAir()));
-			if(getAir() == -20)
+			((EntityMixin)(Object)living).shouldSkipAir = false;
+			
+			// Comprehensive breathing system, replaces vanilla air meter handling
+			int air = getAir();
+			if(!sheet.isAbleToBreathe(fluidAtEyes().getFluid(), StatusEffectUtil.hasWaterBreathing(living)))
 			{
-				setAir(0);
-				damage(getDamageSources().drown(), 2F);
+				// Decline air meter
+				air = getNextAirUnderwater(air);
+				if(air == -20)
+				{
+					setAir(0);
+					damage(getDamageSources().drown(), 2F);
+				}
+				else
+					setAir(air);
 			}
-		}
-		else if(getAir() < getMaxAir())
-		{
 			// Restore air meter
-			setAir(getNextAirOnLand(getAir()));
-		}
+			else if(air < getMaxAir())
+				setAir(getNextAirOnLand(air));
+		});
 	}
 	
 	private FluidState fluidAtEyes()
 	{
 		return getWorld().getFluidState(BlockPos.ofFloored(getX(), getEyeY(), getZ()));
+	}
+	
+	@Inject(method = "canHaveStatusEffect(Lnet/minecraft/entity/effect/StatusEffectInstance;)Z", at = @At("TAIL"), cancellable = true)
+	private void vt$canHaveStatusEffect(StatusEffectInstance effect, final CallbackInfoReturnable<Boolean> ci)
+	{
+		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
+		{
+			AbilitySet abilities = sheet.abilities();
+			switch(LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities, ci.getReturnValue() ? Result.ALLOW : Result.DENY))
+			{
+				case Result.DENY:
+					ci.setReturnValue(false);
+					break;
+				case Result.ALLOW:
+					ci.setReturnValue(true);
+					break;
+				default:
+				case Result.PASS:
+					break;
+			}
+		});
+	}
+	
+	@Inject(method = "isClimbing()Z", at = @At("TAIL"), cancellable = true)
+	private void vt$isClimbing(final CallbackInfoReturnable<Boolean> ci)
+	{
+		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
+		{
+			if(!isSpectator())
+				sheet.activatedAbilities().getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
+					inst -> 
+					{
+						if(!((ToggledAbility)inst.ability()).isActive(inst)) return;
+						World world = getWorld();
+						if(world.getBlockCollisions((LivingEntity)(Object)this, getBoundingBox().expand(0.2D, -0.1D, 0.2D)).iterator().hasNext())
+						{
+							climbingPos = Optional.of(getBlockPos());
+							ci.setReturnValue(true);
+						}
+					});
+		});
 	}
 }

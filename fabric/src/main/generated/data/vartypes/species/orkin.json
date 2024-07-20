@@ -1,4 +1,5 @@
 {
+  "Background": "vartypes:textures/gui/sheet/creator_bastion.png",
   "Display": {
     "Title": {
       "translate": "species.vartypes.orkin"
@@ -9,6 +10,9 @@
     "vartypes:human",
     {
       "Display": {
+        "Description": {
+          "translate": "subtype.vartypes.orkin.desc"
+        },
         "Title": {
           "translate": "subtype.vartypes.orkin"
         }

@@ -9,6 +9,9 @@
     }
   ],
   "Display": {
+    "Description": {
+      "translate": "template.vartypes.insectile.desc"
+    },
     "Title": {
       "translate": "template.vartypes.insectile"
     }
@@ -22,9 +25,11 @@
       ]
     },
     {
-      "Ability": {
-        "Name": "vartypes:climb"
-      },
+      "Ability": [
+        "vartypes:climb",
+        "vartypes:sculk_sight",
+        "vartypes:natural_armour"
+      ],
       "Name": "vartypes:add_ability"
     }
   ],

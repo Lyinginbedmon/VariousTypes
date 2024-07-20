@@ -18,6 +18,7 @@ import com.lying.component.CharacterSheet;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.reference.Reference;
+import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.utility.VTUtils;
@@ -37,6 +38,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -117,6 +119,14 @@ public class VTCommands
 								return Math.min(set.size(), 15);
 							})))
 					.then(argument(PLAYER, EntityArgumentType.player())
+						.then(literal("create")
+								.executes(context -> 
+								{
+									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+									VariousTypes.getSheet(player).ifPresent(sheet ->
+										player.openHandledScreen(new SimpleNamedScreenHandlerFactory((id, playerInventory, custom) -> new CharacterCreationScreenHandler(id, playerInventory.player), player.getDisplayName())));
+									return 15;
+								}))
 						.then(literal("reset")
 								.executes(context -> 
 								{

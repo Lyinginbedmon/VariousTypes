@@ -2,6 +2,7 @@ package com.lying;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +14,13 @@ import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
+import com.lying.network.FinishCharacterCreationReceiver;
+import com.lying.network.VTPacketHandler;
 import com.lying.reference.Reference;
 import com.lying.utility.ServerBus;
 import com.lying.utility.XPlatHandler;
 
+import dev.architectury.networking.NetworkManager;
 import net.minecraft.entity.LivingEntity;
 
 public class VariousTypes
@@ -31,7 +35,8 @@ public class VariousTypes
 		public void setSheet(LivingEntity entity, CharacterSheet sheet) { }
     };
     
-    public static void commonInit()
+    @SuppressWarnings("removal")
+	public static void commonInit()
     {
     	VTAbilities.init();
     	VTTypes.init();
@@ -41,17 +46,27 @@ public class VariousTypes
     	VTItems.init();
     	VTCommands.init();
     	ServerBus.init();
+    	
+    	NetworkManager.registerReceiver(NetworkManager.Side.C2S, VTPacketHandler.FINISH_CHARACTER_ID, new FinishCharacterCreationReceiver());
     }
     
     public static void setPlatHandler(XPlatHandler handler) { HANDLER = handler; }
     
-    public static Optional<CharacterSheet> getSheet(LivingEntity entity)
+    public static Optional<CharacterSheet> getSheet(@Nullable LivingEntity entity)
     {
-    	return HANDLER.getSheet(entity);
+    	Optional<CharacterSheet> sheetOpt = Optional.empty();
+    	if(entity != null)
+	    	try
+	    	{
+	    		sheetOpt = HANDLER.getSheet(entity);
+	    	}
+    		catch(Exception e) { }
+    	return sheetOpt;
     }
     
     public static void setSheet(LivingEntity entity, CharacterSheet sheet)
     {
-    	HANDLER.setSheet(entity, sheet);
+    	if(entity != null && sheet != null)
+    		HANDLER.setSheet(entity, sheet);
     }
 }

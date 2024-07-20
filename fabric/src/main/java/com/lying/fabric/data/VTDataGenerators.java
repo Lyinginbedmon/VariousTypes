@@ -10,5 +10,6 @@ public class VTDataGenerators implements DataGeneratorEntrypoint
 		FabricDataGenerator.Pack pack = fabricDataGenerator.createPack();
 		pack.addProvider(VTSpeciesProvider::new);
 		pack.addProvider(VTTemplatesProvider::new);
+		pack.addProvider(VTStatusEffectTagsProvider::new);
 	}
 }

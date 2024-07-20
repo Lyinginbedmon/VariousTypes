@@ -5,6 +5,7 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
@@ -22,6 +23,11 @@ public class Ability
 	{
 		registryName = regName;
 	}
+	
+	/** Returns what type of ability this is */
+	public AbilityType type() { return AbilityType.PASSIVE; }
+	
+	public final AbilityInstance instance() { return instance(AbilitySource.MISC); }
 	
 	/** Returns a blank instance of this ability from the given source */
 	public final AbilityInstance instance(AbilitySource source) { return new AbilityInstance(this, source); }
@@ -45,6 +51,24 @@ public class Ability
 	
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }
+	
+	public static enum AbilityType
+	{
+		PASSIVE(Integer.MAX_VALUE),
+		ACTIVATED(0),
+		TOGGLED(1);
+		
+		public final int displayOrder;
+		
+		private AbilityType(int orderIn)
+		{
+			displayOrder = orderIn;
+		}
+		
+		public Text translate() { return Reference.ModInfo.translate("gui", "ability_"+name().toLowerCase()); }
+		
+		public static int compare(AbilityType a, AbilityType b) { return (int)Math.signum(a.displayOrder - b.displayOrder); }
+	}
 	
 	/**
 	 * Where a specific ability instance originates<br>
