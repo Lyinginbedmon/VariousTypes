@@ -328,6 +328,7 @@ public class CharacterSheet
 			template.applyTypeOperations(types);
 		
 		SheetEvents.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), homeDimension(), types);
+		
 		this.types = types.copy();
 		this.actions.markDirty();
 	}

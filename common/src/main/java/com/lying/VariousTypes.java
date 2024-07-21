@@ -27,6 +27,8 @@ public class VariousTypes
 {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.ModInfo.MOD_ID);
     
+    public static int POWER = 5;
+    
     /** Cross-platform handler for vital functions that aren't handled directly by Architectury */
     private static XPlatHandler HANDLER = new XPlatHandler() 
     {

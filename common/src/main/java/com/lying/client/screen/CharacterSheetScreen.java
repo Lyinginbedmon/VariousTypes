@@ -10,15 +10,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
-import com.lying.client.VariousTypesClient;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTTypes;
@@ -33,35 +32,28 @@ import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.tooltip.TooltipBackgroundRenderer;
-import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.MutableText;
-import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.Util;
 
 public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHandler>
 {
 	private static final PlayerEntity player = MinecraftClient.getInstance().player;
 	private static final DynamicRegistryManager manager = player.getRegistryManager();
 	
-	private DetailObject detailObject = null;
-	private int detailHeight = 0;
+	private Optional<DetailObject> detailObject = Optional.empty();
 	private int scrollAmount = 0;
 	
 	private TypeButtonWidget typeButton;
@@ -122,7 +114,7 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		{
 			List<Type> typeList = types.contents();
 			typeList.sort(Type.sortFunc(manager));
-			setDetail(listToDetail(typeList, this::typeToDetail));
+			setDetail(VTUtilsClient.listToDetail(typeList, this::typeToDetail));
 			setFocused(null);
 		}));
 		addDrawableChild(speciesButton = ButtonWidget.builder(Text.empty(), (button) -> 
@@ -133,7 +125,7 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		}).dimensions(leftX - 90, midY - 90 + 50, 90, 30).build());
 		addDrawableChild(templatesButton = ButtonWidget.builder(Text.empty(), (button) -> 
 		{
-			setDetail(listToDetail(templates, this::templateToDetail));
+			setDetail(VTUtilsClient.listToDetail(templates, this::templateToDetail));
 			setFocused(null);
 		}).dimensions(leftX - 90, midY - 90 + 85, 90, 30).build());
 		
@@ -257,7 +249,7 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 	
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
 	{
-		if(detailObject != null)
+		if(detailObject.isPresent())
 		{
 			scrollAmount += verticalAmount * textRenderer.fontHeight;
 			return true;
@@ -292,10 +284,10 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			context.drawCenteredTextWithShadow(textRenderer, Text.literal((1 + abilityPage) + " / " + abilityPages), midX + 145, midY - 85, 0xFFFFFF);
 		ownerStats.ifPresent(stats -> stats.render(context, midX + 90, midY - 60, midX + 90, midY - 60));
 		
-		if(detailObject != null)
+		detailObject.ifPresent(detail -> 
 		{
 			int maxWidth = Math.min(400, context.getScaledWindowWidth() / 2);
-			detailHeight = detailObject.totalHeight(maxWidth);
+			int detailHeight = detail.totalHeight(maxWidth);
 			int detailY = midY;
 			if(detailHeight > context.getScaledWindowHeight())
 			{
@@ -305,13 +297,13 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			else
 				detailY = midY - detailHeight / 2;
 			
-			detailObject.render(context, midX, detailY, maxWidth);
-		}
+			detail.render(context, midX, detailY, maxWidth);
+		});
 	}
 	
-	public void setDetail(DetailObject obj)
+	public void setDetail(@Nullable DetailObject obj)
 	{
-		detailObject = obj;
+		detailObject = obj == null ? Optional.empty() : Optional.of(obj);
 		scrollAmount = 0;
 	}
 	
@@ -363,13 +355,6 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		return entries.toArray(new MutableText[0]);
 	}
 	
-	private <T extends Object> DetailObject listToDetail(List<T> set, Function<T,MutableText[]> provider)
-	{
-		List<Batch> entries = Lists.newArrayList();
-		set.forEach(entry -> entries.add(new Batch(provider.apply(entry))));
-		return new DetailObject(entries.toArray(new Batch[0]));
-	}
-	
 	/** Stores cached statistics about the character sheet's owner */
 	private class OwnerStats
 	{
@@ -413,111 +398,6 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 				index = renderIndex;
 				iconTex = Reference.ModInfo.prefix("textures/gui/sheet/stat_"+name().toLowerCase()+".png");
 			}
-		}
-	}
-	
-	/**
-	 * An individual rendered tooltip as part of a DetailObject
-	 */
-	private class Batch
-	{
-		private static int PADDING = 5;
-		private final List<Text> entries = Lists.newArrayList();
-		
-		public Batch(MutableText... entriesIn)
-		{
-			for(MutableText text : entriesIn)
-				entries.add(text);
-		}
-		
-		public int backgroundHeight(int maxEntryWidth) { return getConstrainedEntries(maxEntryWidth).size() * textRenderer.fontHeight + PADDING; }
-		
-		public static int backgroundWidth(List<TooltipComponent> entries, int maxEntryWidth, TextRenderer textRenderer)
-		{
-			int maxWidth = 0;
-			for(TooltipComponent text : entries)
-				if(text.getWidth(textRenderer) > maxWidth)
-					maxWidth = text.getWidth(textRenderer);
-			return maxWidth + PADDING;
-		}
-		
-		private List<TooltipComponent> getConstrainedEntries(int maxEntryWidth)
-		{
-			List<OrderedText> wrapped = Lists.newArrayList();
-			for(Text text : entries)
-				wrapped.addAll(textRenderer.wrapLines(text, maxEntryWidth));
-			return wrapped.stream().map(TooltipComponent::of).collect(Util.toArrayList());
-		}
-		
-		@SuppressWarnings("deprecation")
-		public void render(DrawContext context, int x, int y, int maxEntryWidth)
-		{
-			List<TooltipComponent> entries = getConstrainedEntries(maxEntryWidth);
-			int backgroundWidth = backgroundWidth(entries, maxEntryWidth, textRenderer);
-			int backgroundHeight = backgroundHeight(maxEntryWidth);
-			TooltipComponent comp;
-			MatrixStack matrices = context.getMatrices();
-			matrices.push();
-				context.draw(() -> TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y, backgroundWidth, backgroundHeight, 400));
-				matrices.translate(0, 0, 400);
-				int textY = y + (PADDING / 2);
-				int textWidth = (backgroundWidth - PADDING);
-				for(TooltipComponent text : entries)
-				{
-					comp = text;
-					int textX = x;
-					switch(VariousTypesClient.ALIGN_TEXT)
-					{
-						case CENTRE:
-							textX = x - text.getWidth(textRenderer) / 2;
-							break;
-						case RIGHT:
-							textX = x + (textWidth / 2) - text.getWidth(textRenderer);
-							break;
-						default:
-						case LEFT:
-							textX = x - (textWidth / 2);
-							break;
-					}
-					
-					comp.drawText(textRenderer, textX, textY, context.getMatrices().peek().getPositionMatrix(), context.getVertexConsumers());
-					textY += textRenderer.fontHeight;
-				}
-			matrices.pop();
-		}
-	}
-	
-	private class DetailObject
-	{
-		private final int SPACING = 10;
-		private final List<Batch> entries = Lists.newArrayList();
-		
-		public DetailObject(MutableText... entriesIn)
-		{
-			entries.add(new Batch(entriesIn));
-		}
-		
-		public DetailObject(Batch... batches)
-		{
-			for(Batch batch : batches)
-				entries.add(batch);
-		}
-		
-		public void render(DrawContext context, int x, int y, int maxEntryWidth)
-		{
-			for(Batch batch : entries)
-			{
-				batch.render(context, x, y, maxEntryWidth);
-				y += batch.backgroundHeight(maxEntryWidth) + SPACING;
-			}
-		}
-		
-		public int totalHeight(int maxEntryWidth)
-		{
-			int height = SPACING * (entries.size() - 1);
-			for(Batch batch : entries)
-				height += batch.backgroundHeight(maxEntryWidth);
-			return height;
 		}
 	}
 	

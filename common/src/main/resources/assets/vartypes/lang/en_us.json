@@ -161,5 +161,8 @@
 	"gui.vartypes.activated_ability.failed": "You can't use that right now",
 	"gui.vartypes.ability_passive": "Passive Ability",
 	"gui.vartypes.ability_activated": "Activated Ability",
-	"gui.vartypes.ability_toggled": "Toggled Ability"
+	"gui.vartypes.ability_toggled": "Toggled Ability",
+	"gui.vartypes.creator_confirm": "Confirm",
+	"gui.vartypes.creator_species": "Species",
+	"gui.vartypes.creator_template": "Templates"
 }
