@@ -91,7 +91,7 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 		
 		power = sheet.power();
 		species = sheet.getSpecies();
-		templates = sheet.getAppliedTemplates();
+		templates = sheet.getTemplates();
 		
 		types = sheet.types().copy();
 		actions = sheet.actions().copy();

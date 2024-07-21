@@ -89,7 +89,7 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 		}
 		
 		templateIds.clear();
-		sheet.getAppliedTemplates().forEach(tem -> templateIds.add(tem.registryName()));
+		sheet.getTemplates().forEach(tem -> templateIds.add(tem.registryName()));
 	}
 	
 	/**

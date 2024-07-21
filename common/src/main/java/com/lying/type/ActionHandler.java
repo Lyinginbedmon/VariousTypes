@@ -36,7 +36,7 @@ public class ActionHandler
 	
 	private boolean isDirty = false;
 	
-	private ActionHandler() { }
+	protected ActionHandler() { }
 	
 	public ActionHandler copy()
 	{
@@ -45,6 +45,18 @@ public class ActionHandler
 		handler.activeActions.putAll(activeActions);
 		handler.breathableFluids.addAll(breathableFluids);
 		return handler;
+	}
+	
+	public void clone(ActionHandler handler)
+	{
+		this.operations.clear();
+		this.operations.addAll(handler.operations);
+		
+		this.activeActions.clear();
+		handler.activeActions.values().forEach(act -> activate(act));
+		
+		this.breathableFluids.clear();
+		this.breathableFluids.addAll(handler.breathableFluids);
 	}
 	
 	public void clear()
@@ -76,6 +88,8 @@ public class ActionHandler
 		operations.add(operation);
 		return this;
 	}
+	
+	public List<Operation> operations() { return operations; }
 	
 	public Collection<Action> active() { return activeActions.values(); }
 	

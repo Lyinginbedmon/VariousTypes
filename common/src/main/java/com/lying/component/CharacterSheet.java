@@ -1,40 +1,35 @@
 package com.lying.component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import org.apache.commons.lang3.function.Consumers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.ability.Ability;
-import com.lying.ability.Ability.AbilitySource;
-import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilitySet;
-import com.lying.init.VTAbilities;
-import com.lying.init.VTSpeciesRegistry;
-import com.lying.init.VTTemplateRegistry;
-import com.lying.init.VTTypes;
-import com.lying.reference.Reference;
+import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ISheetElement;
+import com.lying.component.module.AbstractSheetModule;
+import com.lying.init.VTSheetElements;
+import com.lying.init.VTSheetElements.SheetElement;
+import com.lying.init.VTSheetModules;
 import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
-import com.lying.utility.ServerEvents.SheetEvents;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -44,27 +39,27 @@ import net.minecraft.world.World;
  */
 public class CharacterSheet
 {
-	private static final Identifier DEFAULT_SPECIES = Reference.ModInfo.prefix("human");
-	private static final RegistryKey<World> DEFAULT_HOME = World.OVERWORLD;
 	protected Optional<LivingEntity> owner = Optional.empty();
 	
-	private TypeSet customTypes = new TypeSet();
-	private AbilitySet customAbilities = new AbilitySet();
-	
-	private Optional<RegistryKey<World>> home = Optional.empty();
-	
-	// Species and templates are stored as IDs so we can retain them even if the datapack changes
-	private Identifier speciesID = DEFAULT_SPECIES;
-	private List<Identifier> templateIDs = Lists.newArrayList();
-	
 	// These values represent the information the character is currently working on
-	private TypeSet types = new TypeSet();
-	private AbilitySet abilities = new AbilitySet();
-	private AbilitySet activatedAbilities = new AbilitySet();
-	private ActionHandler actions = ActionHandler.STANDARD_SET.copy();
+	private Map<SheetElement<?>, ISheetElement<?>> elements = new HashMap<>();
+	// These values alter the contents of elements during sheet building
+	private Map<Identifier, AbstractSheetModule> modules = new HashMap<>();
 	
 	public CharacterSheet(@Nullable LivingEntity ownerIn)
 	{
+		VTSheetElements.getAll().forEach(sup -> 
+		{
+			ISheetElement<?> element = sup.make();
+			elements.put(sup, element);
+		});
+		
+		VTSheetModules.getAll().forEach(sup -> 
+		{
+			AbstractSheetModule module = sup.get();
+			modules.put(module.registryName(), module);
+		});
+		
 		if(ownerIn != null)
 			owner = Optional.of(ownerIn);
 	}
@@ -80,11 +75,7 @@ public class CharacterSheet
 	/** Repopulates the values of this sheet with those of the given sheet, without modifying the owner */
 	public void clone(CharacterSheet sheet, boolean rebuild)
 	{
-		clear(false);
-		speciesID = sheet.speciesID;
-		templateIDs.addAll(sheet.templateIDs);
-		customTypes.addAll(sheet.customTypes);
-		sheet.customAbilities.abilities().forEach(inst -> customAbilities.add(inst));
+		readSheetFromNbt(sheet.writeSheetToNbt(new NbtCompound()));
 		
 		if(rebuild)
 		{
@@ -103,67 +94,31 @@ public class CharacterSheet
 		return this;
 	}
 	
-	public NbtCompound writeSheetToNbt(NbtCompound compound, WrapperLookup registryOps)
+	public NbtCompound writeSheetToNbt(NbtCompound compound)
 	{
-		if(home.isPresent())
-			compound.putString("CustomHome", home.get().getValue().toString());
-		
-		if(speciesID != null)
-			compound.putString("Species", speciesID.toString());
-		
-		if(!templateIDs.isEmpty())
-		{
-			NbtList list = new NbtList();
-			templateIDs.forEach(template -> list.add(NbtString.of(template.toString())));
-			compound.put("Templates", list);
-		}
-		
-		if(!customTypes.isEmpty())
-			compound.put("CustomTypes", customTypes.writeToNbt(registryOps));
-		
-		if(!customAbilities.isEmpty())
-			compound.put("CustomAbilities", customAbilities.writeToNbt(registryOps));
-		
+		NbtList list = new NbtList();
+		modules.values().forEach(module -> list.add(module.write(new NbtCompound())));
+		compound.put("Modules", list);
 		return compound;
 	}
 	
 	public void readSheetFromNbt(NbtCompound compound)
 	{
 		clear(false);
-		if(compound.contains("CustomHome", NbtElement.STRING_TYPE))
-			home = Optional.of(RegistryKey.of(RegistryKeys.WORLD, new Identifier(compound.getString("CustomHome"))));
-		
-		if(compound.contains("Species", NbtElement.STRING_TYPE))
-			speciesID = new Identifier(compound.getString("Species"));
-		
-		if(compound.contains("Templates", NbtElement.LIST_TYPE))
+		NbtList list = compound.getList("Modules", NbtElement.COMPOUND_TYPE);
+		list.forEach(element -> 
 		{
-			NbtList list = compound.getList("Templates", NbtElement.STRING_TYPE);
-			for(int i=0; i<list.size(); i++)
-			{
-				Identifier name = new Identifier(list.getString(i));
-				if(!hasTemplate(name))
-					templateIDs.add(name);
-			}
-		}
-		
-		if(compound.contains("CustomTypes", NbtElement.LIST_TYPE))
-			customTypes = TypeSet.readFromNbt(compound.getList("CustomTypes", NbtElement.STRING_TYPE));
-		
-		if(compound.contains("CustomAbilities", NbtElement.LIST_TYPE))
-			customAbilities = AbilitySet.readFromNbt(compound.getList("CustomAbilities", NbtElement.COMPOUND_TYPE));
+			NbtCompound data = (NbtCompound)element;
+			Identifier id = new Identifier(data.getString("ID"));
+			modules.get(id).read(data.contains("Data", NbtElement.COMPOUND_TYPE) ? data.getCompound("Data") : new NbtCompound());
+		});
 		
 		buildSheet();
 	}
 	
 	public void clear(boolean rebuild)
 	{
-		home = Optional.empty();
-		speciesID = DEFAULT_SPECIES;
-		templateIDs.clear();
-		customTypes.clear();
-		customAbilities.clear();
-		
+		modules.values().forEach(module -> module.clear());
 		if(rebuild)
 		{
 			buildSheet();
@@ -171,225 +126,107 @@ public class CharacterSheet
 		}
 	}
 	
-	public void setHomeDimension(RegistryKey<World> world)
-	{
-		if(home.isPresent() && world == home.get())
-			return;
-		
-		home = Optional.of(world);
-		markDirty();
-	}
+	@SuppressWarnings("unchecked")
+	public <T extends Object> T element(SheetElement<?> element) { return (T)elements.get(element).value(); }
+	
+	public void setHomeDimension(RegistryKey<World> world) { module(VTSheetModules.HOME).set(world); }
 	
 	public void clearHomeDimension()
 	{
-		if(!home.isPresent())
-			return;
-		
-		home = Optional.empty();
+		module(VTSheetModules.HOME).clear();
+		buildSheet();
 		markDirty();
 	}
 	
-	public Optional<RegistryKey<World>> customHome() { return home; }
+	public RegistryKey<World> homeDimension() { return element(VTSheetElements.HOME_DIM); }
 	
-	public RegistryKey<World> homeDimension()
-	{
-		if(home.isPresent())
-			return home.get();
-		
-		RegistryKey<World> home = DEFAULT_HOME;
-		if(hasASpecies() && getSpecies().get().hasConfiguredHome())
-			home = getSpecies().get().homeDimension();
-		
-		return home;
-	}
+	public TypeSet types() { return element(VTSheetElements.TYPES); }
+	
+	public AbilitySet abilities() { return element(VTSheetElements.ABILITES); }
+	
+	public Optional<Species> getSpecies() { return module(VTSheetModules.SPECIES).get(); }
+	
+	public List<Template> getTemplates() { return module(VTSheetModules.TEMPLATES).get(); }
+	
+	public AbilitySet activatedAbilities() { return ((ElementAbilitySet)element(VTSheetElements.ABILITES)).activated(); }
+	
+	public ActionHandler actions() { return element(VTSheetElements.ACTIONS); }
 	
 	/** Returns true if this sheet is using an identifiable species (ie. a registry name that exists in the active datapack) */
 	public boolean hasASpecies() { return getSpecies().isPresent(); }
 	
 	public void setSpecies(@Nullable Identifier registryNameIn)
 	{
-		if(registryNameIn == speciesID)
-			return;
-		
-		speciesID = registryNameIn;
+		module(VTSheetModules.SPECIES).set(registryNameIn);
 		buildSheet();
 		markDirty();
 	}
 	
-	public Optional<Species> getSpecies() { return VTSpeciesRegistry.instance().get(speciesID); }
-	
-	public boolean isSpecies(Identifier registryName)
-	{
-		if(registryName == null)
-			return speciesID == null;
-		else if(speciesID == null)
-			return registryName == null;
-		else
-			return speciesID.equals(registryName);
-	}
+	public boolean isSpecies(Identifier registryName){ return module(VTSheetModules.SPECIES).is(registryName); }
 	
 	public boolean hasTemplate(@NotNull Template templateIn) { return hasTemplate(templateIn.registryName()); }
 	
-	public boolean hasTemplate(@NotNull Identifier registryName) { return templateIDs.contains(registryName); }
+	public boolean hasTemplate(@NotNull Identifier registryName) { return module(VTSheetModules.TEMPLATES).contains(registryName); }
 	
 	public void addTemplate(@NotNull Identifier registryName)
 	{
-		if(hasTemplate(registryName))
-			return;
-		
-		templateIDs.add(registryName);
-		VTTemplateRegistry.instance().get(registryName).ifPresent(tem -> tem.applyTypeOperations(types));
-		buildAbilities();
-		buildActions();
+		module(VTSheetModules.TEMPLATES).add(registryName);
+		buildSheet();
 		markDirty();
 	}
 	
 	public void removeTemplate(@NotNull Identifier registryName)
 	{
-		if(!hasTemplate(registryName))
-			return;
-		
-		templateIDs.remove(registryName);
+		module(VTSheetModules.TEMPLATES).remove(registryName);
 		buildSheet();
 		markDirty();
 	}
 	
 	public void clearTemplates()
 	{
-		if(templateIDs.isEmpty())
-			return;
-		
-		templateIDs.clear();
+		module(VTSheetModules.TEMPLATES).clear();
 		buildSheet();
 		markDirty();
-	}
-	
-	public void setCustomTypes(TypeSet types)
-	{
-		customTypes = types;
-		buildSheet();
-		markDirty();
-	}
-	
-	public List<Template> getAppliedTemplates()
-	{
-		List<Template> templates = Lists.newArrayList();
-		for(Identifier id : templateIDs)
-			VTTemplateRegistry.instance().get(id).ifPresent(tem -> templates.add(tem));
-		return templates;
 	}
 	
 	public int power()
 	{
 		int power = 0;
 		
-		if(hasASpecies())
-			power += getSpecies().get().power();
-		
-		if(!templateIDs.isEmpty())
-			for(Template tem : getAppliedTemplates())
-				power += tem.power();
+		for(AbstractSheetModule module : modules())
+			power += module.power();
 		
 		return power;
 	}
 	
-	public TypeSet types() { return types.copy(); }
+	public final List<AbstractSheetModule> modules()
+	{
+		List<AbstractSheetModule> modules = Lists.newArrayList();
+		modules.addAll(this.modules.values());
+		modules.sort((a,b) -> (int)Math.signum(a.buildOrder() - b.buildOrder()));
+		return modules;
+	}
 	
-	public AbilitySet abilities() { return abilities; }
-	
-	public AbilitySet activatedAbilities() { return activatedAbilities; }
-	
-	public ActionHandler actions() { return actions.copy(); }
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public final <T extends AbstractSheetModule> T module(Supplier<T> moduleIn)
+	{
+		return (T)modules.getOrDefault(moduleIn.get().registryName(), null);
+	}
 	
 	/** Constructs the types and abilities from scratch */
 	public final void buildSheet()
 	{
-		// Types are calculated first, before abilities, for efficiency-sake
-		buildTypes();
-		buildAbilities();
+		List<SheetElement<?>> elements = Lists.newArrayList();
+		elements.addAll(this.elements.keySet());
+		elements.sort((a,b) -> (int)Math.signum(a.buildOrder() - b.buildOrder()));
 		
-		if(actions.isDirty())
-			buildActions();
+		elements.forEach(element -> this.elements.get(element).rebuild(this));
 	}
 	
-	/** Constructs the types based on species, custom types, and applied templates */
-	public final void buildTypes()
-	{
-		// Source initial types from species, if any
-		TypeSet types = !hasASpecies() ? new TypeSet(VTTypes.HUMAN.get()) : getSpecies().get().types().copy();
-		
-		// Apply all custom types
-		// XXX How should custom types be applied? Replace, merge, overrule all, etc.?
-		if(!customTypes.isEmpty())
-			types = customTypes.copy();
-		
-		// Apply templates to types
-		for(Template template : getAppliedTemplates())
-			template.applyTypeOperations(types);
-		
-		SheetEvents.GET_TYPES_EVENT.invoker().affectTypes(getOwner(), homeDimension(), types);
-		
-		this.types = types.copy();
-		this.actions.markDirty();
-	}
+	public boolean hasAction(Action action) { return actions().can(action); }
 	
-	/** Constructs available abilities based on types, species, applied templates, and custom abilities */
-	public final void buildAbilities()
-	{
-		AbilitySet abilities = !hasASpecies() ? new AbilitySet() : getSpecies().get().abilities().copy();
-		
-		// Add abilities from types
-		types.abilities().forEach(inst -> abilities.add(inst.copy()));
-		
-		// Apply templates to abilities
-		for(Template template : getAppliedTemplates())
-			template.applyAbilityOperations(abilities);
-		
-		// Add all custom abilities
-		if(!customAbilities.isEmpty())
-			customAbilities.abilities().forEach(inst -> abilities.add(inst.copy()));
-		
-		// Rebuild actions, including what fluids are breathable
-		this.abilities = abilities;
-		this.actions.markDirty();
-		
-		this.onAbilitiesRebuilt();
-		
-		this.abilities.mergeActivated(this.activatedAbilities);
-	}
-	
-	protected void onAbilitiesRebuilt() { }
-	
-	/** Constructs enabled actions based on types and abilities, incl. determining what fluids are breathable */
-	public void buildActions()
-	{
-		actions.clear();
-		types.contents().forEach(type -> type.actions().stack(actions, types));
-		
-		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
-			this.abilities.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(actions, inst));
-		
-		SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.invoker().affectActions(actions, abilities, getOwner());
-	}
-	
-	public boolean hasAction(Action action) { return actions.can(action); }
-	
-	public boolean isAbleToBreathe(Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || actions.canBreathe(fluid); }
-	
-	public boolean addCustomAbility(Ability ability)
-	{
-		return addCustomAbility(ability, Consumers.nop());
-	}
-	
-	public boolean addCustomAbility(Ability ability, Consumer<NbtCompound> dataModifier)
-	{
-		if(customAbilities.add(ability.instance(AbilitySource.CUSTOM, dataModifier)))
-		{
-			markDirty();
-			return true;
-		}
-		return false;
-	}
+	public boolean isAbleToBreathe(Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || actions().canBreathe(fluid); }
 	
 	public void markDirty()
 	{

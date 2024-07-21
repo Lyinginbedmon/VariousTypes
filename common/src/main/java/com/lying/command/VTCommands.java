@@ -15,6 +15,8 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.component.module.ModuleHome;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.reference.Reference;
@@ -164,7 +166,7 @@ public class VTCommands
 										throw FAILED_GENERIC.create();
 									
 									String home = sheetOpt.get().homeDimension().getValue().toString();
-									if(sheetOpt.get().customHome().isPresent())
+									if(sheetOpt.get().module(VTSheetModules.HOME).isPresent())
 										context.getSource().sendFeedback(() -> translate("command", "get.home.success.custom", player.getDisplayName(), home), true);
 									else
 										context.getSource().sendFeedback(() -> translate("command", "get.home.success", player.getDisplayName(), home), true);
@@ -190,7 +192,7 @@ public class VTCommands
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
 									List<Template> templates;
-									if((templates = sheetOpt.get().getAppliedTemplates()).isEmpty())
+									if((templates = sheetOpt.get().getTemplates()).isEmpty())
 										throw FAILED_NO_TEMPLATES.create();
 									
 									context.getSource().sendFeedback(() -> translate("command","get.templates.success",player.getDisplayName(),templates.size()), true);
@@ -277,7 +279,11 @@ public class VTCommands
 										}
 										catch(Exception e) { }
 										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-										if(sheetOpt.isEmpty() || sheetOpt.get().customHome().isEmpty() || world == null || !world.getRegistryKey().equals(sheetOpt.get().customHome().get()))
+										if(sheetOpt.isEmpty())
+											throw FAILED_GENERIC.create();
+										
+										ModuleHome customHome = sheetOpt.get().module(VTSheetModules.HOME);
+										if(!customHome.isPresent() || world == null || !world.getRegistryKey().equals(customHome.get()))
 											throw FAILED_GENERIC.create();
 										
 										context.getSource().sendFeedback(() -> translate("command","home.remove.success", player.getDisplayName(), sheetOpt.get().homeDimension().getValue().toString()), true);

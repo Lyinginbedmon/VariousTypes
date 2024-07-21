@@ -11,6 +11,8 @@ import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTItems;
 import com.lying.init.VTScreenHandlerTypes;
+import com.lying.init.VTSheetElements;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
@@ -40,6 +42,9 @@ public class VariousTypes
     @SuppressWarnings("removal")
 	public static void commonInit()
     {
+    	VTSheetElements.init();
+    	VTSheetModules.init();
+    	
     	VTAbilities.init();
     	VTTypes.init();
     	VTSpeciesRegistry.init();
