@@ -1,5 +1,10 @@
 package com.lying.component.module;
 
+import java.util.Optional;
+
+import org.jetbrains.annotations.Nullable;
+
+import com.lying.component.CharacterSheet;
 import com.lying.component.element.ISheetElement;
 
 import net.minecraft.nbt.NbtCompound;
@@ -8,6 +13,8 @@ import net.minecraft.util.Identifier;
 /** A component that alters sheet elements in a character sheet, stored in NBT. */
 public abstract class AbstractSheetModule
 {
+	protected Optional<CharacterSheet> parentSheet = Optional.empty();
+	
 	private final Identifier regName;
 	private final int buildOrder;
 	
@@ -18,6 +25,20 @@ public abstract class AbstractSheetModule
 	}
 	
 	public Identifier registryName() { return regName; }
+	
+	public final void setParent(@Nullable CharacterSheet sheet)
+	{
+		parentSheet = sheet == null ? Optional.empty() : Optional.of(sheet);
+	}
+	
+	protected void updateSheet()
+	{
+		parentSheet.ifPresent(sheet -> 
+		{
+			sheet.buildSheet();
+			sheet.markDirty();
+		});
+	}
 	
 	/** The order in which this module should be applied during rebuilding.<br>The higher the value, the later in the rebuild */
 	public int buildOrder() { return buildOrder; }

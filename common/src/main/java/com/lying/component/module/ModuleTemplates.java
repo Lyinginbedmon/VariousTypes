@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.lying.ability.AbilitySet;
+import com.lying.component.CharacterSheet;
 import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.reference.Reference;
 import com.lying.template.Template;
@@ -23,6 +25,8 @@ public class ModuleTemplates extends AbstractSheetModule
 	
 	public ModuleTemplates() { super(Reference.ModInfo.prefix("templates"), 10); }
 	
+	public static boolean hasTemplate(CharacterSheet sheet, Identifier registryName) { return sheet.module(VTSheetModules.TEMPLATES).contains(registryName); }
+	
 	public int power()
 	{
 		int tally = 0;
@@ -31,20 +35,34 @@ public class ModuleTemplates extends AbstractSheetModule
 		return tally;
 	}
 	
-	public void clear() { templateIds.clear(); }
+	public void clear()
+	{
+		templateIds.clear();
+		parentSheet.ifPresent(sheet -> 
+		{
+			sheet.buildSheet();
+			sheet.markDirty();
+		});
+	}
 	
 	public boolean contains(Identifier registryName) { return templateIds.contains(registryName); }
 	
 	public void add(Identifier idIn)
 	{
 		if(!templateIds.contains(idIn))
+		{
 			templateIds.add(idIn);
+			updateSheet();
+		}
 	}
 	
 	public void remove(Identifier idIn)
 	{
 		if(templateIds.contains(idIn))
+		{
 			templateIds.remove(idIn);
+			updateSheet();
+		}
 	}
 	
 	public List<Template> get()

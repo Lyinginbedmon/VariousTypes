@@ -2,6 +2,8 @@ package com.lying.component.module;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.lying.component.element.ElementHome;
 import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
@@ -29,9 +31,16 @@ public class ModuleHome extends AbstractSheetModule
 	
 	public RegistryKey<World> get() { return dimension.get(); }
 	
-	public void set(RegistryKey<World> worldIn) { dimension = worldIn == null ? Optional.empty() : Optional.of(worldIn); }
+	public void set(@Nullable RegistryKey<World> worldIn)
+	{
+		if(worldIn == null && dimension.isEmpty() || !dimension.isEmpty() && dimension.get() == worldIn)
+			return;
+		
+		dimension = worldIn == null ? Optional.empty() : Optional.of(worldIn);
+		updateSheet();
+	}
 	
-	public void clear() { dimension = Optional.empty(); }
+	public void clear() { set(null); }
 	
 	public void affect(ISheetElement<?> element)
 	{

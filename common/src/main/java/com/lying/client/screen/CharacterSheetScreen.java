@@ -18,8 +18,11 @@ import org.joml.Vector2i;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
+import com.lying.ability.AbilitySet;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
+import com.lying.init.VTSheetElements;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 import com.lying.screen.CharacterSheetScreenHandler;
@@ -90,12 +93,12 @@ public class CharacterSheetScreen extends HandledScreen<CharacterSheetScreenHand
 			ownerStats = Optional.empty();
 		
 		power = sheet.power();
-		species = sheet.getSpecies();
-		templates = sheet.getTemplates();
+		species = sheet.module(VTSheetModules.SPECIES).getMaybe();
+		templates = sheet.module(VTSheetModules.TEMPLATES).get();
 		
-		types = sheet.types().copy();
-		actions = sheet.actions().copy();
-		abilities = sheet.abilities().allNonHidden();
+		types = sheet.<TypeSet>element(VTSheetElements.TYPES).copy();
+		actions = sheet.<ActionHandler>element(VTSheetElements.ACTIONS).copy();
+		abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden();
 		abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
 		if(abilities.size() > 1)
 			Collections.sort(abilities, AbilityInstance.sortFunc(manager));

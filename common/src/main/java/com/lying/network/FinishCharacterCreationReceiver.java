@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
+import com.lying.component.module.ModuleTemplates;
+import com.lying.init.VTSheetModules;
 
 import dev.architectury.networking.NetworkManager.NetworkReceiver;
 import dev.architectury.networking.NetworkManager.PacketContext;
@@ -33,12 +35,13 @@ public class FinishCharacterCreationReceiver implements NetworkReceiver<Registry
 	{
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
-			sheet.clear(false);
+			sheet.clear();
 			
 			if(speciesId != null)
-				sheet.setSpecies(speciesId);
+				sheet.module(VTSheetModules.SPECIES).set(speciesId);
 			
-			templateIds.forEach(tem -> sheet.addTemplate(tem));
+			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
+			templateIds.forEach(tem -> templates.add(tem));
 			
 			sheet.buildSheet();
 		});

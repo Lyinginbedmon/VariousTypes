@@ -6,7 +6,9 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 import com.lying.component.CharacterSheet;
+import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTScreenHandlerTypes;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.species.Species;
@@ -40,9 +42,12 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	{
 		CharacterSheet sheet = new CharacterSheet(thePlayer);
 		if(speciesId != null)
-			sheet.setSpecies(speciesId);
+			sheet.module(VTSheetModules.SPECIES).set(speciesId);
 		if(!templateIds.isEmpty())
-			templateIds.forEach(id -> sheet.addTemplate(id));
+		{
+			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
+			templateIds.forEach(id -> templates.add(id));
+		}
 		return sheet;
 	}
 	
@@ -76,20 +81,21 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 		
 		CharacterSheet sheet = new CharacterSheet(thePlayer);
 		if(speciesId != null)
-			sheet.setSpecies(speciesId);
+			sheet.module(VTSheetModules.SPECIES).set(speciesId);
 		
+		ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
 		for(int i=0; i<templateIds.size(); i++)
 		{
 			Identifier name = templateIds.get(i);
 			VTTemplateRegistry.instance().get(name).ifPresent(tem -> 
 			{
 				if(tem.validFor(sheet, thePlayer))
-					sheet.addTemplate(name);
+					templates.add(name);
 			});
 		}
 		
 		templateIds.clear();
-		sheet.getTemplates().forEach(tem -> templateIds.add(tem.registryName()));
+		templates.get().forEach(tem -> templateIds.add(tem.registryName()));
 	}
 	
 	/**

@@ -10,9 +10,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
+import com.lying.ability.AbilitySet;
+import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementAbilitySet;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
+import com.lying.type.ActionHandler;
 import com.lying.utility.ServerEvents;
 
 import net.minecraft.block.BlockState;
@@ -98,9 +103,9 @@ public class EntityMixin
 		
 		DamageSources sources = getDamageSources();
 		if(source == sources.drown())
-			ci.setReturnValue(!sheet.get().hasAction(Action.BREATHE.get()));
+			ci.setReturnValue(!sheet.get().<ActionHandler>element(VTSheetElements.ACTIONS).can(Action.BREATHE.get()));
 		if(source == sources.starve())
-			ci.setReturnValue(!sheet.get().hasAction(Action.EAT.get()));
+			ci.setReturnValue(!sheet.get().<ActionHandler>element(VTSheetElements.ACTIONS).can(Action.EAT.get()));
 	}
 	
 	@Inject(method = "setAir(I)V", at = @At("HEAD"), cancellable = true)
@@ -117,7 +122,7 @@ public class EntityMixin
 		if(!(ent instanceof LivingEntity) || getWorld() == null)
 			return;
 		
-		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.abilities(), ci.getReturnValueI())));
+		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>element(VTSheetElements.ABILITES), ci.getReturnValueI())));
 	}
 	
 	@Inject(method = "canClimb(Lnet/minecraft/block/BlockState;)Z", at = @At("TAIL"), cancellable = true)
@@ -126,10 +131,10 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity && !state.isAir())
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				sheet.activatedAbilities().getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
+				ElementAbilitySet.getActivated(sheet).getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
 					inst -> 
 					{
-//						if(!((ToggledAbility)inst.ability()).isActive(inst))
+						if(!((ToggledAbility)inst.ability()).isActive(inst))
 							ci.setReturnValue(true);
 					});
 			});

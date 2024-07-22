@@ -15,6 +15,8 @@ public class ElementHome implements ISheetElement<RegistryKey<World>>
 	
 	public RegistryKey<World> value() { return dimension; }
 	
+	public static RegistryKey<World> get(CharacterSheet sheet) { return ((ElementHome)sheet.element(VTSheetElements.HOME_DIM)).value(); }
+	
 	public void set(RegistryKey<World> worldIn) { dimension = worldIn; }
 	
 	public void rebuild(CharacterSheet sheet)

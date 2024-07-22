@@ -15,7 +15,9 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementHome;
 import com.lying.component.module.ModuleHome;
+import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
@@ -135,7 +137,7 @@ public class VTCommands
 									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
 									VariousTypes.getSheet(player).ifPresent(sheet -> 
 									{
-										sheet.clear(true);
+										sheet.clear();
 										context.getSource().sendFeedback(() -> translate("command","reset.success", player.getDisplayName()), true);
 									});
 									return 15;
@@ -165,7 +167,7 @@ public class VTCommands
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
 									
-									String home = sheetOpt.get().homeDimension().getValue().toString();
+									String home = ElementHome.get(sheetOpt.get()).getValue().toString();
 									if(sheetOpt.get().module(VTSheetModules.HOME).isPresent())
 										context.getSource().sendFeedback(() -> translate("command", "get.home.success.custom", player.getDisplayName(), home), true);
 									else
@@ -179,9 +181,9 @@ public class VTCommands
 									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
-									else if(!sheetOpt.get().hasASpecies())
+									else if(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().isEmpty())
 										throw FAILED_NO_SPECIES.create();
-									context.getSource().sendFeedback(() -> translate("command","get.species.success", player.getDisplayName(), describeSpecies(sheetOpt.get().getSpecies().get())), true);
+									context.getSource().sendFeedback(() -> translate("command","get.species.success", player.getDisplayName(), describeSpecies(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().get())), true);
 									return 15;
 								}))
 							.then(literal("templates")
@@ -192,7 +194,7 @@ public class VTCommands
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
 									List<Template> templates;
-									if((templates = sheetOpt.get().getTemplates()).isEmpty())
+									if((templates = sheetOpt.get().module(VTSheetModules.TEMPLATES).get()).isEmpty())
 										throw FAILED_NO_TEMPLATES.create();
 									
 									context.getSource().sendFeedback(() -> translate("command","get.templates.success",player.getDisplayName(),templates.size()), true);
@@ -218,7 +220,7 @@ public class VTCommands
 										RegistryKey<World> dim = world.getRegistryKey();
 										sheetOpt.ifPresent(sheet -> 
 										{
-											sheet.setHomeDimension(dim);
+											sheet.module(VTSheetModules.HOME).set(dim);
 											context.getSource().sendFeedback(() -> translate("command", "apply.home.success", player.getDisplayName(), dim.getValue().toString()), true);
 										});
 										return 15;
@@ -237,12 +239,12 @@ public class VTCommands
 										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 										if(sheetOpt.isEmpty())
 											throw FAILED_GENERIC.create();
-										else if(sheetOpt.get().isSpecies(species))
+										else if(sheetOpt.get().module(VTSheetModules.SPECIES).is(species))
 											throw new SimpleCommandExceptionType(translate("command","species.apply.failed", player.getDisplayName(), speciesName)).create();
 										else
 											sheetOpt.ifPresent(sheet -> 
 											{
-												sheet.setSpecies(species);
+												sheet.module(VTSheetModules.SPECIES).set(species);
 												source.sendFeedback(() -> translate("command","species.apply.success", player.getDisplayName(), speciesName), true);
 											});
 										return 15;
@@ -263,8 +265,8 @@ public class VTCommands
 									else
 										sheetOpt.ifPresent(sheet -> 
 										{
-											sheet.clearHomeDimension();
-											context.getSource().sendFeedback(() -> translate("command","home.clear.success", player.getDisplayName(), sheet.homeDimension().getValue().toString()), true);
+											sheet.module(VTSheetModules.HOME).set(null);
+											context.getSource().sendFeedback(() -> translate("command","home.clear.success", player.getDisplayName(), ElementHome.get(sheet).getValue().toString()), true);
 										});
 									return 15;
 								})
@@ -286,7 +288,7 @@ public class VTCommands
 										if(!customHome.isPresent() || world == null || !world.getRegistryKey().equals(customHome.get()))
 											throw FAILED_GENERIC.create();
 										
-										context.getSource().sendFeedback(() -> translate("command","home.remove.success", player.getDisplayName(), sheetOpt.get().homeDimension().getValue().toString()), true);
+										context.getSource().sendFeedback(() -> translate("command","home.remove.success", player.getDisplayName(), ElementHome.get(sheetOpt.get()).getValue().toString()), true);
 										return 15;
 									})))
 							.then(literal("species")
@@ -296,13 +298,13 @@ public class VTCommands
 									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 									if(sheetOpt.isEmpty())
 										throw FAILED_GENERIC.create();
-									else if(!sheetOpt.get().hasASpecies())
+									else if(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().isEmpty())
 										throw FAILED_NO_SPECIES.create();
 									
-									Text oldSpecies = describeSpecies(sheetOpt.get().getSpecies().get());
+									Text oldSpecies = describeSpecies(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().get());
 									sheetOpt.ifPresent(sheet -> 
 									{
-										sheet.setSpecies(null);
+										sheet.module(VTSheetModules.SPECIES).set(null);
 										context.getSource().sendFeedback(() -> translate("command", "species.remove.success", oldSpecies, player.getDisplayName()), true);
 									});
 									return 15;
@@ -318,14 +320,14 @@ public class VTCommands
 										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 										if(sheetOpt.isEmpty())
 											throw FAILED_GENERIC.create();
-										else if(!sheetOpt.get().hasASpecies())
+										else if(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().isEmpty())
 											throw FAILED_NO_SPECIES.create();
-										else if(!sheetOpt.get().isSpecies(species))
+										else if(!sheetOpt.get().module(VTSheetModules.SPECIES).is(species))
 											throw new SimpleCommandExceptionType(translate("command","species.remove.failed", player.getDisplayName(), speciesName)).create();
 										
 										sheetOpt.ifPresent(sheet -> 
 										{
-											sheet.setSpecies(null);
+											sheet.module(VTSheetModules.SPECIES).set(null);
 											context.getSource().sendFeedback(() -> translate("command", "species.remove.success", speciesName, player.getDisplayName()), true);
 										});
 										return 15;
@@ -343,12 +345,12 @@ public class VTCommands
 										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 										if(sheetOpt.isEmpty())
 											throw FAILED_GENERIC.create();
-										else if(!sheetOpt.get().hasTemplate(template))
+										else if(!ModuleTemplates.hasTemplate(sheetOpt.get(), template))
 											throw new SimpleCommandExceptionType(translate("command","template.remove.failed.missing", player.getDisplayName(), templateName)).create();
 										else
 											sheetOpt.ifPresent(sheet -> 
 											{
-												sheet.removeTemplate(template);
+												sheet.module(VTSheetModules.TEMPLATES).remove(template);
 												source.sendFeedback(() -> translate("command", "template.remove.success", templateName, player.getDisplayName()), true);
 											});
 										return 15;
@@ -364,7 +366,7 @@ public class VTCommands
 										else
 											sheetOpt.ifPresent(sheet -> 
 											{
-												sheet.clearTemplates();
+												sheet.module(VTSheetModules.TEMPLATES).clear();
 												source.sendFeedback(() -> translate("command", "template.remove.all.success", player.getDisplayName()), true);
 											});
 										return 15;
@@ -381,14 +383,14 @@ public class VTCommands
 		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 		if(sheetOpt.isEmpty())
 			throw FAILED_GENERIC.create();
-		else if(sheetOpt.get().hasTemplate(template))
+		else if(ModuleTemplates.hasTemplate(sheetOpt.get(), template))
 			throw new SimpleCommandExceptionType(translate("command", "template.apply.failed.present", player.getDisplayName(), describeTemplate(tem.get()))).create();
 		else if(!tem.get().validFor(sheetOpt.get(), player) && !force)
 			throw new SimpleCommandExceptionType(translate("command", "template.apply.failed.invalid", describeTemplate(tem.get()), player.getDisplayName())).create();
 		
 		sheetOpt.ifPresent(sheet -> 
 		{
-			sheet.addTemplate(template);
+			sheet.module(VTSheetModules.TEMPLATES).add(template);
 			source.sendFeedback(() -> translate("command", "template.apply.success", describeTemplate(tem.get()), player.getDisplayName()), true);
 		});
 		return 15;

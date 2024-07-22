@@ -11,6 +11,8 @@ import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
 import com.lying.utility.ServerEvents.SheetEvents;
 
+import net.minecraft.fluid.Fluid;
+
 public class ElementActionHandler extends ActionHandler implements ISheetElement<ActionHandler>
 {
 	public ElementActionHandler()
@@ -20,6 +22,8 @@ public class ElementActionHandler extends ActionHandler implements ISheetElement
 	}
 	
 	public SheetElement<?> registry() { return VTSheetElements.ACTIONS; }
+	
+	public static boolean canBreathe(CharacterSheet sheet, Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || ((ElementActionHandler)sheet.element(VTSheetElements.ACTIONS)).canBreathe(fluid); }
 	
 	public ActionHandler value() { return this; }
 	

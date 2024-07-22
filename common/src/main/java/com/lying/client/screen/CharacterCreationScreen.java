@@ -11,6 +11,7 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
+import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.network.VTPacketHandler;
@@ -118,13 +119,13 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 		List<Template> templates = Lists.newArrayList();
 		VTTemplateRegistry.instance().getAll().forEach(tem -> 
 		{
-			if(sheet.hasTemplate(tem.registryName()) || (tem.power() <= (VariousTypes.POWER - sheet.power()) && tem.validFor(sheet, mc.player)))
+			if(ModuleTemplates.hasTemplate(sheet, tem.registryName()) || (tem.power() <= (VariousTypes.POWER - sheet.power()) && tem.validFor(sheet, mc.player)))
 				templates.add(tem);
 		});
 		templates.sort((a,b) -> 
 		{
-			if(sheet.hasTemplate(a.registryName()) != sheet.hasTemplate(b.registryName()))
-				return sheet.hasTemplate(a.registryName()) ? -1 : 1;
+			if(ModuleTemplates.hasTemplate(sheet, a.registryName()) != ModuleTemplates.hasTemplate(sheet, b.registryName()))
+				return ModuleTemplates.hasTemplate(sheet, a.registryName()) ? -1 : 1;
 			else
 				return VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString());
 		});

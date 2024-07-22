@@ -9,7 +9,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.lying.VariousTypes;
+import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
+import com.lying.type.TypeSet;
 
 import net.minecraft.enchantment.DamageEnchantment;
 import net.minecraft.entity.Entity;
@@ -33,7 +35,7 @@ public class DamageEnchantmentMixin
 		if(level > 0 && applicableEntities.isPresent() && target instanceof LivingEntity && applicableEntities.get() == EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)
 			VariousTypes.getSheet(living = (LivingEntity)target).ifPresent(sheet -> 
 			{
-				if(!sheet.types().contains(VTTypes.ARTHROPOD.get()))
+				if(!sheet.<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.ARTHROPOD.get()))
 					return;
 				
 				int i = 20 + user.getRandom().nextInt(10 * level);

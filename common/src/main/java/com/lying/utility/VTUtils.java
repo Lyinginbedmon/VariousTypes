@@ -9,6 +9,8 @@ import org.joml.Vector2i;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.lying.component.CharacterSheet;
+import com.lying.component.module.ModuleTemplates;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.species.Species;
@@ -38,19 +40,21 @@ public class VTUtils
 		randomSpecies.addAll(VTSpeciesRegistry.instance().getAll());
 		randomSpecies.removeIf(species -> species.power() > power);
 		if(!randomSpecies.isEmpty())
-			sheet.setSpecies(randomSpecies.get(rand.nextInt(randomSpecies.size())).registryName());
+			sheet.module(VTSheetModules.SPECIES).set(randomSpecies.get(rand.nextInt(randomSpecies.size())).registryName());
 		
 		if(sheet.power() < power)
 		{
+			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
 			// Pick a random arrangement of valid templates
 			List<Template> candidates = getValidTemplatesFor(sheet, ent);
 			candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
+			
 			while(!candidates.isEmpty() && sheet.power() < power)
 			{
 				Template candidate = candidates.get(rand.nextInt(candidates.size()));
 				if(candidate.validFor(sheet, ent))
 				{
-					sheet.addTemplate(candidate.registryName());
+					templates.add(candidate.registryName());
 					break;
 				}
 				
@@ -66,7 +70,7 @@ public class VTUtils
 	{
 		List<Template> templates = Lists.newArrayList();
 		templates.addAll(VTTemplateRegistry.instance().getAll());
-		templates.removeIf(tem -> sheet.hasTemplate(tem.registryName()) || !tem.validFor(sheet, owner));
+		templates.removeIf(tem -> ModuleTemplates.hasTemplate(sheet, tem.registryName()) || !tem.validFor(sheet, owner));
 		return templates;
 	}
 	

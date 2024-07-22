@@ -8,10 +8,13 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.lying.ability.AbilitySet;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference.ModInfo;
+import com.lying.type.TypeSet;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.RegistryWrapper;
@@ -28,12 +31,12 @@ public abstract class Precondition
 	 */
 	public static final Supplier<Precondition> IS_LIVING	= register(prefix("is_living"), () -> new SimpleCondition(prefix("is_living")) 
 	{
-		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.types().contains(VTTypes.UNDEAD.get()); }
+		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.UNDEAD.get()); }
 	});
 	
 	public static final Supplier<Precondition> PHYSICAL		= register(prefix("is_physical"), () -> new SimpleCondition(prefix("is_physical"))
 	{
-		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.abilities().hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
+		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<AbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
 	});
 	
 	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_of_types"), () -> new TypeCondition.All(prefix("has_all_of_types")));

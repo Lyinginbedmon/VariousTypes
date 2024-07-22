@@ -7,7 +7,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.component.CharacterSheet;
+import com.lying.init.VTSheetElements;
 import com.lying.type.Type;
+import com.lying.type.TypeSet;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.RegistryWrapper;
@@ -26,7 +28,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 	
 	public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 	{
-		return types.isEmpty() || types.stream().allMatch(type -> sheet.types().contains(type));
+		return types.isEmpty() || types.stream().allMatch(type -> sheet.<TypeSet>element(VTSheetElements.TYPES).contains(type));
 	}
 	
 	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
@@ -60,7 +62,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().allMatch(type -> sheet.types().contains(type));
+			return types.isEmpty() || types.stream().allMatch(type -> sheet.<TypeSet>element(VTSheetElements.TYPES).contains(type));
 		}
 	}
 	
@@ -75,7 +77,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().anyMatch(type -> sheet.types().contains(type));
+			return types.isEmpty() || types.stream().anyMatch(type -> sheet.<TypeSet>element(VTSheetElements.TYPES).contains(type));
 		}
 	}
 	
@@ -90,7 +92,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 		
 		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 		{
-			return types.isEmpty() || types.stream().noneMatch(type -> sheet.types().contains(type));
+			return types.isEmpty() || types.stream().noneMatch(type -> sheet.<TypeSet>element(VTSheetElements.TYPES).contains(type));
 		}
 	}
 }

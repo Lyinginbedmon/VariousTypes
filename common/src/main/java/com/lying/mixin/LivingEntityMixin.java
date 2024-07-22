@@ -13,8 +13,12 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionHandler;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
+import com.lying.type.TypeSet;
 import com.lying.utility.ServerEvents.LivingEvents;
 import com.lying.utility.ServerEvents.Result;
 
@@ -67,7 +71,7 @@ public class LivingEntityMixin extends EntityMixin
 		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)(Object)this);
 		if(sheet.isEmpty())
 			return;
-		else if(sheet.get().types().contains(VTTypes.UNDEAD.get()))
+		else if(sheet.get().<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.UNDEAD.get()))
 			ci.setReturnValue(true);
 	}
 	
@@ -76,7 +80,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			if(sheet.abilities().hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+			if(sheet.<AbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 			{
 				ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
 				if(!helmet.isEmpty())
@@ -103,7 +107,7 @@ public class LivingEntityMixin extends EntityMixin
 		LivingEntity living = (LivingEntity)(Object)this;
 		VariousTypes.getSheet(living).ifPresent(sheet -> 
 		{
-			if(sheet.isAbleToBreathe(Fluids.WATER, StatusEffectUtil.hasWaterBreathing(living)))
+			if(ElementActionHandler.canBreathe(sheet, Fluids.WATER, StatusEffectUtil.hasWaterBreathing(living)))
 				ci.setReturnValue(true);
 		});
 	}
@@ -125,7 +129,7 @@ public class LivingEntityMixin extends EntityMixin
 			
 			// Comprehensive breathing system, replaces vanilla air meter handling
 			int air = getAir();
-			if(!sheet.isAbleToBreathe(fluidAtEyes().getFluid(), StatusEffectUtil.hasWaterBreathing(living)))
+			if(!ElementActionHandler.canBreathe(sheet, fluidAtEyes().getFluid(), StatusEffectUtil.hasWaterBreathing(living)))
 			{
 				// Decline air meter
 				air = getNextAirUnderwater(air);
@@ -153,7 +157,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			AbilitySet abilities = sheet.abilities();
+			AbilitySet abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES);
 			switch(LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities, ci.getReturnValue() ? Result.ALLOW : Result.DENY))
 			{
 				case Result.DENY:
@@ -175,7 +179,7 @@ public class LivingEntityMixin extends EntityMixin
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 		{
 			if(!isSpectator())
-				sheet.activatedAbilities().getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
+				ElementAbilitySet.getActivated(sheet).getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
 					inst -> 
 					{
 						if(!((ToggledAbility)inst.ability()).isActive(inst)) return;

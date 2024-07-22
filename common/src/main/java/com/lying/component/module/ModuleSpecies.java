@@ -2,6 +2,8 @@ package com.lying.component.module;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.lying.ability.AbilitySet;
 import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
@@ -23,21 +25,28 @@ public class ModuleSpecies extends AbstractSheetModule
 	
 	public int power()
 	{
-		Optional<Species> spec = get();
+		Optional<Species> spec = getMaybe();
 		return spec.isPresent() ? spec.get().power() : 0;
 	}
 	
-	public Optional<Species> get() { return speciesId.isPresent() ? VTSpeciesRegistry.instance().get(speciesId.get()) : Optional.empty(); }
+	public Optional<Species> getMaybe() { return speciesId.isPresent() ? VTSpeciesRegistry.instance().get(speciesId.get()) : Optional.empty(); }
 	
 	public boolean is(Identifier registryName) { return speciesId.isPresent() && speciesId.get().equals(registryName); }
 	
 	public void clear() { speciesId = Optional.of(DEFAULT_SPECIES); }
 	
-	public void set(Identifier speciesIdIn) { speciesId = Optional.of(speciesIdIn); }
+	public void set(@Nullable Identifier speciesIdIn)
+	{
+		if(speciesId.isEmpty() && speciesIdIn == null || !speciesId.isEmpty() && speciesId.get() == speciesIdIn)
+			return;
+		
+		speciesId = speciesIdIn == null ? Optional.empty() : Optional.of(speciesIdIn);
+		updateSheet();
+	}
 	
 	public void affect(ISheetElement<?> element)
 	{
-		Optional<Species> spec = get();
+		Optional<Species> spec = getMaybe();
 		
 		if(!spec.isPresent())
 			return;
