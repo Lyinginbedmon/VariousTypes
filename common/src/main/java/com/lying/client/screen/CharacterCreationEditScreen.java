@@ -2,10 +2,13 @@ package com.lying.client.screen;
 
 import static com.lying.reference.Reference.ModInfo.translate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
@@ -19,6 +22,7 @@ import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.utility.VTUtils;
+import com.mojang.datafixers.util.Pair;
 
 import dev.architectury.networking.NetworkManager;
 import io.netty.buffer.Unpooled;
@@ -33,72 +37,89 @@ import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class CharacterCreationScreen extends HandledScreen<CharacterCreationScreenHandler>
+public class CharacterCreationEditScreen extends HandledScreen<CharacterCreationScreenHandler>
 {
 	public static final MinecraftClient mc = MinecraftClient.getInstance();
-	private CharacterSheet testSheet;
+	private static final Vector2i backingSize = new Vector2i(450, 250);
+	
+	private final PlayerInventory inventory;
 	
 	private Optional<DetailObject> detailObject = Optional.empty();
 	private int scrollAmount = 0;
 	
-	private ButtonWidget confirmButton;
+	private ButtonWidget confirmButton, previewButton;
+	
+	private final Map<ActiveElement, Pair<ButtonWidget, GuiAbstractList<?>>> tabs = new HashMap<>();
+	private ActiveElement currentTab = ActiveElement.SPECIES;
 	
 	private ButtonWidget speciesButton, templatesButton;
 	private SpeciesListWidget speciesList;
 	private TemplateListWidget templateList;
 	
-	public CharacterCreationScreen(CharacterCreationScreenHandler handler, PlayerInventory inventory, Text title)
+	public CharacterCreationEditScreen(CharacterCreationScreenHandler handler, PlayerInventory inventory, Text title)
 	{
 		super(handler, inventory, title);
-		testSheet = handler.testSheet();
+		this.inventory = inventory;
 	}
 	
-	@SuppressWarnings("removal")
+	public boolean shouldCloseOnEsc() { return false; }
+	
 	public void init()
 	{
 		super.init();
 		
 		addDrawableChild(confirmButton = ButtonWidget.builder(translate("gui", "creator_confirm"), (button) -> 
 		{
-			RegistryByteBuf buffer = new RegistryByteBuf(Unpooled.buffer(), mc.player.getRegistryManager());
-			CharacterCreationScreenHandler handler = getScreenHandler();
-			buffer.writeIdentifier(handler.species() == null ? new Identifier("debug:no_species") : handler.species());
-			
-			buffer.writeInt(handler.templates().size());
-			handler.templates().forEach(tem -> buffer.writeIdentifier(tem));
-			
-			NetworkManager.sendToServer(VTPacketHandler.FINISH_CHARACTER_ID, buffer);
+			confirmCharacterCreation(getScreenHandler());
 			close();
-		}).dimensions(0, 0, 40, 20).build());
+		}).dimensions(0, 0, 50, 20).build());
 		
-		addDrawableChild(speciesButton = ButtonWidget.builder(translate("gui", "creator_species"), (button) -> 
+		addDrawableChild(previewButton = ButtonWidget.builder(Text.literal("Preview"), (button) -> 
 		{
-			speciesList.visible = speciesList.active = true;
-			templateList.visible = templateList.active = false;
-		}).dimensions(0, 0, 60, 20).build());
-		addDrawableChild(templatesButton = ButtonWidget.builder(translate("gui", "creator_template"), (button) -> 
-		{
-			templateList.visible = templateList.active = true;
-			speciesList.visible = speciesList.active = false;
-		}).dimensions(0, 0, 60, 20).build());
+			mc.setScreen(new CharacterCreationPreviewScreen(getScreenHandler(), inventory, this.title));
+		}).dimensions(0, 0, 50, 20).build());
 		
-		addDrawableChild(speciesList = new SpeciesListWidget(client, 300, 210, 0));
+		addDrawableChild(speciesButton = ButtonWidget.builder(translate("gui", "creator_species"), (button) -> setTab(ActiveElement.SPECIES)).dimensions(0, 0, 60, 20).build());
+		addDrawableChild(templatesButton = ButtonWidget.builder(translate("gui", "creator_template"), (button) -> setTab(ActiveElement.TEMPLATES)).dimensions(0, 0, 60, 20).build());
+		
+		addSelectableChild(speciesList = new SpeciesListWidget(client, (backingSize.x / 3) * 2, 210, 0));
 		VTSpeciesRegistry.instance().getAll().forEach(spec -> 
 		{
 			if(spec.power() <= VariousTypes.POWER)
-				speciesList.addEntry(spec);
+				speciesList.addEntry(spec, this);
 		});
 		
-		addDrawableChild(templateList = new TemplateListWidget(client, 300, 210, 0));
+		addSelectableChild(templateList = new TemplateListWidget(client, speciesList.getWidth(), speciesList.getHeight(), 0));
 		updateTemplateList();
-		templateList.visible = templateList.active = false;
+		
+		tabs.put(ActiveElement.SPECIES, Pair.of(speciesButton, speciesList));
+		tabs.put(ActiveElement.TEMPLATES, Pair.of(templatesButton, templateList));
+		setTab(ActiveElement.SPECIES);
 	}
+	
+	private void setTab(ActiveElement tab)
+	{
+		currentTab = tab;
+		tabs.entrySet().forEach(entry -> 
+		{
+			ActiveElement key = entry.getKey();
+			Pair<ButtonWidget, GuiAbstractList<?>> values = entry.getValue();
+			values.getFirst().active = key != tab;
+			GuiAbstractList<?> list = values.getSecond();
+			list.active = list.visible = key == tab && list.entryCount() > 0;
+			list.setScrollAmount(0D);
+		});
+	}
+	
+	public boolean isSpecies(Species species) { return getScreenHandler().species().equals(species.registryName()); }
 	
 	public void setSpecies(Species species)
 	{
 		getScreenHandler().setSpecies(species);
 		updateTemplateList();
 	}
+	
+	public boolean hasTemplate(Template template) { return getScreenHandler().templates().contains(template.registryName()); }
 	
 	public void addTemplate(Template template)
 	{
@@ -129,13 +150,19 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 			else
 				return VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString());
 		});
-		templates.forEach(tem -> templateList.addEntry(tem));
+		templates.forEach(tem -> templateList.addEntry(tem, this));
 	}
 	
 	public void setDetail(@Nullable DetailObject obj)
 	{
 		detailObject = obj == null ? Optional.empty() : Optional.of(obj);
 		scrollAmount = 0;
+	}
+	
+	public boolean mouseClicked(double mouseX, double mouseY, int button)
+	{
+		setDetail(null);
+		return super.mouseClicked(mouseX, mouseY, button);
 	}
 	
 	public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount)
@@ -145,6 +172,10 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 			scrollAmount += verticalAmount * textRenderer.fontHeight;
 			return true;
 		}
+		
+		GuiAbstractList<?> currentList = tabs.get(currentTab).getSecond();
+		if(currentList.isMouseOver(mouseX, mouseY))
+			currentList.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 		return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
 	}
 	
@@ -154,25 +185,25 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 		
 		Optional<Species> species = VTSpeciesRegistry.instance().get(getScreenHandler().species());
 		if(species.isPresent())
-			context.drawTexture(species.get().creatorBackground(), (width - 450) / 2, (height - 250) / 2, 0, 0, 450, 250, 512, 512);
+			context.drawTexture(species.get().creatorBackground(), (width - 450) / 2, (height - 250) / 2, 0, 0, backingSize.x, backingSize.y, 512, 512);
 		
 		renderDarkening(context);
 		drawBackground(context, delta, mouseX, mouseY);
 		
-		speciesList.setPosition((width + 450) / 2 - speciesList.getWidth(), (height + 250) / 2 - speciesList.getHeight() - 2);
+		speciesList.setPosition((width + backingSize.x) / 2 - speciesList.getWidth(), (height + backingSize.y) / 2 - speciesList.getHeight() - 2);
 		templateList.setPosition(speciesList.getX(), speciesList.getY());
-		speciesButton.setPosition(speciesList.getX(), height / 2 - 110);
+		speciesButton.setPosition(speciesList.getX() + 4, height / 2 - 110);
 		templatesButton.setPosition(speciesButton.getX() + speciesButton.getWidth() + 5, speciesButton.getY());
 		
-		speciesButton.active = !VTSpeciesRegistry.instance().getAllIDs().isEmpty();
-		templatesButton.active = !VTTemplateRegistry.instance().getAllIDs().isEmpty();
+		confirmButton.setPosition(width / 2 - 150 + 1, height / 2 + 100);
+		previewButton.setPosition(width / 2 - 150 - 1 - previewButton.getWidth(), confirmButton.getY());
 		
-		confirmButton.setPosition(width / 2 - 150 - (confirmButton.getWidth() / 2), height / 2 + 100);
+		tabs.get(currentTab).getSecond().render(context, mouseX, mouseY, delta);
 	}
 	
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY)
 	{
-		testSheet.getOwner().ifPresent(owner -> 
+		getScreenHandler().testSheet().getOwner().ifPresent(owner -> 
 		{
 			if(owner.getType() == EntityType.PLAYER)
 				VTUtilsClient.renderDemoEntity((PlayerEntity)owner, context, mouseX, mouseY, (width / 2) - 150, (height / 2));
@@ -184,8 +215,8 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 		int midX = backgroundWidth / 2;
 		int midY = backgroundHeight / 2;
 		
-		Text ownerName = mc.player.getDisplayName();
-		context.drawCenteredTextWithShadow(textRenderer, ownerName, (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 100, 0xFFFFFF);
+		context.drawCenteredTextWithShadow(textRenderer, this.title, (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 100, 0xFFFFFF);
+		context.drawCenteredTextWithShadow(textRenderer, Text.literal(String.valueOf(getScreenHandler().testSheet().power())), (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 90, 0xFFFFFF);
 		
 		detailObject.ifPresent(detail -> 
 		{
@@ -202,5 +233,23 @@ public class CharacterCreationScreen extends HandledScreen<CharacterCreationScre
 			
 			detail.render(context, midX, detailY, maxWidth);
 		});
+	}
+	
+	@SuppressWarnings("removal")
+	public static void confirmCharacterCreation(CharacterCreationScreenHandler handler)
+	{
+		RegistryByteBuf buffer = new RegistryByteBuf(Unpooled.buffer(), mc.player.getRegistryManager());
+		buffer.writeIdentifier(handler.species() == null ? new Identifier("debug:no_species") : handler.species());
+		
+		buffer.writeInt(handler.templates().size());
+		handler.templates().forEach(tem -> buffer.writeIdentifier(tem));
+		
+		NetworkManager.sendToServer(VTPacketHandler.FINISH_CHARACTER_ID, buffer);
+	}
+	
+	private static enum ActiveElement
+	{
+		SPECIES,
+		TEMPLATES;
 	}
 }

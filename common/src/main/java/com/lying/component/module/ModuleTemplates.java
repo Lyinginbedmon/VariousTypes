@@ -38,31 +38,43 @@ public class ModuleTemplates extends AbstractSheetModule
 	public void clear()
 	{
 		templateIds.clear();
-		parentSheet.ifPresent(sheet -> 
-		{
-			sheet.buildSheet();
-			sheet.markDirty();
-		});
+		updateSheet();
 	}
 	
 	public boolean contains(Identifier registryName) { return templateIds.contains(registryName); }
 	
-	public void add(Identifier idIn)
+	public void set(Identifier... idIn)
 	{
-		if(!templateIds.contains(idIn))
-		{
-			templateIds.add(idIn);
+		templateIds.clear();
+		add(idIn);
+		if(idIn.length == 0)
 			updateSheet();
-		}
 	}
 	
-	public void remove(Identifier idIn)
+	public void add(Identifier... idIn)
 	{
-		if(templateIds.contains(idIn))
-		{
-			templateIds.remove(idIn);
+		boolean shouldUpdate = false;
+		for(Identifier id : idIn)
+			if(!templateIds.contains(id))
+			{
+				templateIds.add(id);
+				shouldUpdate = true;
+			}
+		if(shouldUpdate)
 			updateSheet();
-		}
+	}
+	
+	public void remove(Identifier... idIn)
+	{
+		boolean shouldUpdate = false;
+		for(Identifier id : idIn)
+			if(templateIds.contains(id))
+			{
+				templateIds.remove(id);
+				shouldUpdate = true;
+			}
+		if(shouldUpdate)
+			updateSheet();
 	}
 	
 	public List<Template> get()

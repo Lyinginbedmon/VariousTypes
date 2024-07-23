@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.base.Supplier;
 import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionHandler;
@@ -35,13 +37,16 @@ public class VTSheetElements
 	
 	public static void init() { }
 	
+	@Nullable
+	public static SheetElement<?> get(Identifier registryName) { return ELEMENTS.getOrDefault(registryName, null); }
+	
 	public static Collection<SheetElement<?>> getAll() { return ELEMENTS.values(); }
 	
 	// XXX Maybe tidy this up to be more like AbstractSheetModule
 	public static class SheetElement<T extends ISheetElement<?>>
 	{
 		private final Identifier registryName;
-		private final int order;
+		private final int order;	// XXX Change to a predicate-based approach to eliminate mandatory ordering?
 		private final Supplier<T> supplier;
 		
 		public SheetElement(Identifier regIn, int orderIn, Supplier<T> supplierIn)

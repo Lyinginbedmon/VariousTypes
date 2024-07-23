@@ -31,7 +31,7 @@ public abstract class Precondition
 	 */
 	public static final Supplier<Precondition> IS_LIVING	= register(prefix("is_living"), () -> new SimpleCondition(prefix("is_living")) 
 	{
-		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.UNDEAD.get()); }
+		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<TypeSet>element(VTSheetElements.TYPES).containsAny(VTTypes.CONSTRUCT.get(), VTTypes.UNDEAD.get()); }
 	});
 	
 	public static final Supplier<Precondition> PHYSICAL		= register(prefix("is_physical"), () -> new SimpleCondition(prefix("is_physical"))

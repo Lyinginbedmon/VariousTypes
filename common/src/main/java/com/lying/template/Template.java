@@ -139,7 +139,7 @@ public class Template
 		
 		public Builder power(int powerIn)
 		{
-			power = powerIn;
+			power = Math.max(0, powerIn);
 			return this;
 		}
 		

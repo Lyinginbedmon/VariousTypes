@@ -3,6 +3,7 @@ package com.lying.template.operation;
 import com.google.gson.JsonObject;
 import com.lying.VariousTypes;
 import com.lying.type.Type;
+import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
 import net.minecraft.registry.DynamicRegistryManager;
@@ -97,6 +98,27 @@ public abstract class TypesOperation extends ConfigurableOperation
 		{
 			typeSet.clear();
 			typeSet.addAll(this.types);
+		}
+	}
+	
+	public static class SetSupertypes extends TypesOperation
+	{
+		public SetSupertypes(Identifier nameIn, Type... typesIn)
+		{
+			super(nameIn, typesIn);
+		}
+		
+		public Text describe(DynamicRegistryManager manager)
+		{
+			return Text.translatable("operation.vartypes.set_supertypes", types.asNameList(manager));
+		}
+		
+		public static SetSupertypes of(Type... typesIn) { return new SetSupertypes(Operation.SET_SUPERTYPES.get().registryName(), typesIn); }
+		
+		public void applyToTypes(TypeSet typeSet)
+		{
+			typeSet.removeIf(type -> type.tier() == Tier.SUPERTYPE);
+			this.types.forEach(type -> typeSet.add(type));
 		}
 	}
 }

@@ -16,6 +16,7 @@ import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference;
+import com.lying.type.Action;
 import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.Result;
 
@@ -80,6 +81,18 @@ public class VTAbilities
 		public void registerEventHandlers()
 		{
 			ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(prefix("deep_breath")) ? air * 2 : air);
+		}
+	});
+	public static final Supplier<Ability> MENDING		= register("mending", () -> new Ability(prefix("mending"))
+	{
+		public void registerEventHandlers()
+		{
+			ServerEvents.SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
+			{
+				// Adds the ability to breathe air after it may have been denied by other breathing abilities
+				if(!handler.can(Action.REGEN.get()) && abilities.hasAbility(registryName()))
+					handler.activate(Action.REGEN.get());
+			});
 		}
 	});
 	

@@ -6,6 +6,10 @@ import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetElements.SheetElement;
 import com.lying.type.TypeSet;
 
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
+
 public class ElementAbilitySet extends AbilitySet implements ISheetElement<AbilitySet>
 {
 	private AbilitySet activated = new AbilitySet();
@@ -13,6 +17,17 @@ public class ElementAbilitySet extends AbilitySet implements ISheetElement<Abili
 	public SheetElement<?> registry(){ return VTSheetElements.ABILITES; }
 	
 	public static AbilitySet getActivated(CharacterSheet sheet) { return ((ElementAbilitySet)sheet.element(VTSheetElements.ABILITES)).activated(); }
+	
+	public NbtCompound writeToNbt(NbtCompound nbt, DynamicRegistryManager manager)
+	{
+		nbt.put("Activated", activated.writeToNbt(manager));
+		return nbt;
+	}
+	
+	public void readFromNbt(NbtCompound nbt)
+	{
+		activated = AbilitySet.readFromNbt(nbt.getList("Activated", NbtElement.COMPOUND_TYPE));
+	}
 	
 	public AbilitySet value() { return this; }
 	

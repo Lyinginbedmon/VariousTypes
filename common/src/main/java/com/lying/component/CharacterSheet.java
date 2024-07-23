@@ -87,9 +87,23 @@ public class CharacterSheet
 	
 	public NbtCompound writeSheetToNbt(NbtCompound compound)
 	{
-		NbtList list = new NbtList();
-		modules.values().forEach(module -> list.add(module.write(new NbtCompound())));
-		compound.put("Modules", list);
+		NbtList listM = new NbtList();
+		modules.values().forEach(module -> listM.add(module.write(new NbtCompound())));
+		compound.put("Modules", listM);
+		
+		NbtList listE = new NbtList();
+		elements.values().forEach(element -> 
+		{
+			NbtCompound data = element.writeToNbt(new NbtCompound(), owner.get().getRegistryManager());
+			if(!data.isEmpty())
+			{
+				data.putString("RegistryName", element.registry().registryName().toString());
+				listE.add(data);
+			}
+		});
+		if(!listE.isEmpty())
+			compound.put("Elements", listE);
+		
 		return compound;
 	}
 	
@@ -103,6 +117,18 @@ public class CharacterSheet
 			Identifier id = new Identifier(data.getString("ID"));
 			modules.get(id).read(data.contains("Data", NbtElement.COMPOUND_TYPE) ? data.getCompound("Data") : new NbtCompound());
 		});
+		
+		if(compound.contains("Elements", NbtElement.LIST_TYPE))
+			for(NbtElement el : compound.getList("Elements", NbtElement.COMPOUND_TYPE))
+			{
+				NbtCompound nbt = (NbtCompound)el;
+				Identifier regName = new Identifier(nbt.getString("RegistryName"));
+				nbt.remove("RegistryName");
+				SheetElement<?> element = VTSheetElements.get(regName);
+				if(element == null || nbt.isEmpty())
+					continue;
+				elements.get(element).readFromNbt(nbt);
+			}
 		
 		buildSheet();
 	}

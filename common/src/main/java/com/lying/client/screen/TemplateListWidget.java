@@ -4,55 +4,68 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.lying.client.screen.TemplateListWidget.TemplateEntry;
+import com.lying.client.utility.VTUtilsClient;
 import com.lying.template.Template;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
-import net.minecraft.client.gui.widget.ElementListWidget;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.text.Text;
 
-public class TemplateListWidget extends ElementListWidget<TemplateEntry>
+public class TemplateListWidget extends GuiAbstractList<TemplateEntry>
 {
 	public TemplateListWidget(MinecraftClient client, int width, int height, int y)
 	{
 		super(client, width, height, y, 25);
 	}
 	
-	public void addEntry(Template spec)
+	public int getRowWidth() { return this.width - 20; }
+	
+	public int getScrollbarX() { return getX() + 3; }
+	
+	public void addEntry(Template spec, CharacterCreationEditScreen parent)
 	{
-		addEntry(new TemplateEntry(spec));
+		addEntry(new TemplateEntry(spec, parent, this.width));
 	}
 	
-	public void clear() { clearEntries(); }
-
-	public static class TemplateEntry extends ElementListWidget.Entry<TemplateEntry>
+	public static class TemplateEntry extends GuiAbstractList.ListEntry<TemplateEntry>
 	{
+		private static final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 		private final Template template;
+		private final CharacterCreationEditScreen parent;
 		
-		public TemplateEntry(Template templateIn)
+		private final ButtonWidget infoButton, addButton, removeButton;
+		private List<ButtonWidget> children = Lists.newArrayList();
+		
+		public TemplateEntry(Template templateIn, CharacterCreationEditScreen parentIn, int widthIn)
 		{
 			template = templateIn;
+			parent = parentIn;
+			children.add(infoButton = ButtonWidget.builder(Text.literal("Info"), button -> { parent.setDetail(new DetailObject(VTUtilsClient.templateToDetail(template))); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
+			children.add(addButton = ButtonWidget.builder(Text.literal("+"), button -> { parent.addTemplate(template); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
+			children.add(removeButton = ButtonWidget.builder(Text.literal("-"), button -> { parent.removeTemplate(template); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
 		}
 		
-		public List<? extends Element> children()
+		public void updatePosition(int x, int y)
 		{
-			// TODO Auto-generated method stub
-			return Lists.newArrayList();
+			infoButton.setPosition(x + 1, y);
+			addButton.setPosition(x + 150, y);
+			removeButton.setPosition(x + 150 + 1 + addButton.getWidth(), y);
 		}
-
-		@Override
-		public List<? extends Selectable> selectableChildren()
+		
+		public List<? extends Element> children() { return children; }
+		
+		public List<? extends Selectable> selectableChildren() { return children; }
+		
+		public void render(DrawContext context, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta)
 		{
-			// TODO Auto-generated method stub
-			return Lists.newArrayList();
-		}
-
-		@Override
-		public void render(DrawContext var1, int var2, int var3, int var4, int var5, int var6, int var7, int var8, boolean var9, float var10)
-		{
-			// TODO Auto-generated method stub
-			
+			addButton.active = !parent.hasTemplate(template);
+			removeButton.active = parent.hasTemplate(template);
+			children.forEach(child -> child.render(context, mouseX, mouseY, tickDelta));
+			context.drawText(textRenderer, template.displayName(), x + 25 + (125 - textRenderer.getWidth(template.displayName())) / 2, y + (25 - textRenderer.fontHeight) / 2, 0xFFFFFF, false);
 		}
 	}
 }

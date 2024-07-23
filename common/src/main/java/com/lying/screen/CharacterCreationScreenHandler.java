@@ -1,10 +1,12 @@
 package com.lying.screen;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTScreenHandlerTypes;
@@ -26,19 +28,35 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	private Identifier speciesId;
 	private List<Identifier> templateIds = Lists.newArrayList();
 	
+	private CharacterSheet testSheet;
+	
 	public CharacterCreationScreenHandler(int syncId, PlayerEntity player)
 	{
 		super(VTScreenHandlerTypes.CREATION_SCREEN_HANDLER.get(), syncId);
 		thePlayer = player;
 		
-		speciesId = VTSpeciesRegistry.instance().get(VTSpeciesRegistry.DEFAULT_SPECIES).isPresent() ? VTSpeciesRegistry.DEFAULT_SPECIES : VTSpeciesRegistry.instance().getAllIDs().stream().findFirst().get();
+		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+		sheetOpt.ifPresentOrElse(sheet -> 
+		{
+			sheet.module(VTSheetModules.SPECIES).getMaybe().ifPresent(spec -> speciesId = spec.registryName());
+			sheet.module(VTSheetModules.TEMPLATES).get().forEach(tem -> templateIds.add(tem.registryName())); 
+		}, () -> 
+		{
+			speciesId = VTSpeciesRegistry.instance().get(VTSpeciesRegistry.DEFAULT_SPECIES).isPresent() ? VTSpeciesRegistry.DEFAULT_SPECIES : VTSpeciesRegistry.instance().getAllIDs().stream().findFirst().get();
+		});
+		
+		buildSheet();
 	}
 	
 	public ItemStack quickMove(PlayerEntity var1, int var2) { return ItemStack.EMPTY; }
 	
 	public boolean canUse(PlayerEntity var1) { return true; }
 	
-	public CharacterSheet testSheet()
+	/** Returns the current calculated character sheet */
+	public CharacterSheet testSheet() { return testSheet; }
+	
+	/** Constructs a character sheet from the current parameters */
+	protected void buildSheet()
 	{
 		CharacterSheet sheet = new CharacterSheet(thePlayer);
 		if(speciesId != null)
@@ -48,7 +66,8 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
 			templateIds.forEach(id -> templates.add(id));
 		}
-		return sheet;
+		sheet.buildSheet();
+		testSheet = sheet;
 	}
 	
 	@Nullable
@@ -61,13 +80,42 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	{
 		speciesId = species.registryName();
 		validateTemplates();
+		buildSheet();
 	}
 	
 	/** Adds the given template to the list of applied templates. */
 	public void addTemplate(Template template)
 	{
 		if(!templateIds.contains(template.registryName()))
+		{
 			templateIds.add(template.registryName());
+			buildSheet();
+		}
+	}
+	
+	/**
+	 * Removes the given template from the list of applied templates, then validates.
+	 */
+	public void removeTemplate(Template template)
+	{
+		Identifier regName = template.registryName();
+		if(templateIds.contains(regName))
+		{
+			int index = templateIds.indexOf(regName);
+			/*
+			 * If a template is removed from earlier in the sequence,
+			 * ensure that all subsequent templates are still valid.
+			 */
+			if(index == templateIds.size() - 1)
+				templateIds.remove(index);
+			else
+			{
+				templateIds.remove(index);
+				validateTemplates();
+			}
+			
+			buildSheet();
+		}
 	}
 	
 	/**
@@ -96,30 +144,5 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 		
 		templateIds.clear();
 		templates.get().forEach(tem -> templateIds.add(tem.registryName()));
-	}
-	
-	/**
-	 * Removes the given template from the list of applied templates, then validates.
-	 */
-	public void removeTemplate(Template template)
-	{
-		Identifier regName = template.registryName();
-		if(templateIds.contains(regName))
-		{
-			int index = templateIds.indexOf(regName);
-			/*
-			 * If a template is removed from earlier in the sequence,
-			 * ensure that all subsequent templates are still valid.
-			 */
-			if(index == templateIds.size() - 1)
-			{
-				templateIds.remove(index);
-				return;
-			}
-			
-			templateIds.remove(index);
-			validateTemplates();
-			return;
-		}
 	}
 }

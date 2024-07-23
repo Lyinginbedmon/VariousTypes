@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
 
 import dev.architectury.networking.NetworkManager.NetworkReceiver;
@@ -25,7 +24,8 @@ public class FinishCharacterCreationReceiver implements NetworkReceiver<Registry
 			speciesId = null;
 		
 		List<Identifier> templateIds = Lists.newArrayList();
-		for(int i=0; i<value.readInt(); i++)
+		final int templateCount = value.readInt();
+		for(int i=0; i<templateCount; i++)
 			templateIds.add(value.readIdentifier());
 		
 		applyCreation(player, speciesId, templateIds);
@@ -40,8 +40,7 @@ public class FinishCharacterCreationReceiver implements NetworkReceiver<Registry
 			if(speciesId != null)
 				sheet.module(VTSheetModules.SPECIES).set(speciesId);
 			
-			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
-			templateIds.forEach(tem -> templates.add(tem));
+			sheet.module(VTSheetModules.TEMPLATES).set(templateIds.toArray(new Identifier[0]));
 			
 			sheet.buildSheet();
 		});

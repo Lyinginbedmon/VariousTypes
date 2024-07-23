@@ -57,6 +57,8 @@ public abstract class Operation
 	/** Completely overrides any existing typeset with the given typeset */
 	public static final Supplier<Operation> SET_TYPES				= register(prefix("set_types"), () -> new TypesOperation.Set(prefix("set_types")));
 	
+	public static final Supplier<Operation> SET_SUPERTYPES			= register(prefix("set_supertypes"), () -> new TypesOperation.SetSupertypes(prefix("set_supertypes")));
+	
 	/** If target types are present, remove them and add the given types */
 	public static final Supplier<Operation> REPLACE_TYPES			= register(prefix("replace_types"), () -> new OperationReplaceTypes(prefix("replace_types"), new TypeSet()));
 	

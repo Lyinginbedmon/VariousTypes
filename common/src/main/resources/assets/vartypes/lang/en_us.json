@@ -82,6 +82,7 @@
 	"operation.vartypes.remove_types": "Lose type: [%s]",
 	"operation.vartypes.replace_types": "Replace all [%s] with [%s]",
 	"operation.vartypes.set_types": "Types become: %s",
+	"operation.vartypes.set_supertypes": "Supertypes become: [%s]",
 	"operation.vartypes.add_ability": "Gain ability: [%s]",
 	"operation.vartypes.remove_ability": "Lose ability: [%s]",
 	"operation.vartypes.remove_all_ability": "Lose all [%s] abilities",
@@ -123,6 +124,9 @@
 	"ability.vartypes.natural_armour": "Natural Armour",
 	"ability.vartypes.sculk_sight": "Sculksight",
 	"ability.vartypes.deep_breath": "Deep Breath",
+	"ability.vartypes.deep_breath.desc": "You can hold your breath twice as long as others",
+	"ability.vartypes.mending": "Mending",
+	"ability.vartypes.mending.desc": "You are, despite all reason to the contrary, able to regenerate health over time",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",
@@ -164,5 +168,9 @@
 	"gui.vartypes.ability_toggled": "Toggled Ability",
 	"gui.vartypes.creator_confirm": "Confirm",
 	"gui.vartypes.creator_species": "Species",
-	"gui.vartypes.creator_template": "Templates"
+	"gui.vartypes.creator_template": "Templates",
+	"gui.vartypes.creator_set_species": "Click to select %s",
+	"gui.vartypes.creator_add_template": "Click to add %s",
+	"gui.vartypes.creator_remove_template": "Click to remove %s",
+	"gui.vartypes.power_value": "Power: %s"
 }
