@@ -17,7 +17,9 @@ import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.type.Type;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
@@ -32,7 +34,6 @@ public class VTUtils
 	public static CharacterSheet makeRandomSheet(LivingEntity ent, int power)
 	{
 		CharacterSheet sheet = new CharacterSheet(ent);
-		
 		Random rand = ent.getRandom();
 		
 		// Pick a random species
@@ -42,35 +43,36 @@ public class VTUtils
 		if(!randomSpecies.isEmpty())
 			sheet.module(VTSheetModules.SPECIES).set(randomSpecies.get(rand.nextInt(randomSpecies.size())).registryName());
 		
-		if(sheet.power() < power)
+		// Pick a random arrangement of valid templates
+		ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
+		List<Template> candidates = getValidTemplatesFor(sheet, ent, Math.max(0, power - sheet.power()));
+		while(!candidates.isEmpty())
 		{
-			ModuleTemplates templates = sheet.module(VTSheetModules.TEMPLATES);
-			// Pick a random arrangement of valid templates
-			List<Template> candidates = getValidTemplatesFor(sheet, ent);
-			candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
-			
-			while(!candidates.isEmpty() && sheet.power() < power)
-			{
-				Template candidate = candidates.get(rand.nextInt(candidates.size()));
-				if(candidate.validFor(sheet, ent))
-				{
-					templates.add(candidate.registryName());
-					break;
-				}
-				
-				candidates = getValidTemplatesFor(sheet, ent);
-				candidates.removeIf(tem -> tem.power() > (power - sheet.power()));
-			}
+			Template candidate = candidates.get(rand.nextInt(candidates.size()));
+			templates.add(candidate.registryName());
+			candidates = getValidTemplatesFor(sheet, ent, Math.max(0, power - sheet.power()));
 		}
 		
 		return sheet;
 	}
 	
-	public static List<Template> getValidTemplatesFor(CharacterSheet sheet, LivingEntity owner)
+	public static List<Template> getValidTemplatesFor(CharacterSheet sheet, LivingEntity owner, int powerLimit)
 	{
+		boolean ignoreConditions = owner.getType() == EntityType.PLAYER && ((PlayerEntity)owner).isCreative();
+		ModuleTemplates existing = sheet.module(VTSheetModules.TEMPLATES);
+		int maxPower = powerLimit >= 0 ? powerLimit : Integer.MAX_VALUE;
 		List<Template> templates = Lists.newArrayList();
-		templates.addAll(VTTemplateRegistry.instance().getAll());
-		templates.removeIf(tem -> ModuleTemplates.hasTemplate(sheet, tem.registryName()) || !tem.validFor(sheet, owner));
+		VTTemplateRegistry.instance().getAll().forEach(tem -> 
+		{
+			if(tem.power() > maxPower)
+				return;
+			else if(existing.contains(tem.registryName()))
+				return;
+			else if(!tem.validFor(sheet, owner) && !ignoreConditions)
+				return;
+			else
+				templates.add(tem);
+		});
 		return templates;
 	}
 	

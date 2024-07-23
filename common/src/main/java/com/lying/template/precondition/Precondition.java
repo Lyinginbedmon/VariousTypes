@@ -13,11 +13,14 @@ import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
+import com.lying.reference.Reference;
 import com.lying.reference.Reference.ModInfo;
 import com.lying.type.TypeSet;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /** A requirement that must be met prior to applying this template during character creation */
@@ -63,6 +66,8 @@ public abstract class Precondition
 	{
 		this.registryName = idIn;
 	}
+	
+	public Text describe(DynamicRegistryManager manager) { return Reference.ModInfo.translate("precondition", registryName.getPath()); }
 	
 	public abstract boolean isValidFor(CharacterSheet sheet, LivingEntity owner);
 	

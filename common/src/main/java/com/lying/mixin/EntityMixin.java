@@ -131,12 +131,8 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity && !state.isAir())
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				ElementAbilitySet.getActivated(sheet).getAbilitiesOfType(VTAbilities.CLIMB.get().registryName()).stream().findFirst().ifPresent(
-					inst -> 
-					{
-						if(!((ToggledAbility)inst.ability()).isActive(inst))
-							ci.setReturnValue(true);
-					});
+				if(ToggledAbility.hasActive(ElementAbilitySet.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
+					ci.setReturnValue(true);
 			});
 	}
 }

@@ -11,8 +11,10 @@ import com.lying.type.TypeSet;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
 
 public class ServerEvents
@@ -56,6 +58,14 @@ public class ServerEvents
 		public interface GetMaxAirEvent
 		{
 			int maxAir(AbilitySet abilities, int maxAir);
+		}
+		
+		public static final Event<GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.createLoop(GetStatusEffectEvent.class);
+		
+		@FunctionalInterface
+		public interface GetStatusEffectEvent
+		{
+			StatusEffectInstance getStatusEffect(RegistryEntry<StatusEffect> effect, LivingEntity entity, AbilitySet abilities, final StatusEffectInstance actual);
 		}
 	}
 	

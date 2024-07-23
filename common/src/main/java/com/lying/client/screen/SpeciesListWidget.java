@@ -44,7 +44,7 @@ public class SpeciesListWidget extends GuiAbstractList<SpeciesEntry>
 		{
 			species = speciesIn;
 			parent = parentIn;
-			children.add(ButtonWidget.builder(Text.literal("Info"), button -> { parent.setDetail(new DetailObject(VTUtilsClient.speciesToDetail(species))); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
+			children.add(new InspectButton(0, 0, 24, 24, button -> { parent.setDetail(new DetailObject(VTUtilsClient.speciesToDetail(species))); button.setFocused(false); }));
 			children.add(selectButton = ButtonWidget.builder(species.displayName(), button -> { parent.setSpecies(species); button.setFocused(false); }).dimensions(25, 0, 150, 24).build());
 		}
 		

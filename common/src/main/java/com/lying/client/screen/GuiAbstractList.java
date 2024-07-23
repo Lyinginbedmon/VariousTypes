@@ -19,6 +19,8 @@ public abstract class GuiAbstractList<E extends GuiAbstractList.ListEntry<E>> ex
 	
 	public int entryCount() { return getEntryCount(); }
 	
+	public boolean isEmpty() { return entryCount() == 0; }
+	
 	public void clear() { clearEntries(); }
 	
 	public void setPosition(int x, int y)

@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.lying.ability.AbilitySet;
+import com.lying.component.element.ElementHome;
 import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSpeciesRegistry;
@@ -50,6 +51,12 @@ public class ModuleSpecies extends AbstractSheetModule
 		
 		if(!spec.isPresent())
 			return;
+		else if(element.registry() == VTSheetElements.HOME_DIM)
+			spec.ifPresent(species -> 
+			{
+				if(species.hasConfiguredHome())
+					((ElementHome)element).set(species.homeDimension());
+			});
 		else if(element.registry() == VTSheetElements.TYPES)
 			spec.ifPresent(species -> 
 			{

@@ -61,8 +61,17 @@ public class VTUtilsClient
 		entries.add(template.displayName().copy().formatted(Formatting.BOLD));
 		template.display().description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
 		if(template.power() != 0)
-			entries.add(translate("gui", "power_value", template.power()).copy());
-		template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe(manager))));
+			entries.add(translate("gui", "power_value", Text.literal(String.valueOf(template.power())).copy().formatted(Formatting.GRAY)).copy());
+		if(player.isCreative() && !template.preconditions().isEmpty())
+		{
+			entries.add(translate("gui", "preconditions").copy());
+			template.preconditions().forEach(pc -> entries.add(Text.literal(" - ").append(pc.describe(manager).copy().formatted(Formatting.GRAY))));
+		}
+		if(!template.operations().isEmpty())
+		{
+			entries.add(translate("gui", "operations").copy());
+			template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe(manager).copy().formatted(Formatting.GRAY))));
+		}
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(template.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);

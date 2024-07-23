@@ -8,11 +8,15 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
+import com.lying.reference.Reference;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public abstract class TypeCondition extends ConfigurableCondition
@@ -25,6 +29,8 @@ public abstract class TypeCondition extends ConfigurableCondition
 		for(Type type : typesIn)
 			types.add(type);
 	}
+	
+	public Text describe(DynamicRegistryManager manager) { return Reference.ModInfo.translate("precondition", registryName.getPath(), VTUtils.listToString(types, type -> type.displayName(manager), ", ")); }
 	
 	public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 	{

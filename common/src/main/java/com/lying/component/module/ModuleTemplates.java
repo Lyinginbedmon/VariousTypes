@@ -43,6 +43,11 @@ public class ModuleTemplates extends AbstractSheetModule
 	
 	public boolean contains(Identifier registryName) { return templateIds.contains(registryName); }
 	
+	public int index(Identifier registryName)
+	{
+		return contains(registryName) ? templateIds.indexOf(registryName) : -1;
+	}
+	
 	public void set(Identifier... idIn)
 	{
 		templateIds.clear();

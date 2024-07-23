@@ -420,6 +420,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private static class ActionButtonWidget extends IconButtonWidget
 	{
 		private static final Identifier TEXTURE = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/sheet/action_outline.png");
+		private static final Identifier TEXTURE_ALT = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/sheet/action_outline_alt.png");
 		private final Action action;
 		private final boolean can;
 		
@@ -433,8 +434,8 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 		{
 			float brightness = isHovered() ? 1F : can ? 0.75F : 0.45F;
-			context.drawTexturedQuad(TEXTURE, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
 			context.drawTexturedQuad(action.texture(), this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
+			context.drawTexturedQuad(can ? TEXTURE : TEXTURE_ALT, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
 		}
 	}
 }

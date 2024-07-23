@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 import com.lying.client.screen.TemplateListWidget.TemplateEntry;
 import com.lying.client.utility.VTUtilsClient;
+import com.lying.reference.Reference;
 import com.lying.template.Template;
 
 import net.minecraft.client.MinecraftClient;
@@ -13,7 +14,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 
 public class TemplateListWidget extends GuiAbstractList<TemplateEntry>
 {
@@ -33,6 +34,11 @@ public class TemplateListWidget extends GuiAbstractList<TemplateEntry>
 	
 	public static class TemplateEntry extends GuiAbstractList.ListEntry<TemplateEntry>
 	{
+		private static final Identifier TEXTURE_ADD = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/add.png");
+		private static final Identifier TEXTURE_REM = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/remove.png");
+		private static final Identifier TEXTURE_ADD_HOV = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/add_hovered.png");
+		private static final Identifier TEXTURE_REM_HOV = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/remove_hovered.png");
+		
 		private static final TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
 		private final Template template;
 		private final CharacterCreationEditScreen parent;
@@ -44,9 +50,9 @@ public class TemplateListWidget extends GuiAbstractList<TemplateEntry>
 		{
 			template = templateIn;
 			parent = parentIn;
-			children.add(infoButton = ButtonWidget.builder(Text.literal("Info"), button -> { parent.setDetail(new DetailObject(VTUtilsClient.templateToDetail(template))); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
-			children.add(addButton = ButtonWidget.builder(Text.literal("+"), button -> { parent.addTemplate(template); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
-			children.add(removeButton = ButtonWidget.builder(Text.literal("-"), button -> { parent.removeTemplate(template); button.setFocused(false); }).dimensions(0, 0, 24, 24).build());
+			children.add(infoButton = new InspectButton(0, 0, 24, 24, button -> { parent.setDetail(new DetailObject(VTUtilsClient.templateToDetail(template))); button.setFocused(false); }));
+			children.add(addButton = new IconButton(0, 0, 24, 24, button -> { parent.addTemplate(template); button.setFocused(false); }, TEXTURE_ADD, TEXTURE_ADD_HOV));
+			children.add(removeButton = new IconButton(0, 0, 24, 24, button -> { parent.removeTemplate(template); button.setFocused(false); }, TEXTURE_REM, TEXTURE_REM_HOV));
 		}
 		
 		public void updatePosition(int x, int y)

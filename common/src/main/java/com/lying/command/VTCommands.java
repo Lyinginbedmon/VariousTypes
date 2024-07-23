@@ -143,7 +143,7 @@ public class VTCommands
 									return 15;
 								}))
 						.then(literal("randomize")
-							.executes(context -> tryRandomize(EntityArgumentType.getPlayer(context, PLAYER), VariousTypes.POWER, context.getSource()))	// TODO Replace static power with server config value
+							.executes(context -> tryRandomize(EntityArgumentType.getPlayer(context, PLAYER), VariousTypes.POWER, context.getSource()))
 							.then(argument("power", IntegerArgumentType.integer(0))
 								.executes(context -> tryRandomize(EntityArgumentType.getPlayer(context, PLAYER), IntegerArgumentType.getInteger(context, "power"), context.getSource()))))
 						.then(literal("get")

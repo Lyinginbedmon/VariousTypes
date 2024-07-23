@@ -29,12 +29,13 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	private List<Identifier> templateIds = Lists.newArrayList();
 	
 	private CharacterSheet testSheet;
+	public final int powerLimit;
 	
 	public CharacterCreationScreenHandler(int syncId, PlayerEntity player)
 	{
 		super(VTScreenHandlerTypes.CREATION_SCREEN_HANDLER.get(), syncId);
 		thePlayer = player;
-		
+		powerLimit = player.isCreative() ? -1 : VariousTypes.POWER;
 		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 		sheetOpt.ifPresentOrElse(sheet -> 
 		{
@@ -54,6 +55,21 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	
 	/** Returns the current calculated character sheet */
 	public CharacterSheet testSheet() { return testSheet; }
+	
+	protected Identifier getDefaultSpecies()
+	{
+		return VTSpeciesRegistry.instance().get(VTSpeciesRegistry.DEFAULT_SPECIES).isPresent() ? VTSpeciesRegistry.DEFAULT_SPECIES : VTSpeciesRegistry.instance().getAllIDs().stream().findFirst().get();
+	}
+	
+	public void copySheet(CharacterSheet sheetIn)
+	{
+		sheetIn.module(VTSheetModules.SPECIES).getMaybe().ifPresentOrElse(spec -> speciesId = spec.registryName(), () -> speciesId = getDefaultSpecies());
+		
+		templateIds.clear();
+		sheetIn.module(VTSheetModules.TEMPLATES).get().forEach(tem -> templateIds.add(tem.registryName()));
+		
+		testSheet = sheetIn;
+	}
 	
 	/** Constructs a character sheet from the current parameters */
 	protected void buildSheet()

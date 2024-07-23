@@ -45,7 +45,22 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new ToggledAbility(prefix("night_vision")));
+	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new ToggledAbility(prefix("night_vision")) 
+	{
+		public void registerEventHandlers()
+		{
+			ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect,living,abilities,actual) -> 
+			{
+				if(
+					effect == StatusEffects.NIGHT_VISION 
+					&& abilities.hasAbility(registryName()) 
+					&& ToggledAbility.hasActive(abilities, registryName())
+					)
+					return new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
+				return actual;
+			});
+		}
+	});
 	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight")));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new ActivatedAbility(prefix("swim")) 
 	{

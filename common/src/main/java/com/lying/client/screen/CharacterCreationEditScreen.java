@@ -11,13 +11,14 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
-import com.lying.VariousTypes;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
+import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.network.VTPacketHandler;
+import com.lying.reference.Reference;
 import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.species.Species;
 import com.lying.template.Template;
@@ -52,7 +53,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	private final Map<ActiveElement, Pair<ButtonWidget, GuiAbstractList<?>>> tabs = new HashMap<>();
 	private ActiveElement currentTab = ActiveElement.SPECIES;
 	
-	private ButtonWidget speciesButton, templatesButton;
+	private ButtonWidget speciesButton, templatesButton, randomButton;
 	private SpeciesListWidget speciesList;
 	private TemplateListWidget templateList;
 	
@@ -74,10 +75,17 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 			close();
 		}).dimensions(0, 0, 50, 20).build());
 		
-		addDrawableChild(previewButton = ButtonWidget.builder(Text.literal("Preview"), (button) -> 
+		addDrawableChild(previewButton = ButtonWidget.builder(translate("gui", "creator_preview"), (button) -> 
 		{
 			mc.setScreen(new CharacterCreationPreviewScreen(getScreenHandler(), inventory, this.title));
 		}).dimensions(0, 0, 50, 20).build());
+		
+		addDrawableChild(randomButton = new IconButton(0, 0, 20, 20, button -> 
+		{
+			// TODO Add dice roll sound effect on randomise
+			getScreenHandler().copySheet(VTUtils.makeRandomSheet(mc.player, getScreenHandler().powerLimit));
+			updateTemplateList();
+		}, Reference.ModInfo.prefix("textures/gui/randomise.png"), Reference.ModInfo.prefix("textures/gui/randomise_hovered.png")));
 		
 		addDrawableChild(speciesButton = ButtonWidget.builder(translate("gui", "creator_species"), (button) -> setTab(ActiveElement.SPECIES)).dimensions(0, 0, 60, 20).build());
 		addDrawableChild(templatesButton = ButtonWidget.builder(translate("gui", "creator_template"), (button) -> setTab(ActiveElement.TEMPLATES)).dimensions(0, 0, 60, 20).build());
@@ -85,7 +93,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		addSelectableChild(speciesList = new SpeciesListWidget(client, (backingSize.x / 3) * 2, 210, 0));
 		VTSpeciesRegistry.instance().getAll().forEach(spec -> 
 		{
-			if(spec.power() <= VariousTypes.POWER)
+			if(spec.power() <= getScreenHandler().powerLimit)
 				speciesList.addEntry(spec, this);
 		});
 		
@@ -104,9 +112,9 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		{
 			ActiveElement key = entry.getKey();
 			Pair<ButtonWidget, GuiAbstractList<?>> values = entry.getValue();
-			values.getFirst().active = key != tab;
 			GuiAbstractList<?> list = values.getSecond();
-			list.active = list.visible = key == tab && list.entryCount() > 0;
+			values.getFirst().active = key != tab && !list.isEmpty();
+			list.active = list.visible = key == tab && !list.isEmpty();
 			list.setScrollAmount(0D);
 		});
 	}
@@ -138,15 +146,37 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		templateList.clear();
 		CharacterSheet sheet = getScreenHandler().testSheet();
 		List<Template> templates = Lists.newArrayList();
+		int sheetPower = sheet.power();
+		int powerLimit = getScreenHandler().powerLimit;
 		VTTemplateRegistry.instance().getAll().forEach(tem -> 
 		{
-			if(ModuleTemplates.hasTemplate(sheet, tem.registryName()) || (tem.power() <= (VariousTypes.POWER - sheet.power()) && tem.validFor(sheet, mc.player)))
+			/*
+			 * Only display the template if 
+			 * 	a. the sheet already has it
+			 * 	b. the player is in Creative mode, and therefore not subject to power limits or preconditions
+			 * 	c. the template's power is within budget and it's valid for the sheet in its present condition
+			 */
+			boolean valid = false;
+			if(ModuleTemplates.hasTemplate(sheet, tem.registryName()))
+				valid = true;
+			else if(mc.player.isCreative())
+				valid = true;
+			else if(tem.validFor(sheet, mc.player) && (powerLimit < 0 || (sheetPower + tem.power()) <= powerLimit))
+				valid = true;
+			
+			if(valid)
 				templates.add(tem);
 		});
+		ModuleTemplates templateMod = sheet.module(VTSheetModules.TEMPLATES);
 		templates.sort((a,b) -> 
 		{
-			if(ModuleTemplates.hasTemplate(sheet, a.registryName()) != ModuleTemplates.hasTemplate(sheet, b.registryName()))
-				return ModuleTemplates.hasTemplate(sheet, a.registryName()) ? -1 : 1;
+			// Sort applied templates to the top of the list, in order of application, to make removal easier
+			boolean hasA = templateMod.contains(a.registryName());
+			boolean hasB = templateMod.contains(b.registryName());
+			if(hasA != hasB)
+				return hasA ? -1 : 1;
+			else if(hasA && hasB)
+				return (int)Math.signum(templateMod.index(a.registryName()) - templateMod.index(b.registryName()));
 			else
 				return VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString());
 		});
@@ -194,6 +224,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		templateList.setPosition(speciesList.getX(), speciesList.getY());
 		speciesButton.setPosition(speciesList.getX() + 4, height / 2 - 110);
 		templatesButton.setPosition(speciesButton.getX() + speciesButton.getWidth() + 5, speciesButton.getY());
+		randomButton.setPosition((width + backingSize.x) / 2 - randomButton.getWidth() - 2, speciesButton.getY());
 		
 		confirmButton.setPosition(width / 2 - 150 + 1, height / 2 + 100);
 		previewButton.setPosition(width / 2 - 150 - 1 - previewButton.getWidth(), confirmButton.getY());
@@ -216,7 +247,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		int midY = backgroundHeight / 2;
 		
 		context.drawCenteredTextWithShadow(textRenderer, this.title, (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 100, 0xFFFFFF);
-		context.drawCenteredTextWithShadow(textRenderer, Text.literal(String.valueOf(getScreenHandler().testSheet().power())), (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 90, 0xFFFFFF);
+		context.drawCenteredTextWithShadow(textRenderer, Reference.ModInfo.translate("gui", "power_value", getScreenHandler().testSheet().power( ) + " / " + getScreenHandler().powerLimit), (backgroundWidth / 2) - 150, (backgroundHeight / 2) - 90, 0xFFFFFF);
 		
 		detailObject.ifPresent(detail -> 
 		{

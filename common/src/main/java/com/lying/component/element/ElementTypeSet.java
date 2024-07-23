@@ -20,15 +20,6 @@ public class ElementTypeSet extends TypeSet implements ISheetElement<TypeSet>
 		
 		sheet.modules().forEach(module -> module.affect(this));
 		
-//		// Apply all custom types
-//		// XXX How should custom types be applied? Replace, merge, overrule all, etc.?
-//		if(!sheet.customTypes.isEmpty())
-//			types = sheet.customTypes.copy();
-//		
-//		// Apply templates to types
-//		for(Template template : sheet.getAppliedTemplates())
-//			template.applyTypeOperations(types);
-		
 		if(ofTier(Tier.SUPERTYPE).isEmpty())
 			add(VTTypes.HUMAN.get());
 		
