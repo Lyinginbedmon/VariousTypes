@@ -17,7 +17,7 @@ public class PlayerSheetHandler extends CharacterSheet implements AutoSyncedComp
 	
 	public void writeToNbt(NbtCompound tag, WrapperLookup registryLookup)
 	{
-		super.writeSheetToNbt(tag, registryLookup);
+		super.writeSheetToNbt(tag);
 	}
 	
 	public void readFromNbt(NbtCompound tag, WrapperLookup registryLookup)

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
 import com.lying.ability.AbilityInstance;
@@ -17,6 +19,7 @@ import com.lying.template.Template;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.MutableText;
@@ -29,16 +32,42 @@ public class VTUtilsClient
 	public static final PlayerEntity player = client.player;
 	public static final DynamicRegistryManager manager = player.getRegistryManager();
 	
-	public static void renderDemoEntity(@Nullable PlayerEntity owner, DrawContext context, int mouseX, int mouseY, int renderX, int renderY)
+	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float yaw)
 	{
-		// TODO Exchange for animated biped model using same player skin
-		if(owner == null)
+		if(entity == null)
 			return;
 		
-		int displayWidth = 200;
-		int displayHeight = 200;
 		int size = 80;
-		InventoryScreen.drawEntity(context, renderX - (displayWidth / 2), renderY - (displayHeight / 2), renderX + (displayWidth / 2), renderY + (displayHeight / 2), size, 0.0625f, mouseX, mouseY, owner);
+		float p = entity.getScale();
+		Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
+		Quaternionf quaternionf2 = new Quaternionf().rotateX(0F);
+		quaternionf.mul(quaternionf2);
+		entity.bodyYaw = 180F + yaw * 20F;
+		entity.setYaw(180F + yaw * 40F);
+		entity.setPitch(0F);
+		entity.headYaw = entity.getYaw();
+		entity.prevHeadYaw = entity.getYaw();
+		float q = size / p;
+		InventoryScreen.drawEntity(context, renderX, renderY, q, new Vector3f(0.0f, entity.getHeight() / 2.0f + 0.0625f * p, 0.0f), quaternionf, quaternionf2, entity);
+	}
+	
+	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY)
+	{
+		if(entity == null)
+			return;
+		
+		float yaw;
+		switch(client.options.getMainArm().getValue())
+		{
+			case LEFT:
+				yaw = (float)Math.toRadians(75D);
+				break;
+			case RIGHT:
+			default:
+				yaw = (float)Math.toRadians(-75D);
+				break;
+		}
+		renderDisplayEntity(entity, context, renderX, renderY, yaw);
 	}
 	
 	public static MutableText[] speciesToDetail(Species species)

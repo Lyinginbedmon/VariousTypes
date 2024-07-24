@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
+import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
@@ -31,8 +32,6 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.text.Text;
@@ -44,6 +43,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	private static final Vector2i backingSize = new Vector2i(450, 250);
 	
 	private final PlayerInventory inventory;
+	private Optional<AnimatedPlayerEntity> animatedPlayer = Optional.empty();
 	
 	private Optional<DetailObject> detailObject = Optional.empty();
 	private int scrollAmount = 0;
@@ -61,6 +61,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	{
 		super(handler, inventory, title);
 		this.inventory = inventory;
+		animatedPlayer = Optional.of(AnimatedPlayerEntity.of(mc.player.getGameProfile()));
 	}
 	
 	public boolean shouldCloseOnEsc() { return false; }
@@ -93,7 +94,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		addSelectableChild(speciesList = new SpeciesListWidget(client, (backingSize.x / 3) * 2, 210, 0));
 		VTSpeciesRegistry.instance().getAll().forEach(spec -> 
 		{
-			if(spec.power() <= getScreenHandler().powerLimit)
+			if(getScreenHandler().powerLimit < 0 || spec.power() <= getScreenHandler().powerLimit)
 				speciesList.addEntry(spec, this);
 		});
 		
@@ -103,6 +104,15 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		tabs.put(ActiveElement.SPECIES, Pair.of(speciesButton, speciesList));
 		tabs.put(ActiveElement.TEMPLATES, Pair.of(templatesButton, templateList));
 		setTab(ActiveElement.SPECIES);
+	}
+	
+	protected void handledScreenTick()
+	{
+		animatedPlayer.ifPresent(player -> 
+		{
+			++player.age;
+			player.tick();
+		});
 	}
 	
 	private void setTab(ActiveElement tab)
@@ -234,11 +244,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY)
 	{
-		getScreenHandler().testSheet().getOwner().ifPresent(owner -> 
-		{
-			if(owner.getType() == EntityType.PLAYER)
-				VTUtilsClient.renderDemoEntity((PlayerEntity)owner, context, mouseX, mouseY, (width / 2) - 150, (height / 2));
-		});
+		animatedPlayer.ifPresent(owner -> VTUtilsClient.renderDisplayEntity(owner, context, (width / 2) - 150, (height / 2)));
 	}
 	
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY)

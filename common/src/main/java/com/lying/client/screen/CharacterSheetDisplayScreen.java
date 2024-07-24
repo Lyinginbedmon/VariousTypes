@@ -18,6 +18,7 @@ import org.joml.Vector2i;
 import com.google.common.collect.Lists;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
@@ -64,7 +65,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
 	
 	private CharacterSheet sheet;
-	private Optional<LivingEntity> sheetOwner;
+	private Optional<AnimatedPlayerEntity> animatedPlayer = Optional.empty();
 	private int power;
 	private Optional<OwnerStats> ownerStats;
 	private Optional<Species> species;
@@ -85,11 +86,16 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	public void setCharacterSheet(CharacterSheet sheetIn)
 	{
 		sheet = sheetIn;
-		sheetOwner = sheet.getOwner();
-		if(sheet.getOwner().isPresent())
+		sheet.getOwner().ifPresentOrElse(owner -> 
+		{
+			ownerStats = Optional.of(new OwnerStats(owner));
+			if(owner.getType() == EntityType.PLAYER)
+				animatedPlayer = Optional.of(AnimatedPlayerEntity.of(((PlayerEntity)owner).getGameProfile()));
+		}, () -> 
+		{
 			ownerStats = Optional.of(new OwnerStats(sheet.getOwner().get()));
-		else
-			ownerStats = Optional.empty();
+			animatedPlayer = Optional.empty();
+		});
 		
 		power = sheet.power();
 		species = sheet.module(VTSheetModules.SPECIES).getMaybe();
@@ -160,6 +166,15 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			addActionButton(actions.get(i), offset, deg[i], midX, midY);
 		
 		initializeButtons();
+	}
+	
+	protected void handledScreenTick()
+	{
+		animatedPlayer.ifPresent(player -> 
+		{
+			++player.age;
+			player.tick();
+		});
 	}
 	
 	private ButtonWidget makeAbilityButton(int index, int x, int y)
@@ -268,10 +283,9 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY)
 	{
-		sheetOwner.ifPresent(owner -> 
+		animatedPlayer.ifPresent(player -> 
 		{
-			if(owner.getType() == EntityType.PLAYER)
-				VTUtilsClient.renderDemoEntity((PlayerEntity)owner, context, mouseX, mouseY, width / 2, height / 2);
+			VTUtilsClient.renderDisplayEntity(player, context, width / 2, height / 2);
 		});
 	}
 	
@@ -339,7 +353,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		}
 		
 		// HAS - Health, Armour, Speed
-		// TODO Display current attack damage as well?
+		// XXX Display current attack damage as well?
 		public void render(DrawContext context, int textX, int textY, int iconX, int iconY)
 		{
 			for(Entry<Stat, Integer> entry : stats.entrySet())

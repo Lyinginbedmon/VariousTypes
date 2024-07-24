@@ -10,6 +10,9 @@
     }
   ],
   "Display": {
+    "Description": {
+      "translate": "template.vartypes.winged.desc"
+    },
     "Title": {
       "translate": "template.vartypes.winged"
     }

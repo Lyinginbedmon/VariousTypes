@@ -84,7 +84,6 @@ public class DetailObject
 			return wrapped.stream().map(TooltipComponent::of).collect(Util.toArrayList());
 		}
 		
-		@SuppressWarnings("deprecation")
 		public void render(DrawContext context, int x, int y, int maxEntryWidth)
 		{
 			List<TooltipComponent> entries = getConstrainedEntries(maxEntryWidth);
@@ -93,7 +92,8 @@ public class DetailObject
 			TooltipComponent comp;
 			MatrixStack matrices = context.getMatrices();
 			matrices.push();
-				context.draw(() -> TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y, backgroundWidth, backgroundHeight, 400));
+				context.drawTooltip(textRenderer, Text.empty(), x, y + backgroundHeight / 2);	// XXX Don't ask me why, but backgrounds fail to render promptly w/out this
+				TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y, backgroundWidth, backgroundHeight, 400);
 				matrices.translate(0, 0, 400);
 				int textY = y + (PADDING / 2);
 				int textWidth = (backgroundWidth - PADDING);

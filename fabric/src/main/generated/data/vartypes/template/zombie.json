@@ -15,14 +15,13 @@
     }
   },
   "Operations": [
-    "vartypes:lose_dummy_subtypes",
-    "vartypes:lose_supertypes",
     {
-      "Name": "vartypes:add_types",
+      "Name": "vartypes:set_supertypes",
       "Types": [
         "vartypes:undead"
       ]
     },
+    "vartypes:lose_dummy_subtypes",
     {
       "Ability": "vartypes:natural_armour",
       "Name": "vartypes:add_ability"

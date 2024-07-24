@@ -18,12 +18,15 @@
     }
   },
   "Operations": [
-    "vartypes:lose_supertypes",
     {
-      "Name": "vartypes:add_types",
+      "Name": "vartypes:set_supertypes",
       "Types": [
         "vartypes:undead"
       ]
+    },
+    {
+      "Ability": "vartypes:mending",
+      "Name": "vartypes:add_ability"
     }
   ]
 }

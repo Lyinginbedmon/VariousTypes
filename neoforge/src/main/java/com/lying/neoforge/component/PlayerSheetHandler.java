@@ -17,7 +17,7 @@ public class PlayerSheetHandler extends CharacterSheet implements INBTSerializab
 	
 	public @UnknownNullability NbtCompound serializeNBT(WrapperLookup provider)
 	{
-		return super.writeSheetToNbt(new NbtCompound(), provider);
+		return super.writeSheetToNbt(new NbtCompound());
 	}
 	
 	public void deserializeNBT(WrapperLookup provider, NbtCompound nbt)

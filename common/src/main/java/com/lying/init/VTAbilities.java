@@ -104,7 +104,7 @@ public class VTAbilities
 		{
 			ServerEvents.SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
 			{
-				// Adds the ability to breathe air after it may have been denied by other breathing abilities
+				// Adds the ability to regenerate health after it may have been denied
 				if(!handler.can(Action.REGEN.get()) && abilities.hasAbility(registryName()))
 					handler.activate(Action.REGEN.get());
 			});

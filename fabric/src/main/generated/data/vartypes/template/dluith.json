@@ -15,7 +15,7 @@
   },
   "Operations": [
     {
-      "Name": "vartypes:add_types",
+      "Name": "vartypes:set_supertypes",
       "Types": [
         "vartypes:aduain"
       ]
