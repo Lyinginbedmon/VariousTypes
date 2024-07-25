@@ -66,6 +66,8 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	
 	public boolean shouldCloseOnEsc() { return false; }
 	
+	public boolean shouldPause() { return true; }
+	
 	public void init()
 	{
 		super.init();
@@ -78,7 +80,9 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		
 		addDrawableChild(previewButton = ButtonWidget.builder(translate("gui", "creator_preview"), (button) -> 
 		{
-			mc.setScreen(new CharacterCreationPreviewScreen(getScreenHandler(), inventory, this.title));
+			CharacterCreationPreviewScreen preview = new CharacterCreationPreviewScreen(getScreenHandler(), inventory, this.title);
+			animatedPlayer.ifPresent(character -> preview.setCharacter(character));
+			mc.setScreen(preview);
 		}).dimensions(0, 0, 50, 20).build());
 		
 		addDrawableChild(randomButton = new IconButton(0, 0, 20, 20, button -> 
@@ -104,6 +108,11 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		tabs.put(ActiveElement.SPECIES, Pair.of(speciesButton, speciesList));
 		tabs.put(ActiveElement.TEMPLATES, Pair.of(templatesButton, templateList));
 		setTab(ActiveElement.SPECIES);
+	}
+	
+	public void setCharacter(AnimatedPlayerEntity character)
+	{
+		animatedPlayer = Optional.of(character);
 	}
 	
 	protected void handledScreenTick()
@@ -244,7 +253,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY)
 	{
-		animatedPlayer.ifPresent(owner -> VTUtilsClient.renderDisplayEntity(owner, context, (width / 2) - 150, (height / 2)));
+		animatedPlayer.ifPresent(owner -> VTUtilsClient.renderDisplayEntity(owner, context, (width / 2) - 150, (height / 2), -10F));
 	}
 	
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY)

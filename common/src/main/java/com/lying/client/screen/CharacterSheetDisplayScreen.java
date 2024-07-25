@@ -65,7 +65,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
 	
 	private CharacterSheet sheet;
-	private Optional<AnimatedPlayerEntity> animatedPlayer = Optional.empty();
+	protected Optional<AnimatedPlayerEntity> animatedPlayer = Optional.empty();
 	private int power;
 	private Optional<OwnerStats> ownerStats;
 	private Optional<Species> species;
@@ -108,6 +108,13 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		if(abilities.size() > 1)
 			Collections.sort(abilities, AbilityInstance.sortFunc(REG_MANAGER));
 	}
+	
+	public void setCharacter(AnimatedPlayerEntity character)
+	{
+		animatedPlayer = Optional.of(character);
+	}
+	
+	public boolean shouldPause() { return true; }
 	
 	public void init()
 	{
@@ -285,7 +292,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	{
 		animatedPlayer.ifPresent(player -> 
 		{
-			VTUtilsClient.renderDisplayEntity(player, context, width / 2, height / 2);
+			VTUtilsClient.renderDisplayEntity(player, context, width / 2, height / 2, -7.5F);
 		});
 	}
 	

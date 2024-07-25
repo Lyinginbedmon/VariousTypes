@@ -176,6 +176,7 @@
 	"gui.vartypes.ability_toggled": "Toggled Ability",
 	"gui.vartypes.creator_confirm": "Confirm",
 	"gui.vartypes.creator_preview": "Preview",
+	"gui.vartypes.creator_back": "Back",
 	"gui.vartypes.creator_species": "Species",
 	"gui.vartypes.creator_template": "Templates",
 	"gui.vartypes.creator_set_species": "Click to select %s",

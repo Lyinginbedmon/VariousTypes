@@ -32,7 +32,7 @@ public class VTUtilsClient
 	public static final PlayerEntity player = client.player;
 	public static final DynamicRegistryManager manager = player.getRegistryManager();
 	
-	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float yaw)
+	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float pitch, float yaw)
 	{
 		if(entity == null)
 			return;
@@ -40,18 +40,18 @@ public class VTUtilsClient
 		int size = 80;
 		float p = entity.getScale();
 		Quaternionf quaternionf = new Quaternionf().rotateZ((float)Math.PI);
-		Quaternionf quaternionf2 = new Quaternionf().rotateX(0F);
+		Quaternionf quaternionf2 = new Quaternionf().rotateX((float)Math.toRadians(pitch));
 		quaternionf.mul(quaternionf2);
 		entity.bodyYaw = 180F + yaw * 20F;
 		entity.setYaw(180F + yaw * 40F);
-		entity.setPitch(0F);
+		entity.setPitch(pitch);
 		entity.headYaw = entity.getYaw();
 		entity.prevHeadYaw = entity.getYaw();
 		float q = size / p;
 		InventoryScreen.drawEntity(context, renderX, renderY, q, new Vector3f(0.0f, entity.getHeight() / 2.0f + 0.0625f * p, 0.0f), quaternionf, quaternionf2, entity);
 	}
 	
-	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY)
+	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float pitch)
 	{
 		if(entity == null)
 			return;
@@ -67,7 +67,7 @@ public class VTUtilsClient
 				yaw = (float)Math.toRadians(-75D);
 				break;
 		}
-		renderDisplayEntity(entity, context, renderX, renderY, yaw);
+		renderDisplayEntity(entity, context, renderX, renderY, pitch, yaw);
 	}
 	
 	public static MutableText[] speciesToDetail(Species species)

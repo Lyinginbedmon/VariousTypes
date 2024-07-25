@@ -31,8 +31,8 @@ public class VariousTypesClient
 		
 		ClientsideEntities.init();
 		EntityRendererRegistry.register(ClientsideEntities.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
-		EntityModelLayerRegistry.register(ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(new Dilation(0F), false));
-		EntityModelLayerRegistry.register(ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(new Dilation(0F), true));
+		EntityModelLayerRegistry.register(ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
+		EntityModelLayerRegistry.register(ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
 	}
 	
 	public static enum TextAlign implements StringIdentifiable

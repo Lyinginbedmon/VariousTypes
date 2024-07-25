@@ -26,7 +26,12 @@ public class CharacterCreationPreviewScreen extends CharacterSheetDisplayScreen<
 		
 		int midX = width / 2;
 		int midY = height / 2;
-		addDrawableChild(ButtonWidget.builder(translate("gui", "creator_back"), button -> mc.setScreen(new CharacterCreationEditScreen(getScreenHandler(), this.inventory, this.title))).dimensions(midX - 55, midY - 125, 50, 20).build());
+		addDrawableChild(ButtonWidget.builder(translate("gui", "creator_back"), button -> 
+		{	
+			CharacterCreationEditScreen editor = new CharacterCreationEditScreen(getScreenHandler(), this.inventory, this.title);
+			animatedPlayer.ifPresent(character -> editor.setCharacter(character));
+			mc.setScreen(editor);
+		}).dimensions(midX - 55, midY - 125, 50, 20).build());
 		addDrawableChild(ButtonWidget.builder(translate("gui", "creator_confirm"), button -> 
 		{
 			CharacterCreationEditScreen.confirmCharacterCreation(getScreenHandler());
