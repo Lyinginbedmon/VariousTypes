@@ -5,9 +5,10 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -17,6 +18,8 @@ import net.minecraft.util.StringIdentifiable;
 /** A distinct gameplay-modifying property */
 public class Ability
 {
+	public static final Codec<Ability> CODEC = RecordCodecBuilder.create(instance -> instance.group(Identifier.CODEC.fieldOf("Ability").forGetter(Ability::registryName)).apply(instance, VTAbilities::get));
+	
 	private final Identifier registryName;
 	
 	public Ability(Identifier regName)
@@ -82,7 +85,8 @@ public class Ability
 		TEMPLATE(2),
 		CUSTOM(-1);
 		
-		public static final Codec<AbilitySource> SOURCE = Codec.STRING.comapFlatMap(string -> DataResult.success(AbilitySource.fromName(string)), AbilitySource::asString);
+		@SuppressWarnings("deprecation")
+		public static final StringIdentifiable.EnumCodec<AbilitySource> CODEC = StringIdentifiable.createCodec(AbilitySource::values);
 		
 		private final int priority;
 		

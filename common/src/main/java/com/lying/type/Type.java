@@ -21,8 +21,6 @@ import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -61,11 +59,11 @@ public class Type
 	}
 	
 	/** Returns a comparator for sorting types alphabetically by their display name */
-	public static Comparator<Type> sortFunc(DynamicRegistryManager manager)
+	public static Comparator<Type> sortFunc()
 	{
 		return (a, b) -> 
 			a.tier() == b.tier() ? 
-				VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()) : 
+				VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : 
 				(int)Math.signum(a.tier().ordinal() - b.tier().ordinal());
 	}
 	
@@ -78,7 +76,7 @@ public class Type
 	
 	public final int color() { return this.colour; }
 	
-	public Text displayName(DynamicRegistryManager manager) { return display.title(); }
+	public Text displayName() { return display.title(); }
 	
 	public Optional<Text> description() { return display.description(); }
 	
@@ -108,7 +106,7 @@ public class Type
 	
 	public void read(NbtCompound data) { }
 	
-	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
+	public JsonElement writeToJson()
 	{
 		return new JsonPrimitive(registryName().toString());
 	}

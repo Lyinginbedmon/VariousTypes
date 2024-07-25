@@ -23,7 +23,7 @@ public abstract class ActivatedAbility extends Ability
 		if(!instance.isReadOnly() && canTrigger(owner, instance))
 		{
 			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.success", instance.displayName(owner.getRegistryManager())), true);
+				((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.success", instance.displayName()), true);
 			activate(owner, instance);
 		}
 		else if(owner.getType() == EntityType.PLAYER)

@@ -7,26 +7,44 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.Ability.AbilityType;
 import com.lying.init.VTAbilities;
 import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.StringNbtReader;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 /** A unique instance of a given ability */
 public class AbilityInstance
 {
+	public static final Codec<AbilityInstance> CODEC_VITALS = RecordCodecBuilder.create(instance -> instance.group(
+			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
+			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
+				.apply(instance, (a,b) -> 
+				{
+					AbilityInstance inst = a.instance();
+					b.ifPresent(mem -> inst.setMemory(mem));
+					return inst;
+				}));
+	public static final Codec<AbilityInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
+			AbilitySource.CODEC.fieldOf("Source").forGetter(AbilityInstance::source),
+			Codec.BOOL.optionalFieldOf("ReadOnly").forGetter(AbilityInstance::lockedMaybe),
+			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityInstance::display),
+			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
+				.apply(instance, AbilityInstance::new));
 	private final Ability ability;
 	private final AbilitySource source;
 	private boolean locked = false;
@@ -46,12 +64,21 @@ public class AbilityInstance
 		dataModifier.accept(memory);
 	}
 	
+	protected AbilityInstance(Ability ability, AbilitySource source, Optional<Boolean> isLocked, Optional<LoreDisplay> display, Optional<NbtCompound> memory)
+	{
+		this(ability,source);
+		if(isLocked.isPresent() && isLocked.get())
+			lock();
+		display.ifPresent(dis -> setDisplay(dis));
+		memory.ifPresent(mem -> setMemory(mem));
+	}
+	
 	/** Returns a comparator for sorting abilities alphabetically by their display name */
-	public static Comparator<AbilityInstance> sortFunc(DynamicRegistryManager manager)
+	public static Comparator<AbilityInstance> sortFunc()
 	{
 		return (a, b) -> {
 			int comparison;
-			return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()) : comparison;
+			return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : comparison;
 			};
 	}
 	
@@ -69,122 +96,65 @@ public class AbilityInstance
 		display = Optional.of(new LoreDisplay(component, display.isPresent() ? display.get().description() : Optional.empty()));
 	}
 	
-	public Text displayName(DynamicRegistryManager world)
+	public Text displayName()
 	{
 		if(display.isPresent())
 			return display.get().title();
 		return ability.displayName(this);
 	}
 	
-	public Optional<Text> description(DynamicRegistryManager world)
+	public Optional<Text> description()
 	{
-		if(display.isPresent())
-		{
-			LoreDisplay lore = display.get();
-			if(lore.description().isPresent())
-				return lore.description();
-		}
+		if(display.isPresent() && display.get().description().isPresent())
+			return display.get().description();
 		return ability.description(this);
 	}
 	
-	public NbtCompound writeToNbt(NbtCompound compound, WrapperLookup manager)
+	public NbtElement writeToNbt(NbtCompound compound)
 	{
-		compound.putString("Ability", ability.registryName().toString());
-		compound.putString("Source", source.asString());
-		
-		if(display.isPresent())
-			compound.putString("Display", display.get().toJson(manager).toString());
-		
-		if(isReadOnly())
-			compound.putBoolean("ReadOnly", true);
-		
-		if(!memory().isEmpty())
-			compound.put("Memory", memory);
-		
-		return compound;
+		return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
 	}
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
-		JsonObject json = new JsonObject();
-		json.addProperty("Name", ability.registryName().toString());
-		if(!vitalOnly)
-		{
-			json.addProperty("Source", source.asString());
-			if(!display.isEmpty())
-				json.add("Display", display.get().toJson(manager));
-			if(isReadOnly())
-				json.addProperty("ReadOnly", true);
-		}
-		if(!memory.isEmpty())
-			json.addProperty("Memory", memory.toString());
-		
-		if(json.size() == 1)
+		if(vitalOnly && memoryMaybe().isEmpty())
 			return new JsonPrimitive(ability.registryName().toString());
-		return json;
+		
+		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
+		Codec<AbilityInstance> codec = vitalOnly ? CODEC_VITALS : CODEC;
+		return codec.encodeStart(registryOps, this).getOrThrow();
 	}
 	
 	@Nullable
 	public static AbilityInstance readFromNbt(NbtCompound data)
 	{
-		Ability ability = data.contains("Ability", NbtElement.STRING_TYPE) ? VTAbilities.get(new Identifier(data.getString("Ability"))) : null;
-		if(ability == null)
-			return null;
-		
-		AbilitySource source = AbilitySource.fromName(data.getString("Source"));
-		AbilityInstance instance = ability.instance(source);
-		
-//		if(data.contains("Display", NbtElement.COMPOUND_TYPE))
-//			instance.setDisplay(new JsonObject(data.getString("Display")));	// FIXME Identify nbt -> JSON to load LoreDisplay
-		
-		if(data.contains("ReadOnly") && data.getBoolean("ReadOnly"))
-			instance.lock();
-		
-		if(data.contains("Memory", NbtElement.COMPOUND_TYPE))
-			instance.setMemory(data.getCompound("Memory"));
-		
-		return instance;
+		return CODEC.parse(NbtOps.INSTANCE, data).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 	}
 	
 	public static AbilityInstance readFromJson(JsonElement element, AbilitySource forceSource)
 	{
-		if(element.isJsonObject())
-		{
-			JsonObject data = element.getAsJsonObject();
-			if(!data.has("Name"))
-				throw new NullPointerException();
-			
-			Ability ability = VTAbilities.get(new Identifier(data.get("Name").getAsString()));
-			
-			AbilitySource source = forceSource == null ? AbilitySource.fromName(data.get("Source").getAsString()) : forceSource;
-			AbilityInstance instance = ability.instance(source);
-			
-			if(data.has("Display"))
-				instance.display = Optional.of(LoreDisplay.fromJson(data.get("Display")));
-			
-			if(data.has("ReadOnly") && data.get("ReadOnly").getAsBoolean())
-				instance.lock();
-			
-			if(data.has("Memory"))
-				instance.memory = tryParseNbt(data.get("Memory"));
-			
-			return instance;
-		}
-		else
+		if(element.isJsonPrimitive())
 		{
 			Ability ability = VTAbilities.get(new Identifier(element.getAsString()));
 			AbilitySource source = forceSource == null ? AbilitySource.MISC : forceSource;
 			return ability.instance(source);
 		}
-	}
-	
-	private static NbtCompound tryParseNbt(JsonElement element)
-	{
-		try
+		else if(element.isJsonObject())
 		{
-			return StringNbtReader.parse(element.getAsString());
+			AbilityInstance inst = CODEC.parse(JsonOps.INSTANCE, element.getAsJsonObject()).getOrThrow();
+			if(forceSource != null && forceSource != inst.source())
+			{
+				AbilityInstance inst2 = inst.ability().instance(forceSource);
+				inst.memoryMaybe().ifPresent(mem -> inst2.setMemory(mem));
+				inst.lockedMaybe().ifPresent(lock -> inst2.lock());
+				inst.display().ifPresent(dis -> inst2.setDisplay(dis));
+				return inst2;
+			}
+			else
+				return inst;
 		}
-		catch(Exception e) { return new NbtCompound(); }
+		else
+			return VTAbilities.DUMMY.get().instance();
 	}
 	
 	/**
@@ -192,6 +162,8 @@ public class AbilityInstance
 	 * This usually indicates that it is a default model not to be directly utilised.
 	 */
 	public boolean isReadOnly() { return locked; }
+	
+	protected Optional<Boolean> lockedMaybe() { return locked ? Optional.of(locked) : Optional.empty(); }
 	
 	public AbilityInstance lock()
 	{
@@ -202,6 +174,11 @@ public class AbilityInstance
 	public Ability ability() { return ability; }
 	
 	public NbtCompound memory() { return memory; }
+	
+	protected Optional<NbtCompound> memoryMaybe()
+	{
+		return memory.isEmpty() ? Optional.empty() : Optional.of(memory);
+	}
 	
 	public void setMemory(NbtCompound dataIn)
 	{

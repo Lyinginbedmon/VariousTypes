@@ -94,7 +94,7 @@ public class CharacterSheet
 		NbtList listE = new NbtList();
 		elements.values().forEach(element -> 
 		{
-			NbtCompound data = element.writeToNbt(new NbtCompound(), owner.get().getRegistryManager());
+			NbtCompound data = element.writeToNbt(new NbtCompound());
 			if(!data.isEmpty())
 			{
 				data.putString("RegistryName", element.registry().registryName().toString());

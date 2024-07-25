@@ -14,7 +14,6 @@ import com.lying.type.TypeSet;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -30,7 +29,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 			types.add(type);
 	}
 	
-	public Text describe(DynamicRegistryManager manager) { return Reference.ModInfo.translate("precondition", registryName.getPath(), VTUtils.listToString(types, type -> type.displayName(manager), ", ")); }
+	public Text describe() { return Reference.ModInfo.translate("precondition", registryName.getPath(), VTUtils.listToString(types, type -> type.displayName(), ", ")); }
 	
 	public boolean isValidFor(CharacterSheet sheet, LivingEntity owner)
 	{
@@ -40,7 +39,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
-		types.forEach(type -> list.add(type.writeToJson(manager)));
+		types.forEach(type -> list.add(type.writeToJson()));
 		data.add("Types", list);
 		return data;
 	}

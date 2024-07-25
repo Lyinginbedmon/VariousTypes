@@ -13,10 +13,11 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 public class DummyType extends Type
@@ -44,10 +45,10 @@ public class DummyType extends Type
 	
 	public Identifier listID() { return listID; }
 	
-	protected void write(NbtCompound compound, DynamicRegistryManager manager)
+	protected void write(NbtCompound compound)
 	{
 		compound.putString("ID", listID.toString());
-		compound.putString("DisplayName", Text.Serialization.toJsonString(displayName(manager), manager));
+		compound.put("DisplayName", TextCodecs.CODEC.encodeStart(NbtOps.INSTANCE, displayName()).getOrThrow());
 	}
 	
 	public void read(NbtCompound compound)
@@ -56,7 +57,7 @@ public class DummyType extends Type
 		data = compound;
 	}
 	
-	public Text displayName(DynamicRegistryManager manager) { return display.title(); }
+	public Text displayName() { return display.title(); }
 	
 	public Optional<Text> description() { return display.description(); }
 	

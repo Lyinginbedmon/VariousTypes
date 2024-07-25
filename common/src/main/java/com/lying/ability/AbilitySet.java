@@ -16,7 +16,6 @@ import com.lying.ability.Ability.AbilityType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of ability instances */
@@ -121,10 +120,10 @@ public class AbilitySet
 		return abilities;
 	}
 	
-	public NbtList writeToNbt(WrapperLookup manager)
+	public NbtList writeToNbt()
 	{
 		NbtList list = new NbtList();
-		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound(), manager)));
+		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound())));
 		return list;
 	}
 	

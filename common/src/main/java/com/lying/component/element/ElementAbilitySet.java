@@ -8,7 +8,6 @@ import com.lying.type.TypeSet;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.DynamicRegistryManager;
 
 public class ElementAbilitySet extends AbilitySet implements ISheetElement<AbilitySet>
 {
@@ -18,9 +17,9 @@ public class ElementAbilitySet extends AbilitySet implements ISheetElement<Abili
 	
 	public static AbilitySet getActivated(CharacterSheet sheet) { return ((ElementAbilitySet)sheet.element(VTSheetElements.ABILITES)).activated(); }
 	
-	public NbtCompound writeToNbt(NbtCompound nbt, DynamicRegistryManager manager)
+	public NbtCompound writeToNbt(NbtCompound nbt)
 	{
-		nbt.put("Activated", activated.writeToNbt(manager));
+		nbt.put("Activated", activated.writeToNbt());
 		return nbt;
 	}
 	

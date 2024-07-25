@@ -20,7 +20,6 @@ import com.lying.type.Type;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -95,9 +94,9 @@ public class VTUtils
 		return describe(spec.displayName(), spec.registryName(), spec.display().description());
 	}
 	
-	public static Text describeType(Type type, DynamicRegistryManager manager)
+	public static Text describeType(Type type)
 	{
-		return describe(type.displayName(manager), type.listID(), Optional.empty());
+		return describe(type.displayName(), type.listID(), Optional.empty());
 	}
 	
 	private static Text describe(Text display, Identifier regName, Optional<Text> desc)

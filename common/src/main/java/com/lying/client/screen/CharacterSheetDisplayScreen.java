@@ -44,7 +44,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -55,7 +54,6 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 {
 	public static final MinecraftClient mc = MinecraftClient.getInstance();
 	public static final PlayerEntity PLAYER = mc.player;
-	public static final DynamicRegistryManager REG_MANAGER = PLAYER.getRegistryManager();
 	
 	private Optional<DetailObject> detailObject = Optional.empty();
 	private int scrollAmount = 0;
@@ -106,7 +104,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden();
 		abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
 		if(abilities.size() > 1)
-			Collections.sort(abilities, AbilityInstance.sortFunc(REG_MANAGER));
+			Collections.sort(abilities, AbilityInstance.sortFunc());
 	}
 	
 	public void setCharacter(AnimatedPlayerEntity character)
@@ -125,10 +123,10 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		int spacing = 100;
 		
 		int leftX = midX - spacing;
-		addDrawableChild(typeButton = new TypeButtonWidget(leftX - 45 - 22, midY - 90, types.ofTier(Tier.SUPERTYPE).stream().findFirst().get().displayName(REG_MANAGER), (button) -> 
+		addDrawableChild(typeButton = new TypeButtonWidget(leftX - 45 - 22, midY - 90, types.ofTier(Tier.SUPERTYPE).stream().findFirst().get().displayName(), (button) -> 
 		{
 			List<Type> typeList = types.contents();
-			typeList.sort(Type.sortFunc(REG_MANAGER));
+			typeList.sort(Type.sortFunc());
 			setDetail(VTUtilsClient.listToDetail(typeList, this::typeToDetail));
 			setFocused(null);
 		}));
@@ -227,7 +225,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	{
 		Type supertype = types.ofTier(Tier.SUPERTYPE).stream().findFirst().get();
 		typeButton.updateSupertype(supertype);
-		typeButton.setTooltip(Tooltip.of(types.display(REG_MANAGER)));
+		typeButton.setTooltip(Tooltip.of(types.display()));
 		
 		speciesButton.active = species.isPresent();
 		if(species.isPresent())
@@ -261,7 +259,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			if(index >= abilities.size())
 				button.setMessage(Text.empty());
 			else
-				button.setMessage(abilities.get(index).displayName(REG_MANAGER));
+				button.setMessage(abilities.get(index).displayName());
 		}
 	}
 	
@@ -333,12 +331,12 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private MutableText[] typeToDetail(Type type)
 	{
 		List<MutableText> entries = Lists.newArrayList();
-		entries.add(type.displayName(REG_MANAGER).copy().formatted(Formatting.BOLD));
+		entries.add(type.displayName().copy().formatted(Formatting.BOLD));
 		type.description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
 		type.abilities().forEach(inst -> 
 		{
 			if(!inst.ability().isHidden(inst))
-				entries.add(Text.literal(" * ").append(inst.displayName(REG_MANAGER)));
+				entries.add(Text.literal(" * ").append(inst.displayName()));
 		});
 		if(client.options.advancedItemTooltips || PLAYER.isCreative())
 			entries.add(Text.literal(type.listID().toString()).copy().formatted(Formatting.DARK_GRAY));

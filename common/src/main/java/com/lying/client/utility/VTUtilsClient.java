@@ -21,7 +21,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -30,7 +29,6 @@ public class VTUtilsClient
 {
 	public static final MinecraftClient client = MinecraftClient.getInstance();
 	public static final PlayerEntity player = client.player;
-	public static final DynamicRegistryManager manager = player.getRegistryManager();
 	
 	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float pitch, float yaw)
 	{
@@ -74,11 +72,11 @@ public class VTUtilsClient
 	{
 		List<MutableText> entries = Lists.newArrayList();
 		entries.add(species.displayName().copy().formatted(Formatting.BOLD));
-		entries.add(species.types().display(manager).copy());
+		entries.add(species.types().display().copy());
 		species.display().description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
 		if(species.power() != 0)
 			entries.add(translate("gui", "power_value", species.power()).copy());
-		species.abilities().allNonHidden().forEach(inst -> entries.add(Text.literal(" * ").append(inst.displayName(manager))));
+		species.abilities().allNonHidden().forEach(inst -> entries.add(Text.literal(" * ").append(inst.displayName())));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(species.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);
@@ -94,12 +92,12 @@ public class VTUtilsClient
 		if(player.isCreative() && !template.preconditions().isEmpty())
 		{
 			entries.add(translate("gui", "preconditions").copy());
-			template.preconditions().forEach(pc -> entries.add(Text.literal(" - ").append(pc.describe(manager).copy().formatted(Formatting.GRAY))));
+			template.preconditions().forEach(pc -> entries.add(Text.literal(" - ").append(pc.describe().copy().formatted(Formatting.GRAY))));
 		}
 		if(!template.operations().isEmpty())
 		{
 			entries.add(translate("gui", "operations").copy());
-			template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe(manager).copy().formatted(Formatting.GRAY))));
+			template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe().copy().formatted(Formatting.GRAY))));
 		}
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(template.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
@@ -109,9 +107,9 @@ public class VTUtilsClient
 	public static  MutableText[] abilityToDetail(AbilityInstance instance)
 	{
 		List<MutableText> entries = Lists.newArrayList();
-		entries.add(instance.displayName(manager).copy().formatted(Formatting.BOLD));
+		entries.add(instance.displayName().copy().formatted(Formatting.BOLD));
 		entries.add(instance.ability().type().translate().copy());
-		instance.description(manager).ifPresent(text -> entries.add(text.copy().formatted(Formatting.GRAY)));
+		instance.description().ifPresent(text -> entries.add(text.copy().formatted(Formatting.GRAY)));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(instance.mapName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);

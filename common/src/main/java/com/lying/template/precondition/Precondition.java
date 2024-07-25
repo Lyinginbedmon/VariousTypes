@@ -18,7 +18,6 @@ import com.lying.reference.Reference.ModInfo;
 import com.lying.type.TypeSet;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -67,7 +66,7 @@ public abstract class Precondition
 		this.registryName = idIn;
 	}
 	
-	public Text describe(DynamicRegistryManager manager) { return Reference.ModInfo.translate("precondition", registryName.getPath()); }
+	public Text describe() { return Reference.ModInfo.translate("precondition", registryName.getPath()); }
 	
 	public abstract boolean isValidFor(CharacterSheet sheet, LivingEntity owner);
 	

@@ -92,7 +92,7 @@ public class DetailObject
 			TooltipComponent comp;
 			MatrixStack matrices = context.getMatrices();
 			matrices.push();
-				context.drawTooltip(textRenderer, Text.empty(), x, y + backgroundHeight / 2);	// XXX Don't ask me why, but backgrounds fail to render promptly w/out this
+				context.drawTooltip(textRenderer, Text.empty(), x + 0xFFFFFF, y);	// XXX Don't ask me why, but backgrounds fail to render promptly w/out this
 				TooltipBackgroundRenderer.render(context, x - backgroundWidth / 2, y, backgroundWidth, backgroundHeight, 400);
 				matrices.translate(0, 0, 400);
 				int textY = y + (PADDING / 2);

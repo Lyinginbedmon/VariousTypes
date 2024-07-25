@@ -6,7 +6,6 @@ import com.lying.type.Type;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
-import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -47,9 +46,9 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe(DynamicRegistryManager manager)
+		public Text describe()
 		{
-			return Text.translatable("operation.vartypes.add_types", types.asNameList(manager));
+			return Text.translatable("operation.vartypes.add_types", types.asNameList());
 		}
 		
 		public static Add of(Type... typesIn) { return new Add(Operation.ADD_TYPES.get().registryName(), typesIn); }
@@ -67,9 +66,9 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe(DynamicRegistryManager manager)
+		public Text describe()
 		{
-			return Text.translatable("operation.vartypes.lose_types", types.asNameList(manager));
+			return Text.translatable("operation.vartypes.lose_types", types.asNameList());
 		}
 		
 		public static Remove of(Type... typesIn) { return new Remove(Operation.REMOVE_TYPES.get().registryName(), typesIn); }
@@ -87,9 +86,9 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe(DynamicRegistryManager manager)
+		public Text describe()
 		{
-			return Text.translatable("operation.vartypes.set_types", types.display(manager));
+			return Text.translatable("operation.vartypes.set_types", types.display());
 		}
 		
 		public static Set of(Type... typesIn) { return new Set(Operation.SET_TYPES.get().registryName(), typesIn); }
@@ -108,9 +107,9 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe(DynamicRegistryManager manager)
+		public Text describe()
 		{
-			return Text.translatable("operation.vartypes.set_supertypes", types.asNameList(manager));
+			return Text.translatable("operation.vartypes.set_supertypes", types.asNameList());
 		}
 		
 		public static SetSupertypes of(Type... typesIn) { return new SetSupertypes(Operation.SET_SUPERTYPES.get().registryName(), typesIn); }
