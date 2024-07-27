@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
@@ -19,8 +18,12 @@ import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -31,6 +34,20 @@ import net.minecraft.util.Identifier;
  */
 public class Type
 {
+	public static final Codec<Type> CODEC = Identifier.CODEC.comapFlatMap(id -> 
+			{
+				Type ability = VTTypes.get(id);
+				if(ability != null)
+					return DataResult.success(ability);
+				else
+					return DataResult.error(() -> "Not a recognised type: '"+String.valueOf(id) + "'");
+			}, Type::registryName).stable();
+	
+	/** Comparator for sorting types alphabetically by their display name */
+	public static final Comparator<Type> SORT_FUNC = (a, b) -> 
+		a.tier() == b.tier() ? 
+			VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : 
+			(int)Math.signum(a.tier().ordinal() - b.tier().ordinal());
 	public static final int DEFAULT_COLOR = 0x236EF5;
 	
 	protected final Identifier registryName;
@@ -56,15 +73,6 @@ public class Type
 		actions = actionsIn.copy();
 		abilities = abilitiesIn.copy();
 		compatibilityCheck = compIn;
-	}
-	
-	/** Returns a comparator for sorting types alphabetically by their display name */
-	public static Comparator<Type> sortFunc()
-	{
-		return (a, b) -> 
-			a.tier() == b.tier() ? 
-				VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : 
-				(int)Math.signum(a.tier().ordinal() - b.tier().ordinal());
 	}
 	
 	public final Identifier registryName() { return registryName; }
@@ -106,9 +114,9 @@ public class Type
 	
 	public void read(NbtCompound data) { }
 	
-	public JsonElement writeToJson()
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
-		return new JsonPrimitive(registryName().toString());
+		return CODEC.encodeStart(JsonOps.INSTANCE, this).getOrThrow();
 	}
 	
 	@Nullable

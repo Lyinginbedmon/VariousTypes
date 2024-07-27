@@ -169,8 +169,8 @@
 	"gui.vartypes.no_character_sheet": "%s has no character sheet to view",
 	"gui.vartypes.typeset": "%s (%s)",
 	"gui.vartypes.templates": "%s templates",
-	"gui.vartypes.activated_ability.success": "Used ability: %s",
-	"gui.vartypes.activated_ability.failed": "You can't use that right now",
+	"gui.vartypes.activated_ability.success": "Used [%s]",
+	"gui.vartypes.activated_ability.failed": "You can't use %s right now",
 	"gui.vartypes.ability_passive": "Passive Ability",
 	"gui.vartypes.ability_activated": "Activated Ability",
 	"gui.vartypes.ability_toggled": "Toggled Ability",
@@ -182,5 +182,17 @@
 	"gui.vartypes.creator_set_species": "Click to select %s",
 	"gui.vartypes.creator_add_template": "Click to add %s",
 	"gui.vartypes.creator_remove_template": "Click to remove %s",
-	"gui.vartypes.power_value": "Power %s"
+	"gui.vartypes.power_value": "Power %s",
+	"gui.vartypes.no_abilities_to_activate": "You don't have any abilities to activate",
+	"gui.vartypes.no_ability_favourited": "You have no ability assigned to that slot",
+	"gui.vartypes.set_favourite": "Left-click to set favourite",
+	"gui.vartypes.clear_held_ability": "Click to clear",
+	"gui.vartypes.clear_favourite": "Right-click to clear",
+	// Keybinds
+	"category.vartypes.keybindings": "Various Types",
+	"key.vartypes.open_abilities": "Open ability menu",
+	"key.vartypes.use_fav_ability_1": "Activate favourited ability 1",
+	"key.vartypes.use_fav_ability_2": "Activate favourited ability 2",
+	"key.vartypes.use_fav_ability_3": "Activate favourited ability 3",
+	"key.vartypes.use_fav_ability_4": "Activate favourited ability 4"
 }

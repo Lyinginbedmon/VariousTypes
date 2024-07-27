@@ -104,7 +104,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden();
 		abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
 		if(abilities.size() > 1)
-			Collections.sort(abilities, AbilityInstance.sortFunc());
+			Collections.sort(abilities, AbilityInstance.SORT_FUNC);
 	}
 	
 	public void setCharacter(AnimatedPlayerEntity character)
@@ -126,7 +126,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		addDrawableChild(typeButton = new TypeButtonWidget(leftX - 45 - 22, midY - 90, types.ofTier(Tier.SUPERTYPE).stream().findFirst().get().displayName(), (button) -> 
 		{
 			List<Type> typeList = types.contents();
-			typeList.sort(Type.sortFunc());
+			typeList.sort(Type.SORT_FUNC);
 			setDetail(VTUtilsClient.listToDetail(typeList, this::typeToDetail));
 			setFocused(null);
 		}));

@@ -13,11 +13,9 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 public class DummyType extends Type
@@ -29,13 +27,13 @@ public class DummyType extends Type
 	
 	protected NbtCompound data = new NbtCompound();
 	protected Identifier listID;
-	protected LoreDisplay display;
+	protected LoreDisplay customDisplay;
 	
 	protected DummyType(Identifier nameIn, Identifier listIDIn, LoreDisplay displayIn)
 	{
 		super(nameIn, new AbilitySet(), ActionHandler.NONE, Predicates.alwaysTrue(), new LoreDisplay());
 		listID = listIDIn;
-		display = displayIn;
+		customDisplay = displayIn;
 	}
 	
 	public static DummyType create(Identifier listID, LoreDisplay displayIn)
@@ -48,20 +46,20 @@ public class DummyType extends Type
 	protected void write(NbtCompound compound)
 	{
 		compound.putString("ID", listID.toString());
-		compound.put("DisplayName", TextCodecs.CODEC.encodeStart(NbtOps.INSTANCE, displayName()).getOrThrow());
+		compound.put("Display", customDisplay.writeNbt());
 	}
 	
 	public void read(NbtCompound compound)
 	{
 		listID = new Identifier(data.getString("ID"));
-		data = compound;
+		customDisplay = LoreDisplay.fromNbt(compound.getCompound("Display"));
 	}
 	
-	public Text displayName() { return display.title(); }
+	public Text displayName() { return customDisplay.title(); }
 	
-	public Optional<Text> description() { return display.description(); }
+	public Optional<Text> description() { return customDisplay.description(); }
 	
-	public LoreDisplay display() { return display; }
+	public LoreDisplay display() { return customDisplay; }
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{

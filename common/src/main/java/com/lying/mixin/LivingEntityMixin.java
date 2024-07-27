@@ -125,7 +125,11 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$baseTickHead(final CallbackInfo ci)
 	{
 		LivingEntity living = (LivingEntity)(Object)this;
-		VariousTypes.getSheet(living).ifPresent(sheet -> ((EntityMixin)(Object)living).shouldSkipAir = true);
+		VariousTypes.getSheet(living).ifPresent(sheet -> 
+		{
+			((EntityMixin)(Object)living).shouldSkipAir = true;
+			sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).tick(living);
+		});
 	}
 	
 	@Inject(method = "baseTick()V", at = @At("TAIL"))
@@ -233,7 +237,7 @@ public class LivingEntityMixin extends EntityMixin
 		{
 			CharacterSheet sheet = sheetOpt.get();
 			final StatusEffectInstance actual = activeStatusEffects.get(effect);
-			return ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, (LivingEntity)(Object)this, sheet.element(VTSheetElements.ABILITES), actual);
+			return ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, (LivingEntity)(Object)this, sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES), actual);
 		}
 		return spoofed;
 	}

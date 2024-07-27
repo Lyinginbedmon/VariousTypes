@@ -1,14 +1,16 @@
 package com.lying.ability;
 
+import com.lying.VariousTypes;
+
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class ToggledAbility extends ActivatedAbility
 {
-	public ToggledAbility(Identifier regName)
+	public ToggledAbility(Identifier regName, Category catIn)
 	{
-		super(regName);
+		super(regName, catIn);
 	}
 	
 	public AbilityType type() { return AbilityType.TOGGLED; }
@@ -24,6 +26,7 @@ public class ToggledAbility extends ActivatedAbility
 		NbtCompound mem = instance.memory();
 		mem.putBoolean("IsActive", !isActive(instance));
 		instance.setMemory(mem);
+		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.markDirty());
 		
 		if(isActive(instance))
 			onActivation(owner, instance);

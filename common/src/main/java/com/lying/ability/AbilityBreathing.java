@@ -24,7 +24,7 @@ public abstract class AbilityBreathing extends Ability
 	
 	public AbilityBreathing(Identifier regName, BiConsumer<ActionHandler, AbilityInstance> func)
 	{
-		super(regName);
+		super(regName, Category.UTILITY);
 		this.applyFunc = func;
 	}
 	

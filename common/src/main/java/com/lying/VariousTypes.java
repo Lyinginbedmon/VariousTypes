@@ -16,7 +16,10 @@ import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
+import com.lying.network.ActivateAbilityReceiver;
 import com.lying.network.FinishCharacterCreationReceiver;
+import com.lying.network.OpenAbilityMenuReceiver;
+import com.lying.network.SetFavouriteAbilityReceiver;
 import com.lying.network.VTPacketHandler;
 import com.lying.reference.Reference;
 import com.lying.utility.ServerBus;
@@ -56,6 +59,9 @@ public class VariousTypes
     	ServerBus.init();
     	
     	NetworkManager.registerReceiver(NetworkManager.Side.C2S, VTPacketHandler.FINISH_CHARACTER_ID, new FinishCharacterCreationReceiver());
+    	NetworkManager.registerReceiver(NetworkManager.Side.C2S, VTPacketHandler.OPEN_ABILITY_MENU_ID, new OpenAbilityMenuReceiver());
+    	NetworkManager.registerReceiver(NetworkManager.Side.C2S, VTPacketHandler.SET_FAVOURITE_ABILITY_ID, new SetFavouriteAbilityReceiver());
+    	NetworkManager.registerReceiver(NetworkManager.Side.C2S, VTPacketHandler.ACTIVATE_ABILITY_ID, new ActivateAbilityReceiver());
     }
     
     public static void setPlatHandler(XPlatHandler handler) { HANDLER = handler; }
@@ -76,5 +82,11 @@ public class VariousTypes
     {
     	if(entity != null && sheet != null)
     		HANDLER.setSheet(entity, sheet);
+    }
+    
+    public static void syncSheet(LivingEntity entity)
+    {
+    	if(entity != null)
+    		HANDLER.syncSheet(entity);
     }
 }

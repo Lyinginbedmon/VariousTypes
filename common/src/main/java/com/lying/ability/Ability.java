@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.serialization.DataResult;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
@@ -18,17 +18,28 @@ import net.minecraft.util.StringIdentifiable;
 /** A distinct gameplay-modifying property */
 public class Ability
 {
-	public static final Codec<Ability> CODEC = RecordCodecBuilder.create(instance -> instance.group(Identifier.CODEC.fieldOf("Ability").forGetter(Ability::registryName)).apply(instance, VTAbilities::get));
+	public static final Codec<Ability> CODEC = Identifier.CODEC.comapFlatMap(id -> 
+			{
+				Ability ability = VTAbilities.get(id);
+				if(ability != null)
+					return DataResult.success(ability);
+				else
+					return DataResult.error(() -> "Not a registered ability: '"+String.valueOf(id) + "'");
+			}, Ability::registryName).stable();
 	
 	private final Identifier registryName;
+	private final Category category;
 	
-	public Ability(Identifier regName)
+	public Ability(Identifier regName, Category catIn)
 	{
 		registryName = regName;
+		category = catIn;
 	}
 	
 	/** Returns what type of ability this is */
 	public AbilityType type() { return AbilityType.PASSIVE; }
+	
+	public Identifier iconTexture() { return category.icon(); }
 	
 	public final AbilityInstance instance() { return instance(AbilitySource.MISC); }
 	
@@ -106,5 +117,14 @@ public class Ability
 		}
 		
 		public boolean overrules(AbilitySource other) { return other.priority >= priority; }
+	}
+	
+	public static enum Category
+	{
+		OFFENSE,
+		DEFENSE,
+		UTILITY;
+		
+		public Identifier icon() { return Reference.ModInfo.prefix("textures/gui/ability_"+name().toLowerCase()+".png"); }
 	}
 }

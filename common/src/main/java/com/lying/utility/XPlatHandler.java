@@ -15,4 +15,9 @@ public interface XPlatHandler
 	
 	/** Sets the character sheet of the given entity to be identical to the given character sheet */
 	public void setSheet(LivingEntity entity, CharacterSheet sheet);
+	
+	public default void syncSheet(LivingEntity entity)
+	{
+		getSheet(entity).ifPresent(sheet -> setSheet(entity, sheet));
+	}
 }

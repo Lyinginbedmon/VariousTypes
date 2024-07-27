@@ -1,6 +1,5 @@
 package com.lying.type;
 
-import static com.lying.reference.Reference.ModInfo.translate;
 import static com.lying.utility.VTUtils.listToString;
 
 import java.util.Collection;
@@ -15,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
+import com.lying.reference.Reference;
 import com.lying.type.Type.Tier;
 
 import net.minecraft.nbt.NbtCompound;
@@ -51,19 +51,19 @@ public class TypeSet
 					vars[tier.ordinal()] = types.get(0).displayName().copy();
 					break;
 				default:
-					Collections.sort(types, Type.sortFunc());
+					Collections.sort(types, Type.SORT_FUNC);
 					vars[tier.ordinal()] = listToString(types, type -> type.displayName(), tier.ordinal() == 0 ? " " : ", ");
 					break;
 			}
 		}
 		
-		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : translate("gui", "typeset", vars);
+		return vars[Tier.SUBTYPE.ordinal()] == null ? vars[Tier.SUPERTYPE.ordinal()] : Reference.ModInfo.translate("gui", "typeset", vars);
 	}
 	
 	public Text asNameList()
 	{
 		List<Type> typeList = contents();
-		typeList.sort(Type.sortFunc());
+		typeList.sort(Type.SORT_FUNC);
 		
 		MutableText name = null;
 		if(typeList.isEmpty())
@@ -112,7 +112,7 @@ public class TypeSet
 	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
-		types.forEach(inst -> list.add(inst.writeToJson()));
+		types.forEach(inst -> list.add(inst.writeToJson(manager)));
 		return list;
 	}
 	

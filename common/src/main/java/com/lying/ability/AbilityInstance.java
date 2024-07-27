@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.Ability.AbilityType;
@@ -29,25 +28,38 @@ import net.minecraft.util.Identifier;
 /** A unique instance of a given ability */
 public class AbilityInstance
 {
+	/** Used for storing the absolute bare minimum operational information only */
 	public static final Codec<AbilityInstance> CODEC_VITALS = RecordCodecBuilder.create(instance -> instance.group(
 			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
+			Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityInstance::cooldownMaybe),
 			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
-				.apply(instance, (a,b) -> 
+				.apply(instance, (a,b,c) -> 
 				{
 					AbilityInstance inst = a.instance();
-					b.ifPresent(mem -> inst.setMemory(mem));
+					b.ifPresent(val -> inst.cooldown = Optional.of(Math.abs(val)));
+					c.ifPresent(mem -> inst.memory = mem);
 					return inst;
 				}));
+	/** Used for storing absolutely everything about an AbilityInstance */
 	public static final Codec<AbilityInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
 			AbilitySource.CODEC.fieldOf("Source").forGetter(AbilityInstance::source),
+			Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityInstance::cooldownMaybe),
 			Codec.BOOL.optionalFieldOf("ReadOnly").forGetter(AbilityInstance::lockedMaybe),
 			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityInstance::display),
 			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
 				.apply(instance, AbilityInstance::new));
+	
+	/** Comparator for sorting abilities alphabetically by their display name */
+	public static final Comparator<AbilityInstance> SORT_FUNC = (a,b) -> {
+		int comparison;
+		return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : comparison;
+		};
+	
 	private final Ability ability;
 	private final AbilitySource source;
 	private boolean locked = false;
+	private Optional<Integer> cooldown = Optional.empty();
 	private Optional<LoreDisplay> display = Optional.empty();
 	private NbtCompound memory;
 	
@@ -64,22 +76,14 @@ public class AbilityInstance
 		dataModifier.accept(memory);
 	}
 	
-	protected AbilityInstance(Ability ability, AbilitySource source, Optional<Boolean> isLocked, Optional<LoreDisplay> display, Optional<NbtCompound> memory)
+	protected AbilityInstance(Ability ability, AbilitySource source, Optional<Integer> cool, Optional<Boolean> isLocked, Optional<LoreDisplay> display, Optional<NbtCompound> memory)
 	{
 		this(ability,source);
+		cool.ifPresent(val -> cooldown = Optional.of(Math.abs(val)));
 		if(isLocked.isPresent() && isLocked.get())
 			lock();
 		display.ifPresent(dis -> setDisplay(dis));
 		memory.ifPresent(mem -> setMemory(mem));
-	}
-	
-	/** Returns a comparator for sorting abilities alphabetically by their display name */
-	public static Comparator<AbilityInstance> sortFunc()
-	{
-		return (a, b) -> {
-			int comparison;
-			return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : comparison;
-			};
 	}
 	
 	/** The variable map name for this specific ability instance */
@@ -91,10 +95,7 @@ public class AbilityInstance
 	
 	public Optional<LoreDisplay> display() { return display; }
 	
-	public void setDisplayName(Text component)
-	{
-		display = Optional.of(new LoreDisplay(component, display.isPresent() ? display.get().description() : Optional.empty()));
-	}
+	public void setCooldown(int cooldown) { this.cooldown = Optional.of(cooldown); }
 	
 	public Text displayName()
 	{
@@ -110,25 +111,36 @@ public class AbilityInstance
 		return ability.description(this);
 	}
 	
+	protected Optional<Integer> cooldownMaybe() { return cooldown; }
+	
+	public int cooldown()
+	{
+		if(cooldown.isPresent())
+			return cooldown.get();
+		if(ability.type() != AbilityType.PASSIVE)
+			return ((ActivatedAbility)ability).cooldownDefault();
+		return 0;
+	}
+	
 	public NbtElement writeToNbt(NbtCompound compound)
 	{
 		return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
-	}
-	
-	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
-	{
-		if(vitalOnly && memoryMaybe().isEmpty())
-			return new JsonPrimitive(ability.registryName().toString());
-		
-		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
-		Codec<AbilityInstance> codec = vitalOnly ? CODEC_VITALS : CODEC;
-		return codec.encodeStart(registryOps, this).getOrThrow();
 	}
 	
 	@Nullable
 	public static AbilityInstance readFromNbt(NbtCompound data)
 	{
 		return CODEC.parse(NbtOps.INSTANCE, data).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+	}
+	
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
+	{
+		if(vitalOnly && memoryMaybe().isEmpty() && cooldownMaybe().isEmpty())
+			return Ability.CODEC.encodeStart(JsonOps.INSTANCE, ability).getOrThrow();
+		
+		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
+		Codec<AbilityInstance> codec = vitalOnly ? CODEC_VITALS : CODEC;
+		return codec.encodeStart(registryOps, this).getOrThrow();
 	}
 	
 	public static AbilityInstance readFromJson(JsonElement element, AbilitySource forceSource)

@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -33,6 +35,8 @@ public class AbilitySet
 	public void clear() { abilities.clear(); }
 	
 	public boolean isEmpty() { return abilities.isEmpty(); }
+	
+	public int size() { return abilities.size(); }
 	
 	/** Adds the given ability if it does not already exist in the map or if the given instance should overrule it */
 	public boolean add(AbilityInstance ability)
@@ -95,6 +99,9 @@ public class AbilitySet
 	{
 		return abilities.values().stream().anyMatch(instance -> instance.ability().registryName().equals(registryName));
 	}
+	
+	@Nullable
+	public AbilityInstance get(Identifier mapName) { return abilities.getOrDefault(mapName, null); }
 	
 	public List<AbilityInstance> getAbilitiesOfType(Identifier registryName)
 	{
