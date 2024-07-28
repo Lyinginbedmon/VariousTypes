@@ -1,5 +1,8 @@
 package com.lying.component.module;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+import static com.lying.utility.VTUtils.describeTemplate;
+
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -12,20 +15,40 @@ import com.lying.init.VTTemplateRegistry;
 import com.lying.reference.Reference;
 import com.lying.template.Template;
 import com.lying.type.TypeSet;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class ModuleTemplates extends AbstractSheetModule
 {
+	public static final SimpleCommandExceptionType NO_VALUE = new SimpleCommandExceptionType(translate("command", "failed_no_templates_applied"));
 	private List<Identifier> templateIds = Lists.newArrayList();
 	
-	public ModuleTemplates() { super(Reference.ModInfo.prefix("templates"), 10); }
+	public ModuleTemplates() { super(Reference.ModInfo.prefix("templates"), 100); }
 	
 	public static boolean hasTemplate(CharacterSheet sheet, Identifier registryName) { return sheet.module(VTSheetModules.TEMPLATES).contains(registryName); }
+	
+	public Command<ServerCommandSource> describeTo(ServerCommandSource source, LivingEntity owner)
+	{
+		return context -> 
+		{
+			List<Template> templates = get();
+			if(templates.isEmpty())
+				throw NO_VALUE.create();
+			
+			source.sendFeedback(() -> translate("command","get.templates.success", owner.getDisplayName(), templates.size()), true);
+			templates.forEach(tem -> source.sendFeedback(() -> Text.literal(" * ").append(describeTemplate(tem)), false));
+			return 15;
+		};
+	}
 	
 	public int power()
 	{

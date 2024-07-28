@@ -127,12 +127,14 @@ public class CharacterSheet
 				SheetElement<?> element = VTSheetElements.get(regName);
 				if(element == null || nbt.isEmpty())
 					continue;
+				
 				elements.get(element).readFromNbt(nbt);
 			}
 		
 		buildSheet();
 	}
 	
+	/** Resets all module values, note that these changes are not applied to elements until {@link buildSheet} is next called. */
 	public void clear()
 	{
 		modules.values().forEach(module -> module.clear());
@@ -166,14 +168,10 @@ public class CharacterSheet
 		return (T)modules.getOrDefault(moduleIn.get().registryName(), null);
 	}
 	
-	/** Constructs the types and abilities from scratch */
+	/** Reconstructs all sheet elements in build order */
 	public final void buildSheet()
 	{
-		List<SheetElement<?>> elements = Lists.newArrayList();
-		elements.addAll(this.elements.keySet());
-		elements.sort((a,b) -> (int)Math.signum(a.buildOrder() - b.buildOrder()));
-		
-		elements.forEach(element -> this.elements.get(element).rebuild(this));
+		VTSheetElements.buildOrder().forEach(element -> this.elements.get(element).rebuild(this));
 	}
 	
 	public void markDirty()

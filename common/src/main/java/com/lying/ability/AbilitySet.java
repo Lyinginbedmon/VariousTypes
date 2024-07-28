@@ -71,6 +71,12 @@ public class AbilitySet
 		}
 	}
 	
+	/** Adds the ability, overriding any pre-existing ability if necessary */
+	public void set(AbilityInstance ability)
+	{
+		abilities.put(ability.mapName(), ability);
+	}
+	
 	/**
 	 * Ensures the given set has all abilities of this set and none outside of it, without modifying the actual abilities.<br>
 	 * Used to create an AbilitySet that can be acted upon by user input.
@@ -88,6 +94,7 @@ public class AbilitySet
 				activeSet.remove(entry.getKey());
 	}
 	
+	/** Returns a map of all non-passive ability instances in this set */
 	protected Map<Identifier, AbilityInstance> activatedAbilities()
 	{
 		Map<Identifier, AbilityInstance> activatedAbilities = new HashMap<>();

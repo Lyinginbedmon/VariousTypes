@@ -18,6 +18,7 @@ import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionHandler;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
@@ -128,7 +129,7 @@ public class LivingEntityMixin extends EntityMixin
 		VariousTypes.getSheet(living).ifPresent(sheet -> 
 		{
 			((EntityMixin)(Object)living).shouldSkipAir = true;
-			sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).tick(living);
+			sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).tick(living);
 		});
 	}
 	
@@ -191,7 +192,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 		{
-			if(!isSpectator() && ToggledAbility.hasActive(ElementAbilitySet.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
+			if(!isSpectator() && ToggledAbility.hasActive(ElementActionables.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
 			{
 				World world = getWorld();
 				if(world.getBlockCollisions((LivingEntity)(Object)this, getBoundingBox().expand(0.2D, -0.1D, 0.2D)).iterator().hasNext())
@@ -237,7 +238,11 @@ public class LivingEntityMixin extends EntityMixin
 		{
 			CharacterSheet sheet = sheetOpt.get();
 			final StatusEffectInstance actual = activeStatusEffects.get(effect);
-			return ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, (LivingEntity)(Object)this, sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES), actual);
+			
+			AbilitySet set = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).copy();
+			sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
+			
+			return ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, (LivingEntity)(Object)this, set, actual);
 		}
 		return spoofed;
 	}

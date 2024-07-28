@@ -3,7 +3,7 @@ package com.lying.ability;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import com.lying.VariousTypes;
-import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 
@@ -49,8 +49,8 @@ public abstract class ActivatedAbility extends Ability
 	{
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{
-			ElementAbilitySet actionables = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES);
-			AbilityInstance inst = actionables.activated().get(mapName);
+			ElementActionables actionables = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
+			AbilityInstance inst = actionables.get(mapName);
 			if(inst.cooldown() > 0)
 			{
 				actionables.putOnCooldown(mapName, owner.getEntityWorld().getTime(), inst.cooldown());
@@ -64,7 +64,7 @@ public abstract class ActivatedAbility extends Ability
 	{
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
-			ElementAbilitySet actionables = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES);
+			ElementActionables actionables = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
 			if(actionables.hasAbilityInstance(mapName))
 			{
 				AbilityInstance inst = actionables.get(mapName);

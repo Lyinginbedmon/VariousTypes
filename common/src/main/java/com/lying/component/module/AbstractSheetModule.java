@@ -6,8 +6,11 @@ import org.jetbrains.annotations.Nullable;
 
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ISheetElement;
+import com.mojang.brigadier.Command;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 
 /** A component that alters sheet elements in a character sheet, stored in NBT. */
@@ -25,6 +28,9 @@ public abstract class AbstractSheetModule
 	}
 	
 	public Identifier registryName() { return regName; }
+	
+	/** Called by the vartypes get command to read the contents of a player's module */
+	public abstract Command<ServerCommandSource> describeTo(ServerCommandSource source, LivingEntity owner);
 	
 	public final void setParent(@Nullable CharacterSheet sheet)
 	{

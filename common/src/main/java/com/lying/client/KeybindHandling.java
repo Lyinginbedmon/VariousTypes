@@ -7,7 +7,7 @@ import com.lying.VariousTypes;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.network.ActivateAbilityPacket;
 import com.lying.client.network.OpenAbilityMenuPacket;
-import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 
 import dev.architectury.event.events.client.ClientTickEvent;
@@ -26,8 +26,8 @@ public class KeybindHandling
 		{
 			handleKey(VTKeybinds.keyOpenAbilities, key -> VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 			{
-				ElementAbilitySet abilities = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES);
-				switch(abilities.activated().size())
+				ElementActionables abilities = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
+				switch(abilities.size())
 				{
 					case 0:
 						mc.player.sendMessage(Text.translatable("gui.vartypes.no_abilities_to_activate"));
@@ -46,7 +46,7 @@ public class KeybindHandling
 			{
 				final int slot = i;
 				handleKey(VTKeybinds.keyFavAbility[slot], key -> 
-					VariousTypes.getSheet(mc.player).ifPresent(sheet -> sendActivationPacket(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).getFavourite(slot))));
+					VariousTypes.getSheet(mc.player).ifPresent(sheet -> sendActivationPacket(sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).getFavourite(slot))));
 			}
 		});
 	}

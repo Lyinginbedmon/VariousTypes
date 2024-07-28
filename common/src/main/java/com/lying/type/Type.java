@@ -24,7 +24,6 @@ import com.mojang.serialization.JsonOps;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -103,14 +102,14 @@ public class Type
 	
 	public boolean compatibleWith(Type other) { return compatibilityCheck.apply(other); }
 	
-	public final NbtCompound writeToNbt(NbtCompound data, WrapperLookup manager)
+	public final NbtCompound writeToNbt(NbtCompound data)
 	{
 		data.putString("Type", registryName.toString());
-		write(data, manager);
+		write(data);
 		return data;
 	}
 	
-	protected void write(NbtCompound data, WrapperLookup manager) { }
+	protected void write(NbtCompound data) { }
 	
 	public void read(NbtCompound data) { }
 	

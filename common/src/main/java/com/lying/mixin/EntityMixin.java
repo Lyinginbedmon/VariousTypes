@@ -13,7 +13,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
-import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
@@ -131,7 +131,7 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity && !state.isAir())
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(ToggledAbility.hasActive(ElementAbilitySet.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
+				if(ToggledAbility.hasActive(ElementActionables.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
 					ci.setReturnValue(true);
 			});
 	}

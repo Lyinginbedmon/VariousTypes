@@ -1,5 +1,8 @@
 package com.lying.component.module;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+import static com.lying.utility.VTUtils.describeSpecies;
+
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -12,13 +15,18 @@ import com.lying.init.VTSpeciesRegistry;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.type.TypeSet;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 
 public class ModuleSpecies extends AbstractSheetModule
 {
+	public static final SimpleCommandExceptionType NO_VALUE = new SimpleCommandExceptionType(translate("command", "failed_no_species_selected"));
 	private static final Identifier DEFAULT_SPECIES = Reference.ModInfo.prefix("human");
 	private Optional<Identifier> speciesId = Optional.of(DEFAULT_SPECIES);
 	
@@ -28,6 +36,18 @@ public class ModuleSpecies extends AbstractSheetModule
 	{
 		Optional<Species> spec = getMaybe();
 		return spec.isPresent() ? spec.get().power() : 0;
+	}
+	
+	public Command<ServerCommandSource> describeTo(ServerCommandSource source, LivingEntity owner)
+	{
+		return context -> 
+		{
+			if(speciesId.isEmpty() || getMaybe().isEmpty())
+				throw NO_VALUE.create();
+			
+			source.sendFeedback(() -> translate("command","get.species.success", owner.getDisplayName(), describeSpecies(getMaybe().get())), true);
+			return 15;
+		};
 	}
 	
 	public Optional<Species> getMaybe() { return speciesId.isPresent() ? VTSpeciesRegistry.instance().get(speciesId.get()) : Optional.empty(); }
@@ -83,5 +103,4 @@ public class ModuleSpecies extends AbstractSheetModule
 		if(nbt.contains("ID", NbtElement.STRING_TYPE))
 			speciesId = Optional.of(new Identifier(nbt.getString("ID")));
 	}
-
 }

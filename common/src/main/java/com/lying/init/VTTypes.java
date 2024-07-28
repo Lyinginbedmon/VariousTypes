@@ -1,9 +1,9 @@
 package com.lying.init;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +21,9 @@ import com.lying.type.DummyType;
 import com.lying.type.Type;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
-import com.lying.utility.LoreDisplay;
 
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 
 public class VTTypes
@@ -39,19 +40,16 @@ public class VTTypes
 	public static final Supplier<Type> CONSTRUCT		= register("construct", () -> Type.Builder.of(prefix("construct"), Tier.SUPERTYPE).colour(0xDB6D00)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.NIGHT_VISION.get())
-			.addAbility(VTAbilities.CRITPROOF.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> DRAGON			= register("dragon", () -> Type.Builder.of(prefix("dragon"), Tier.SUPERTYPE).colour(0x920000)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> ELEMENT			= register("element", () -> Type.Builder.of(prefix("element"), Tier.SUPERTYPE).colour(0xFF6DB6)
 			.setActions(ActionHandler.REGEN_ONLY)
-			.addAbility(VTAbilities.CRITPROOF.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> FAE				= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).colour(0xDDB6DB).build());
 	public static final Supplier<Type> HUMAN			= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).colour(0x006DDB).build());
 	public static final Supplier<Type> OOZE				= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).colour(0xB6DBFF)
 			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
-			.addAbility(VTAbilities.CRITPROOF.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get())
 			.addAbility(VTAbilities.SCULK_SIGHT.get()).build());
 	public static final Supplier<Type> OTHALL			= register("othall", () -> Type.Builder.of(prefix("othall"), Tier.SUPERTYPE).colour(0xB66DFF)
@@ -59,12 +57,10 @@ public class VTTypes
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> PLANT			= register("plant", () -> Type.Builder.of(prefix("plant"), Tier.SUPERTYPE).colour(0x24FF24)
 			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.SLEEP.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
-			.addAbility(VTAbilities.CRITPROOF.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> UNDEAD			= register("undead", () -> Type.Builder.of(prefix("undead"), Tier.SUPERTYPE).colour(0x1F1F1F)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.NIGHT_VISION.get())
-			.addAbility(VTAbilities.CRITPROOF.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	
 	public static final Supplier<Type> NATIVE			= register("native", () -> Type.Builder.of(prefix("native"), Tier.SUBTYPE).description(ModInfo.translate("type", "native.desc"))
@@ -100,9 +96,11 @@ public class VTTypes
 	public static final Supplier<Type> REPTILIAN	= dummyType("reptilian");
 	public static final Supplier<Type> VERDINE		= dummyType("verdine");	// Elves
 	
-	private static final Supplier<Type> dummyType(String name) { return () -> DummyType.create(prefix(name), new LoreDisplay(ModInfo.translate("subtype", name))); }
+	public static Collection<Identifier> typeIds() { return TYPES.keySet(); }
 	
-	private static final Supplier<Type> dummyTypeWithDesc(String name) { return () -> DummyType.create(prefix(name), new LoreDisplay(ModInfo.translate("subtype", name), Optional.of(ModInfo.translate("subtype", name+".desc")))); }
+	private static final Supplier<Type> dummyType(String name) { return () -> DummyType.create(prefix(name), ModInfo.translate("subtype", name)); }
+	
+	private static final Supplier<Type> dummyTypeWithDesc(String name) { return () -> DummyType.create(prefix(name), ModInfo.translate("subtype", name), ModInfo.translate("subtype", name+".desc")); }
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	
@@ -136,5 +134,29 @@ public class VTTypes
 		List<Supplier<Type>> types = Lists.newArrayList();
 		TYPES.values().stream().filter(sup -> sup.get().tier() == tierIn).forEach(type -> types.add(type));
 		return types;
+	}
+	
+	@Nullable
+	public static Type fromNbt(NbtElement nbt)
+	{
+		switch(nbt.getType())
+		{
+			case NbtElement.STRING_TYPE:
+				return get(new Identifier(nbt.asString()));
+			case NbtElement.COMPOUND_TYPE:
+				NbtCompound compound = (NbtCompound)nbt;
+				if(compound.contains("Type", NbtElement.STRING_TYPE))
+				{
+					Type type = get(new Identifier(compound.getString("Type")));
+					if(type == null)
+						return null;
+					type.read(compound);
+					return type;
+				}
+				else
+					return DummyType.fromNbt(nbt);
+			default:
+				return null;
+		}
 	}
 }

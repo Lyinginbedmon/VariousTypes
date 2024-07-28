@@ -7,13 +7,10 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
-import com.lying.ability.ActivatedAbility;
 import com.lying.client.KeybindHandling;
 import com.lying.client.network.ActivateAbilityPacket;
-import com.lying.client.network.SetFavouriteAbilityPacket;
-import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
-import com.lying.reference.Reference;
 import com.lying.screen.AbilityMenuHandler;
 
 import net.minecraft.client.MinecraftClient;
@@ -26,7 +23,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
 
 public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 {
@@ -34,9 +30,9 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 	private Optional<AbilityInstance> abilityUnderMouse = Optional.empty();
 	
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
-	private FavouriteButton[] favouriteButtons = new FavouriteButton[4];
+	private FavouriteAbilityButton[] favouriteButtons = new FavouriteAbilityButton[4];
 	
-	private static ElementAbilitySet element;
+	private static ElementActionables element;
 	private List<AbilityInstance> abilities = Lists.newArrayList();
 	private int abilityPages = 0;
 	private int abilityPage = 0;
@@ -46,8 +42,8 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 		super(handler, inventory, title);
 		VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 		{
-			element = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES);
-			abilities = element.activated().allNonHidden();
+			element = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
+			abilities = element.allNonHidden();
 			abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
 			if(abilities.size() > 1)
 				Collections.sort(abilities, AbilityInstance.SORT_FUNC);
@@ -88,7 +84,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 		
 		VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 		{
-			ElementAbilitySet element = sheet.element(VTSheetElements.ABILITES);
+			ElementActionables element = sheet.element(VTSheetElements.ACTIONABLES);
 			for(int i=0; i<favouriteButtons.length; i++)
 			{
 				final int slot = i;
@@ -108,11 +104,11 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 		}).dimensions(x, y, 90, 30).build();
 	}
 	
-	private FavouriteButton makeFavouriteButton(int index, int x, int y)
+	private FavouriteAbilityButton makeFavouriteButton(int index, int x, int y)
 	{
-		return new FavouriteButton(x - 30, y, index, (button) -> 
+		return new FavouriteAbilityButton(x - 30, y, index, (button) -> 
 		{
-			VariousTypes.getSheet(mc.player).ifPresent(sheet -> KeybindHandling.sendActivationPacket(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).getFavourite(index)));
+			VariousTypes.getSheet(mc.player).ifPresent(sheet -> KeybindHandling.sendActivationPacket(sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).getFavourite(index)));
 			close();
 		});
 	}
@@ -176,7 +172,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 			if(abilityUnderMouse.isPresent())
 			{
 				// If we're hovering over a favourite button, set it to the held ability
-				for(FavouriteButton favourite : favouriteButtons)
+				for(FavouriteAbilityButton favourite : favouriteButtons)
 					if(favourite.isMouseOver(mouseX, mouseY))
 					{
 						favourite.setAbility(abilityUnderMouse.get());
@@ -201,7 +197,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 			abilityUnderMouse = Optional.empty();
 			
 			// If we are hovering over a favourite button, clear its setting
-			for(FavouriteButton favourite : favouriteButtons)
+			for(FavouriteAbilityButton favourite : favouriteButtons)
 				if(favourite.isMouseOver(mouseX, mouseY))
 				{
 					favourite.clear();
@@ -214,70 +210,4 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 	protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) { }
 	
 	protected void drawForeground(DrawContext context, int mouseX, int mouseY) { }
-	
-	private static class FavouriteButton extends ButtonWidget
-	{
-		private static final Identifier TEXTURE = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/favourite_ability.png");
-		private static final Identifier TEXTURE_HOVERED = new Identifier(Reference.ModInfo.MOD_ID, "textures/gui/favourite_ability_hovered.png");
-		
-		private final int index;
-		private Optional<AbilityInstance> contents = Optional.empty();
-		
-		public FavouriteButton(int x, int y, int index, PressAction onPress)
-		{
-			super(x, y, 30, 30, Text.empty(), onPress, DEFAULT_NARRATION_SUPPLIER);
-			this.index = index;
-			this.active = false;
-		}
-		
-		public boolean isMouseOver(double mouseX, double mouseY)
-		{
-			return this.visible && mouseX >= (double)this.getX() && mouseY >= (double)this.getY() && mouseX < (double)(this.getX() + this.width) && mouseY < (double)(this.getY() + this.height);
-		}
-		
-		public void clear()
-		{
-			contents = Optional.empty();
-			setTooltip(null);
-			SetFavouriteAbilityPacket.send(index, null);
-			this.active = false;
-		}
-		
-		public void setAbility(AbilityInstance inst)
-		{
-			contents = Optional.of(inst);
-			setTooltip(Tooltip.of(Text.empty()
-					.append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n").append(
-					Text.translatable("gui.vartypes.clear_favourite").formatted(Formatting.GRAY, Formatting.ITALIC))));
-			SetFavouriteAbilityPacket.send(index, inst.mapName());
-			this.active = contents.isPresent();
-		}
-		
-		protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
-		{
-			context.drawTexturedQuad(isHovered() ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), getBottom(), 0, 0F, 1F, 0F, 1F, 1F, 1F, 1F, 1F);
-			contents.ifPresent(inst -> 
-			{
-				ElementAbilitySet element = VariousTypes.getSheet(mc.player).get().<ElementAbilitySet>element(VTSheetElements.ABILITES);
-				float f = element.getCooldown(inst.mapName(), mc.player.getWorld().getTime());
-				
-				float u1 = 0F;
-				int iconHeight = getHeight() - 4;
-				int renderedHeight = (int)(iconHeight * f);
-				if(f < 1F)
-				{
-					f -= f%0.1F;
-					renderedHeight = (int)(iconHeight * f);
-					f = (float)renderedHeight / (float)iconHeight;
-					
-					u1 = 1F - f;
-				}
-				
-				if(!((ActivatedAbility)inst.ability()).canTrigger(mc.player, inst))
-					f = Math.min(f, 0.3F);
-				
-				context.drawTexturedQuad(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - renderedHeight, getBottom() - 2, 0, 0F, 1F, u1, 1F, f, f, f, 1F);
-			});
-		}
-	}
 }

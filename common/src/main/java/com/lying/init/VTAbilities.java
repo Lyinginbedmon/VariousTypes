@@ -10,11 +10,11 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
+import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
-import com.lying.ability.Ability.Category;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
@@ -26,7 +26,10 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Vec3d;
 
 public class VTAbilities
 {
@@ -65,7 +68,7 @@ public class VTAbilities
 	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight"), Category.UTILITY));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new ActivatedAbility(prefix("swim"), Category.UTILITY) 
 	{
-		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 15; }
+		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
 		
 		public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
 		{
@@ -81,14 +84,25 @@ public class VTAbilities
 	public static final Supplier<Ability> CLIMB			= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
 	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));
 	public static final Supplier<Ability> BURROW		= register("burrow", () -> new ToggledAbility(prefix("burrow"), Category.UTILITY));
-	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new ActivatedAbility(prefix("teleport"), Category.UTILITY) {	// LoS teleport
+	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new ActivatedAbility(prefix("teleport"), Category.UTILITY){	// LoS teleport
+		public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
+		{
+			double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 8D;
+			return owner.raycast(range, 1F, false).getType() != HitResult.Type.MISS;
+		}
+		
 		protected void activate(LivingEntity owner, AbilityInstance instance)
 		{
+			double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 8D;
+			HitResult trace = owner.raycast(range, 1F, false);
+			if(trace.getType() == HitResult.Type.MISS)
+				return;
 			
+			Vec3d hitPos = trace.getPos();
+			owner.sendMessage(Text.literal("Hit: "+hitPos.toString()));
 		}});
 	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY));	// Incorporeal
 	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
-	public static final Supplier<Ability> CRITPROOF		= register("critproof", () -> new Ability(prefix("critproof"), Category.DEFENSE));	// Immune to critical hits
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic"), Category.DEFENSE) 
 	{
 		public void registerEventHandlers()

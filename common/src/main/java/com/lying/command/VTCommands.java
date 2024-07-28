@@ -11,20 +11,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
-import com.lying.component.module.ModuleHome;
+import com.lying.component.module.AbstractSheetModule;
+import com.lying.component.module.ModuleCustomHome;
+import com.lying.component.module.ModuleCustomTypes;
 import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
+import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.species.Species;
 import com.lying.template.Template;
+import com.lying.type.DummyType;
+import com.lying.type.Type;
 import com.lying.utility.VTUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -37,6 +43,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.argument.DimensionArgumentType;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.command.argument.IdentifierArgumentType;
+import net.minecraft.command.argument.NbtCompoundArgumentType;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registry;
@@ -55,14 +62,16 @@ public class VTCommands
 	private static final SimpleCommandExceptionType FAILED_GENERIC = make("generic");
 	private static final SimpleCommandExceptionType FAILED_NO_OPTIONS = make("list_empty");
 	private static final SimpleCommandExceptionType FAILED_NO_SPECIES = make("no_species_selected");
-	private static final SimpleCommandExceptionType FAILED_NO_TEMPLATES = make("no_templates_applied");
 	private static final SimpleCommandExceptionType FAILED_UNKNOWN_SPECIES = make("unrecognised_species");
 	private static final SimpleCommandExceptionType FAILED_UNKNOWN_TEMPLATE = make("unrecognised_template");
 	public static final SuggestionProvider<ServerCommandSource> SPECIES_IDS = SuggestionProviders.register(new Identifier("species"), (context, builder) -> CommandSource.suggestIdentifiers(VTSpeciesRegistry.instance().getAllIDs(), builder));
 	public static final SuggestionProvider<ServerCommandSource> TEMPLATE_IDS = SuggestionProviders.register(new Identifier("templates"), (context, builder) -> CommandSource.suggestIdentifiers(VTTemplateRegistry.instance().getAllIDs(), builder));
+	public static final SuggestionProvider<ServerCommandSource> MODULE_IDS = SuggestionProviders.register(new Identifier("modules"), (context, builder) -> CommandSource.suggestIdentifiers(VTSheetModules.commandIds(), builder));
+	public static final SuggestionProvider<ServerCommandSource> TYPE_IDS = SuggestionProviders.register(new Identifier("types"), (context, builder) -> CommandSource.suggestIdentifiers(VTTypes.typeIds(), builder));
 	private static final String PLAYER = "player";
 	private static final String SPECIES = "species";
 	private static final String TEMPLATE = "template";
+	private static final String TYPE = "type";
 	
 	private static SimpleCommandExceptionType make(String name)
 	{
@@ -138,6 +147,7 @@ public class VTCommands
 									VariousTypes.getSheet(player).ifPresent(sheet -> 
 									{
 										sheet.clear();
+										sheet.buildSheet();
 										context.getSource().sendFeedback(() -> translate("command","reset.success", player.getDisplayName()), true);
 									});
 									return 15;
@@ -168,41 +178,23 @@ public class VTCommands
 										throw FAILED_GENERIC.create();
 									
 									String home = ElementHome.get(sheetOpt.get()).getValue().toString();
-									if(sheetOpt.get().module(VTSheetModules.HOME).isPresent())
-										context.getSource().sendFeedback(() -> translate("command", "get.home.success.custom", player.getDisplayName(), home), true);
-									else
-										context.getSource().sendFeedback(() -> translate("command", "get.home.success", player.getDisplayName(), home), true);
+									context.getSource().sendFeedback(() -> translate("command", "get.home.success", player.getDisplayName(), home), true);
 									return 15;
 								}))
-							.then(literal("species")
+							.then(argument("module", IdentifierArgumentType.identifier()).suggests(MODULE_IDS)
 								.executes(context -> 
 								{
 									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+									Identifier moduleID = IdentifierArgumentType.getIdentifier(context, "module");
+									Supplier<AbstractSheetModule> module = VTSheetModules.get(moduleID);
 									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-									if(sheetOpt.isEmpty())
+									if(sheetOpt.isEmpty() || module == null)
 										throw FAILED_GENERIC.create();
-									else if(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().isEmpty())
-										throw FAILED_NO_SPECIES.create();
-									context.getSource().sendFeedback(() -> translate("command","get.species.success", player.getDisplayName(), describeSpecies(sheetOpt.get().module(VTSheetModules.SPECIES).getMaybe().get())), true);
-									return 15;
-								}))
-							.then(literal("templates")
-								.executes(context -> 
-								{
-									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
-									Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-									if(sheetOpt.isEmpty())
-										throw FAILED_GENERIC.create();
-									List<Template> templates;
-									if((templates = sheetOpt.get().module(VTSheetModules.TEMPLATES).get()).isEmpty())
-										throw FAILED_NO_TEMPLATES.create();
 									
-									context.getSource().sendFeedback(() -> translate("command","get.templates.success",player.getDisplayName(),templates.size()), true);
-									templates.forEach(tem -> context.getSource().sendFeedback(() -> Text.literal(" * ").append(describeTemplate(tem)), false));
-									return 15;
+									return sheetOpt.get().module(module).describeTo(context.getSource(), player).run(context);
 								})))
 						.then(literal("apply")
-							.then(literal("home")
+							.then(literal("custom_home")
 								.then(argument("dimension", DimensionArgumentType.dimension())
 									.executes(context -> 
 									{
@@ -221,7 +213,7 @@ public class VTCommands
 										sheetOpt.ifPresent(sheet -> 
 										{
 											sheet.module(VTSheetModules.HOME).set(dim);
-											context.getSource().sendFeedback(() -> translate("command", "apply.home.success", player.getDisplayName(), dim.getValue().toString()), true);
+											context.getSource().sendFeedback(() -> translate("command", "apply.custom_home.success", player.getDisplayName(), dim.getValue().toString()), true);
 										});
 										return 15;
 									})))
@@ -253,9 +245,46 @@ public class VTCommands
 								.then(argument(TEMPLATE, IdentifierArgumentType.identifier()).suggests(TEMPLATE_IDS)
 									.executes(context -> tryApplyTemplate(EntityArgumentType.getPlayer(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), false, context.getSource()))
 									.then(argument("force", BoolArgumentType.bool())
-										.executes(context -> tryApplyTemplate(EntityArgumentType.getPlayer(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), BoolArgumentType.getBool(context, "force"), context.getSource()))))))
+										.executes(context -> tryApplyTemplate(EntityArgumentType.getPlayer(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), BoolArgumentType.getBool(context, "force"), context.getSource())))))
+							.then(literal("custom_types")
+								.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Identifier typeId = IdentifierArgumentType.getIdentifier(context, TYPE);
+										Type type = VTTypes.get(typeId);
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || type == null)
+											throw FAILED_GENERIC.create();
+										
+										ModuleCustomTypes custTypes = sheetOpt.get().module(VTSheetModules.TYPES);
+										if(!custTypes.add(type))
+											throw new SimpleCommandExceptionType(translate("command","custom_types.add.failed.present", player.getDisplayName(), VTUtils.describeType(type))).create();
+										
+										source.sendFeedback(() -> translate("command", "custom_types.add.success", VTUtils.describeType(type), player.getDisplayName()), true);
+										return 15;
+									}))
+								.then(argument("dummy", NbtCompoundArgumentType.nbtCompound())
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										System.out.println("Type compound argument present, building as dummy");
+										Type type = DummyType.fromNbt(NbtCompoundArgumentType.getNbtCompound(context, "dummy"));
+										if(type == null)
+											System.out.println("Couldn't build dummy type");
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || type == null)
+											throw FAILED_GENERIC.create();
+										ModuleCustomTypes custTypes = sheetOpt.get().module(VTSheetModules.TYPES);
+										if(!custTypes.add(type))
+											throw new SimpleCommandExceptionType(translate("command","custom_types.add.failed.present", player.getDisplayName(), VTUtils.describeType(type))).create();
+										source.sendFeedback(() -> translate("command", "custom_types.add.success", VTUtils.describeType(type), player.getDisplayName()), true);
+										return 15;
+									}))))
 						.then(literal("remove")
-							.then(literal("home")
+							.then(literal("custom_home")
 								.executes(context -> 
 								{
 									PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
@@ -266,7 +295,7 @@ public class VTCommands
 										sheetOpt.ifPresent(sheet -> 
 										{
 											sheet.module(VTSheetModules.HOME).set(null);
-											context.getSource().sendFeedback(() -> translate("command","home.clear.success", player.getDisplayName(), ElementHome.get(sheet).getValue().toString()), true);
+											context.getSource().sendFeedback(() -> translate("command","custom_home.clear.success", player.getDisplayName(), ElementHome.get(sheet).getValue().toString()), true);
 										});
 									return 15;
 								})
@@ -284,11 +313,11 @@ public class VTCommands
 										if(sheetOpt.isEmpty())
 											throw FAILED_GENERIC.create();
 										
-										ModuleHome customHome = sheetOpt.get().module(VTSheetModules.HOME);
+										ModuleCustomHome customHome = sheetOpt.get().module(VTSheetModules.HOME);
 										if(!customHome.isPresent() || world == null || !world.getRegistryKey().equals(customHome.get()))
 											throw FAILED_GENERIC.create();
 										
-										context.getSource().sendFeedback(() -> translate("command","home.remove.success", player.getDisplayName(), ElementHome.get(sheetOpt.get()).getValue().toString()), true);
+										context.getSource().sendFeedback(() -> translate("command","custom_home.remove.success", player.getDisplayName(), ElementHome.get(sheetOpt.get()).getValue().toString()), true);
 										return 15;
 									})))
 							.then(literal("species")
@@ -369,6 +398,58 @@ public class VTCommands
 												sheet.module(VTSheetModules.TEMPLATES).clear();
 												source.sendFeedback(() -> translate("command", "template.remove.all.success", player.getDisplayName()), true);
 											});
+										return 15;
+									})))
+							.then(literal("custom_types")
+								.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Identifier typeId = IdentifierArgumentType.getIdentifier(context, TYPE);
+										Type type = VTTypes.get(typeId);
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || type == null)
+											throw FAILED_GENERIC.create();
+										ModuleCustomTypes custTypes = sheetOpt.get().module(VTSheetModules.TYPES);
+										if(!custTypes.remove(type))
+											throw new SimpleCommandExceptionType(translate("command","custom_types.remove.failed.missing", player.getDisplayName(), VTUtils.describeType(type))).create();
+										
+										source.sendFeedback(() -> translate("command", "custom_types.remove.success", VTUtils.describeType(type), player.getDisplayName()), true);
+										return 15;
+									}))
+								.then(argument("dummy", NbtCompoundArgumentType.nbtCompound())
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Type type = DummyType.fromNbt(NbtCompoundArgumentType.getNbtCompound(context, "dummy"));
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty() || type == null)
+											throw FAILED_GENERIC.create();
+										ModuleCustomTypes custTypes = sheetOpt.get().module(VTSheetModules.TYPES);
+										
+										if(custTypes.has(type))
+										{
+											final Type typeToRemove = custTypes.get(type.listID()).get();
+											custTypes.remove(typeToRemove);
+											source.sendFeedback(() -> translate("command", "custom_types.remove.success", VTUtils.describeType(typeToRemove), player.getDisplayName()), true);
+										}
+										else
+											throw new SimpleCommandExceptionType(translate("command","custom_types.remove.failed.missing", player.getDisplayName(), VTUtils.describeType(type))).create();
+										
+										return 15;
+									}))
+								.then(literal("all")
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty())
+											throw FAILED_GENERIC.create();
+										sheetOpt.get().module(VTSheetModules.TYPES).clear();
+										source.sendFeedback(() -> translate("command", "custom_types.remove.all.success", player.getDisplayName()), true);
 										return 15;
 									}))))));
 		});

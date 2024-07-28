@@ -1,7 +1,7 @@
 package com.lying.network;
 
 import com.lying.VariousTypes;
-import com.lying.component.element.ElementAbilitySet;
+import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 
 import dev.architectury.networking.NetworkManager.NetworkReceiver;
@@ -22,7 +22,7 @@ public class SetFavouriteAbilityReceiver implements NetworkReceiver<RegistryByte
 		
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
-			if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).setFavourite(slot, shouldSet ? map : null))
+			if(sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).setFavourite(slot, shouldSet ? map : null))
 				sheet.markDirty();
 		});
 	}

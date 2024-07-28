@@ -1,5 +1,7 @@
 package com.lying.component.module;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -8,21 +10,38 @@ import com.lying.component.element.ElementHome;
 import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
-public class ModuleHome extends AbstractSheetModule
+public class ModuleCustomHome extends AbstractSheetModule
 {
+	public static final SimpleCommandExceptionType NO_VALUE = new SimpleCommandExceptionType(translate("command", "failed_no_dimension_set"));
 	private Optional<RegistryKey<World>> dimension = Optional.empty();
 	
-	public ModuleHome()
+	public ModuleCustomHome()
 	{
 		super(Reference.ModInfo.prefix("home"), 1000);
+	}
+	
+	public Command<ServerCommandSource> describeTo(ServerCommandSource source, LivingEntity owner)
+	{
+		return context ->
+		{
+			if(dimension.isEmpty())
+				throw NO_VALUE.create();
+			
+			source.sendFeedback(() -> translate("command", "get.custom_home.success", dimension.get().getValue().toString()), true);
+			return 15;
+		};
 	}
 	
 	public int power() { return 0; }
