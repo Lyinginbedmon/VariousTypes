@@ -202,7 +202,50 @@ public class AbilityInstance
 	public final AbilityInstance copy()
 	{
 		AbilityInstance clone = new AbilityInstance(ability, source);
-		clone.setMemory(memory());
+		AbilityNbt.fromInstance(this).applyTo(clone);
 		return clone;
+	}
+	
+	/** Helper class used by commands to permit changing ability instance customisable values in the same NBT compound */
+	public static class AbilityNbt
+	{
+		public static final Codec<AbilityNbt> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityNbt::display),
+				Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityNbt::cooldownMaybe),
+				NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityNbt::memoryMaybe))
+					.apply(instance, AbilityNbt::new));
+		
+		private final Optional<LoreDisplay> display;
+		private final Optional<Integer> cooldown;
+		private final Optional<NbtCompound> memory;
+		
+		public AbilityNbt(Optional<LoreDisplay> displayIn, Optional<Integer> coolIn, Optional<NbtCompound> memoryIn)
+		{
+			display = displayIn;
+			cooldown = coolIn;
+			memory = memoryIn;
+		}
+		
+		public Optional<LoreDisplay> display() { return display; }
+		public Optional<Integer> cooldownMaybe() { return cooldown; }
+		public Optional<NbtCompound> memoryMaybe() { return memory; }
+		
+		public void applyTo(AbilityInstance inst)
+		{
+			display.ifPresent(dis -> inst.setDisplay(dis));
+			cooldown.ifPresent(cool -> inst.setCooldown(cool));
+			memory.ifPresent(mem -> inst.setMemory(inst.memory.copyFrom(mem)));
+		}
+		
+		@Nullable
+		public static AbilityNbt readFromNbt(NbtCompound data)
+		{
+			return CODEC.parse(NbtOps.INSTANCE, data).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+		}
+		
+		public static AbilityNbt fromInstance(AbilityInstance inst)
+		{
+			return new AbilityNbt(inst.display(), inst.cooldownMaybe(), inst.memoryMaybe());
+		}
 	}
 }

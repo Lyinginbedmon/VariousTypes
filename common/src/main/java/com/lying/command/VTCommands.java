@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
+import com.lying.ability.AbilityInstance.AbilityNbt;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
 import com.lying.component.module.AbstractSheetModule;
@@ -289,7 +290,7 @@ public class VTCommands
 												throw FAILED_GENERIC.create();
 											
 											AbilityInstance inst = VTAbilities.get(abilityID).instance(AbilitySource.CUSTOM);
-											inst.setMemory(NbtCompoundArgumentType.getNbtCompound(context, "nbt").copyFrom(inst.memory()));
+											AbilityNbt.readFromNbt(NbtCompoundArgumentType.getNbtCompound(context, "nbt")).applyTo(inst);
 											
 											ModuleCustomAbilities custAbilities = sheetOpt.get().module(VTSheetModules.ABILITIES);
 											custAbilities.add(inst);
