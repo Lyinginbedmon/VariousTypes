@@ -43,6 +43,7 @@ public class FinishCharacterCreationReceiver implements NetworkReceiver<Registry
 			sheet.module(VTSheetModules.TEMPLATES).set(templateIds.toArray(new Identifier[0]));
 			
 			sheet.buildSheet();
+			sheet.incEdits();
 		});
 	}
 }

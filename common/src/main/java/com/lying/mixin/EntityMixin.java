@@ -13,6 +13,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
@@ -68,6 +69,9 @@ public class EntityMixin
 	
 	@Shadow
 	public double getZ() { return 0D; }
+	
+	@Shadow
+	public float getYaw() { return 0F; }
 	
 	@Shadow
 	public boolean isAlive() { return true; }
@@ -132,6 +136,17 @@ public class EntityMixin
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
 				if(ToggledAbility.hasActive(ElementActionables.getActivated(sheet), VTAbilities.CLIMB.get().registryName()))
+					ci.setReturnValue(true);
+			});
+	}
+	
+	@Inject(method = "isInvisible()Z", at = @At("TAIL"), cancellable = true)
+	private void vt$isInvis(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
+			{
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INVISIIBILITY.get().registryName()))
 					ci.setReturnValue(true);
 			});
 	}

@@ -61,11 +61,13 @@ public class ServerEvents
 		}
 		
 		public static final Event<GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.createLoop(GetStatusEffectEvent.class);
+		/** Result of the latest call to GET_STATUS_EFFECT_EVENT */	// TODO Replace this with something more contained
+		public static StatusEffectInstance GetStatusEffectEventResult = null;
 		
 		@FunctionalInterface
 		public interface GetStatusEffectEvent
 		{
-			StatusEffectInstance getStatusEffect(RegistryEntry<StatusEffect> effect, LivingEntity entity, AbilitySet abilities, final StatusEffectInstance actual);
+			void getStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final StatusEffectInstance actual);
 		}
 	}
 	

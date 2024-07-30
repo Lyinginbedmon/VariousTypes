@@ -30,6 +30,8 @@ public class CharacterSheet
 {
 	protected Optional<LivingEntity> owner = Optional.empty();
 	
+	protected int timesCreated = 0;
+	
 	// These values represent the information the character is currently working on
 	private Map<SheetElement<?>, ISheetElement<?>> elements = new HashMap<>();
 	
@@ -85,8 +87,15 @@ public class CharacterSheet
 		return this;
 	}
 	
+	/** Returns the number of times this sheet has been altered in the character creation screen */
+	public int timesCreated() { return this.timesCreated; }
+	
+	public void incEdits() { this.timesCreated++; }
+	
 	public NbtCompound writeSheetToNbt(NbtCompound compound)
 	{
+		compound.putInt("Edits", timesCreated());
+		
 		NbtList listM = new NbtList();
 		modules.values().forEach(module -> listM.add(module.write(new NbtCompound())));
 		compound.put("Modules", listM);
@@ -109,6 +118,8 @@ public class CharacterSheet
 	
 	public void readSheetFromNbt(NbtCompound compound)
 	{
+		this.timesCreated = compound.getInt("Edits");
+		
 		clear();
 		NbtList list = compound.getList("Modules", NbtElement.COMPOUND_TYPE);
 		list.forEach(element -> 

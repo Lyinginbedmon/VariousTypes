@@ -101,7 +101,7 @@ public class DetailObject
 				{
 					comp = text;
 					int textX = x;
-					switch(VariousTypesClient.ALIGN_TEXT)
+					switch(VariousTypesClient.config.textAlignment())
 					{
 						case CENTRE:
 							textX = x - text.getWidth(textRenderer) / 2;

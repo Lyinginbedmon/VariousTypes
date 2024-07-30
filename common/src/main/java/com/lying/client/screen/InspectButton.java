@@ -1,5 +1,6 @@
 package com.lying.client.screen;
 
+import com.lying.mixin.IDrawContextInvoker;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.gui.DrawContext;
@@ -26,6 +27,6 @@ public class InspectButton extends ButtonWidget
 	public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		float brightness = this.active ? 1F : 0.2F;
-		context.drawTexturedQuad(isHovered() && this.active ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
+		((IDrawContextInvoker)context).drawTexRGBA(isHovered() && this.active ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
 	}
 }

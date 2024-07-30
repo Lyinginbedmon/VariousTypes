@@ -1,5 +1,7 @@
 package com.lying.client.screen;
 
+import com.lying.mixin.IDrawContextInvoker;
+
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -25,6 +27,6 @@ public class IconButton extends ButtonWidget
 	public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 	{
 		float brightness = this.active ? 1F : 0.2F;
-		context.drawTexturedQuad(isHovered() && this.active ? hoveredTexture : texture, getX(), getRight(), getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
+		((IDrawContextInvoker)context).drawTexRGBA(isHovered() && this.active ? hoveredTexture : texture, getX(), getRight(), getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
 	}
 }

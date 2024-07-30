@@ -18,6 +18,7 @@ import com.lying.ability.AbilitySet;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 import com.lying.type.Type.Tier;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -54,11 +55,11 @@ public class TypeSet
 					vars[tier.ordinal()] = Text.literal("N/A");
 					break;
 				case 1:
-					vars[tier.ordinal()] = types.get(0).displayName().copy();
+					vars[tier.ordinal()] = VTUtils.describeType(types.get(0)).copy();
 					break;
 				default:
 					Collections.sort(types, Type.SORT_FUNC);
-					vars[tier.ordinal()] = listToString(types, type -> type.displayName(), tier.ordinal() == 0 ? " " : ", ");
+					vars[tier.ordinal()] = listToString(types, type -> VTUtils.describeType(type), tier.ordinal() == 0 ? " " : ", ");
 					break;
 			}
 		}

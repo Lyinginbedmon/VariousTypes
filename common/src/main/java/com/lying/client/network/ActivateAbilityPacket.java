@@ -1,6 +1,5 @@
 package com.lying.client.network;
 
-import com.lying.ability.ActivatedAbility;
 import com.lying.network.VTPacketHandler;
 
 import dev.architectury.networking.NetworkManager;
@@ -19,7 +18,5 @@ public class ActivateAbilityPacket
 		RegistryByteBuf buffer = new RegistryByteBuf(Unpooled.buffer(), mc.player.getRegistryManager());
 		buffer.writeIdentifier(mapName);
 		NetworkManager.sendToServer(VTPacketHandler.ACTIVATE_ABILITY_ID, buffer);
-		
-		ActivatedAbility.tryTriggerAbility(mc.player, mapName);
 	}
 }

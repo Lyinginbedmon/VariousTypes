@@ -95,7 +95,7 @@ public class VTSheetElements
 		};
 	}
 	
-	// XXX Maybe tidy this up to be more like AbstractSheetModule
+	// XXX Maybe tidy this up to be more like AbstractSheetModule?
 	public static class SheetElement<T extends ISheetElement<?>>
 	{
 		private final Identifier registryName;

@@ -23,7 +23,7 @@ public abstract class ActivatedAbility extends Ability
 	
 	public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return true; }
 	
-	public final void trigger(LivingEntity owner, AbilityInstance instance)
+	public final boolean trigger(LivingEntity owner, AbilityInstance instance)
 	{
 		boolean isServerPlayer = owner.getType() == EntityType.PLAYER && !owner.getWorld().isClient();
 		if(!instance.isReadOnly() && canTrigger(owner, instance))
@@ -35,9 +35,11 @@ public abstract class ActivatedAbility extends Ability
 			
 			if(isServerPlayer)
 				((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.success", instance.displayName()), true);
+			return true;
 		}
 		else if(isServerPlayer)
 			((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.failed", instance.displayName()), true);
+		return false;
 	}
 	
 	/** Called server side when a player activates an ability.<br>Not responsible for cooldowns. */
@@ -55,23 +57,6 @@ public abstract class ActivatedAbility extends Ability
 			{
 				actionables.putOnCooldown(mapName, owner.getEntityWorld().getTime(), inst.cooldown());
 				sheet.markDirty();
-			}
-		});
-	}
-	
-	/** Called both client and server side when a player tries to activate an ability */
-	public static void tryTriggerAbility(PlayerEntity player, Identifier mapName)
-	{
-		VariousTypes.getSheet(player).ifPresent(sheet -> 
-		{
-			ElementActionables actionables = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
-			if(actionables.hasAbilityInstance(mapName))
-			{
-				AbilityInstance inst = actionables.get(mapName);
-				if(!actionables.isAvailable(mapName))
-					player.sendMessage(translate("gui", "activated_ability.failed", inst.displayName()), true);
-				else
-					((ActivatedAbility)inst.ability()).trigger(player, inst);
 			}
 		});
 	}

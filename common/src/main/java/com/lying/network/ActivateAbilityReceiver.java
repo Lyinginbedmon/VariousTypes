@@ -1,6 +1,8 @@
 package com.lying.network;
 
-import com.lying.ability.ActivatedAbility;
+import com.lying.VariousTypes;
+import com.lying.component.element.ElementActionables;
+import com.lying.init.VTSheetElements;
 
 import dev.architectury.networking.NetworkManager.NetworkReceiver;
 import dev.architectury.networking.NetworkManager.PacketContext;
@@ -10,6 +12,6 @@ public class ActivateAbilityReceiver implements NetworkReceiver<RegistryByteBuf>
 {
 	public void receive(RegistryByteBuf value, PacketContext context)
 	{
-		ActivatedAbility.tryTriggerAbility(context.getPlayer(), value.readIdentifier());
+		VariousTypes.getSheet(context.getPlayer()).ifPresent(sheet -> sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).enactActionable(context.getPlayer(), value.readIdentifier()));
 	}
 }

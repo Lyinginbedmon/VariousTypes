@@ -6,9 +6,15 @@
   "client": [
   ],
   "mixins": [
+	"IDrawContextInvoker",
 	"EntityMixin",
 	"LivingEntityMixin",
+	"PlayerEntityMixin",
+	"ServerPlayerEntityMixin",
 	"DamageEnchantmentMixin"
+  ],
+  "client": [
+	
   ],
   "injectors": {
     "defaultRequire": 1

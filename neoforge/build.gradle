@@ -11,8 +11,6 @@ def generatedResources = file("src/generated")
 
 loom
 {
-    accessWidenerPath = project(":common").loom.accessWidenerPath
-    
 	runs
 	{
 		commonDatagen

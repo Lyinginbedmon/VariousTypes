@@ -1,5 +1,7 @@
 package com.lying.component.element;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,16 +11,21 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
+import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.ability.ActivatedAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetElements.SheetElement;
+import com.lying.network.SyncActionablesPacket;
 import com.lying.reference.Reference;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -179,6 +186,23 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 					favourites.set(index, Optional.empty());
 			});
 		}
+	}
+	
+	/** Called client and server-side to interact with activated abilities */
+	public void enactActionable(PlayerEntity owner, Identifier mapName)
+	{
+		if(!hasAbilityInstance(mapName))
+			return;
+		else if(!isAvailable(mapName))
+		{
+			owner.sendMessage(translate("gui", "activated_ability.failed", get(mapName).displayName()), true);
+			return;
+		}
+		
+		AbilityInstance inst = get(mapName);
+		if(((ActivatedAbility)inst.ability()).trigger(owner, inst) && !owner.getWorld().isClient())
+			SyncActionablesPacket.send((ServerPlayerEntity)owner, this);
+		
 	}
 	
 	private static class Cooldown

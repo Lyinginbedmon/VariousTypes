@@ -35,7 +35,7 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	{
 		super(VTScreenHandlerTypes.CREATION_SCREEN_HANDLER.get(), syncId);
 		thePlayer = player;
-		powerLimit = player.isCreative() ? -1 : VariousTypes.POWER;
+		powerLimit = player.isCreative() ? -1 : VariousTypes.config.maxPower();
 		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 		sheetOpt.ifPresentOrElse(sheet -> 
 		{
@@ -51,7 +51,7 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	
 	public ItemStack quickMove(PlayerEntity var1, int var2) { return ItemStack.EMPTY; }
 	
-	public boolean canUse(PlayerEntity var1) { return true; }
+	public boolean canUse(PlayerEntity var1) { return var1.isAlive(); }
 	
 	/** Returns the current calculated character sheet */
 	public CharacterSheet testSheet() { return testSheet; }

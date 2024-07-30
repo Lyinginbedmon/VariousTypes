@@ -1,9 +1,9 @@
 package com.lying.mixin;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,7 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.collect.Maps;
 import com.lying.VariousTypes;
+import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
@@ -23,7 +25,6 @@ import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.TypeSet;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.LivingEvents;
 import com.lying.utility.ServerEvents.Result;
 
@@ -208,12 +209,17 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$hasEffect(RegistryEntry<StatusEffect> effect, final CallbackInfoReturnable<Boolean> ci)
 	{
 		final LivingEntity living = (LivingEntity)(Object)this;
-		VariousTypes.getSheet(living).ifPresent(sheet -> 
+		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			final StatusEffectInstance actual = activeStatusEffects.get(effect);
-			StatusEffectInstance spoofed = getSpoofedStatusEffect(living, effect);
-			if(spoofed != null && !spoofed.equals(actual) && spoofed.getDuration() > 0)
-				ci.setReturnValue(true);
+			for(AbilityInstance inst : getSpoofAbilities(sheet))
+			{
+				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
+				if(ability.shouldApplyTo(effect, inst) && ability.hasSpoofed(effect, inst))
+				{
+					ci.setReturnValue(true);
+					return;
+				}
+			};
 		});
 	}
 	
@@ -221,29 +227,25 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$getEffect(RegistryEntry<StatusEffect> effect, final CallbackInfoReturnable<StatusEffectInstance> ci)
 	{
 		final LivingEntity living = (LivingEntity)(Object)this;
-		VariousTypes.getSheet(living).ifPresent(sheet -> 
+		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			StatusEffectInstance spoofed = getSpoofedStatusEffect(living, effect);
-			if(spoofed != null)
-				ci.setReturnValue(spoofed);
+			for(AbilityInstance inst : getSpoofAbilities(sheet))
+			{
+				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
+				if(ability.shouldApplyTo(effect, inst) && ability.hasSpoofed(effect, inst))
+				{
+					ci.setReturnValue(ability.getSpoofed(effect, inst));
+					return;
+				}
+			};
 		});
 	}
 	
-	@Nullable
-	private StatusEffectInstance getSpoofedStatusEffect(LivingEntity living, RegistryEntry<StatusEffect> effect)
+	/* Returns a list of all status effect spoofing abilities in the given sheet */
+	private static List<AbilityInstance> getSpoofAbilities(CharacterSheet sheet)
 	{
-		StatusEffectInstance spoofed = null;
-		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
-		if(sheetOpt.isPresent())
-		{
-			CharacterSheet sheet = sheetOpt.get();
-			final StatusEffectInstance actual = activeStatusEffects.get(effect);
-			
-			AbilitySet set = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).copy();
-			sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
-			
-			return ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, (LivingEntity)(Object)this, set, actual);
-		}
-		return spoofed;
+		AbilitySet set = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).copy();
+		sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
+		return set.getAbilitiesOfClass(IStatusEffectSpoofAbility.class);
 	}
 }

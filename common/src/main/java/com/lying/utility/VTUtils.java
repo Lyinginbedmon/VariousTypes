@@ -8,6 +8,7 @@ import org.joml.Vector2i;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.lying.ability.AbilityInstance;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
@@ -97,6 +98,11 @@ public class VTUtils
 	public static Text describeType(Type type)
 	{
 		return describe(type.displayName(), type.listID(), Optional.empty());
+	}
+	
+	public static Text describeAbility(AbilityInstance inst)
+	{
+		return describe(inst.displayName(), inst.mapName(), inst.description());
 	}
 	
 	private static Text describe(Text display, Identifier regName, Optional<Text> desc)

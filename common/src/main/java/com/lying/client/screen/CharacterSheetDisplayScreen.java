@@ -16,14 +16,17 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
+import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.client.VariousTypesClient;
 import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTTypes;
+import com.lying.mixin.IDrawContextInvoker;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
@@ -61,6 +64,8 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private TypeButtonWidget typeButton;
 	private ButtonWidget speciesButton, templatesButton;
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
+	private ButtonWidget[] categoryButtons = new ButtonWidget[Category.values().length];
+	private ButtonWidget[] pageButtons = new ButtonWidget[2];
 	
 	private CharacterSheet sheet;
 	protected Optional<AnimatedPlayerEntity> animatedPlayer = Optional.empty();
@@ -71,7 +76,8 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	private TypeSet types;
 	private ActionHandler actions;
 	
-	private List<AbilityInstance> abilities;
+	private Map<Category, List<AbilityInstance>> abilities = new HashMap<>();
+	private Category currentCategory = Category.OFFENSE;
 	private int abilityPages;
 	private int abilityPage = 0;
 	
@@ -101,10 +107,24 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		
 		types = sheet.<TypeSet>element(VTSheetElements.TYPES).copy();
 		actions = sheet.<ActionHandler>element(VTSheetElements.ACTIONS).copy();
-		abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden();
-		abilityPages = Math.ceilDiv(abilities.size(), abilityButtons.length);
-		if(abilities.size() > 1)
-			Collections.sort(abilities, AbilityInstance.SORT_FUNC);
+		sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden().forEach(inst -> 
+		{
+			Category cat = inst.ability().category();
+			List<AbilityInstance> set = abilities(cat);
+			set.add(inst);
+			if(set.size() > 1)
+				Collections.sort(set, AbilityInstance.SORT_FUNC);
+			abilities.put(cat, set);
+		});
+		
+		// Set current category to first non-empty category
+		if(!abilities.isEmpty())
+			for(Category cat : Category.values())
+				if(!abilities.getOrDefault(cat, Lists.newArrayList()).isEmpty())
+				{
+					currentCategory = cat;
+					break;
+				}
 	}
 	
 	public void setCharacter(AnimatedPlayerEntity character)
@@ -122,6 +142,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		int midY = height / 2;
 		int spacing = 100;
 		
+		// Information buttons
 		int leftX = midX - spacing;
 		addDrawableChild(typeButton = new TypeButtonWidget(leftX - 45 - 22, midY - 90, types.ofTier(Tier.SUPERTYPE).stream().findFirst().get().displayName(), (button) -> 
 		{
@@ -142,26 +163,49 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			setFocused(null);
 		}).dimensions(leftX - 90, midY - 90 + 85, 90, 30).build());
 		
+		// Ability buttons
 		for(int i=0; i<abilityButtons.length; i++)
 			addDrawableChild(abilityButtons[i] = makeAbilityButton(i, midX + spacing, midY - 70 + i * 35));
 		
-		if(abilityPages > 1)
+		// Ability category buttons
+		int catY = 0;
+		int pageY = 0;
+		switch(VariousTypesClient.config.buttonLayout())
 		{
-			addDrawableChild(ButtonWidget.builder(Text.literal("<"), (button) -> {
-				if(abilityPage == 0) return;
-				abilityPage -= Math.signum(abilityPage);
-				updateButtons();
+			case CATS_TOP:
+				catY = midY - 93;
+				pageY = midY + 105;
+				break;
+			case CATS_BOT:
+				catY = midY + 105;
+				pageY = midY - 90;
+				break;
+		}
+		for(int i=0; i<Category.values().length; i++)
+		{
+			Category cat = Category.values()[i];
+			addDrawableChild(categoryButtons[i] = new CategoryButton(midX + spacing + i * 36, catY, cat, (button) -> {
+				setCategory(cat);
 				setFocused(null);
-				}).dimensions(midX + spacing, midY - 90, 15, 15).build());
-			
-			addDrawableChild(ButtonWidget.builder(Text.literal(">"), (button) -> {
-				if(abilityPage >= abilityPages - 1) return;
-				abilityPage = Math.min(abilityPage + 1, abilityPages - 1);
-				updateButtons();
-				setFocused(null);
-				}).dimensions(midX + spacing + 90 - 15, midY - 90, 15, 15).build());
+				}));
 		}
 		
+		// Ability page navigation buttons
+		addDrawableChild(pageButtons[0] = ButtonWidget.builder(Text.literal("<"), (button) -> {
+			if(abilityPage == 0) return;
+			abilityPage -= Math.signum(abilityPage);
+			updateButtons();
+			setFocused(null);
+			}).dimensions(midX + spacing, pageY, 15, 15).build());
+		
+		addDrawableChild(pageButtons[1] = ButtonWidget.builder(Text.literal(">"), (button) -> {
+			if(abilityPage >= abilityPages - 1) return;
+			abilityPage = Math.min(abilityPage + 1, abilityPages - 1);
+			updateButtons();
+			setFocused(null);
+			}).dimensions(midX + spacing + 90 - 15, pageY, 15, 15).build());
+		
+		// Action buttons
 		List<Action> actions = Lists.newArrayList();
 		Action.actions().forEach(action -> actions.add(action.get()));
 		Collections.sort(actions, Action.SORT);
@@ -187,8 +231,8 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		return ButtonWidget.builder(Text.empty(), (button) -> 
 		{
 			int i = index + (abilityPage * abilityButtons.length);
-			if(i < abilities.size())
-				setDetail(new DetailObject(VTUtilsClient.abilityToDetail(abilities.get(i))));
+			if(i < abilities(currentCategory).size())
+				setDetail(new DetailObject(VTUtilsClient.abilityToDetail(abilities(currentCategory).get(i))));
 			setFocused(null);
 		}).dimensions(x, y, 90, 30).build();
 	}
@@ -249,18 +293,61 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		updateButtons();
 	}
 	
+	public List<AbilityInstance> abilities(Category cat) { return abilities.getOrDefault(cat, Lists.newArrayList()); }
+	
 	private void updateButtons()
 	{
 		for(int i=0; i<abilityButtons.length; i++)
 		{
 			ButtonWidget button = abilityButtons[i];
 			int index = i + (abilityPage * abilityButtons.length);
-			button.active = index < abilities.size();
-			if(index >= abilities.size())
+			button.active = index < abilities(currentCategory).size();
+			if(index >= abilities(currentCategory).size())
 				button.setMessage(Text.empty());
 			else
-				button.setMessage(abilities.get(index).displayName());
+				button.setMessage(abilities(currentCategory).get(index).displayName());
 		}
+		
+		int catY = 0;
+		int catOffset = 0;
+		switch(VariousTypesClient.config.buttonLayout())
+		{
+			case CATS_TOP:
+				catY = (height / 2) - 93;
+				catOffset = -3;
+				break;
+			case CATS_BOT:
+				catY = (height / 2) + 105;
+				catOffset = 3;
+				break;
+		}
+		for(int i=0; i<categoryButtons.length; i++)
+		{
+			Category cat = Category.values()[i];
+			categoryButtons[i].active = currentCategory != cat && !abilities(cat).isEmpty();
+			categoryButtons[i].setY(catY + (cat == currentCategory ? catOffset : 0));
+		}
+		
+		for(int i=0; i<pageButtons.length; i++)
+			if(abilityPages == 0)
+				pageButtons[i].active = pageButtons[i].visible = false;
+			else
+			{
+				pageButtons[i].visible = true;
+				pageButtons[i].active = (i == 0 && abilityPage > 0) || (i == 1 && abilityPage < abilityPages - 1);
+			}
+	}
+	
+	public void setCategory(Category cat)
+	{
+		if(abilities(cat).isEmpty())
+			return;
+		
+		currentCategory = cat;
+		abilityPages = Math.ceilDiv(abilities(cat).size(), abilityButtons.length);
+		abilityPage = 0;
+		
+		updateButtons();
 	}
 	
 	public boolean mouseClicked(double mouseX, double mouseY, int button)
@@ -302,7 +389,15 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		context.drawCenteredTextWithShadow(textRenderer, ownerName, midX, midY - 100, 0xFFFFFF);
 		context.drawCenteredTextWithShadow(textRenderer, Text.literal(String.valueOf(power)), midX, midY + 90, 0xFFFFFF);
 		if(abilityPages > 1)
-			context.drawCenteredTextWithShadow(textRenderer, Text.literal((1 + abilityPage) + " / " + abilityPages), midX + 145, midY - 85, 0xFFFFFF);
+			switch(VariousTypesClient.config.buttonLayout())
+			{
+				case CATS_TOP:
+					context.drawCenteredTextWithShadow(textRenderer, Text.literal((1 + abilityPage) + " / " + abilityPages), midX + 145, midY + 109, 0xFFFFFF);
+					break;
+				case CATS_BOT:
+					context.drawCenteredTextWithShadow(textRenderer, Text.literal((1 + abilityPage) + " / " + abilityPages), midX + 145, midY - 85, 0xFFFFFF);
+					break;
+			}
 		ownerStats.ifPresent(stats -> stats.render(context, midX + 90, midY - 60, midX + 90, midY - 60));
 		
 		detailObject.ifPresent(detail -> 
@@ -431,7 +526,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			float g = (float)((colour >> 8) & 0xFF) / 255F;
 			float b = (float)(colour & 0xFF) / 255F;
 			
-			context.drawTexturedQuad(isHovered() ? TEXTURE_HOVERED : TEXTURE, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, r, g, b, 1F);
+			((IDrawContextInvoker)context).drawTexRGBA(isHovered() ? TEXTURE_HOVERED : TEXTURE, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, r, g, b, 1F);
 			context.drawCenteredTextWithShadow(textRenderer, getMessage(), getX() + getWidth() / 2, getY() + getHeight() / 2 - textRenderer.fontHeight / 2, 0xFFFFFF);
 		}
 	}
@@ -453,8 +548,8 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta)
 		{
 			float brightness = isHovered() ? 1F : can ? 0.75F : 0.45F;
-			context.drawTexturedQuad(action.texture(), this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
-			context.drawTexturedQuad(can ? TEXTURE : TEXTURE_ALT, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
+			((IDrawContextInvoker)context).drawTexRGBA(action.texture(), this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
+			((IDrawContextInvoker)context).drawTexRGBA(can ? TEXTURE : TEXTURE_ALT, this.getX(), this.getRight(), this.getY(), this.getBottom(), 0, 0, 1F, 0F, 1, brightness, brightness, brightness, 1F);
 		}
 	}
 }

@@ -2,6 +2,7 @@ package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +14,8 @@ import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityInstance;
+import com.lying.ability.AbilityInvisibility;
+import com.lying.ability.AbilityNightVision;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
@@ -49,7 +52,7 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new ToggledAbility(prefix("night_vision"), Category.UTILITY) 
+	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new AbilityNightVision(prefix("night_vision"), Category.UTILITY) 
 	{
 		public void registerEventHandlers()
 		{
@@ -60,12 +63,25 @@ public class VTAbilities
 					&& abilities.hasAbility(registryName()) 
 					&& ToggledAbility.hasActive(abilities, registryName())
 					)
-					return new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
-				return actual;
+					ServerEvents.LivingEvents.GetStatusEffectEventResult = new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
 			});
 		}
 	});
 	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight"), Category.UTILITY));
+	public static final Supplier<Ability> INVISIIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE)
+	{
+		public void registerEventHandlers()
+		{
+			ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect,living,abilities,actual) -> 
+			{
+				if(
+					effect == StatusEffects.INVISIBILITY
+					&& abilities.hasAbility(registryName())
+					)
+					ServerEvents.LivingEvents.GetStatusEffectEventResult = new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
+			});
+		}
+	});
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new ActivatedAbility(prefix("swim"), Category.UTILITY) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
@@ -181,4 +197,6 @@ public class VTAbilities
 	}
 	
 	public static boolean exists(Identifier registryName) { return ABILITIES.containsKey(registryName); }
+	
+	public static Collection<Identifier> abilityIds() { return ABILITIES.keySet(); }
 }

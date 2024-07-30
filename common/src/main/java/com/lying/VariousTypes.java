@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.lying.command.VTCommands;
 import com.lying.component.CharacterSheet;
+import com.lying.config.ServerConfig;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTItems;
 import com.lying.init.VTScreenHandlerTypes;
@@ -32,8 +33,7 @@ public class VariousTypes
 {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.ModInfo.MOD_ID);
     
-    // FIXME Replace with server config value
-    public static int POWER = 5;
+    public static ServerConfig config;
     
     /** Cross-platform handler for vital functions that aren't handled directly by Architectury */
     private static XPlatHandler HANDLER = new XPlatHandler() 
@@ -46,6 +46,9 @@ public class VariousTypes
     @SuppressWarnings("removal")
 	public static void commonInit()
     {
+    	config = new ServerConfig("config/VariousTypesServer.cfg");
+    	config.read();
+    	
     	VTSheetElements.init();
     	VTSheetModules.init();
     	

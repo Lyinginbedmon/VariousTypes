@@ -14,7 +14,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 public class VariousTypesNeoForgeClient
 {
 	@SubscribeEvent
-	public void setupClient(final FMLClientSetupEvent event)
+	public static void setupClient(final FMLClientSetupEvent event)
 	{
     	VariousTypesClient.clientInit();
 	}

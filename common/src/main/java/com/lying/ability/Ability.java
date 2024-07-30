@@ -39,6 +39,8 @@ public class Ability
 	/** Returns what type of ability this is */
 	public AbilityType type() { return AbilityType.PASSIVE; }
 	
+	public Category category() { return category; }
+	
 	public Identifier iconTexture() { return category.icon(); }
 	
 	public final AbilityInstance instance() { return instance(AbilitySource.MISC); }

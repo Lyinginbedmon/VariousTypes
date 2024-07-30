@@ -8,6 +8,7 @@ import com.lying.ability.ActivatedAbility;
 import com.lying.client.network.SetFavouriteAbilityPacket;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
+import com.lying.mixin.IDrawContextInvoker;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.gui.DrawContext;
@@ -69,7 +70,7 @@ public class FavouriteAbilityButton extends ButtonWidget
 	{
 		ElementActionables element = VariousTypes.getSheet(AbilityMenu.mc.player).get().<ElementActionables>element(VTSheetElements.ACTIONABLES);
 		float v = contents.isPresent() && !element.coolingDown() ? 1F : 0.4F;
-		context.drawTexturedQuad(isHovered() && this.active ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), getBottom(), 0, 0F, 1F, 0F, 1F, v, v, v, 1F);
+		((IDrawContextInvoker)context).drawTexRGBA(isHovered() && this.active ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), getBottom(), 0, 0F, 1F, 0F, 1F, v, v, v, 1F);
 		contents.ifPresent(inst -> 
 		{
 			float f = element.getCooldown(inst.mapName(), AbilityMenu.mc.player.getWorld().getTime());
@@ -89,7 +90,7 @@ public class FavouriteAbilityButton extends ButtonWidget
 			if(!((ActivatedAbility)inst.ability()).canTrigger(AbilityMenu.mc.player, inst))
 				f = Math.min(f, 0.3F);
 			
-			context.drawTexturedQuad(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - renderedHeight, getBottom() - 2, 0, 0F, 1F, u1, 1F, f, f, f, 1F);
+			((IDrawContextInvoker)context).drawTexRGBA(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - renderedHeight, getBottom() - 2, 0, 0F, 1F, u1, 1F, f, f, f, 1F);
 		});
 	}
 }

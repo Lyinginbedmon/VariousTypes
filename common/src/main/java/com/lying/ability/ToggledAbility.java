@@ -26,12 +26,13 @@ public class ToggledAbility extends ActivatedAbility
 		NbtCompound mem = instance.memory();
 		mem.putBoolean("IsActive", !isActive(instance));
 		instance.setMemory(mem);
-		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.markDirty());
 		
 		if(isActive(instance))
 			onActivation(owner, instance);
 		else
 			onDeactivation(owner, instance);
+		
+		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.markDirty());
 	}
 	
 	public boolean isActive(AbilityInstance instance)

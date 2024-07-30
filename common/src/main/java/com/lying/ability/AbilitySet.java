@@ -115,6 +115,11 @@ public class AbilitySet
 		return abilities.values().stream().filter(inst -> inst.ability().registryName().equals(registryName)).toList();
 	}
 	
+	public List<AbilityInstance> getAbilitiesOfClass(Class<?> classIn)
+	{
+		return abilities.values().stream().filter(inst -> classIn.isAssignableFrom(inst.ability().getClass())).toList();
+	}
+	
 	public boolean hasAbilityInstance(Identifier mapName)
 	{
 		return abilities.values().stream().anyMatch(instance -> instance.mapName().equals(mapName));
