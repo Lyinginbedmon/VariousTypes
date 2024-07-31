@@ -16,6 +16,7 @@ import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementHome;
+import com.lying.component.element.ElementNonLethal;
 import com.lying.component.element.ElementTypeSet;
 import com.lying.component.element.ISheetElement;
 
@@ -31,6 +32,7 @@ public class VTSheetElements
 	public static final SheetElement<ElementAbilitySet> ABILITES	= register("abilities", listOf(VTSheetElements.TYPES), ElementAbilitySet::new);
 	public static final SheetElement<ElementActionables> ACTIONABLES	= register("actionables", listOf(VTSheetElements.ABILITES), ElementActionables::new);
 	public static final SheetElement<ElementActionHandler> ACTIONS	= register("actions", listOf(VTSheetElements.ABILITES, VTSheetElements.TYPES), ElementActionHandler::new);
+	public static final SheetElement<ElementNonLethal> NONLETHAL	= register("nonlethal", List::of, ElementNonLethal::new);
 	
 	private static final List<SheetElement<?>> SORTED_LIST = Lists.newArrayList();
 	

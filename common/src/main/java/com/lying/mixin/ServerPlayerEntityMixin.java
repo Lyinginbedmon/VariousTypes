@@ -9,9 +9,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
-import com.lying.component.element.ElementActionHandler;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
+import com.lying.type.ActionHandler;
 import com.mojang.datafixers.util.Either;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -38,7 +38,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 		VariousTypes.getSheet((PlayerEntity)(Object)this).ifPresent(sheet -> 
 		{
 			// Prevents natural health regeneration if the player does not have that action
-			if(!sheet.<ElementActionHandler>element(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
+			if(!sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
 			{
 				setSpawnPoint(getWorld().getRegistryKey(), pos, getYaw(), false, true);
 				ci.setReturnValue(Either.left(PlayerEntity.SleepFailureReason.OTHER_PROBLEM));
@@ -53,7 +53,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
 			// Prevents phantoms from spawning from players who cannot sleep
-			if(!sheet.<ElementActionHandler>element(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
+			if(!sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
 				getStatHandler().setStat(player, Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST), 0);
 		});
 	}

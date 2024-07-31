@@ -105,9 +105,9 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		species = sheet.module(VTSheetModules.SPECIES).getMaybe();
 		templates = sheet.module(VTSheetModules.TEMPLATES).get();
 		
-		types = sheet.<TypeSet>element(VTSheetElements.TYPES).copy();
-		actions = sheet.<ActionHandler>element(VTSheetElements.ACTIONS).copy();
-		sheet.<AbilitySet>element(VTSheetElements.ABILITES).allNonHidden().forEach(inst -> 
+		types = sheet.<TypeSet>elementValue(VTSheetElements.TYPES).copy();
+		actions = sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).copy();
+		sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).allNonHidden().forEach(inst -> 
 		{
 			Category cat = inst.ability().category();
 			List<AbilityInstance> set = abilities(cat);

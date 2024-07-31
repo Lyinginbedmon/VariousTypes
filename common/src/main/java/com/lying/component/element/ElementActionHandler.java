@@ -23,7 +23,7 @@ public class ElementActionHandler extends ActionHandler implements ISheetElement
 	
 	public SheetElement<?> registry() { return VTSheetElements.ACTIONS; }
 	
-	public static boolean canBreathe(CharacterSheet sheet, Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || ((ElementActionHandler)sheet.element(VTSheetElements.ACTIONS)).canBreathe(fluid); }
+	public static boolean canBreathe(CharacterSheet sheet, Fluid fluid, boolean hasWaterBreathing) { return hasWaterBreathing || sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).canBreathe(fluid); }
 	
 	public ActionHandler value() { return this; }
 	
@@ -31,10 +31,10 @@ public class ElementActionHandler extends ActionHandler implements ISheetElement
 	{
 		clear();
 		
-		TypeSet typeSet = sheet.element(VTSheetElements.TYPES);
+		TypeSet typeSet = sheet.elementValue(VTSheetElements.TYPES);
 		typeSet.forEach(type -> type.actions().stack(this, typeSet));
 		
-		AbilitySet abilitySet = sheet.element(VTSheetElements.ABILITES);
+		AbilitySet abilitySet = sheet.elementValue(VTSheetElements.ABILITES);
 		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
 			abilitySet.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(this, inst));
 		

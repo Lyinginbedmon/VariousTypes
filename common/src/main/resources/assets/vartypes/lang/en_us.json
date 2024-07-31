@@ -1,6 +1,8 @@
 {
 	"itemGroup.vartypes.item_group": "Various Types",
 	"item.vartypes.character_sheet": "Character Sheet",
+	// Status effects
+	"effect.vartypes.fatigue": "Fatigue",
 	// Supertypes
 	"type.vartypes.animal": "Animal",
 	"type.vartypes.animal.desc": "Animals are abundant and diverse creatures, typically possessed of a blissful state of ignorance that fills their days with idle comfort and joy. But when their stomach grows empty, nature often gifts them with the teeth and claws to rival any blade and sunder any armour. Fortunate indeed then that they need only overcome their neighbour, far less often you, to see their belly filled.",
@@ -182,6 +184,7 @@
 	"command.vartypes.species.remove.failed": "%s is already not a %s",
 	"command.vartypes.reset.success": "Reset the character sheet of %s",
 	"command.vartypes.randomize.success": "Randomized %s's character sheet",
+	"command.vartypes.nonlethal.success": "Applied %s nonlethal damage to %s",
 	// Gui
 	"gui.vartypes.no_character_sheet": "%s has no character sheet to view",
 	"gui.vartypes.typeset": "%s (%s)",

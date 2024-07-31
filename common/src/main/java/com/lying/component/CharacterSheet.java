@@ -152,7 +152,10 @@ public class CharacterSheet
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Object> T element(SheetElement<?> element) { return (T)elements.get(element).value(); }
+	public <T extends Object> T elementValue(SheetElement<?> element) { return (T)elements.get(element).value(); }
+	
+	@SuppressWarnings("unchecked")
+	public <T extends ISheetElement<?>> T element(SheetElement<?> element) { return (T)elements.get(element); }
 	
 	public int power()
 	{

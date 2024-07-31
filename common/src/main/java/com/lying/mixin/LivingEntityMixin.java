@@ -18,9 +18,9 @@ import com.lying.ability.AbilitySet;
 import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
-import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.component.element.ElementActionables;
+import com.lying.component.element.ElementNonLethal;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
@@ -28,12 +28,14 @@ import com.lying.type.TypeSet;
 import com.lying.utility.ServerEvents.LivingEvents;
 import com.lying.utility.ServerEvents.Result;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
@@ -82,7 +84,7 @@ public class LivingEntityMixin extends EntityMixin
 		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)(Object)this);
 		if(sheet.isEmpty())
 			return;
-		else if(sheet.get().<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.UNDEAD.get()))
+		else if(sheet.get().<TypeSet>elementValue(VTSheetElements.TYPES).contains(VTTypes.UNDEAD.get()))
 			ci.setReturnValue(true);
 	}
 	
@@ -91,7 +93,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			if(sheet.<AbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 			{
 				ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
 				if(!helmet.isEmpty())
@@ -172,7 +174,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			AbilitySet abilities = sheet.<AbilitySet>element(VTSheetElements.ABILITES);
+			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITES);
 			switch(LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities, ci.getReturnValue() ? Result.ALLOW : Result.DENY))
 			{
 				case Result.DENY:
@@ -244,8 +246,27 @@ public class LivingEntityMixin extends EntityMixin
 	/* Returns a list of all status effect spoofing abilities in the given sheet */
 	private static List<AbilityInstance> getSpoofAbilities(CharacterSheet sheet)
 	{
-		AbilitySet set = sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).copy();
-		sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
+		AbilitySet set = sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).copy();
+		sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
 		return set.getAbilitiesOfClass(IStatusEffectSpoofAbility.class);
+	}
+	
+	@Inject(method = "heal(F)V", at = @At("HEAD"), cancellable = true)
+	private void vt$healNonlethalFirst(float amount, final CallbackInfo ci)
+	{
+		final LivingEntity living = (LivingEntity)(Object)this;
+		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
+		if(sheetOpt.isEmpty()) return;
+		
+		// Heal nonlethal damage before restoring health
+		ElementNonLethal nonlethal = sheetOpt.get().element(VTSheetElements.NONLETHAL);
+		if(nonlethal.value() > 0F)
+		{
+			float healNon = Math.min(amount, nonlethal.value());
+			nonlethal.accrue(-healNon, living.getMaxHealth(), living.getType() == EntityType.PLAYER ? (PlayerEntity)living : null);
+			amount -= healNon;
+			if(amount == 0F)
+				ci.cancel();
+		}
 	}
 }

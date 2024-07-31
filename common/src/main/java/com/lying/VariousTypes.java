@@ -15,6 +15,7 @@ import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
+import com.lying.init.VTStatusEffects;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.init.VTTypes;
 import com.lying.network.ActivateAbilityReceiver;
@@ -58,6 +59,7 @@ public class VariousTypes
     	VTTemplateRegistry.init();
     	VTScreenHandlerTypes.init();
     	VTItems.init();
+    	VTStatusEffects.init();
     	VTCommands.init();
     	ServerBus.init();
     	

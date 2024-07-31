@@ -39,7 +39,7 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public SheetElement<?> registry(){ return VTSheetElements.ACTIONABLES; }
 	
-	public static AbilitySet getActivated(CharacterSheet sheet) { return ((ElementActionables)sheet.element(VTSheetElements.ACTIONABLES)); }
+	public static AbilitySet getActivated(CharacterSheet sheet) { return sheet.elementValue(VTSheetElements.ACTIONABLES); }
 	
 	public boolean isAvailable(Identifier mapName)
 	{
@@ -174,7 +174,7 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public void rebuild(CharacterSheet sheet)
 	{
-		sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).mergeActivated(this);
+		sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).mergeActivated(this);
 		
 		for(int i=0; i<favourites.size(); i++)
 		{

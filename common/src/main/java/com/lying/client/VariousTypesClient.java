@@ -7,6 +7,7 @@ import com.lying.client.init.ClientsideEntities;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.network.SyncActionablesReceiver;
+import com.lying.client.network.SyncFatigueReceiver;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
@@ -45,6 +46,7 @@ public class VariousTypesClient
 		MenuRegistry.registerScreenFactory(VTScreenHandlerTypes.ABILITY_MENU_HANDLER.get(), AbilityMenu::new);
 		
     	NetworkManager.registerReceiver(NetworkManager.Side.S2C, VTPacketHandler.SYNC_ACTIONABLES_ID, new SyncActionablesReceiver());
+    	NetworkManager.registerReceiver(NetworkManager.Side.S2C, VTPacketHandler.SYNC_FATIGUE_ID, new SyncFatigueReceiver());
 		
 		ClientsideEntities.init();
 		EntityRendererRegistry.register(ClientsideEntities.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);

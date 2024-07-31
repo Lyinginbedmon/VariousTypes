@@ -23,6 +23,6 @@ public class ElementTypeSet extends TypeSet implements ISheetElement<TypeSet>
 		if(ofTier(Tier.SUPERTYPE).isEmpty())
 			add(VTTypes.HUMAN.get());
 		
-		SheetEvents.GET_TYPES_EVENT.invoker().affectTypes(sheet.getOwner(), sheet.element(VTSheetElements.HOME_DIM), this);
+		SheetEvents.GET_TYPES_EVENT.invoker().affectTypes(sheet.getOwner(), sheet.elementValue(VTSheetElements.HOME_DIM), this);
 	}
 }

@@ -35,7 +35,7 @@ public class DamageEnchantmentMixin
 		if(level > 0 && applicableEntities.isPresent() && target instanceof LivingEntity && applicableEntities.get() == EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)
 			VariousTypes.getSheet(living = (LivingEntity)target).ifPresent(sheet -> 
 			{
-				if(!sheet.<TypeSet>element(VTSheetElements.TYPES).contains(VTTypes.ARTHROPOD.get()))
+				if(!sheet.<TypeSet>elementValue(VTSheetElements.TYPES).contains(VTTypes.ARTHROPOD.get()))
 					return;
 				
 				int i = 20 + user.getRandom().nextInt(10 * level);

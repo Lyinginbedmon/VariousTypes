@@ -20,12 +20,14 @@ import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInstance.AbilityNbt;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
+import com.lying.component.element.ElementNonLethal;
 import com.lying.component.module.AbstractSheetModule;
 import com.lying.component.module.ModuleCustomAbilities;
 import com.lying.component.module.ModuleCustomHome;
 import com.lying.component.module.ModuleCustomTypes;
 import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
@@ -38,6 +40,7 @@ import com.lying.type.DummyType;
 import com.lying.type.Type;
 import com.lying.utility.VTUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -297,6 +300,21 @@ public class VTCommands
 											source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
 											return 15;
 										}))))
+							.then(literal("nonlethal")
+								.then(argument("amount", FloatArgumentType.floatArg())
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										float amount = FloatArgumentType.getFloat(context, "amount");
+										VariousTypes.getSheet(player).ifPresent(sheet -> 
+										{
+											ElementNonLethal nonlethal = sheet.element(VTSheetElements.NONLETHAL);
+											nonlethal.accrue(amount, player.getMaxHealth(), player);
+											source.sendFeedback(() -> translate("command", "nonlethal.success", amount, player.getDisplayName()), true);
+										});
+										return 15;
+									})))
 							.then(literal("species")
 								.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
 									.executes(context -> 

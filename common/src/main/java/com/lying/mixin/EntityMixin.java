@@ -107,9 +107,9 @@ public class EntityMixin
 		
 		DamageSources sources = getDamageSources();
 		if(source == sources.drown())
-			ci.setReturnValue(!sheet.get().<ActionHandler>element(VTSheetElements.ACTIONS).can(Action.BREATHE.get()));
+			ci.setReturnValue(!sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.BREATHE.get()));
 		if(source == sources.starve())
-			ci.setReturnValue(!sheet.get().<ActionHandler>element(VTSheetElements.ACTIONS).can(Action.EAT.get()));
+			ci.setReturnValue(!sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.EAT.get()));
 	}
 	
 	@Inject(method = "setAir(I)V", at = @At("HEAD"), cancellable = true)
@@ -126,7 +126,7 @@ public class EntityMixin
 		if(!(ent instanceof LivingEntity) || getWorld() == null)
 			return;
 		
-		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>element(VTSheetElements.ABILITES), ci.getReturnValueI())));
+		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES), ci.getReturnValueI())));
 	}
 	
 	@Inject(method = "canClimb(Lnet/minecraft/block/BlockState;)Z", at = @At("TAIL"), cancellable = true)

@@ -5,7 +5,6 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
-import com.lying.component.element.ElementAbilitySet;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -35,12 +34,16 @@ public class AbilityFastHeal extends Ability
 	{
 		TickEvent.PLAYER_POST.register(player -> 
 		{
-			if(player.getHealth() < player.getMaxHealth())
+			if(!player.getWorld().isClient())
 				VariousTypes.getSheet(player).ifPresent(sheet -> 
 				{
-					if(!sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(registryName())) return;
-					OperatingValues values = OperatingValues.fromNbt(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).get(registryName()).memory());
-					if(player.getHungerManager().getFoodLevel() >= values.minimumFood && player.age%values.healRate == 0)
+					if(!(player.getHealth() < player.getMaxHealth() || sheet.<Float>elementValue(VTSheetElements.NONLETHAL) > 0F))
+						return;
+					if(!sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+						return;
+					
+					OperatingValues values = OperatingValues.fromNbt(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName()).memory());
+					if(player.age%values.healRate == 0 && player.getHungerManager().getFoodLevel() >= values.minimumFood)
 						player.heal(values.healAmount);
 				});
 		});

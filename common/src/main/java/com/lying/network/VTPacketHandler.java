@@ -11,4 +11,5 @@ public class VTPacketHandler
 	public static final Identifier SET_FAVOURITE_ABILITY_ID	= prefix("set_favourite_ability");
 	public static final Identifier ACTIVATE_ABILITY_ID	= prefix("activate_ability");
 	public static final Identifier SYNC_ACTIONABLES_ID	= prefix("sync_actionables");
+	public static final Identifier SYNC_FATIGUE_ID	= prefix("sync_fatigue");
 }
