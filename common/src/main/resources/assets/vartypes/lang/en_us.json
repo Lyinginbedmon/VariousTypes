@@ -137,6 +137,8 @@
 	"ability.vartypes.invisibility.desc": "You are all but imperceptible to others",
 	"ability.vartypes.run_command": "Run Command",
 	"ability.vartypes.run_command.desc": "Runs a predefined command",
+	"ability.vartypes.fast_healing": "Fast Healing",
+	"ability.vartypes.fast_healing.desc": "You are able to recover from harm at an accelerated rate, regardless the severity of your injuries. You regain %s health every %ss whilst having at least %s food.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",
@@ -186,6 +188,7 @@
 	"gui.vartypes.templates": "%s templates",
 	"gui.vartypes.activated_ability.success": "Used [%s]",
 	"gui.vartypes.activated_ability.failed": "You can't use %s right now",
+	"gui.vartypes.ability_cooldown": "Cooldown: %ss",
 	"gui.vartypes.ability_passive": "Passive Ability",
 	"gui.vartypes.ability_activated": "Activated Ability",
 	"gui.vartypes.ability_toggled": "Toggled Ability",

@@ -13,8 +13,10 @@ import com.google.common.collect.Lists;
 import com.lying.ability.AbilityInstance;
 import com.lying.client.screen.DetailObject;
 import com.lying.client.screen.DetailObject.Batch;
+import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -109,6 +111,8 @@ public class VTUtilsClient
 		List<MutableText> entries = Lists.newArrayList();
 		entries.add(instance.displayName().copy().formatted(Formatting.BOLD));
 		entries.add(instance.ability().type().translate().copy());
+		if(instance.cooldown() > 0)
+			entries.add(Reference.ModInfo.translate("gui","ability_cooldown", VTUtils.ticksToSeconds(instance.cooldown())).copy());
 		instance.description().ifPresent(text -> entries.add(text.copy().formatted(Formatting.GRAY)));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(instance.mapName().toString()).copy().formatted(Formatting.DARK_GRAY));

@@ -115,10 +115,8 @@ public class AbilityInstance
 	
 	public int cooldown()
 	{
-		if(cooldown.isPresent())
-			return cooldown.get();
 		if(ability.type() != AbilityType.PASSIVE)
-			return ((ActivatedAbility)ability).cooldownDefault();
+			return cooldown.isPresent() ? cooldown.get() : ((ActivatedAbility)ability).cooldownDefault();
 		return 0;
 	}
 	

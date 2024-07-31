@@ -14,6 +14,7 @@ import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
+import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.type.Type;
@@ -102,7 +103,25 @@ public class VTUtils
 	
 	public static Text describeAbility(AbilityInstance inst)
 	{
-		return describe(inst.displayName(), inst.mapName(), inst.description());
+		MutableText tooltip = Text.empty().append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n");
+		MutableText registry = Text.literal(inst.mapName().toString()).formatted(Formatting.DARK_GRAY);
+		if(inst.cooldown() > 0)
+			tooltip.append(Reference.ModInfo.translate("gui","ability_cooldown", ticksToSeconds(inst.cooldown()))).append("\n");
+		
+		if(inst.description().isPresent())
+			tooltip.append(inst.description().get().copy().formatted(Formatting.ITALIC, Formatting.GRAY)).append("\n").append(registry);
+		else
+			tooltip.append(registry);
+		return inst.displayName().copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
+	}
+	
+	public static Object ticksToSeconds(int ticks)
+	{
+		double seconds = (double)ticks / (double)Reference.Values.TICKS_PER_SECOND;
+		if(seconds%1 == 0)
+			return (int)seconds;
+		else
+			return seconds;
 	}
 	
 	private static Text describe(Text display, Identifier regName, Optional<Text> desc)

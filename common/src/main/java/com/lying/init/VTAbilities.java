@@ -13,8 +13,10 @@ import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
+import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInvisibility;
+import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
@@ -29,10 +31,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Vec3d;
 
 public class VTAbilities
 {
@@ -98,26 +97,10 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> CLIMB			= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
-	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));
+	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));	// TODO Implement
 	public static final Supplier<Ability> BURROW		= register("burrow", () -> new ToggledAbility(prefix("burrow"), Category.UTILITY));
-	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new ActivatedAbility(prefix("teleport"), Category.UTILITY){	// LoS teleport
-		public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
-		{
-			double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 8D;
-			return owner.raycast(range, 1F, false).getType() != HitResult.Type.MISS;
-		}
-		
-		protected void activate(LivingEntity owner, AbilityInstance instance)
-		{
-			double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 8D;
-			HitResult trace = owner.raycast(range, 1F, false);
-			if(trace.getType() == HitResult.Type.MISS)
-				return;
-			
-			Vec3d hitPos = trace.getPos();
-			owner.sendMessage(Text.literal("Hit: "+hitPos.toString()));
-		}});
-	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY));	// Incorporeal
+	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
+	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY));	// Incorporeal	// TODO Implement
 	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic"), Category.DEFENSE) 
 	{
@@ -126,8 +109,9 @@ public class VTAbilities
 			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities,result) -> effect.getEffectType().isIn(VTTags.POISONS) && abilities.hasAbilityInstance(registryName()) ? Result.DENY : result);
 		}
 	});
-	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new Ability(prefix("regeneration"), Category.DEFENSE));
-	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new Ability(prefix("natural_armour"), Category.DEFENSE));
+	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
+	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new Ability(prefix("regeneration"), Category.DEFENSE));	// TODO Implement
+	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new Ability(prefix("natural_armour"), Category.DEFENSE));	// TODO Implement
 	public static final Supplier<Ability> DEEP_BREATH	= register("deep_breath", () -> new Ability(prefix("deep_breath"), Category.UTILITY)
 	{
 		public void registerEventHandlers()

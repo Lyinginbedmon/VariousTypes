@@ -74,6 +74,8 @@ public class AbilitySet
 	/** Adds the ability, overriding any pre-existing ability if necessary */
 	public void set(AbilityInstance ability)
 	{
+		if(abilities.containsKey(ability.mapName()))
+			abilities.remove(ability.mapName());
 		abilities.put(ability.mapName(), ability);
 	}
 	
