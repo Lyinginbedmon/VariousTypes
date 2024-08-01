@@ -27,8 +27,12 @@ public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends S
 			ANIMS.put(AnimatedPlayerEntity.ANIM_TPOSE, VTAnimations.PLAYER_TPOSE);
 			ANIMS.put(AnimatedPlayerEntity.ANIM_WALK, VTAnimations.PLAYER_WALK);
 			ANIMS.put(AnimatedPlayerEntity.ANIM_LOOK_AROUND, VTAnimations.PLAYER_LOOK_AROUND);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME, VTAnimations.PLAYER_FGAME);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT, VTAnimations.PLAYER_SIT);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_START, VTAnimations.PLAYER_FGAME_START);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_MAIN, VTAnimations.PLAYER_FGAME_MAIN);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_END, VTAnimations.PLAYER_FGAME_END);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_START, VTAnimations.PLAYER_SIT_START);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_MAIN, VTAnimations.PLAYER_SIT_MAIN);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_END, VTAnimations.PLAYER_SIT_END);
 			ANIMS.put(AnimatedPlayerEntity.ANIM_WOLOLO, VTAnimations.PLAYER_WOLOLO);
 			ANIMS.put(AnimatedPlayerEntity.ANIM_PDANCE, VTAnimations.PLAYER_PDANCE);
 			ANIMS.put(AnimatedPlayerEntity.ANIM_SNEAK, VTAnimations.PLAYER_SNEAK);
@@ -84,7 +88,7 @@ public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends S
 		else
 		{
 			ModelPartData right_arm = root.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create().uv(40, 16).cuboid(-4.0F, -3.0F, -2.0F, 4.0F, 12.0F, 4.0F, dilation.add(0.0F)), ModelTransform.pivot(-4.0F, -21.0F, 0.0F));
-			right_arm.addChild("right_sleeve", ModelPartBuilder.create().uv(39, 32).cuboid(-4.0F, -3.0F, -2.0F, 4.0F, 12.0F, 4.0F, dilation.add(0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+			right_arm.addChild("right_sleeve", ModelPartBuilder.create().uv(40, 32).cuboid(-4.0F, -3.0F, -2.0F, 4.0F, 12.0F, 4.0F, dilation.add(0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 			
 			ModelPartData left_arm = root.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create().uv(32, 48).cuboid(0.0F, -3.0F, -2.0F, 4.0F, 12.0F, 4.0F, dilation.add(0.0F)), ModelTransform.pivot(4.0F, -21.0F, 0.0F));
 			left_arm.addChild("left_sleeve", ModelPartBuilder.create().uv(48, 48).cuboid(0.0F, -3.0F, -2.0F, 4.0F, 12.0F, 4.0F, dilation.add(0.25F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));

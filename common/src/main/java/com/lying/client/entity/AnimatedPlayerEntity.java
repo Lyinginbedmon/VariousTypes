@@ -1,5 +1,8 @@
 package com.lying.client.entity;
 
+import java.util.List;
+import java.util.Map;
+
 import com.lying.client.init.ClientsideEntities;
 import com.lying.client.utility.AnimationManager;
 import com.mojang.authlib.GameProfile;
@@ -27,31 +30,46 @@ public class AnimatedPlayerEntity extends LivingEntity
 	public static final int ANIM_TPOSE = 1;
 	public static final int ANIM_WALK = 2;
 	public static final int ANIM_LOOK_AROUND = 3;
-	public static final int ANIM_FGAME = 4;
-	public static final int ANIM_SIT = 5;
-	public static final int ANIM_WOLOLO = 6;
-	public static final int ANIM_PDANCE = 7;
-	public static final int ANIM_SNEAK = 8;
-	public static final int ANIM_SWAY = 9;
-	public static final int ANIM_WAVE = 10;
+	public static final int ANIM_FGAME_START = 4;
+	public static final int ANIM_FGAME_MAIN = 5;
+	public static final int ANIM_FGAME_END = 6;
+	public static final int ANIM_SIT_START = 7;
+	public static final int ANIM_SIT_MAIN = 8;
+	public static final int ANIM_SIT_END = 9;
+	public static final int ANIM_WOLOLO = 10;
+	public static final int ANIM_PDANCE = 11;
+	public static final int ANIM_SNEAK = 12;
+	public static final int ANIM_SWAY = 13;
+	public static final int ANIM_WAVE = 14;
 	public final AnimationManager<AnimatedPlayerEntity> animations = new AnimationManager<>(
 			Pair.of(ANIM_IDLE, 2F), 
 			Pair.of(ANIM_TPOSE, 3F), 
 			Pair.of(ANIM_WALK, 3F), 
 			Pair.of(ANIM_LOOK_AROUND, 2F), 
-			Pair.of(ANIM_FGAME, 3F), 
-			Pair.of(ANIM_SIT, 5F), 
+			Pair.of(ANIM_FGAME_START, 0.3333F),
+			Pair.of(ANIM_FGAME_MAIN, 2.25F),
+			Pair.of(ANIM_FGAME_END, 0.3333F),
+			Pair.of(ANIM_SIT_START, 0.7917F),
+			Pair.of(ANIM_SIT_MAIN, 3.0833F),
+			Pair.of(ANIM_SIT_END, 1.0833F),
 			Pair.of(ANIM_WOLOLO, 2.9167F), 
 			Pair.of(ANIM_PDANCE, 3.5417F), 
 			Pair.of(ANIM_SNEAK, 2.0833F), 
 			Pair.of(ANIM_SWAY, 3.25F), 
 			Pair.of(ANIM_WAVE, 1.5F));
+	public final AnimationStateEngine stateEngine = new AnimationStateEngine(Map.of(
+			ANIM_IDLE, List.of(ANIM_IDLE, ANIM_IDLE, ANIM_IDLE, ANIM_IDLE, ANIM_FGAME_START, ANIM_SIT_START, ANIM_TPOSE, ANIM_LOOK_AROUND, ANIM_PDANCE, ANIM_SNEAK, ANIM_SWAY),
+			ANIM_FGAME_START, List.of(ANIM_FGAME_MAIN),
+			ANIM_FGAME_MAIN, List.of(ANIM_FGAME_MAIN, ANIM_FGAME_MAIN, ANIM_FGAME_END),
+			ANIM_SIT_START, List.of(ANIM_SIT_MAIN),
+			ANIM_SIT_MAIN, List.of(ANIM_SIT_MAIN, ANIM_SIT_MAIN, ANIM_SIT_END)
+			));
 	
 	public AnimatedPlayerEntity(EntityType<? extends AnimatedPlayerEntity> typeIn, World worldIn)
 	{
 		super(typeIn, worldIn);
 		animations.stopAll();
-		animations.start(10, age);
+		animations.start(ANIM_WAVE, age);
 	}
 	
 	public static AnimatedPlayerEntity of(GameProfile gameProfile)
@@ -90,9 +108,9 @@ public class AnimatedPlayerEntity extends LivingEntity
 		this.animations.tick(this);
 		
 		if(animations.currentAnim() == -1)
-			if(animations.lastAnim() == ANIM_IDLE && random.nextInt(5) == 0)
-				animations.start(random.nextBetween(ANIM_IDLE, ANIM_SWAY), age);
-			else
-				animations.start(ANIM_IDLE, age);
+		{
+			List<Integer> candidates = stateEngine.getTransitions(animations.lastAnim());
+			animations.start(candidates.get(random.nextInt(candidates.size())), age);
+		}
 	}
 }
