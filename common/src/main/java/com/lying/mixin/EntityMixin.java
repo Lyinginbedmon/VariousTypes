@@ -146,8 +146,30 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INVISIIBILITY.get().registryName()))
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INVISIBILITY.get().registryName()))
 					ci.setReturnValue(true);
+			});
+	}
+	
+	@Inject(method = "isCollidable()Z", at = @At("TAIL"), cancellable = true)
+	private void vt$isCollidable(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
+			{
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
+					ci.setReturnValue(true);
+			});
+	}
+	
+	@Inject(method = "isPushable()Z", at = @At("TAIL"), cancellable = true)
+	private void vt$isPushable(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
+			{
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
+					ci.setReturnValue(false);
 			});
 	}
 }

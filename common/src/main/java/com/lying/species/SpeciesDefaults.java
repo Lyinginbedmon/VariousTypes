@@ -11,6 +11,10 @@ import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 
+import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -30,13 +34,20 @@ public class SpeciesDefaults
 			.texture(Species.BACKING_END_CITY)
 			.from(World.END)
 			.setTypes(VTTypes.OTHALL.get())
-			.addAbility(VTAbilities.TELEPORT.get()).build());
+			.addAbility(VTAbilities.TELEPORT.get())
+			.addAbility(VTAbilities.PARIAH.get(), nbt -> 
+			{
+				NbtList list = new NbtList();
+				list.add(NbtString.of(Registries.ENTITY_TYPE.getId(EntityType.ENDERMAN).toString()));
+				nbt.put("Entities", list);
+			}).build());
 	
 	// Piglin
 	public static final Supplier<Species> ORKIN	= register(prefix("orkin"), () -> Species.Builder.of(prefix("orkin"))
 			.texture(Species.BACKING_BASTION)
 			.from(World.NETHER)
-			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get()).build());
+			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
+			.addAbility(VTAbilities.GOLDHEARTED.get()).build());
 	
 	// Lizardfolk
 	public static final Supplier<Species> MUCKIE	= register(prefix("muckie"), () -> Species.Builder.of(prefix("muckie"))

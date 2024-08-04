@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.reference.Reference;
+import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.screen.CharacterSheetScreenHandler;
 
 import dev.architectury.registry.menu.MenuRegistry;
@@ -39,7 +40,10 @@ public class CharacterSheetItem extends Item
 		if(opt.isPresent())
 		{
 			if(!world.isClient())
-				MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), user.getDisplayName()));
+				if(opt.get().timesCreated() == 0)
+					user.openHandledScreen(new SimpleNamedScreenHandlerFactory((id, playerInventory, custom) -> new CharacterCreationScreenHandler(id, playerInventory.player), user.getDisplayName()));
+				else
+					MenuRegistry.openMenu((ServerPlayerEntity)user, new SimpleNamedScreenHandlerFactory((id, playerInv, custom) -> new CharacterSheetScreenHandler(id), user.getDisplayName()));
 			return TypedActionResult.success(stackInHand, world.isClient());
 		}
 		else

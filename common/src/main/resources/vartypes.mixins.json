@@ -11,6 +11,8 @@
 	"LivingEntityMixin",
 	"PlayerEntityMixin",
 	"ServerPlayerEntityMixin",
+	"MobEntityMixin",
+	"PiglinBrainMixin",
 	"DamageEnchantmentMixin"
   ],
   "client": [

@@ -13,11 +13,14 @@ import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
+import com.lying.ability.AbilityEffectOnDemand;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
+import com.lying.ability.AbilityPariah;
+import com.lying.ability.AbilityRemappablePassive;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
@@ -67,7 +70,7 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight"), Category.UTILITY));
-	public static final Supplier<Ability> INVISIIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE)
+	public static final Supplier<Ability> INVISIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE)
 	{
 		public void registerEventHandlers()
 		{
@@ -81,20 +84,11 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> SWIM			= register("swim", () -> new ActivatedAbility(prefix("swim"), Category.UTILITY) 
+	public static final Supplier<Ability> SWIM			= register("swim", () -> new AbilityEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
 		
-		public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
-		{
-			return owner.isSwimming();
-		}
-		
-		protected void activate(LivingEntity owner, AbilityInstance instance)
-		{
-			if(!owner.getWorld().isClient())
-				owner.addStatusEffect(new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true));
-		}
+		public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return owner.isSwimming(); }
 	});
 	public static final Supplier<Ability> CLIMB			= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
 	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));	// TODO Implement
@@ -150,17 +144,47 @@ public class VTAbilities
 			catch(Exception e) { }
 		}
 	});
+	public static final Supplier<Ability> PARIAH	= register("pariah", () -> new AbilityPariah(prefix("pariah"), Category.UTILITY));
+	public static final Supplier<Ability> GOLDHEARTED	= register("goldheart", () -> new Ability(prefix("goldheart"), Category.DEFENSE));
+	public static final Supplier<Ability> INDOMITABLE	= register("indomitable", () -> new Ability(prefix("indomitable"), Category.OFFENSE));
 	
-	/** An ability that does nothing but which can be given a custom map name */
-	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
-	{
-		public Identifier mapName(AbilityInstance instance)
-		{
-			if(instance.memory().contains("MapName", NbtElement.STRING_TYPE))
-				return new Identifier(instance.memory().getString("MapName"));
-			return super.registryName();
-		}
-	});
+	public static final Supplier<Ability> DUMMY = register("dummy", () -> new AbilityRemappablePassive(prefix("dummy"), Category.UTILITY));
+	
+	/*
+	 * TODO Implement more abilities
+	 	 * Attribute modifier abilities (health, attack damage, movement speed, armour, knockback resistance)
+	 	 * Constant status effect abilities
+		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
+		 * Bad Breath - Spawns a cloud of configurable status effect gas that spreads outward
+		 * Berserk - Temporarily gain more health and attack damage, but weak & fatigued afterwards (Orkin trademark ability)
+		 * Blink - Very temporary (read single digit seconds) Spectator mode with no menu access, moderate cooldown
+		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
+		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
+		 * Enchain - Locks a target in place with a set of magical chains
+		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
+		 * Faeskin - Take extra damage from attacks with items tagged as #vartypes:silver and hurt by contact with #vartypes:silver blocks, which also function like fences to them
+		 * Fireball - Shoots a Ghast fireball projectile
+		 * Flaming Fist - Applies Fire Aspect to all melee attacks
+		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
+		 * Gelatinous - Resistance to physical forms of damage, semi-transparent rendering
+		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
+		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable
+		 * Mindless - Cannot pick up XP, cannot craft, immune to mind-affecting effects
+		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
+		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
+		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
+		 * Omniscient - Cannot pick up XP but always treated as having 999 levels
+		 * Poison Hand - Applies configurable status effects to target on melee hit
+		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
+		 * Ribshot - Shoot a bone needle projectile
+		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
+		 * Stonesense - Ping the locations of nearby ores
+		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
+		 * Thunderstep - Spawn lightning at current position and target position, teleporting from one to the other. Implicitly immune to lightning damage
+		 * Quake - Slams towards ground, on impact replaces nearby blocks radiating outward, relative to distance dropped, with falling blocks tossed upward
+		 * Water Walking - Treat all fluid source blocks as having solid top faces unless sneaking
+		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
+	 */
 	
 	public static Supplier<Ability> register(String name, Supplier<Ability> ability)
 	{

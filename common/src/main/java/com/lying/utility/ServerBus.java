@@ -44,9 +44,8 @@ public class ServerBus
 			if(player.age%Reference.Values.TICKS_PER_MINUTE == 0 && nonlethalDamage.value() > 0)
 				nonlethalDamage.accrue(-1F, maxHealth, player);
 			
-			float gradient = maxHealth / 4F;
-			int amplifier = Math.clamp((int)(nonlethalDamage.value() / gradient) - 1, -1, 2);
-			handleFatigue(amplifier, player);
+			double gradient = Math.pow(nonlethalDamage.value() / maxHealth, 3);
+			handleFatigue((int)((gradient * 3) - 1), player);
 		}));
 	}
 	
@@ -56,7 +55,7 @@ public class ServerBus
 			return;
 		
 		// If the player already has a stronger instance of Fatigue, remove it so the weaker instance (if any) will take effect
-		if(player.hasStatusEffect(VTStatusEffects.FATIGUE) && player.getStatusEffect(VTStatusEffects.FATIGUE).getAmplifier() > amplifier)
+		if(amplifier >= 0 && player.hasStatusEffect(VTStatusEffects.FATIGUE) && player.getStatusEffect(VTStatusEffects.FATIGUE).getAmplifier() > amplifier)
 			player.removeStatusEffect(VTStatusEffects.FATIGUE);
 		if(amplifier >= 0)
 			player.addStatusEffect(new StatusEffectInstance(VTStatusEffects.FATIGUE, Reference.Values.TICKS_PER_SECOND * 3, amplifier));

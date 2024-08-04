@@ -43,7 +43,7 @@ public class AbilityInstance
 	/** Used for storing absolutely everything about an AbilityInstance */
 	public static final Codec<AbilityInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
-			AbilitySource.CODEC.fieldOf("Source").forGetter(AbilityInstance::source),
+			AbilitySource.CODEC.optionalFieldOf("Source").forGetter(AbilityInstance::sourceMaybe),
 			Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityInstance::cooldownMaybe),
 			Codec.BOOL.optionalFieldOf("ReadOnly").forGetter(AbilityInstance::lockedMaybe),
 			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityInstance::display),
@@ -76,9 +76,9 @@ public class AbilityInstance
 		dataModifier.accept(memory);
 	}
 	
-	protected AbilityInstance(Ability ability, AbilitySource source, Optional<Integer> cool, Optional<Boolean> isLocked, Optional<LoreDisplay> display, Optional<NbtCompound> memory)
+	protected AbilityInstance(Ability ability, Optional<AbilitySource> source, Optional<Integer> cool, Optional<Boolean> isLocked, Optional<LoreDisplay> display, Optional<NbtCompound> memory)
 	{
-		this(ability,source);
+		this(ability, source.isPresent() ? source.get() : AbilitySource.MISC);
 		cool.ifPresent(val -> cooldown = Optional.of(Math.abs(val)));
 		if(isLocked.isPresent() && isLocked.get())
 			lock();
@@ -90,6 +90,8 @@ public class AbilityInstance
 	public Identifier mapName() { return ability.mapName(this); }
 	
 	public AbilitySource source() { return source; }
+	
+	private Optional<AbilitySource> sourceMaybe() { return Optional.of(source); }
 	
 	public void setDisplay(LoreDisplay displayIn) { display = Optional.of(displayIn); }
 	
