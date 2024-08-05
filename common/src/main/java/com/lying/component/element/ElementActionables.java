@@ -174,7 +174,12 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public void rebuild(CharacterSheet sheet)
 	{
-		sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).mergeActivated(this);
+		ElementAbilitySet abilities = sheet.element(VTSheetElements.ABILITES);
+		abilities.mergeActivated(this);
+		
+		// Add all sub-abilities from activated abilities and re-merge
+		abilities().forEach(inst -> inst.ability().getSubAbilities(inst).forEach(sub -> abilities.add(sub.copy())));
+		abilities.mergeActivated(this);
 		
 		for(int i=0; i<favourites.size(); i++)
 		{
@@ -186,6 +191,8 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 					favourites.set(index, Optional.empty());
 			});
 		}
+		
+		
 	}
 	
 	/** Called client and server-side to interact with activated abilities */

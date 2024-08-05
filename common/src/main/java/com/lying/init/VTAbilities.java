@@ -3,7 +3,9 @@ package com.lying.init;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jetbrains.annotations.Nullable;
@@ -16,11 +18,13 @@ import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityEffectOnDemand;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityInstance;
+import com.lying.ability.AbilityIntangible;
 import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityRemappablePassive;
+import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
@@ -94,7 +98,14 @@ public class VTAbilities
 	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));	// TODO Implement
 	public static final Supplier<Ability> BURROW		= register("burrow", () -> new ToggledAbility(prefix("burrow"), Category.UTILITY));
 	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
-	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY));	// Incorporeal	// TODO Implement
+	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY)
+	{
+		protected void onActivation(LivingEntity owner, AbilityInstance instance) { VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync()); }
+		protected void onDeactivation(LivingEntity owner, AbilityInstance instance) { VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync()); }
+		
+		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
+	});
+	public static final Supplier<Ability> INTANGIBLE	= register("intangible", () -> new AbilityIntangible(prefix("intangible"), Category.UTILITY));
 	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic"), Category.DEFENSE) 
 	{
@@ -147,6 +158,7 @@ public class VTAbilities
 	public static final Supplier<Ability> PARIAH	= register("pariah", () -> new AbilityPariah(prefix("pariah"), Category.UTILITY));
 	public static final Supplier<Ability> GOLDHEARTED	= register("goldheart", () -> new Ability(prefix("goldheart"), Category.DEFENSE));
 	public static final Supplier<Ability> INDOMITABLE	= register("indomitable", () -> new Ability(prefix("indomitable"), Category.OFFENSE));
+	public static final Supplier<Ability> WATER_WALKING = register("water_walking", () -> new AbilityWaterWalking(prefix("water_walking"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new AbilityRemappablePassive(prefix("dummy"), Category.UTILITY));
 	
@@ -183,6 +195,7 @@ public class VTAbilities
 		 * Thunderstep - Spawn lightning at current position and target position, teleporting from one to the other. Implicitly immune to lightning damage
 		 * Quake - Slams towards ground, on impact replaces nearby blocks radiating outward, relative to distance dropped, with falling blocks tossed upward
 		 * Water Walking - Treat all fluid source blocks as having solid top faces unless sneaking
+		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */
 	

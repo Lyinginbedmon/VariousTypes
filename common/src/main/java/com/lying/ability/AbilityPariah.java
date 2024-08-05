@@ -26,7 +26,7 @@ public class AbilityPariah extends Ability
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		NbtList list = instance.memory().contains("Entities", NbtElement.LIST_TYPE) ? instance.memory().getList("Entities", NbtElement.STRING_TYPE) : new NbtList();
-		MutableText names = VTUtils.listToString(typesToNames(listToTypes(list)), text -> text, ", ");
+		MutableText names = VTUtils.listToString(listToTypes(list), EntityType::getName, ", ");
 		return Optional.of(translate("ability",registryName().getPath()+".desc", names));
 	}
 	
@@ -46,12 +46,5 @@ public class AbilityPariah extends Ability
 				listOut.add(type);
 		}
 		return listOut;
-	}
-	
-	public static List<Text> typesToNames(List<EntityType<?>> typesIn)
-	{
-		List<Text> names = Lists.newArrayList();
-		typesIn.forEach(type -> names.add(type.getName()));
-		return names;
 	}
 }

@@ -188,6 +188,12 @@ public class CharacterSheet
 		VTSheetElements.buildOrder().forEach(element -> this.elements.get(element).rebuild(this));
 	}
 	
+	public final void buildAndSync()
+	{
+		buildSheet();
+		markDirty();
+	}
+	
 	public void markDirty()
 	{
 		if(hasOwner())

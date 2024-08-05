@@ -19,5 +19,7 @@ public class ElementAbilitySet extends AbilitySet implements ISheetElement<Abili
 		(sheet.<TypeSet>elementValue(VTSheetElements.TYPES)).abilities().forEach(inst -> add(inst.copy()));
 		
 		sheet.modules().forEach(module -> module.affect(this));
+		
+		abilities().forEach(inst -> inst.ability().getSubAbilities(inst).forEach(sub -> add(sub.copy())));
 	}
 }

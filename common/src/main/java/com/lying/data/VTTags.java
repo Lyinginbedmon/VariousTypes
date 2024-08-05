@@ -20,4 +20,5 @@ public class VTTags
 	public static final TagKey<Item> SILVER_ITEM = TagKey.of(RegistryKeys.ITEM, prefix("silver"));
 	
 	public static final TagKey<Block> SILVER_BLOCK = TagKey.of(RegistryKeys.BLOCK, prefix("silver"));
+	public static final TagKey<Block> UNPHASEABLE = TagKey.of(RegistryKeys.BLOCK, prefix("unphaseable"));
 }

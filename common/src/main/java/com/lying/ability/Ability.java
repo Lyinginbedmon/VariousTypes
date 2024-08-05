@@ -2,6 +2,8 @@ package com.lying.ability;
 
 import static com.lying.reference.Reference.ModInfo.translate;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -67,6 +69,8 @@ public class Ability
 	
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }
+	
+	public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return Collections.emptyList(); };
 	
 	public static enum AbilityType
 	{

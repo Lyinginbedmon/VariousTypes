@@ -190,6 +190,13 @@ public class Species
 			return addAbility(inst, Consumers.nop());
 		}
 		
+		public Builder addAbility(Ability... abilities)
+		{
+			for(Ability inst : abilities)
+				addAbility(inst);
+			return this;
+		}
+		
 		public Builder addAbility(Ability inst, Consumer<NbtCompound> dataModifier)
 		{
 			abilities.add(inst.instance(AbilitySource.SPECIES, dataModifier));
