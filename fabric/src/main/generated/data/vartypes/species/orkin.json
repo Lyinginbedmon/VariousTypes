@@ -1,4 +1,7 @@
 {
+  "Abilities": [
+    "vartypes:goldheart"
+  ],
   "Background": "vartypes:textures/gui/sheet/creator_bastion.png",
   "Display": {
     "Title": {

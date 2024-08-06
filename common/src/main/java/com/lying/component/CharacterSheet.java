@@ -14,6 +14,7 @@ import com.lying.component.element.ISheetElement;
 import com.lying.component.module.AbstractSheetModule;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetElements.SheetElement;
+import com.lying.utility.ServerEvents;
 import com.lying.init.VTSheetModules;
 
 import net.minecraft.entity.LivingEntity;
@@ -185,7 +186,9 @@ public class CharacterSheet
 	/** Reconstructs all sheet elements in build order */
 	public final void buildSheet()
 	{
+		owner.ifPresent(living -> ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITES)));
 		VTSheetElements.buildOrder().forEach(element -> this.elements.get(element).rebuild(this));
+		owner.ifPresent(living -> ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITES)));
 	}
 	
 	public final void buildAndSync()

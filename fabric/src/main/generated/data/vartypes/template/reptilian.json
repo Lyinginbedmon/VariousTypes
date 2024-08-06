@@ -46,9 +46,17 @@
     {
       "Ability": [
         "vartypes:night_vision",
-        "vartypes:natural_armour",
         "vartypes:deep_breath"
       ],
+      "Name": "vartypes:add_ability"
+    },
+    {
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 2
+        }
+      },
       "Name": "vartypes:add_ability"
     }
   ],

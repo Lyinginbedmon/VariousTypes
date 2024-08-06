@@ -1,6 +1,9 @@
 package com.lying.utility;
 
+import java.util.Optional;
+
 import com.lying.VariousTypes;
+import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
@@ -13,6 +16,7 @@ import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ServerBus
 {
@@ -26,6 +30,8 @@ public class ServerBus
 			// Automatically add NATIVE or OTHAKIN depending on relation to home dimension
 			entity.ifPresent(ent -> types.add(home == null || home == ent.getWorld().getRegistryKey() ? VTTypes.NATIVE.get() : VTTypes.OTHAKIN.get()));
 		});
+		ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().removeAttributeModifiers(living, inst)));
+		ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().applyAttributeModifiers(living, inst)));
 		
 		PlayerEvent.PLAYER_JOIN.register((player) -> VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
@@ -47,6 +53,21 @@ public class ServerBus
 			double gradient = Math.pow(nonlethalDamage.value() / maxHealth, 3);
 			handleFatigue((int)((gradient * 3) - 1), player);
 		}));
+		
+		PlayerEvent.PLAYER_CLONE.register((ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean wonGame) -> 
+		{
+			Optional<CharacterSheet> sheetOptA = VariousTypes.getSheet(oldPlayer);
+			Optional<CharacterSheet> sheetOptB = VariousTypes.getSheet(newPlayer);
+			
+			if(sheetOptA.isPresent() != sheetOptB.isPresent()) return;
+			else if(sheetOptA.isEmpty()) return;
+			else
+				sheetOptB.ifPresent(sheet -> 
+				{
+					sheet.clear();
+					sheet.clone(sheetOptA.get(), true);
+				});
+		});
 	}
 	
 	private static void handleFatigue(int amplifier, LivingEntity player)

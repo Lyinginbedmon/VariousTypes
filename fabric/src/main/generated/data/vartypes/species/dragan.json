@@ -1,0 +1,11 @@
+{
+  "Background": "vartypes:textures/gui/sheet/creator_end_island.png",
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.dragan"
+    }
+  },
+  "Types": [
+    "vartypes:dragon"
+  ]
+}

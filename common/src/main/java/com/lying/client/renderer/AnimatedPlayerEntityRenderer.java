@@ -5,10 +5,13 @@ import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.PlayerListEntry;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRendererFactory.Context;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerModelPart;
+import net.minecraft.client.util.DefaultSkinHelper;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
@@ -27,7 +30,7 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 	
 	public void render(AnimatedPlayerEntity animatedPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
 	{
-		switch(animatedPlayerEntity.getSkinTextures().model())
+		switch(getSkinTextures(animatedPlayerEntity).model())
 		{
 			case WIDE:
 				this.model = MODEL_WIDE;
@@ -61,9 +64,15 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 	
 	protected boolean hasLabel(AnimatedPlayerEntity animatedPlayerEntity) { return false; }
 	
+	public SkinTextures getSkinTextures(AnimatedPlayerEntity animatedPlayerEntity)
+	{
+		PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(animatedPlayerEntity.getUuid());
+		return playerListEntry == null ? DefaultSkinHelper.getSkinTextures(animatedPlayerEntity.getGameProfile()) : playerListEntry.getSkinTextures();
+	}
+	
 	public Identifier getTexture(AnimatedPlayerEntity animatedPlayerEntity)
 	{
-		return animatedPlayerEntity.getSkinTextures().texture();
+		return getSkinTextures(animatedPlayerEntity).texture();
 	}
 	
 	protected void scale(AnimatedPlayerEntity animatedPlayerEntity, MatrixStack matrixStack, float f)

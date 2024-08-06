@@ -23,7 +23,12 @@
     },
     "vartypes:lose_dummy_subtypes",
     {
-      "Ability": "vartypes:natural_armour",
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 2
+        }
+      },
       "Name": "vartypes:add_ability"
     }
   ],

@@ -1,0 +1,19 @@
+{
+  "Background": "vartypes:textures/gui/sheet/creator_default.png",
+  "Display": {
+    "Title": {
+      "translate": "species.vartypes.verdine"
+    }
+  },
+  "Types": [
+    "vartypes:human",
+    {
+      "Display": {
+        "Title": {
+          "translate": "subtype.vartypes.verdine"
+        }
+      },
+      "ID": "vartypes:verdine"
+    }
+  ]
+}

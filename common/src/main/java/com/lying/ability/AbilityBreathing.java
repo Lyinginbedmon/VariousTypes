@@ -1,5 +1,8 @@
 package com.lying.ability;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -26,6 +29,11 @@ public abstract class AbilityBreathing extends Ability
 	{
 		super(regName, Category.UTILITY);
 		this.applyFunc = func;
+	}
+	
+	public Optional<Text> description(AbilityInstance instance)
+	{
+		return Optional.of(translate("ability", registryName().getPath()+".desc", getFluid(instance).id().toString()));
 	}
 	
 	@NotNull

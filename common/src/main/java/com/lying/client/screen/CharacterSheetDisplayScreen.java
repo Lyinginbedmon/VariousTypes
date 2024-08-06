@@ -94,7 +94,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		{
 			ownerStats = Optional.of(new OwnerStats(owner));
 			if(owner.getType() == EntityType.PLAYER)
-				animatedPlayer = Optional.of(AnimatedPlayerEntity.of(((PlayerEntity)owner).getGameProfile()));
+				animatedPlayer = Optional.of(AnimatedPlayerEntity.of(((PlayerEntity)owner).getGameProfile(), mc.world));
 		}, () -> 
 		{
 			ownerStats = Optional.of(new OwnerStats(sheet.getOwner().get()));

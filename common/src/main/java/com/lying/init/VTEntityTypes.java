@@ -1,4 +1,4 @@
-package com.lying.client.init;
+package com.lying.init;
 
 import java.util.function.Supplier;
 
@@ -12,7 +12,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.RegistryKeys;
 
-public class ClientsideEntities
+public class VTEntityTypes
 {
 	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Reference.ModInfo.MOD_ID, RegistryKeys.ENTITY_TYPE);
 

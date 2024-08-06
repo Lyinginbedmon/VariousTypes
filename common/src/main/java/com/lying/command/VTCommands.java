@@ -18,6 +18,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInstance.AbilityNbt;
+import com.lying.ability.AbilitySet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
 import com.lying.component.element.ElementNonLethal;
@@ -38,6 +39,7 @@ import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.type.DummyType;
 import com.lying.type.Type;
+import com.lying.type.TypeSet;
 import com.lying.utility.VTUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -195,6 +197,39 @@ public class VTCommands
 									});
 									return 15;
 								}))
+							.then(literal("abilities")
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty())
+											throw FAILED_GENERIC.create();
+										else
+											sheetOpt.ifPresent(sheet -> 
+											{
+												AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITES);
+												source.sendFeedback(() -> translate("command","get.abilities.success", player.getDisplayName(), abilities.size()), true);
+												
+												List<Text> entries = Lists.newArrayList();
+												abilities.abilities().forEach(inst -> entries.add(Text.literal(" * ").append(VTUtils.describeAbility(inst))));
+												entries.sort((a,b) -> VTUtils.stringComparator(a.getString(), b.getString()));
+												entries.forEach(entry -> source.sendFeedback(() -> entry, false));
+											});
+										return 15;
+									}))
+								.then(literal("types")
+									.executes(context -> 
+									{
+										ServerCommandSource source = context.getSource();
+										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+										if(sheetOpt.isEmpty())
+											throw FAILED_GENERIC.create();
+										else
+											sheetOpt.ifPresent(sheet -> source.sendFeedback(() -> translate("command","get.types.success", player.getDisplayName(), sheet.<TypeSet>elementValue(VTSheetElements.TYPES).asNameList()), true));
+										return 15;
+									}))
 							.then(argument("module", StringArgumentType.word()).suggests(MODULE_IDS)
 								.executes(context -> 
 								{

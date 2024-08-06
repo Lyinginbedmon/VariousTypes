@@ -86,6 +86,14 @@ public class AbilityInstance
 		memory.ifPresent(mem -> setMemory(mem));
 	}
 	
+	public final void copyDetails(AbilityInstance source)
+	{
+		cooldown = source.cooldown;
+		display = source.display;
+		memory = source.memory;
+		locked = source.locked;
+	}
+	
 	/** The variable map name for this specific ability instance */
 	public Identifier mapName() { return ability.mapName(this); }
 	

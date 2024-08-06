@@ -1,7 +1,7 @@
 package com.lying.neoforge.client;
 
 import com.lying.client.VariousTypesClient;
-import com.lying.client.init.ClientsideEntities;
+import com.lying.init.VTEntityTypes;
 import com.lying.reference.Reference;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -21,6 +21,6 @@ public class VariousTypesNeoForgeClient
 	
 	public void registerEntityAttributes(final EntityAttributeCreationEvent event)
 	{
-		event.put(ClientsideEntities.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes().build());
+		event.put(VTEntityTypes.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes().build());
 	}
 }

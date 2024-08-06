@@ -4,15 +4,23 @@ import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttribute;
+import net.minecraft.entity.attribute.EntityAttributeInstance;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -31,6 +39,9 @@ public class Ability
 	
 	private final Identifier registryName;
 	private final Category category;
+	
+	private final Map<RegistryEntry<EntityAttribute>, Function<AbilityInstance,EntityAttributeModifier>> attributeModifiers = new HashMap<>();
+	private boolean attributesLoaded = false;
 	
 	public Ability(Identifier regName, Category catIn)
 	{
@@ -70,7 +81,43 @@ public class Ability
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }
 	
+	/** Returns a collection of ability instances imparted by having this ability */
 	public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return Collections.emptyList(); };
+	
+	public final void generateModifiers()
+	{
+		if(attributesLoaded) return;
+		
+		attributeModifiers.clear();
+		generateAttributeModifiers();
+		
+		attributesLoaded = true;
+	}
+	
+	protected void generateAttributeModifiers() { }
+	
+	protected final void addAttributeModifier(RegistryEntry<EntityAttribute> attribute, EntityAttributeModifier modifier) { attributeModifiers.put(attribute, (inst) -> modifier); }
+	protected final void addAttributeModifier(RegistryEntry<EntityAttribute> attribute, Function<AbilityInstance,EntityAttributeModifier> func) { attributeModifiers.put(attribute, func); }
+	
+	public final void applyAttributeModifiers(LivingEntity living, AbilityInstance instance)
+	{
+		generateAttributeModifiers();
+		attributeModifiers.entrySet().forEach(entry -> 
+		{
+			EntityAttributeModifier modifier = entry.getValue().apply(instance);
+			EntityAttributeInstance attribute = living.getAttributeInstance(entry.getKey());
+			if(attribute.getModifier(modifier.uuid()) == null)
+			{
+				attribute.addPersistentModifier(modifier);
+			}
+		});
+	}
+	
+	public final void removeAttributeModifiers(LivingEntity living, AbilityInstance instance)
+	{
+		generateAttributeModifiers();
+		attributeModifiers.entrySet().forEach(entry -> living.getAttributeInstance(entry.getKey()).removeModifier(entry.getValue().apply(instance).uuid()));
+	}
 	
 	public static enum AbilityType
 	{

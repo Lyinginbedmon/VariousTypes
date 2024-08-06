@@ -26,9 +26,17 @@
     {
       "Ability": [
         "vartypes:climb",
-        "vartypes:sculk_sight",
-        "vartypes:natural_armour"
+        "vartypes:sculk_sight"
       ],
+      "Name": "vartypes:add_ability"
+    },
+    {
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 2
+        }
+      },
       "Name": "vartypes:add_ability"
     }
   ],

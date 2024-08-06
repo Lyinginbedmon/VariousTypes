@@ -36,7 +36,8 @@ public final class VariousTypesFabric implements ModInitializer
 			
 			public void setSheet(LivingEntity entity, CharacterSheet sheet)
 			{
-				VTComponents.CHARACTER_SHEET.sync(entity);
+				if(entity.getType() == EntityType.PLAYER)
+					VTComponents.CHARACTER_SHEET.sync(entity);
 			}
 		});
 	}

@@ -61,7 +61,9 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 	{
 		super(handler, inventory, title);
 		this.inventory = inventory;
-		animatedPlayer = Optional.of(AnimatedPlayerEntity.of(mc.player.getGameProfile()));
+		animatedPlayer = Optional.of(AnimatedPlayerEntity.of(mc.player.getGameProfile(), mc.world));
+		animatedPlayer.get().setCustomName(mc.player.getDisplayName());
+		handler.setTestEntity(animatedPlayer.get());
 	}
 	
 	public boolean shouldCloseOnEsc() { return false; }
@@ -81,7 +83,11 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		addDrawableChild(previewButton = ButtonWidget.builder(translate("gui", "creator_preview"), (button) -> 
 		{
 			CharacterCreationPreviewScreen preview = new CharacterCreationPreviewScreen(getScreenHandler(), inventory, this.title);
-			animatedPlayer.ifPresent(character -> preview.setCharacter(character));
+			animatedPlayer.ifPresent(character -> 
+			{
+				getScreenHandler().setTestEntity(character);
+				preview.setCharacter(character);
+			});
 			mc.setScreen(preview);
 		}).dimensions(0, 0, 50, 20).build());
 		

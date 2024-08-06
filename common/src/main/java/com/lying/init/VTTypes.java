@@ -12,6 +12,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityBreathing;
+import com.lying.ability.SingleAttributeAbility;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference.ModInfo;
 import com.lying.type.Action;
@@ -39,16 +40,20 @@ public class VTTypes
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> CONSTRUCT		= register("construct", () -> Type.Builder.of(prefix("construct"), Tier.SUPERTYPE).colour(0xDB6D00)
 			.setActions(ActionHandler.NONE)
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
 			.addAbility(VTAbilities.NIGHT_VISION.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> DRAGON			= register("dragon", () -> Type.Builder.of(prefix("dragon"), Tier.SUPERTYPE).colour(0x920000)
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
 	public static final Supplier<Type> ELEMENT			= register("element", () -> Type.Builder.of(prefix("element"), Tier.SUPERTYPE).colour(0xFF6DB6)
 			.setActions(ActionHandler.REGEN_ONLY)
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
-	public static final Supplier<Type> FAE				= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).colour(0xDDB6DB).build());
+	public static final Supplier<Type> FAE				= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).colour(0xDDB6DB)
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, -5)).build());
 	public static final Supplier<Type> HUMAN			= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).colour(0x006DDB).build());
 	public static final Supplier<Type> OOZE				= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).colour(0xB6DBFF)
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
 			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
 			.addAbility(VTAbilities.MITHRIDATIC.get())
 			.addAbility(VTAbilities.SCULK_SIGHT.get()).build());
@@ -60,6 +65,7 @@ public class VTTypes
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> UNDEAD			= register("undead", () -> Type.Builder.of(prefix("undead"), Tier.SUPERTYPE).colour(0x1F1F1F)
 			.setActions(ActionHandler.NONE)
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
 			.addAbility(VTAbilities.NIGHT_VISION.get())
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	

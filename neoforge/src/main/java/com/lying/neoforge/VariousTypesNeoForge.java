@@ -40,7 +40,8 @@ public final class VariousTypesNeoForge
 			
 			public void setSheet(LivingEntity entity, CharacterSheet sheet)
 			{
-				entity.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(entity));
+				if(entity.getType() == EntityType.PLAYER)
+					entity.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(entity));
 			}
 		});
 	}

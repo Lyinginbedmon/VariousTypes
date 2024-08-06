@@ -1,7 +1,7 @@
 package com.lying.fabric.client;
 
 import com.lying.client.VariousTypesClient;
-import com.lying.client.init.ClientsideEntities;
+import com.lying.init.VTEntityTypes;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -15,6 +15,6 @@ public final class VariousTypesFabricClient implements ClientModInitializer
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
     	VariousTypesClient.clientInit();
     	
-    	FabricDefaultAttributeRegistry.register(ClientsideEntities.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes());
+    	FabricDefaultAttributeRegistry.register(VTEntityTypes.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes());
     }
 }

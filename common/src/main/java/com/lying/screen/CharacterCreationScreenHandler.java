@@ -16,6 +16,7 @@ import com.lying.init.VTTemplateRegistry;
 import com.lying.species.Species;
 import com.lying.template.Template;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
@@ -24,6 +25,7 @@ import net.minecraft.util.Identifier;
 public class CharacterCreationScreenHandler extends ScreenHandler
 {
 	private final PlayerEntity thePlayer;
+	private Optional<LivingEntity> testEntity = Optional.empty();
 	
 	private Identifier speciesId;
 	private List<Identifier> templateIds = Lists.newArrayList();
@@ -53,6 +55,12 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	
 	public boolean canUse(PlayerEntity var1) { return var1.isAlive(); }
 	
+	public void setTestEntity(@Nullable LivingEntity entityIn)
+	{
+		this.testEntity = entityIn == null ? Optional.empty() : Optional.of(entityIn);
+		buildSheet();
+	}
+	
 	/** Returns the current calculated character sheet */
 	public CharacterSheet testSheet() { return testSheet; }
 	
@@ -74,7 +82,7 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 	/** Constructs a character sheet from the current parameters */
 	protected void buildSheet()
 	{
-		CharacterSheet sheet = new CharacterSheet(thePlayer);
+		CharacterSheet sheet = new CharacterSheet(testEntity.isPresent() ? testEntity.get() : null);
 		if(speciesId != null)
 			sheet.module(VTSheetModules.SPECIES).set(speciesId);
 		if(!templateIds.isEmpty())

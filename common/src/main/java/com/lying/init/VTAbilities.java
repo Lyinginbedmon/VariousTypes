@@ -23,9 +23,11 @@ import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
+import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilityRemappablePassive;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
+import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference;
@@ -115,8 +117,9 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
-	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new Ability(prefix("regeneration"), Category.DEFENSE));	// TODO Implement
-	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new Ability(prefix("natural_armour"), Category.DEFENSE));	// TODO Implement
+	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new AbilityRegeneration(prefix("regeneration"), Category.DEFENSE));	// TODO Implement
+	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new SingleAttributeAbility.Armour(prefix("natural_armour"), Category.DEFENSE));
+	public static final Supplier<Ability> BONUS_HEALTH	= register("bonus_health", () -> new SingleAttributeAbility.Health(prefix("bonus_health"), Category.DEFENSE));
 	public static final Supplier<Ability> DEEP_BREATH	= register("deep_breath", () -> new Ability(prefix("deep_breath"), Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -164,7 +167,6 @@ public class VTAbilities
 	
 	/*
 	 * TODO Implement more abilities
-	 	 * Attribute modifier abilities (health, attack damage, movement speed, armour, knockback resistance)
 	 	 * Constant status effect abilities
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
 		 * Bad Breath - Spawns a cloud of configurable status effect gas that spreads outward

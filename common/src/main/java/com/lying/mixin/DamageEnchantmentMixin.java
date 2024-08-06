@@ -28,18 +28,21 @@ public class DamageEnchantmentMixin
 	@Shadow
 	private Optional<TagKey<EntityType<?>>> applicableEntities;
 	
+	// FIXME Ensure Undead and Arthropod players are affected by Smite and Bane of Arthropods
+	
 	@Inject(method = "onTargetDamaged(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;I)V", at = @At("HEAD"), cancellable = true)
 	private void vt$onTargetDamage(LivingEntity user, Entity target, int level, final CallbackInfo ci)
 	{
 		LivingEntity living;
-		if(level > 0 && applicableEntities.isPresent() && target instanceof LivingEntity && applicableEntities.get() == EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)
-			VariousTypes.getSheet(living = (LivingEntity)target).ifPresent(sheet -> 
-			{
-				if(!sheet.<TypeSet>elementValue(VTSheetElements.TYPES).contains(VTTypes.ARTHROPOD.get()))
-					return;
-				
-				int i = 20 + user.getRandom().nextInt(10 * level);
-				living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, i, 3));
-			});
+		if(level > 0 && applicableEntities.isPresent() && target instanceof LivingEntity)
+			if(applicableEntities.get() == EntityTypeTags.SENSITIVE_TO_BANE_OF_ARTHROPODS)
+				VariousTypes.getSheet(living = (LivingEntity)target).ifPresent(sheet -> 
+				{
+					if(!sheet.<TypeSet>elementValue(VTSheetElements.TYPES).contains(VTTypes.ARTHROPOD.get()))
+						return;
+					
+					int i = 20 + user.getRandom().nextInt(10 * level);
+					living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, i, 3));
+				});
 	}
 }

@@ -60,9 +60,7 @@ public abstract class AbilityOperation extends ConfigurableOperation
 				throw new NullPointerException();
 			
 			AbilityInstance ability = inst.ability().instance(AbilitySource.TEMPLATE);
-			inst.display().ifPresent(lore -> ability.setDisplay(lore));
-			ability.setMemory(inst.memory());
-			ability.lock();
+			ability.copyDetails(inst);
 			return ability;
 		}
 		

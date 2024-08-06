@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.lying.ability.SingleAttributeAbility;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.template.operation.AbilityOperation;
@@ -42,23 +43,27 @@ public class TemplateDefaults
 			.condition(Precondition.IS_LIVING.get())
 			.condition(TypeCondition.All.of(VTTypes.HUMAN.get()))
 			.operation(TypesOperation.SetSupertypes.of(VTTypes.ADUAIN.get()))
-			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get(), VTAbilities.SCULK_SIGHT.get(), VTAbilities.NAT_ARMOUR.get())).build());
+			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get(), VTAbilities.SCULK_SIGHT.get()))
+			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(2))).build());
 	public static final Supplier<Template> SIAR			= register(prefix("siar"), () -> Template.Builder.of(prefix("siar"))	// Lich
 			.power(4)
 			.condition(TypeCondition.Any.of(VTTypes.HUMAN.get(), VTTypes.OTHALL.get(), VTTypes.DRAGON.get()))
-			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get())).build());
+			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get()))
+			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(5))).build());
 	public static final Supplier<Template> REPTILIAN	= register(prefix("reptilian"), () -> Template.Builder.of(prefix("reptilian")).description(translate("template","reptilian.desc"))
 			.power(2)
 			.condition(Precondition.IS_LIVING.get())
 			.condition(TypeCondition.All.of(VTTypes.HUMAN.get()))
 			.condition(TypeCondition.None.of(VTTypes.REPTILIAN.get()))
 			.operation(TypesOperation.Add.of(VTTypes.REPTILIAN.get()))
-			.operation(AbilityOperation.Add.of(VTAbilities.NIGHT_VISION.get(), VTAbilities.NAT_ARMOUR.get(), VTAbilities.DEEP_BREATH.get())).build());
+			.operation(AbilityOperation.Add.of(VTAbilities.NIGHT_VISION.get(), VTAbilities.DEEP_BREATH.get()))
+			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(2))).build());
 	public static final Supplier<Template> VAMPIRE		= register(prefix("vampire"), () -> Template.Builder.of(prefix("vampire"))
 			.power(8)
 			.condition(TypeCondition.Any.of(VTTypes.HUMAN.get(), VTTypes.OTHALL.get(), VTTypes.DRAGON.get()))
 			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get(), VTTypes.ALTERED.get()))
-			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get(), VTAbilities.BURN_IN_SUN.get())).build());
+			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get(), VTAbilities.BURN_IN_SUN.get()))
+			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(6))).build());
 	public static final Supplier<Template> WINGED		= register(prefix("winged"), () -> Template.Builder.of(prefix("winged")).description(translate("template","winged.desc"))
 			.power(2)
 			.condition(TypeCondition.Any.of(VTTypes.ANIMAL.get(), VTTypes.HUMAN.get(), VTTypes.ARTHROPOD.get()))
@@ -69,7 +74,8 @@ public class TemplateDefaults
 			.condition(TypeCondition.None.of(VTTypes.OOZE.get(), VTTypes.ADUAIN.get()))
 			.operation(TypesOperation.SetSupertypes.of(VTTypes.UNDEAD.get()))
 			.operation(Operation.LOSE_DUMMY_SUBTYPES.get())
-			.operation(AbilityOperation.Add.of(VTAbilities.NAT_ARMOUR.get())).build());
+			.operation(AbilityOperation.Add.of(VTAbilities.BURN_IN_SUN.get()))
+			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(2))).build());
 	
 	private static Supplier<Template> register(Identifier name, Supplier<Template> template)
 	{

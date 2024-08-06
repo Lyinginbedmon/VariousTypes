@@ -40,6 +40,16 @@ public class ServerEvents
 		{
 			void affectActions(ActionHandler handler, AbilitySet abilities, Optional<LivingEntity> owner);
 		}
+		
+		public static final Event<SheetRebuildEvent> BEFORE_REBUILD_EVENT = EventFactory.createLoop(SheetRebuildEvent.class);
+		
+		public static final Event<SheetRebuildEvent> AFTER_REBUILD_EVENT = EventFactory.createLoop(SheetRebuildEvent.class);
+		
+		@FunctionalInterface
+		public interface SheetRebuildEvent
+		{
+			void process(LivingEntity owner, AbilitySet abilities);
+		}
 	}
 	
 	public static class LivingEvents

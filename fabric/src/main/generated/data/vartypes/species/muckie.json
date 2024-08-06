@@ -1,6 +1,7 @@
 {
   "Abilities": [
-    "vartypes:deep_breath"
+    "vartypes:deep_breath",
+    "vartypes:swim"
   ],
   "Background": "vartypes:textures/gui/sheet/creator_shipwreck.png",
   "Display": {

@@ -3,7 +3,6 @@ package com.lying.client;
 import org.lwjgl.glfw.GLFW;
 
 import com.lying.client.config.ClientConfig;
-import com.lying.client.init.ClientsideEntities;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.network.SyncActionablesReceiver;
@@ -13,6 +12,7 @@ import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
 import com.lying.client.utility.ClientBus;
+import com.lying.init.VTEntityTypes;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.network.VTPacketHandler;
 import com.lying.reference.Reference;
@@ -48,8 +48,7 @@ public class VariousTypesClient
     	NetworkManager.registerReceiver(NetworkManager.Side.S2C, VTPacketHandler.SYNC_ACTIONABLES_ID, new SyncActionablesReceiver());
     	NetworkManager.registerReceiver(NetworkManager.Side.S2C, VTPacketHandler.SYNC_FATIGUE_ID, new SyncFatigueReceiver());
 		
-		ClientsideEntities.init();
-		EntityRendererRegistry.register(ClientsideEntities.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
 		EntityModelLayerRegistry.register(ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
 		EntityModelLayerRegistry.register(ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
 		
