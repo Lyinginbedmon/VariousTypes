@@ -19,15 +19,22 @@ import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.type.Type;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 
 public class VTUtils
 {
@@ -55,6 +62,16 @@ public class VTUtils
 		}
 		
 		return sheet;
+	}
+	
+	public static void playSound(Entity owner, SoundEvent sound, SoundCategory category, float pitch, float volume)
+	{
+		playSound(owner.getWorld(), RegistryEntry.of(sound), category, owner.getX(), owner.getEyeY(), owner.getZ(), pitch, volume, owner.getWorld().getRandom().nextLong());
+	}
+	
+	public static void playSound(World world, RegistryEntry<SoundEvent> sound, SoundCategory category, double x, double y, double z, float pitch, float volume, long seed)
+	{
+		world.getPlayers().forEach(player -> ((ServerPlayerEntity)player).networkHandler.send(new PlaySoundS2CPacket(sound, category, x, y, z, pitch, volume, seed), null));
 	}
 	
 	public static List<Template> getValidTemplatesFor(CharacterSheet sheet, LivingEntity owner, int powerLimit)

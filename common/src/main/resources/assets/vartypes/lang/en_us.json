@@ -161,6 +161,8 @@
 	"ability.vartypes.indomitable.desc": "Waves and rocks break upon you with ease, your bounding box is as sturdy as the finest boat.",
 	"ability.vartypes.water_walking": "Waterstrider",
 	"ability.vartypes.water_walking.desc": "Your feet are specially adapted for bouyancy. You can stand atop [%s] as though it were solid ground.",
+	"ability.vartypes.ribshot": "Ribshot",
+	"ability.vartypes.ribshot.desc": "You can quickly shoot out a bony projectile at your foes. Don't worry, ribs grow back.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

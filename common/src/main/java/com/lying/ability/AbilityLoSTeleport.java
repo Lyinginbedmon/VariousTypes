@@ -2,14 +2,12 @@ package com.lying.ability;
 
 import com.google.common.collect.ImmutableList;
 import com.lying.reference.Reference;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -22,7 +20,7 @@ import net.minecraft.world.World;
 
 public class AbilityLoSTeleport extends ActivatedAbility
 {
-	private static final RegistryEntry<SoundEvent> VWORP_SOUND = RegistryEntry.of(SoundEvents.ENTITY_ENDERMAN_TELEPORT);
+	private static final SoundEvent VWORP_SOUND = SoundEvents.ENTITY_ENDERMAN_TELEPORT;
 	private static final ImmutableList<Vec3i> VALID_HORIZONTAL_OFFSETS = ImmutableList.of(
 			new Vec3i(0, 0, 0),
 			new Vec3i(0, 0, -1), 
@@ -70,11 +68,7 @@ public class AbilityLoSTeleport extends ActivatedAbility
 	
 	private static void playVworp(BlockPos pos, Entity owner)
 	{
-		long seed = owner.getWorld().getRandom().nextLong();
-		double x = pos.getX() + 0.5D;
-		double y = pos.getY();
-		double z = pos.getZ() + 0.5D;
-		owner.getWorld().getPlayers().forEach(player -> ((ServerPlayerEntity)player).networkHandler.send(new PlaySoundS2CPacket(VWORP_SOUND, SoundCategory.PLAYERS, x, y, z, 1F, 1F, seed), null));
+		VTUtils.playSound(owner, VWORP_SOUND, SoundCategory.PLAYERS, 1F, 1F);
 	}
 	
 	// Finds a safe position to teleport to around the target point

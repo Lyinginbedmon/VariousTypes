@@ -28,19 +28,30 @@ import com.lying.ability.AbilityRemappablePassive;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.SingleAttributeAbility;
+import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
 import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.Result;
+import com.lying.utility.VTUtils;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
+import net.minecraft.entity.projectile.ProjectileUtil;
+import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 
 public class VTAbilities
 {
@@ -162,6 +173,39 @@ public class VTAbilities
 	public static final Supplier<Ability> GOLDHEARTED	= register("goldheart", () -> new Ability(prefix("goldheart"), Category.DEFENSE));
 	public static final Supplier<Ability> INDOMITABLE	= register("indomitable", () -> new Ability(prefix("indomitable"), Category.OFFENSE));
 	public static final Supplier<Ability> WATER_WALKING = register("water_walking", () -> new AbilityWaterWalking(prefix("water_walking"), Category.UTILITY));
+	public static final Supplier<Ability> RIBSHOT		= register("ribshot", () -> new SpawnProjectileAbility(prefix("ribshot"), Category.OFFENSE)
+	{
+		protected void shootFrom(LivingEntity owner, AbilityInstance instance)
+		{
+			PersistentProjectileEntity abstractarrow = ProjectileUtil.createArrowProjectile(owner, Items.ARROW.getDefaultStack(), 1F);	// TODO Replace with non-pickup bone projectile
+			Vec3d lookVec = Vec3d.fromPolar(owner.getPitch(), owner.getHeadYaw());
+			abstractarrow.setVelocity(lookVec.x, lookVec.y, lookVec.z, 1.6f, 6);
+			VTUtils.playSound(owner, SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
+			owner.getWorld().spawnEntity(abstractarrow);
+		}
+	});
+	public static final Supplier<Ability> FIREBALL		= register("fireball", () -> new SpawnProjectileAbility(prefix("fireball"), Category.OFFENSE)
+	{
+		protected void shootFrom(LivingEntity owner, AbilityInstance instance)
+		{
+			Vec3d lookVec = Vec3d.fromPolar(owner.getPitch(), owner.getHeadYaw());
+			Entity projectile;
+			if(instance.memory().getBoolean("Explosive"))
+			{
+				// Create ghast fireball
+				projectile = new FireballEntity(owner.getWorld(), owner, lookVec.x * 4D, lookVec.y * 4D, lookVec.z * 4D, 1);
+				projectile.setPosition(owner.getEyePos().add(lookVec));
+			}
+			else
+			{
+				// Create blaze fireball
+				projectile = new SmallFireballEntity(owner.getWorld(), owner, lookVec.x * 4D, lookVec.y * 4D, lookVec.z * 4D);
+				projectile.setPosition(owner.getEyePos().add(lookVec));
+			}
+			VTUtils.playSound(owner, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
+			owner.getWorld().spawnEntity(projectile);
+		}
+	});
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new AbilityRemappablePassive(prefix("dummy"), Category.UTILITY));
 	
@@ -177,7 +221,6 @@ public class VTAbilities
 		 * Enchain - Locks a target in place with a set of magical chains
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
 		 * Faeskin - Take extra damage from attacks with items tagged as #vartypes:silver and hurt by contact with #vartypes:silver blocks, which also function like fences to them
-		 * Fireball - Shoots a Ghast fireball projectile
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Gelatinous - Resistance to physical forms of damage, semi-transparent rendering
@@ -190,13 +233,11 @@ public class VTAbilities
 		 * Omniscient - Cannot pick up XP but always treated as having 999 levels
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
-		 * Ribshot - Shoot a bone needle projectile
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
 		 * Stonesense - Ping the locations of nearby ores
 		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
 		 * Thunderstep - Spawn lightning at current position and target position, teleporting from one to the other. Implicitly immune to lightning damage
 		 * Quake - Slams towards ground, on impact replaces nearby blocks radiating outward, relative to distance dropped, with falling blocks tossed upward
-		 * Water Walking - Treat all fluid source blocks as having solid top faces unless sneaking
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */
