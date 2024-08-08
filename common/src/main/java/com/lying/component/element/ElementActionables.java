@@ -92,6 +92,9 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public NbtCompound writeToNbt(NbtCompound nbt)
 	{
+		if(coolingDown())
+			nbt.putInt("Global", globalCooldown);
+		
 		nbt.put("Abilities", writeToNbt());
 		
 		if(!cooldowns.isEmpty())
@@ -126,6 +129,9 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	{
 		clear();
 		readFromNbt(nbt.getList("Abilities", NbtElement.COMPOUND_TYPE)).abilities().forEach(inst -> add(inst));
+		
+		if(nbt.contains("Global", NbtElement.INT_TYPE))
+			globalCooldown = nbt.getInt("Global");
 		
 		cooldowns.clear();
 		if(nbt.contains("Cooldowns", NbtElement.LIST_TYPE))

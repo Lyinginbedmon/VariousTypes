@@ -15,6 +15,7 @@ import com.google.common.collect.Maps;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.ability.IPhasingAbility;
 import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
@@ -35,6 +36,7 @@ import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffectUtil;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
@@ -211,6 +213,12 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$hasEffect(RegistryEntry<StatusEffect> effect, final CallbackInfoReturnable<Boolean> ci)
 	{
 		final LivingEntity living = (LivingEntity)(Object)this;
+		if(effect == StatusEffects.BLINDNESS && IPhasingAbility.isActivelyPhasing(living))
+		{
+			ci.setReturnValue(true);
+			return;
+		}
+		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
 			for(AbilityInstance inst : getSpoofAbilities(sheet))
@@ -229,6 +237,13 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$getEffect(RegistryEntry<StatusEffect> effect, final CallbackInfoReturnable<StatusEffectInstance> ci)
 	{
 		final LivingEntity living = (LivingEntity)(Object)this;
+		
+		if(effect == StatusEffects.BLINDNESS && IPhasingAbility.isActivelyPhasing(living))
+		{
+			ci.setReturnValue(new StatusEffectInstance(StatusEffects.BLINDNESS, -1));
+			return;
+		}
+		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
 			for(AbilityInstance inst : getSpoofAbilities(sheet))

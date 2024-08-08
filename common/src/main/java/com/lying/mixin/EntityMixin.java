@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
+import com.lying.ability.IPhasingAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
@@ -97,6 +98,8 @@ public class EntityMixin
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
 	{
+		// Note: Set return value to TRUE to PREVENT damage of the given type to the entity
+		
 		Entity ent = (Entity)(Object)this;
 		if(!(ent instanceof LivingEntity))
 			return;
@@ -106,10 +109,15 @@ public class EntityMixin
 			return;
 		
 		DamageSources sources = getDamageSources();
-		if(source == sources.drown())
-			ci.setReturnValue(!sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.BREATHE.get()));
-		if(source == sources.starve())
-			ci.setReturnValue(!sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.EAT.get()));
+		// Can't drown if you don't need to breathe
+		if(source == sources.drown() && !sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.BREATHE.get()))
+			ci.setReturnValue(true);
+		// Can't starve if you don't need to eat
+		else if(source == sources.starve() && !sheet.get().<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.EAT.get()))
+			ci.setReturnValue(true);
+		// Can't suffocate if you can move through solid blocks
+		else if(source == sources.inWall() && IPhasingAbility.isActivelyPhasing((LivingEntity)ent))
+			ci.setReturnValue(true);
 	}
 	
 	@Inject(method = "setAir(I)V", at = @At("HEAD"), cancellable = true)

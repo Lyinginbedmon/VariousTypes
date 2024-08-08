@@ -12,8 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 
-// TODO Incorporate more broadly to prevent suffocation damage and permit limited vision whilst inside of blocks
-public class AbilityIntangible extends Ability implements IBlockCollisionAbility
+public class AbilityIntangible extends Ability implements IPhasingAbility
 {
 	public AbilityIntangible(Identifier regName, Category catIn)
 	{
@@ -27,6 +26,7 @@ public class AbilityIntangible extends Ability implements IBlockCollisionAbility
 	
 	public Optional<VoxelShape> getCollisionFor(BlockState state, BlockPos pos, LivingEntity living, AbilityInstance instance)
 	{
+		// FIXME Improve detection by checking all Y positions inside living hitbox
 		return isApplicableTo(state, living, instance) && (living.isSneaking() || pos.getY() >= living.getY()) ? Optional.of(VoxelShapes.empty()) : Optional.empty();
 	}
 }

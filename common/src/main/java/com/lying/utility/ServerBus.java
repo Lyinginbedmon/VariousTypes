@@ -35,6 +35,7 @@ public class ServerBus
 		
 		PlayerEvent.PLAYER_JOIN.register((player) -> VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
+			sheet.buildAndSync();
 			SyncFatiguePacket.send(player, sheet.elementValue(VTSheetElements.NONLETHAL));
 			SyncActionablesPacket.send(player, sheet.elementValue(VTSheetElements.ACTIONABLES));
 		}));

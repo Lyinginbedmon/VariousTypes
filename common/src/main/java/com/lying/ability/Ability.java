@@ -141,6 +141,7 @@ public class Ability
 	 * Where a specific ability instance originates<br>
 	 * This determines which ability is retained if two or more share the same map name
 	 */
+	@SuppressWarnings("deprecation")
 	public static enum AbilitySource implements StringIdentifiable
 	{
 		MISC(Integer.MAX_VALUE),
@@ -149,7 +150,6 @@ public class Ability
 		TEMPLATE(2),
 		CUSTOM(-1);
 		
-		@SuppressWarnings("deprecation")
 		public static final StringIdentifiable.EnumCodec<AbilitySource> CODEC = StringIdentifiable.createCodec(AbilitySource::values);
 		
 		private final int priority;

@@ -2,6 +2,7 @@ package com.lying.ability;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 
 public abstract class SpawnProjectileAbility extends ActivatedAbility
 {
@@ -12,8 +13,8 @@ public abstract class SpawnProjectileAbility extends ActivatedAbility
 	
 	protected final void activate(LivingEntity owner, AbilityInstance instance)
 	{
-		shootFrom(owner, instance);
+		shootFrom(owner, Vec3d.fromPolar(owner.getPitch(), owner.getHeadYaw()), instance);
 	}
 	
-	protected abstract void shootFrom(LivingEntity owner, AbilityInstance instance);
+	protected abstract void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance);
 }

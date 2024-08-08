@@ -37,20 +37,26 @@ import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.Result;
 import com.lying.utility.VTUtils;
 
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireballEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.fluid.Fluids;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Unit;
 import net.minecraft.util.math.Vec3d;
 
 public class VTAbilities
@@ -113,8 +119,19 @@ public class VTAbilities
 	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
 	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY)
 	{
-		protected void onActivation(LivingEntity owner, AbilityInstance instance) { VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync()); }
-		protected void onDeactivation(LivingEntity owner, AbilityInstance instance) { VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync()); }
+		protected void onActivation(LivingEntity owner, AbilityInstance instance)
+		{
+			if(owner.getType() == EntityType.PLAYER)
+				((PlayerEntity)owner).sendMessage(Text.literal("You are now intangible"));
+			VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
+		}
+		
+		protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
+		{
+			if(owner.getType() == EntityType.PLAYER)
+				((PlayerEntity)owner).sendMessage(Text.literal("You are no longer intangible"));
+			VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
+		}
 		
 		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
 	});
@@ -175,32 +192,33 @@ public class VTAbilities
 	public static final Supplier<Ability> WATER_WALKING = register("water_walking", () -> new AbilityWaterWalking(prefix("water_walking"), Category.UTILITY));
 	public static final Supplier<Ability> RIBSHOT		= register("ribshot", () -> new SpawnProjectileAbility(prefix("ribshot"), Category.OFFENSE)
 	{
-		protected void shootFrom(LivingEntity owner, AbilityInstance instance)
+		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
 		{
-			PersistentProjectileEntity abstractarrow = ProjectileUtil.createArrowProjectile(owner, Items.ARROW.getDefaultStack(), 1F);	// TODO Replace with non-pickup bone projectile
-			Vec3d lookVec = Vec3d.fromPolar(owner.getPitch(), owner.getHeadYaw());
-			abstractarrow.setVelocity(lookVec.x, lookVec.y, lookVec.z, 1.6f, 6);
+			ItemStack bone = Items.BONE.getDefaultStack().copy();
+			bone.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+			PersistentProjectileEntity abstractarrow = ProjectileUtil.createArrowProjectile(owner, bone, 1F);	// TODO Replace with non-pickup bone projectile
+			abstractarrow.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
+			abstractarrow.setVelocity(direction.x, direction.y, direction.z, 1.6f, 6);
 			VTUtils.playSound(owner, SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
 			owner.getWorld().spawnEntity(abstractarrow);
 		}
 	});
 	public static final Supplier<Ability> FIREBALL		= register("fireball", () -> new SpawnProjectileAbility(prefix("fireball"), Category.OFFENSE)
 	{
-		protected void shootFrom(LivingEntity owner, AbilityInstance instance)
+		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
 		{
-			Vec3d lookVec = Vec3d.fromPolar(owner.getPitch(), owner.getHeadYaw());
 			Entity projectile;
 			if(instance.memory().getBoolean("Explosive"))
 			{
 				// Create ghast fireball
-				projectile = new FireballEntity(owner.getWorld(), owner, lookVec.x * 4D, lookVec.y * 4D, lookVec.z * 4D, 1);
-				projectile.setPosition(owner.getEyePos().add(lookVec));
+				projectile = new FireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D, 1);
+				projectile.setPosition(owner.getEyePos().add(direction));
 			}
 			else
 			{
 				// Create blaze fireball
-				projectile = new SmallFireballEntity(owner.getWorld(), owner, lookVec.x * 4D, lookVec.y * 4D, lookVec.z * 4D);
-				projectile.setPosition(owner.getEyePos().add(lookVec));
+				projectile = new SmallFireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D);
+				projectile.setPosition(owner.getEyePos().add(direction));
 			}
 			VTUtils.playSound(owner, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
 			owner.getWorld().spawnEntity(projectile);
