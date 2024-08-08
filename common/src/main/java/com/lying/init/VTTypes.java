@@ -89,7 +89,7 @@ public class VTTypes
 			.addAbility(VTAbilities.SUFFOCATE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.SWIM.get()).build());
 	public static final Supplier<Type> SPECTRAL			= register("spectral", () -> Type.Builder.of(prefix("spectral"), Tier.SUBTYPE)
-			.addAbility(VTAbilities.GHOSTLY.get()).build());
+			.addAbility(VTAbilities.INTANGIBLE.get()).build());
 	
 	/** A do-nothing subtype that can be given a customised ID and display name, primarily for flavour purposes */
 	public static final Supplier<Type> DUMMY	= register("dummy", () -> DummyType.Builder.of(prefix("dummy")).build());

@@ -1,20 +1,24 @@
 package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
+import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Supplier;
+import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
+import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityEffectOnDemand;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityInstance;
@@ -24,7 +28,6 @@ import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityRegeneration;
-import com.lying.ability.AbilityRemappablePassive;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.SingleAttributeAbility;
@@ -41,6 +44,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -51,9 +55,13 @@ import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
@@ -115,21 +123,21 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> CLIMB			= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
 	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));	// TODO Implement
-	public static final Supplier<Ability> BURROW		= register("burrow", () -> new ToggledAbility(prefix("burrow"), Category.UTILITY));
+	public static final Supplier<Ability> BURROW		= register("burrow", () -> new AbilityBurrow(prefix("burrow"), Category.UTILITY));
 	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
 	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY)
 	{
 		protected void onActivation(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Text.literal("You are now intangible"));
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
 			VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
 		}
 		
 		protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Text.literal("You are no longer intangible"));
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
 			VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
 		}
 		
@@ -139,9 +147,32 @@ public class VTAbilities
 	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic"), Category.DEFENSE) 
 	{
+		public Optional<Text> description(AbilityInstance instance)
+		{
+			MutableText names = VTUtils.listToString(getTags(instance.memory()), tag -> Text.literal(tag.id().toString()), ", ");
+			return Optional.of(translate("ability",registryName().getPath()+".desc", names));
+		}
+		
 		public void registerEventHandlers()
 		{
-			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities,result) -> effect.getEffectType().isIn(VTTags.POISONS) && abilities.hasAbilityInstance(registryName()) ? Result.DENY : result);
+			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities,result) -> 
+			{
+				List<AbilityInstance> set = abilities.getAbilitiesOfType(registryName());
+				return set.stream().anyMatch(inst -> getTags(inst.memory()).stream().anyMatch(tag -> effect.getEffectType().isIn(tag))) ? Result.DENY : result;
+			});
+		}
+		
+		public static List<TagKey<StatusEffect>> getTags(NbtCompound memory)
+		{
+			List<TagKey<StatusEffect>> tags = Lists.newArrayList();
+			
+			if(memory.contains("Effects", NbtElement.LIST_TYPE))
+				for(NbtElement element : memory.getList("Effects", NbtElement.STRING_TYPE))
+					tags.add(TagKey.of(RegistryKeys.STATUS_EFFECT, new Identifier(element.asString())));
+			else
+				tags.add(VTTags.POISONS);
+			
+			return tags;
 		}
 	});
 	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
@@ -169,12 +200,7 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> RUN_CMD	= register("run_command", () -> new ActivatedAbility(prefix("run_command"), Category.UTILITY)
 	{
-		public Identifier mapName(AbilityInstance instance)
-		{
-			if(instance.memory().contains("MapName", NbtElement.STRING_TYPE))
-				return new Identifier(instance.memory().getString("MapName"));
-			return super.mapName(instance);
-		}
+		protected boolean remappable() { return true; }
 		
 		protected void activate(LivingEntity owner, AbilityInstance instance)
 		{
@@ -225,7 +251,10 @@ public class VTAbilities
 		}
 	});
 	
-	public static final Supplier<Ability> DUMMY = register("dummy", () -> new AbilityRemappablePassive(prefix("dummy"), Category.UTILITY));
+	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
+	{
+		protected boolean remappable() { return true; }
+	});
 	
 	/*
 	 * TODO Implement more abilities

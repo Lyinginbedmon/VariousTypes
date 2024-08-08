@@ -1,5 +1,9 @@
 package com.lying.ability;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
+import java.util.Optional;
+
 import com.google.common.collect.ImmutableList;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -7,10 +11,12 @@ import com.lying.utility.VTUtils;
 import net.minecraft.entity.Dismounting;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -42,17 +48,21 @@ public class AbilityLoSTeleport extends ActivatedAbility
 		super(registryName, category);
 	}
 	
+	public Optional<Text> description(AbilityInstance instance)
+	{
+		return Optional.of(translate("ability",registryName().getPath()+".desc", (int)range(instance.memory())));
+	}
+	
 	public int defaultCooldown() { return Reference.Values.TICKS_PER_SECOND * 2; }
 	
 	public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
 	{
-		double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 16D;
-		return owner.raycast(range, 1F, true).getType() != HitResult.Type.MISS;
+		return owner.raycast(range(instance.memory()), 1F, true).getType() != HitResult.Type.MISS;
 	}
 	
 	protected void activate(LivingEntity owner, AbilityInstance instance)
 	{
-		double range = instance.memory().contains("Range", NbtElement.DOUBLE_TYPE) ? instance.memory().getDouble("Range") : 16D;
+		double range = range(instance.memory());
 		HitResult trace = owner.raycast(range, 1F, true);
 		if(trace.getType() == HitResult.Type.MISS)
 			return;
@@ -84,5 +94,10 @@ public class AbilityLoSTeleport extends ActivatedAbility
 			return point;
 		}
 		return new Vec3d(mutable.getX() + 0.5D, mutable.getY(), mutable.getZ() + 0.5D);
+	}
+	
+	public static double range(NbtCompound memory)
+	{
+		return memory.contains("Range", NbtElement.DOUBLE_TYPE) ? memory.getDouble("Range") : 16D;
 	}
 }

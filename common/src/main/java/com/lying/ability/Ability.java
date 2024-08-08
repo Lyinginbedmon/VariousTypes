@@ -20,6 +20,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -49,6 +50,9 @@ public class Ability
 		category = catIn;
 	}
 	
+	/** Returns true if this ability can be given a custom map name in its instance memory */
+	protected boolean remappable() { return false; }
+	
 	/** Returns what type of ability this is */
 	public AbilityType type() { return AbilityType.PASSIVE; }
 	
@@ -67,7 +71,15 @@ public class Ability
 	/** The unique registry name of abilities of this type */
 	public Identifier registryName() { return registryName; }
 	
-	public Identifier mapName(AbilityInstance instance) { return registryName(); }
+	public Identifier nameInAbilityMap(AbilityInstance instance)
+	{
+		if(remappable() && instance.memory().contains("MapName", NbtElement.STRING_TYPE))
+			return new Identifier(instance.memory().getString("MapName"));
+		
+		return mapName(instance);
+	}
+	
+	protected Identifier mapName(AbilityInstance instance) { return registryName(); }
 	
 	public boolean isHidden(AbilityInstance instance) { return false; }
 	

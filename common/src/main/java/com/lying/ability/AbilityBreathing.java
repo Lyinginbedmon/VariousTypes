@@ -58,7 +58,7 @@ public abstract class AbilityBreathing extends Ability
 			super(regName, (action,inst) -> action.allowBreathe(getFluid(inst)));
 		}
 		
-		public Identifier mapName(AbilityInstance inst) { return new Identifier(registryName().getNamespace(), "breathe_in_"+getFluid(inst).id().getPath()); }
+		public Identifier nameInAbilityMap(AbilityInstance inst) { return new Identifier(registryName().getNamespace(), "breathe_in_"+getFluid(inst).id().getPath()); }
 		
 		public Text displayName(AbilityInstance inst) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+".breathe_in", getFluid(inst).id().getPath()); }
 	}
@@ -70,7 +70,7 @@ public abstract class AbilityBreathing extends Ability
 			super(regName, (action,inst) -> action.denyBreathe(getFluid(inst)));
 		}
 		
-		public Identifier mapName(AbilityInstance inst) { return new Identifier(registryName().getNamespace(), "suffocate_in_"+getFluid(inst).id().getPath()); }
+		public Identifier nameInAbilityMap(AbilityInstance inst) { return new Identifier(registryName().getNamespace(), "suffocate_in_"+getFluid(inst).id().getPath()); }
 		
 		public Text displayName(AbilityInstance inst) { return Text.translatable("ability."+Reference.ModInfo.MOD_ID+".suffocate_in", getFluid(inst).id().getPath()); }
 	}

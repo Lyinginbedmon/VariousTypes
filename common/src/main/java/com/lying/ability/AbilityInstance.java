@@ -95,7 +95,7 @@ public class AbilityInstance
 	}
 	
 	/** The variable map name for this specific ability instance */
-	public Identifier mapName() { return ability.mapName(this); }
+	public Identifier mapName() { return ability.nameInAbilityMap(this); }
 	
 	public AbilitySource source() { return source; }
 	

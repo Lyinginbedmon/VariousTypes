@@ -6,11 +6,13 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.data.VTTags;
 import com.lying.init.VTSheetElements;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -33,14 +35,14 @@ public interface IPhasingAbility extends IBlockCollisionAbility
 	public static boolean isPhasingAtPos(LivingEntity living, BlockPos pos)
 	{
 		final BlockState state = living.getWorld().getBlockState(pos);
-		return getPhasingAbilities(living).stream().anyMatch(inst -> ((IPhasingAbility)inst.ability()).isApplicableTo(state, (LivingEntity)living, inst));
+		return !cannotEverBePhased(state) && getPhasingAbilities(living).stream().anyMatch(inst -> ((IPhasingAbility)inst.ability()).isApplicableTo(state, (LivingEntity)living, inst));
 	}
 	
+	/** Returns true if the block should never be considered phaseable due to datapack tags */
+	private static boolean cannotEverBePhased(BlockState state) { return state.isIn(VTTags.UNPHASEABLE) || state.isIn(BlockTags.WITHER_IMMUNE); }
+	
 	/** Returns true if the player has any phasing ability */
-	public static boolean isPhasingAtAll(LivingEntity living)
-	{
-		return !getPhasingAbilities(living).isEmpty();
-	}
+	public static boolean isPhasingAtAll(LivingEntity living) { return !getPhasingAbilities(living).isEmpty(); }
 	
 	/** Returns true if the given entity is phasing through any block within their bounding box */
 	public static boolean isActivelyPhasing(LivingEntity living)
@@ -72,7 +74,7 @@ public interface IPhasingAbility extends IBlockCollisionAbility
 		for(AbilityInstance inst : getPhasingAbilities(living))
 		{
 			IBlockCollisionAbility ability = (IPhasingAbility)inst.ability();
-			if(positions.stream().anyMatch(pos -> ability.isApplicableTo(world.getBlockState(pos), living, inst)))
+			if(positions.stream().anyMatch(pos -> !cannotEverBePhased(world.getBlockState(pos)) && ability.isApplicableTo(world.getBlockState(pos), living, inst)))
 				return true;
 		}
 		return false;
