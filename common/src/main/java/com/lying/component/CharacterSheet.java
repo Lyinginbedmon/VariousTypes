@@ -14,13 +14,18 @@ import com.lying.component.element.ISheetElement;
 import com.lying.component.module.AbstractSheetModule;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetElements.SheetElement;
-import com.lying.utility.ServerEvents;
 import com.lying.init.VTSheetModules;
+import com.lying.network.SyncActionablesPacket;
+import com.lying.network.SyncFatiguePacket;
+import com.lying.network.SyncPosePacket;
+import com.lying.utility.ServerEvents;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
 /**
@@ -195,6 +200,16 @@ public class CharacterSheet
 	{
 		buildSheet();
 		markDirty();
+		owner.ifPresent(owner -> 
+		{
+			if(owner.getType() != EntityType.PLAYER || owner.getWorld().isClient())
+				return;
+			
+			ServerPlayerEntity player = (ServerPlayerEntity)owner;
+			SyncActionablesPacket.send(player, elementValue(VTSheetElements.ACTIONABLES));
+			SyncFatiguePacket.send(player, elementValue(VTSheetElements.NONLETHAL));
+			SyncPosePacket.sendSync(player, elementValue(VTSheetElements.SPECIAL_POSE));
+		});
 	}
 	
 	public void markDirty()

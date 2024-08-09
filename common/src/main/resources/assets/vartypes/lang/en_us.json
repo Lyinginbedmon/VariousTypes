@@ -224,6 +224,8 @@
 	"gui.vartypes.ability_passive": "Passive Ability",
 	"gui.vartypes.ability_activated": "Activated Ability",
 	"gui.vartypes.ability_toggled": "Toggled Ability",
+	"gui.vartypes.toggle_on": "%s (ACTIVE)",
+	"gui.vartypes.toggle_off": "%s (INACTIVE)",
 	"gui.vartypes.creator_confirm": "Confirm",
 	"gui.vartypes.creator_preview": "Preview",
 	"gui.vartypes.creator_back": "Back",

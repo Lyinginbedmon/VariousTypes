@@ -14,7 +14,6 @@ public class SyncActionablesPacket
 	public static void send(ServerPlayerEntity player, AbilitySet actionables)
 	{
 		RegistryByteBuf buffer = new RegistryByteBuf(Unpooled.buffer(), player.getRegistryManager());
-		
 		NbtCompound comp = new NbtCompound();
 		comp.put("Abilities", actionables.writeToNbt());
 		buffer.writeNbt(comp);

@@ -12,6 +12,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityBreathing;
+import com.lying.ability.AbilityBurrow;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference.ModInfo;
@@ -25,6 +26,7 @@ import com.lying.type.TypeSet;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.Identifier;
 
 public class VTTypes
@@ -78,7 +80,7 @@ public class VTTypes
 	public static final Supplier<Type> AIR				= register("air", () -> Type.Builder.of(prefix("air"), Tier.SUBTYPE)
 			.addAbility(VTAbilities.FLY.get()).build());
 	public static final Supplier<Type> EARTH			= register("earth", () -> Type.Builder.of(prefix("earth"), Tier.SUBTYPE)
-			.addAbility(VTAbilities.BURROW.get()).build());
+			.addAbility(AbilityBurrow.of(BlockTags.DIRT, BlockTags.BASE_STONE_OVERWORLD, BlockTags.BASE_STONE_NETHER)).build());
 	public static final Supplier<Type> FIRE				= register("fire", () -> Type.Builder.of(prefix("fire"), Tier.SUBTYPE).build());
 	public static final Supplier<Type> WATER			= register("water", () -> Type.Builder.of(prefix("water"), Tier.SUBTYPE)
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())

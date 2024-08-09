@@ -32,7 +32,7 @@ public class ToggledAbility extends ActivatedAbility
 		else
 			onDeactivation(owner, instance);
 		
-		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.markDirty());
+		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
 	}
 	
 	public boolean isActive(AbilityInstance instance)

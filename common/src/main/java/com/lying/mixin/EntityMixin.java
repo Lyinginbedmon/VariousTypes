@@ -24,6 +24,7 @@ import com.lying.utility.ServerEvents;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
@@ -52,6 +53,9 @@ public class EntityMixin
 	
 	@Shadow
 	public World getWorld() { return null; }
+	
+	@Shadow
+	public boolean hasVehicle() { return false; }
 	
 	@Shadow
 	public Box getBoundingBox() { return Box.of(Vec3d.ZERO, 1D, 1D, 1D); }
@@ -94,6 +98,12 @@ public class EntityMixin
 	
 	@Shadow
 	public DamageSources getDamageSources() { return null; }
+	
+	@Shadow
+	public EntityPose getPose() { return EntityPose.STANDING; }
+	
+	@Shadow
+	public void setPose(EntityPose poseIn) { }
 	
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)

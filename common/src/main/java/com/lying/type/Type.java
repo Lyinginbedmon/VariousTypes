@@ -199,6 +199,14 @@ public class Type
 			return this;
 		}
 		
+		public Builder addAbility(AbilityInstance inst)
+		{
+			AbilityInstance conformed = inst.ability().instance(AbilitySource.TYPE);
+			conformed.copyDetails(inst);
+			abilities.add(conformed.lock());
+			return this;
+		}
+		
 		public Builder compatibility(Predicate<Type> checkIn)
 		{
 			compCheck = checkIn;

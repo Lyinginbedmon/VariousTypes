@@ -1,5 +1,7 @@
 package com.lying.client.screen;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
+import com.lying.ability.Ability.AbilityType;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityInstance;
 import com.lying.client.KeybindHandling;
@@ -24,6 +27,7 @@ import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -181,7 +185,11 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 			{
 				AbilityInstance inst = currentSet.get(index);
 				button.setMessage(inst.displayName());
-				button.setTooltip(Tooltip.of(inst.description().get()));
+				
+				MutableText text = inst.description().get().copy();
+				if(inst.ability().type() == AbilityType.TOGGLED)
+					text.append("\n").append(translate("gui", "toggle_"+(inst.memory().getBoolean("IsActive") ? "on" : "off"), AbilityType.TOGGLED.translate()).copy());
+				button.setTooltip(Tooltip.of(text));
 			}
 		}
 		

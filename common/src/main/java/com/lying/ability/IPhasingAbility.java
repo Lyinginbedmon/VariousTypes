@@ -1,11 +1,13 @@
 package com.lying.ability;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.component.CharacterSheet;
+import com.lying.ability.Ability.AbilityType;
 import com.lying.data.VTTags;
 import com.lying.init.VTSheetElements;
 
@@ -13,6 +15,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.FluidBlock;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -25,10 +28,23 @@ public interface IPhasingAbility extends IBlockCollisionAbility
 		return isPhasingAtPos(living, living.getBlockPos().add(0, (int)living.getEyeHeight(living.getPose()), 0));
 	}
 	
-	public static List<AbilityInstance> getPhasingAbilities(LivingEntity living)
+	public static Collection<AbilityInstance> getPhasingAbilities(LivingEntity living)
 	{
-		Optional<CharacterSheet> sheet = VariousTypes.getSheet((LivingEntity)living);
-		return sheet.isEmpty() ? Lists.newArrayList() : sheet.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(IPhasingAbility.class);
+		Map<Identifier, AbilityInstance> abilityMap = new HashMap<>();
+		
+		VariousTypes.getSheet((LivingEntity)living).ifPresent(sheet -> 
+		{
+			// Collect all passive abilities from main ability set
+			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(IPhasingAbility.class).stream().
+				filter(inst -> inst.ability().type() == AbilityType.PASSIVE).
+					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+			
+			// Collect all activated abilities from actionable ability set
+			sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).getAbilitiesOfClass(IPhasingAbility.class).
+					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+		});
+		
+		return abilityMap.isEmpty() ? Lists.newArrayList() : abilityMap.values();
 	}
 	
 	/** Checks if the player can phase through the block at the given position */

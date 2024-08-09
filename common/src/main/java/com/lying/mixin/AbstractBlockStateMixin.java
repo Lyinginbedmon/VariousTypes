@@ -9,9 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
-import com.lying.ability.AbilitySet;
 import com.lying.ability.IBlockCollisionAbility;
-import com.lying.init.VTSheetElements;
 
 import net.minecraft.block.AbstractBlock.AbstractBlockState;
 import net.minecraft.block.BlockState;
@@ -38,7 +36,7 @@ public class AbstractBlockStateMixin
 		LivingEntity living = (LivingEntity)entityContext.getEntity();
 		VariousTypes.getSheet(living).ifPresent(sheet -> 
 		{
-			for(AbilityInstance inst : sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(IBlockCollisionAbility.class))
+			for(AbilityInstance inst : IBlockCollisionAbility.getCollisionAbilities(living))
 			{
 				Optional<VoxelShape> result = ((IBlockCollisionAbility)inst.ability()).getCollisionFor((BlockState)(Object)this, pos, living, inst);
 				if(result.isPresent())
