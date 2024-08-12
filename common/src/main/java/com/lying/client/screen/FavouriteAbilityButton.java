@@ -5,10 +5,10 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.ActivatedAbility;
-import com.lying.client.network.SetFavouriteAbilityPacket;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 import com.lying.mixin.IDrawContextInvoker;
+import com.lying.network.SetFavouriteAbilityPacket;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.gui.DrawContext;

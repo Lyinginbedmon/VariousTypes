@@ -37,7 +37,7 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 	{
 		VariousTypes.getSheet((PlayerEntity)(Object)this).ifPresent(sheet -> 
 		{
-			// Prevents natural health regeneration if the player does not have that action
+			// Prevents sleeping at beds if the player does not have that action
 			if(!sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
 			{
 				setSpawnPoint(getWorld().getRegistryKey(), pos, getYaw(), false, true);

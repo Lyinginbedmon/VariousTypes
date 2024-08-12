@@ -4,30 +4,29 @@ import dev.architectury.networking.NetworkManager;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 
-public class SyncFatiguePacket
+public class ActivateAbilityPacket
 {
-	private static final Identifier PACKET_ID = VTPacketHandler.SYNC_FATIGUE_ID;
+	private static final Identifier PACKET_ID = VTPacketHandler.ACTIVATE_ABILITY_ID;
 	public static final CustomPayload.Id<Payload> PACKET_TYPE = new CustomPayload.Id<>(PACKET_ID);
 	public static final PacketCodec<RegistryByteBuf, Payload> PACKET_CODEC = CustomPayload.codecOf(Payload::write, Payload::new);
 	
-	public static void send(ServerPlayerEntity player, float fatigue)
+	public static void send(Identifier mapName)
 	{
-		NetworkManager.sendToPlayer(player, new Payload(fatigue));
+		NetworkManager.sendToServer(new Payload(mapName));
 	}
 	
-	public static record Payload(float fatigue) implements CustomPayload
+	public static record Payload(Identifier mapName) implements CustomPayload
 	{
 		public Payload(RegistryByteBuf buffer)
 		{
-			this(buffer.readFloat());
+			this(buffer.readIdentifier());
 		}
 		
 		public void write(RegistryByteBuf buffer)
 		{
-			buffer.writeFloat(fatigue);
+			buffer.writeIdentifier(mapName);
 		}
 		
 		public Id<? extends CustomPayload> getId() { return PACKET_TYPE; }

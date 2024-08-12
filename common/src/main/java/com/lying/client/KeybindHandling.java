@@ -5,10 +5,10 @@ import java.util.function.Consumer;
 
 import com.lying.VariousTypes;
 import com.lying.client.init.VTKeybinds;
-import com.lying.client.network.ActivateAbilityPacket;
-import com.lying.client.network.OpenAbilityMenuPacket;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
+import com.lying.network.ActivateAbilityPacket;
+import com.lying.network.OpenAbilityMenuPacket;
 
 import dev.architectury.event.events.client.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;

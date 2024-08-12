@@ -4,11 +4,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.util.Identifier;
 
-public class AbilityEffectOnDemand extends ActivatedAbility
+public class AbilityStatusEffectOnDemand extends ActivatedAbility
 {
 	private final StatusEffectInstance[] effects;
 	
-	public AbilityEffectOnDemand(Identifier registryName, Category category, StatusEffectInstance... effectIn)
+	public AbilityStatusEffectOnDemand(Identifier registryName, Category category, StatusEffectInstance... effectIn)
 	{
 		super(registryName, category);
 		this.effects = effectIn;

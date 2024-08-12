@@ -6,17 +6,18 @@
   "client": [
   ],
   "mixins": [
-	"IDrawContextInvoker",
 	"EntityMixin",
 	"LivingEntityMixin",
 	"PlayerEntityMixin",
 	"ServerPlayerEntityMixin",
+	"ServerPlayNetworkHandlerMixin",
 	"MobEntityMixin",
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
 	"DamageEnchantmentMixin"
   ],
   "client": [
+  	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin"
   ],
   "injectors": {

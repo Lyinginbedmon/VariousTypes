@@ -15,9 +15,9 @@ import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityInstance;
 import com.lying.client.KeybindHandling;
 import com.lying.client.VariousTypesClient;
-import com.lying.client.network.ActivateAbilityPacket;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
+import com.lying.network.ActivateAbilityPacket;
 import com.lying.screen.AbilityMenuHandler;
 
 import net.minecraft.client.MinecraftClient;

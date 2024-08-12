@@ -10,11 +10,13 @@ import com.lying.type.TypeSet;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
+import dev.architectury.event.EventResult;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
 public class ServerEvents
@@ -78,6 +80,30 @@ public class ServerEvents
 		public interface GetStatusEffectEvent
 		{
 			void getStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final StatusEffectInstance actual);
+		}
+		
+		public static final Event<CanFly> CAN_FLY_EVENT = EventFactory.createEventResult(CanFly.class);
+		
+		@FunctionalInterface
+		public interface CanFly
+		{
+			EventResult canCurrentlyFly(LivingEntity entity);
+		}
+		
+		public static final Event<CustomElytraCheck> CUSTOM_ELYTRA_CHECK_EVENT = EventFactory.createEventResult(CustomElytraCheck.class);
+		
+		@FunctionalInterface
+		public interface CustomElytraCheck
+		{
+			EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
+		}
+		
+		public static final Event<PlayerInput> PLAYER_INPUT_EVENT = EventFactory.createLoop(PlayerInput.class);
+		
+		@FunctionalInterface
+		public interface PlayerInput
+		{
+			void onPlayerInput(ServerPlayerEntity player, float forward, float strafe, boolean jump, boolean sneak);
 		}
 	}
 	

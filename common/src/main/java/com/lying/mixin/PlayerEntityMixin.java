@@ -13,9 +13,12 @@ import com.lying.VariousTypes;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
+import com.lying.utility.ServerEvents;
 import com.mojang.datafixers.util.Either;
 
+import dev.architectury.event.EventResult;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
@@ -25,6 +28,9 @@ public class PlayerEntityMixin extends LivingEntityMixin
 {
 	@Shadow
 	protected boolean canChangeIntoPose(EntityPose pose) { return false; }
+	
+	@Shadow
+	public void startFallFlying() { }
 	
 	@Inject(method = "canFoodHeal()Z", at = @At("TAIL"), cancellable = true)
 	private void vt$canFoodHeal(final CallbackInfoReturnable<Boolean> ci)
@@ -76,5 +82,22 @@ public class PlayerEntityMixin extends LivingEntityMixin
 					setPose(pose);
 				ci.cancel();
 			}));
+	}
+	
+	@Inject(method = "checkFallFlying()Z", at = @At("HEAD"), cancellable = true)
+	private void vt$checkFallFlying(final CallbackInfoReturnable<Boolean> ci)
+	{
+		PlayerEntity player = (PlayerEntity)(Object)this;
+		if(ServerEvents.LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(player) == EventResult.interruptFalse())
+		{
+			ci.setReturnValue(false);
+			return;
+		}
+		
+		if(!isOnGround() && !isFallFlying() && !isTouchingWater() && !hasStatusEffect(StatusEffects.LEVITATION) && ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(player, false) == EventResult.interruptTrue())
+		{
+			startFallFlying();
+			ci.setReturnValue(true);
+		}
 	}
 }

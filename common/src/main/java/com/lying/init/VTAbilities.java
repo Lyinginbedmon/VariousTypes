@@ -19,8 +19,8 @@ import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
-import com.lying.ability.AbilityEffectOnDemand;
 import com.lying.ability.AbilityFastHeal;
+import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityIntangible;
 import com.lying.ability.AbilityInvisibility;
@@ -28,6 +28,7 @@ import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityRegeneration;
+import com.lying.ability.AbilityStatusEffectOnDemand;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.SingleAttributeAbility;
@@ -115,14 +116,14 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> SWIM			= register("swim", () -> new AbilityEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
+	public static final Supplier<Ability> SWIM			= register("swim", () -> new AbilityStatusEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
 		
 		public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return owner.isSwimming(); }
 	});
 	public static final Supplier<Ability> CLIMB			= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
-	public static final Supplier<Ability> FLY			= register("fly", () -> new ToggledAbility(prefix("fly"), Category.UTILITY));	// TODO Implement
+	public static final Supplier<Ability> FLY			= register("fly", () -> new AbilityFly(prefix("fly"), Category.UTILITY));
 	public static final Supplier<Ability> BURROW		= register("burrow", () -> new AbilityBurrow(prefix("burrow"), Category.UTILITY));
 	public static final Supplier<Ability> TELEPORT		= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
 	public static final Supplier<Ability> GHOSTLY		= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY)

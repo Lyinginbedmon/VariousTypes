@@ -26,9 +26,11 @@ import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.TypeSet;
+import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.LivingEvents;
 import com.lying.utility.ServerEvents.Result;
 
+import dev.architectury.event.EventResult;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -48,6 +50,8 @@ import net.minecraft.world.World;
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin extends EntityMixin
 {
+	private static final int FALL_FLYING_FLAG_INDEX = 7;
+	
 	@Shadow
 	private Optional<BlockPos> climbingPos = Optional.empty();
 	
@@ -79,6 +83,12 @@ public class LivingEntityMixin extends EntityMixin
 	/** Functionally repurposed as "next air somewhere you can breathe" */
 	@Shadow
 	public int getNextAirOnLand(int air) { return air + 4; }
+	
+	@Shadow
+	public boolean isFallFlying() { return false; }
+	
+	@Shadow
+	public boolean hasStatusEffect(RegistryEntry<StatusEffect> entry) { return false; }
 	
 	@Inject(method = "hasInvertedHealingAndHarm()Z", at = @At("HEAD"), cancellable = true)
 	private void vt$hasInvertedHealingAndHarm(final CallbackInfoReturnable<Boolean> ci)
@@ -283,5 +293,21 @@ public class LivingEntityMixin extends EntityMixin
 			if(amount == 0F)
 				ci.cancel();
 		}
+	}
+	
+	@Inject(method = "tickFallFlying()V", at = @At("HEAD"), cancellable = true)
+	private void vt$tickFallFlying(final CallbackInfo ci)
+	{
+		final LivingEntity living = (LivingEntity)(Object)this;
+		if(ServerEvents.LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(living) == EventResult.interruptFalse())
+		{
+			if(!getWorld().isClient())
+				setFlag(FALL_FLYING_FLAG_INDEX, false);
+			
+			ci.cancel();
+		}
+		
+		if(ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(living, true) == EventResult.interruptTrue())
+			ci.cancel();
 	}
 }

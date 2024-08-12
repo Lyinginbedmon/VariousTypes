@@ -18,7 +18,7 @@ import com.lying.component.module.ModuleTemplates;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
-import com.lying.network.VTPacketHandler;
+import com.lying.network.FinishCharacterCreationPacket;
 import com.lying.reference.Reference;
 import com.lying.screen.CharacterCreationScreenHandler;
 import com.lying.species.Species;
@@ -26,16 +26,12 @@ import com.lying.template.Template;
 import com.lying.utility.VTUtils;
 import com.mojang.datafixers.util.Pair;
 
-import dev.architectury.networking.NetworkManager;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 
 public class CharacterCreationEditScreen extends HandledScreen<CharacterCreationScreenHandler>
 {
@@ -287,16 +283,9 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		});
 	}
 	
-	@SuppressWarnings("removal")
 	public static void confirmCharacterCreation(CharacterCreationScreenHandler handler)
 	{
-		RegistryByteBuf buffer = new RegistryByteBuf(Unpooled.buffer(), mc.player.getRegistryManager());
-		buffer.writeIdentifier(handler.species() == null ? new Identifier("debug:no_species") : handler.species());
-		
-		buffer.writeInt(handler.templates().size());
-		handler.templates().forEach(tem -> buffer.writeIdentifier(tem));
-		
-		NetworkManager.sendToServer(VTPacketHandler.FINISH_CHARACTER_ID, buffer);
+		FinishCharacterCreationPacket.send(handler.species(), handler.templates());
 	}
 	
 	private static enum ActiveElement

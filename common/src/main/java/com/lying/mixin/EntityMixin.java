@@ -105,6 +105,15 @@ public class EntityMixin
 	@Shadow
 	public void setPose(EntityPose poseIn) { }
 	
+	@Shadow
+	public boolean isOnGround() { return false; }
+	
+	@Shadow
+	public boolean isTouchingWater() { return false; }
+	
+	@Shadow
+	protected void setFlag(int index, boolean value) { }
+	
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
 	{
@@ -188,6 +197,17 @@ public class EntityMixin
 			{
 				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
 					ci.setReturnValue(false);
+			});
+	}
+	
+	@Inject(method = "bypassesSteppingEffects()Z", at = @At("TAIL"), cancellable = true)
+	private void vt$bypassesSteppingEffects(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
+			{
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INTANGIBLE.get().registryName()))
+					ci.setReturnValue(true);
 			});
 	}
 }
