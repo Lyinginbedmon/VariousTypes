@@ -98,7 +98,8 @@ public class ServerEvents
 			EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
 		}
 		
-		public static final Event<PlayerInput> PLAYER_INPUT_EVENT = EventFactory.createLoop(PlayerInput.class);
+		/** Fired when the server receives a PlayerFlightInput packet from a flying player */
+		public static final Event<PlayerInput> PLAYER_FLIGHT_INPUT_EVENT = EventFactory.createLoop(PlayerInput.class);
 		
 		@FunctionalInterface
 		public interface PlayerInput

@@ -11,11 +11,15 @@ import dev.architectury.event.EventResult;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 
 public class AbilityFly extends Ability
 {
+	public static final double DEFAULT_SPEED = 1D;
+	public static final float DEFAULT_EXHAUSTION = 0.15F;
+	
 	public AbilityFly(Identifier regName, Category catIn)
 	{
 		super(regName, catIn);
@@ -36,27 +40,25 @@ public class AbilityFly extends Ability
 			if(player.getHungerManager().getFoodLevel() <= 3)
 				return EventResult.pass();
 			
-			if(ticking && player.isFallFlying() && player.isMainPlayer())
+			if(ticking && player.isFallFlying() && (!player.getWorld().isClient() || player.isMainPlayer()))
 			{
 				double input = Math.max(0, player.forwardSpeed);
 				if(input > 0)
 				{
-					Vec3d direction = player.getRotationVector();
-					double forward = input * 0.3F * player.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-					player.addVelocity(direction.multiply(forward));
+					AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+					double multiplier = flight.memory().contains("Speed", NbtElement.DOUBLE_TYPE) ? flight.memory().getDouble("Speed") : DEFAULT_SPEED;
 					
-					// TODO Fix using hunger for propulsion
-//						float exhaustion = (float)Math.abs(input);
-//						player.addExhaustion(exhaustion);
+					Vec3d direction = player.getRotationVector();
+					double forward = input * 0.3F * player.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED) * multiplier;
+					player.addVelocity(direction.multiply(forward));
 				}
 			}
 			
 			return EventResult.interruptTrue();
 		});
 		
-		ServerEvents.LivingEvents.PLAYER_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
+		ServerEvents.LivingEvents.PLAYER_FLIGHT_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
 		{
-			System.out.println("Firing input event for "+player.getDisplayName().getString());
 			if(player.getHungerManager().getFoodLevel() <= 3 || !player.isFallFlying())
 				return;
 			
@@ -64,18 +66,12 @@ public class AbilityFly extends Ability
 			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
 				return;
 			
+			AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+			float exhaustion = flight.memory().contains("Food", NbtElement.FLOAT_TYPE) ? flight.memory().getFloat("Food") : DEFAULT_EXHAUSTION;
+			
 			double input = Math.max(0, forward);
-			System.out.println("Server motion: "+input);
 			if(input > 0)
-			{
-				Vec3d direction = player.getRotationVector();
-				double thrust = input * 0.3F * player.getAttributeValue(EntityAttributes.GENERIC_MOVEMENT_SPEED);
-				player.addVelocity(direction.multiply(thrust));
-				
-				// TODO Fix using hunger for propulsion
-				float exhaustion = (float)Math.abs(input);
-				player.addExhaustion(exhaustion);
-			}
+				player.addExhaustion((float)Math.abs(input) * exhaustion);
 		});
 	}
 }

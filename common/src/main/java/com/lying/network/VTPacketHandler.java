@@ -9,6 +9,7 @@ import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.screen.AbilityMenuHandler;
+import com.lying.utility.ServerEvents;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
@@ -24,6 +25,7 @@ public class VTPacketHandler
 	public static final Identifier OPEN_ABILITY_MENU_ID	= prefix("c2s_open_ability_menu");
 	public static final Identifier SET_FAVOURITE_ABILITY_ID	= prefix("c2s_set_favourite_ability");
 	public static final Identifier ACTIVATE_ABILITY_ID	= prefix("c2s_activate_ability");
+	public static final Identifier PLAYER_FLYING_INPUT_ID	= prefix("c2s_player_flying_input");
 	
 	public static final Identifier SYNC_ACTIONABLES_ID	= prefix("s2c_sync_actionables");
 	public static final Identifier SYNC_FATIGUE_ID	= prefix("s2c_sync_fatigue");
@@ -67,5 +69,11 @@ public class VTPacketHandler
     	});
     	NetworkManager.registerReceiver(NetworkManager.c2s(), ActivateAbilityPacket.PACKET_TYPE, ActivateAbilityPacket.PACKET_CODEC, (value, context) -> 
     		VariousTypes.getSheet(context.getPlayer()).ifPresent(sheet -> sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES).enactActionable(context.getPlayer(), value.mapName())));
+    	NetworkManager.registerReceiver(NetworkManager.c2s(), PlayerFlightInputPacket.PACKET_TYPE, PlayerFlightInputPacket.PACKET_CODEC, (value, context) -> 
+    	{
+    		ServerPlayerEntity player = (ServerPlayerEntity)context.getPlayer();
+    		if(player.isFallFlying())
+    			ServerEvents.LivingEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
+    	});
 	}
 }

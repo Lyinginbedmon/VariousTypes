@@ -10,13 +10,13 @@
 	"LivingEntityMixin",
 	"PlayerEntityMixin",
 	"ServerPlayerEntityMixin",
-	"ServerPlayNetworkHandlerMixin",
 	"MobEntityMixin",
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
 	"DamageEnchantmentMixin"
   ],
   "client": [
+	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin"
   ],
