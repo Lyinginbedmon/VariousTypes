@@ -28,6 +28,15 @@
         "vartypes:burn_in_sun"
       ],
       "Name": "vartypes:add_ability"
+    },
+    {
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 6
+        }
+      },
+      "Name": "vartypes:add_ability"
     }
   ],
   "Power": 8

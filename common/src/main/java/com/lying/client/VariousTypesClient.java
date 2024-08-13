@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFW;
 import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTKeybinds;
-import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
@@ -23,11 +22,9 @@ import com.lying.network.SyncPosePacket;
 import com.lying.reference.Reference;
 
 import dev.architectury.networking.NetworkManager;
-import dev.architectury.registry.client.level.entity.EntityModelLayerRegistry;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.model.Dilation;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityPose;
@@ -109,7 +106,5 @@ public class VariousTypesClient
 	private static void registerEntityRenderers()
 	{
 		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
-		EntityModelLayerRegistry.register(ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
-		EntityModelLayerRegistry.register(ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
 	}
 }

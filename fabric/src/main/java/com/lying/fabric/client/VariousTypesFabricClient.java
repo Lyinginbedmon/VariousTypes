@@ -1,11 +1,11 @@
 package com.lying.fabric.client;
 
 import com.lying.client.VariousTypesClient;
-import com.lying.init.VTEntityTypes;
+import com.lying.client.model.AnimatedPlayerEntityModel;
 
+import dev.architectury.registry.client.level.entity.EntityModelLayerRegistry;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.model.Dilation;
 
 public final class VariousTypesFabricClient implements ClientModInitializer
 {
@@ -15,6 +15,7 @@ public final class VariousTypesFabricClient implements ClientModInitializer
         // This entrypoint is suitable for setting up client-specific logic, such as rendering.
     	VariousTypesClient.clientInit();
     	
-    	FabricDefaultAttributeRegistry.register(VTEntityTypes.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes());
+		EntityModelLayerRegistry.register(VariousTypesClient.ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
+		EntityModelLayerRegistry.register(VariousTypesClient.ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
     }
 }

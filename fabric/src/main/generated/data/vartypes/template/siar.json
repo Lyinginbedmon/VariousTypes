@@ -20,6 +20,15 @@
       "Types": [
         "vartypes:undead"
       ]
+    },
+    {
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 5
+        }
+      },
+      "Name": "vartypes:add_ability"
     }
   ],
   "Power": 4

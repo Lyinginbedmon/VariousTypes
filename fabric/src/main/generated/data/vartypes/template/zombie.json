@@ -23,6 +23,10 @@
     },
     "vartypes:lose_dummy_subtypes",
     {
+      "Ability": "vartypes:burn_in_sun",
+      "Name": "vartypes:add_ability"
+    },
+    {
       "Ability": {
         "Ability": "vartypes:natural_armour",
         "Memory": {

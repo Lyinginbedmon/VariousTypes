@@ -1,14 +1,17 @@
 package com.lying.neoforge.client;
 
+import com.lying.VariousTypes;
 import com.lying.client.VariousTypesClient;
+import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.init.VTEntityTypes;
 import com.lying.reference.Reference;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.model.Dilation;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 @EventBusSubscriber(modid = Reference.ModInfo.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class VariousTypesNeoForgeClient
@@ -19,8 +22,18 @@ public class VariousTypesNeoForgeClient
     	VariousTypesClient.clientInit();
 	}
 	
-	public void registerEntityAttributes(final EntityAttributeCreationEvent event)
+	@SubscribeEvent
+	public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event)
 	{
-		event.put(VTEntityTypes.ANIMATED_PLAYER.get(), PlayerEntity.createPlayerAttributes().build());
+		VariousTypes.LOGGER.info("Entity renderer registration");
+		event.registerEntityRenderer(VTEntityTypes.ANIMATED_PLAYER.get(), AnimatedPlayerEntityRenderer::new);
+	}
+	
+	@SubscribeEvent
+	public static void registerEntityLayers(EntityRenderersEvent.RegisterLayerDefinitions event)
+	{
+		VariousTypes.LOGGER.info("Entity layer registration");
+		event.registerLayerDefinition(VariousTypesClient.ANIMATED_PLAYER, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
+		event.registerLayerDefinition(VariousTypesClient.ANIMATED_PLAYER_SLIM, () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
 	}
 }
