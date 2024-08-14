@@ -63,7 +63,7 @@ public class VariousTypesClient
     		VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
     		{
     			ElementActionables element = sheet.element(VTSheetElements.ACTIONABLES);
-    			value.actionables().abilities().forEach(inst -> element.set(inst));
+    			element.readFromNbt(value.actionables().storeNbt());
     		});
     	});
     	NetworkManager.registerReceiver(NetworkManager.s2c(), SyncFatiguePacket.PACKET_TYPE, SyncFatiguePacket.PACKET_CODEC, (value, context) -> 

@@ -11,6 +11,7 @@ import com.google.gson.JsonObject;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
+import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
@@ -185,9 +186,9 @@ public class Species
 			return this;
 		}
 		
-		public Builder addAbility(Ability inst)
+		public Builder addAbility(Ability ability)
 		{
-			return addAbility(inst, Consumers.nop());
+			return addAbility(ability, Consumers.nop());
 		}
 		
 		public Builder addAbility(Ability... abilities)
@@ -197,9 +198,22 @@ public class Species
 			return this;
 		}
 		
-		public Builder addAbility(Ability inst, Consumer<NbtCompound> dataModifier)
+		public Builder addAbility(Ability ability, Consumer<NbtCompound> dataModifier)
 		{
-			abilities.add(inst.instance(AbilitySource.SPECIES, dataModifier));
+			abilities.add(ability.instance(AbilitySource.SPECIES, dataModifier));
+			return this;
+		}
+		
+		public Builder addAbility(AbilityInstance inst)
+		{
+			if(inst.source() == AbilitySource.SPECIES)
+				abilities.add(inst);
+			else
+			{
+				AbilityInstance conformed = inst.ability().instance(AbilitySource.SPECIES);
+				conformed.copyDetails(inst);
+				abilities.add(inst);
+			}
 			return this;
 		}
 		

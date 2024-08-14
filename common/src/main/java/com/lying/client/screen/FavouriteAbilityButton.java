@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.ActivatedAbility;
+import com.lying.component.element.Cooldown;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 import com.lying.mixin.IDrawContextInvoker;
@@ -73,24 +74,37 @@ public class FavouriteAbilityButton extends ButtonWidget
 		((IDrawContextInvoker)context).drawTexRGBA(isHovered() && this.active ? TEXTURE_HOVERED : TEXTURE, getX(), getRight(), getY(), getBottom(), 0, 0F, 1F, 0F, 1F, v, v, v, 1F);
 		contents.ifPresent(inst -> 
 		{
-			float f = element.getCooldown(inst.mapName(), AbilityMenu.mc.player.getWorld().getTime());
-			
-			float u1 = 0F;
 			int iconHeight = getHeight() - 4;
-			int renderedHeight = (int)(iconHeight * f);
-			if(f < 1F)
+			
+			Cooldown cool = element.getCooldown(inst.mapName());
+			if(cool == null)
 			{
-				f -= f%0.1F;
-				renderedHeight = (int)(iconHeight * f);
-				f = (float)renderedHeight / (float)iconHeight;
-				
-				u1 = 1F - f;
+				// No cooldown in effect, just render if we can use it right now
+				float f = ((ActivatedAbility)inst.ability()).canTrigger(AbilityMenu.mc.player, inst) ? 1F : 0.3F;
+				((IDrawContextInvoker)context).drawTexRGBA(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - iconHeight, getBottom() - 2, 0, 0F, 1F, 0F, 1F, f, f, f, 1F);
+				return;
+			}
+			else if(cool.isIndefinite())
+			{
+				// Indefinite cooldown in effect, render transparent icon
+				((IDrawContextInvoker)context).drawTexRGBA(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - iconHeight, getBottom() - 2, 0, 0F, 1F, 0F, 1F, 0.3F, 0.3F, 0.3F, 0.5F);
+				return;
 			}
 			
-			if(!((ActivatedAbility)inst.ability()).canTrigger(AbilityMenu.mc.player, inst))
-				f = Math.min(f, 0.3F);
+			// Temporary cooldown in effect, render partial icon
+			float volume = cool.progress(AbilityMenu.mc.player.getWorld().getTime());
+			float u1 = 0F;
+			int renderedHeight = (int)(iconHeight * volume);
+			if(volume < 1F)
+			{
+				volume -= volume%0.1F;
+				renderedHeight = (int)(iconHeight * volume);
+				volume = (float)renderedHeight / (float)iconHeight;
+				
+				u1 = 1F - volume;
+			}
 			
-			((IDrawContextInvoker)context).drawTexRGBA(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - renderedHeight, getBottom() - 2, 0, 0F, 1F, u1, 1F, f, f, f, 1F);
+			((IDrawContextInvoker)context).drawTexRGBA(inst.ability().iconTexture(), getX() + 2, getRight() - 2, getBottom() - renderedHeight, getBottom() - 2, 0, 0F, 1F, u1, 1F, volume, volume, volume, 1F);
 		});
 	}
 }

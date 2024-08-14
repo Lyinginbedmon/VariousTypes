@@ -11,6 +11,7 @@
 	"PlayerEntityMixin",
 	"ServerPlayerEntityMixin",
 	"MobEntityMixin",
+	"ExperienceOrbEntityMixin",
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
 	"DamageEnchantmentMixin"
@@ -18,7 +19,8 @@
   "client": [
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
-	"InGameOverlayRendererMixin"
+	"InGameOverlayRendererMixin",
+	"CraftingResultSlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1

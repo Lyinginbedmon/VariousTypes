@@ -10,7 +10,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import com.google.common.collect.Lists;
+import com.lying.VariousTypes;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -48,6 +51,26 @@ public class Ability
 	{
 		registryName = regName;
 		category = catIn;
+	}
+	
+	/** Returns a collection of all abilities of the given class from all sources in the owner's character sheet */
+	public static Collection<AbilityInstance> getAllOf(Class<?> classIn, LivingEntity owner)
+	{
+		Map<Identifier, AbilityInstance> abilityMap = new HashMap<>();
+		
+		VariousTypes.getSheet(owner).ifPresent(sheet -> 
+		{
+			// Collect all passive abilities from main ability set
+			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(classIn).stream().
+				filter(inst -> inst.ability().type() == AbilityType.PASSIVE).
+					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+			
+			// Collect all activated abilities from actionable ability set
+			sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).getAbilitiesOfClass(classIn).
+					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+		});
+		
+		return abilityMap.isEmpty() ? Lists.newArrayList() : abilityMap.values();
 	}
 	
 	/** Returns true if this ability can be given a custom map name in its instance memory */
@@ -153,7 +176,6 @@ public class Ability
 	 * Where a specific ability instance originates<br>
 	 * This determines which ability is retained if two or more share the same map name
 	 */
-	@SuppressWarnings("deprecation")
 	public static enum AbilitySource implements StringIdentifiable
 	{
 		MISC(Integer.MAX_VALUE),
@@ -162,6 +184,7 @@ public class Ability
 		TEMPLATE(2),
 		CUSTOM(-1);
 		
+		@SuppressWarnings("deprecation")
 		public static final StringIdentifiable.EnumCodec<AbilitySource> CODEC = StringIdentifiable.createCodec(AbilitySource::values);
 		
 		private final int priority;

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.lying.ability.SingleAttributeAbility;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
@@ -45,7 +46,8 @@ public class SpeciesDefaults
 			.texture(Species.BACKING_BASTION)
 			.from(World.NETHER)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
-			.addAbility(VTAbilities.GOLDHEARTED.get()).build());
+			.addAbility(SingleAttributeAbility.Health.of(-4))
+			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get()).build());
 	
 	public static final Supplier<Species> MUCKIE	= register(prefix("muckie"), () -> Species.Builder.of(prefix("muckie"))
 			.texture(Species.BACKING_SHIPWRECK)

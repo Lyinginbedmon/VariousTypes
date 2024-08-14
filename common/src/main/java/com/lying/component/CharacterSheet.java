@@ -206,7 +206,7 @@ public class CharacterSheet
 				return;
 			
 			ServerPlayerEntity player = (ServerPlayerEntity)owner;
-			SyncActionablesPacket.send(player, elementValue(VTSheetElements.ACTIONABLES));
+			SyncActionablesPacket.send(player, element(VTSheetElements.ACTIONABLES));
 			SyncFatiguePacket.send(player, elementValue(VTSheetElements.NONLETHAL));
 			SyncPosePacket.sendSync(player, elementValue(VTSheetElements.SPECIAL_POSE));
 		});

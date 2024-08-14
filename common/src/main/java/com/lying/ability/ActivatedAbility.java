@@ -47,13 +47,14 @@ public abstract class ActivatedAbility extends Ability
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND; }
 	
+	/** Puts the ability on cooldown, if it isn't already */
 	public static void putAbilityOnCooldown(LivingEntity owner, Identifier mapName)
 	{
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{
 			ElementActionables actionables = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
 			AbilityInstance inst = actionables.get(mapName);
-			if(inst.cooldown() > 0)
+			if(inst.cooldown() > 0 && actionables.getCooldown(mapName) == null)
 			{
 				actionables.putOnCooldown(mapName, owner.getEntityWorld().getTime(), inst.cooldown());
 				sheet.markDirty();

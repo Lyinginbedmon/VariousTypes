@@ -13,10 +13,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.google.common.collect.Maps;
 import com.lying.VariousTypes;
+import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.IPhasingAbility;
 import com.lying.ability.IStatusEffectSpoofAbility;
+import com.lying.ability.ITickingAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
@@ -173,6 +175,15 @@ public class LivingEntityMixin extends EntityMixin
 			// Restore air meter
 			else if(air < getMaxAir())
 				setAir(getNextAirOnLand(air));
+			
+			// Tick any actively-ticking abilities
+			if(!living.getWorld().isClient())
+				Ability.getAllOf(ITickingAbility.class, living).forEach(inst -> 
+				{
+					ITickingAbility ability = (ITickingAbility)inst.ability();
+					if(ability.shouldTick(living, inst))
+						ability.onTick(inst, sheet, living);
+				});
 		});
 	}
 	

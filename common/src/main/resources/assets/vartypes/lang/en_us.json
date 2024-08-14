@@ -168,6 +168,11 @@
 	"ability.vartypes.ribshot": "Ribshot",
 	"ability.vartypes.ribshot.desc": "You can quickly shoot out a bony projectile at your foes. Don't worry, ribs grow back.",
 	"ability.vartypes.fireball": "Fireball",
+	"ability.vartypes.berserk": "Berserk",
+	"ability.vartypes.berserk.desc": "Your rage has kept you alive through dire circumstances. You gain Strength and Absorption for [%ss], but are weaker and slower for [%ss] afterwards.",
+	"ability.vartypes.mindless": "Mindless",
+	"ability.vartypes.mindless.desc": "Your mind is long gone, if it ever truly existed. You cannot collect experience and are incapable of crafting.",
+	"ability.vartypes.quake": "Quake",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

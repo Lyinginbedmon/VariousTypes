@@ -10,7 +10,6 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
-import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.ActivatedAbility;
@@ -48,10 +47,29 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public boolean coolingDown() { return globalCooldown < GLOBAL_COOL_LENGTH; }
 	
+	/** Puts the ability on cooldown, overriding any existing cooldown */
 	public void putOnCooldown(Identifier mapName, long startFrom, int duration)
 	{
-		cooldowns.put(mapName, new Cooldown(startFrom, duration));
-		globalCooldown = 0;
+		putOnCooldown(mapName, startFrom, duration, true);
+	}
+	
+	/** Puts the ability on cooldown, overriding any existing cooldown */
+	public void putOnCooldown(Identifier mapName, long startFrom, int duration, boolean fireGlobal)
+	{
+		startCooldown(mapName, new Cooldown(startFrom, duration), fireGlobal);
+	}
+	
+	/** Puts the ability on indefinite cooldown, without triggering global cooldown, usually for ticking abilities */
+	public void putOnIndefiniteCooldown(Identifier mapName, boolean fireGlobal)
+	{
+		startCooldown(mapName, new Cooldown(), fireGlobal);
+	}
+	
+	private void startCooldown(Identifier mapName, Cooldown cool, boolean fireGlobal)
+	{
+		cooldowns.put(mapName, cool);
+		if(fireGlobal)
+			globalCooldown = 0;
 	}
 	
 	public void clearCooldown(Identifier mapName)
@@ -59,10 +77,20 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 		cooldowns.remove(mapName);
 	}
 	
-	/* Returns the progression of the given ability's cooldown, ranging from 0F (just started) to 1F (complete) */
-	public float getCooldown(Identifier mapName, long time)
+	@Nullable
+	public Cooldown getCooldown(Identifier mapName)
 	{
-		return cooldowns.containsKey(mapName) ? cooldowns.get(mapName).progress(time) : 1F;
+		return cooldowns.getOrDefault(mapName, null);
+	}
+	
+	/* Returns the progression of the given ability's cooldown, ranging from 0F (just started) to 1F (complete) */
+	public float getCooldownProgress(Identifier mapName, long time)
+	{
+		if(!cooldowns.containsKey(mapName))
+			return 1F;
+		
+		Cooldown cool = cooldowns.get(mapName);
+		return cool.isIndefinite() ? 0F : cool.progress(time);
 	}
 	
 	public void tick(LivingEntity owner)
@@ -76,18 +104,23 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 		List<Identifier> cooledOff = Lists.newArrayList();
 		cooldowns.entrySet().removeIf(entry -> 
 		{
-			if(entry.getValue().hasElapsed(owner.getWorld().getTime()))
+			Cooldown cool = entry.getValue();
+			if(!cool.isIndefinite() && cool.hasElapsed(owner.getWorld().getTime()))
 			{
 				cooledOff.add(entry.getKey());
 				return true;
 			}
 			return false;
 		});
+		
+		// XXX Notify player of ability(s) coming off cooldown?
 		if(!owner.getWorld().isClient() && !cooledOff.isEmpty())
-		{
-			// XXX Notify player of ability(s) coming off cooldown?
-			VariousTypes.getSheet(owner).get().markDirty();
-		}
+			SyncActionablesPacket.send((ServerPlayerEntity)owner, this);
+	}
+	
+	public NbtCompound storeNbt()
+	{
+		return this.writeToNbt(new NbtCompound());
 	}
 	
 	public NbtCompound writeToNbt(NbtCompound nbt)
@@ -156,6 +189,13 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 		}
 	}
 	
+	public static ElementActionables buildFromNbt(NbtCompound nbt)
+	{
+		ElementActionables actionables = new ElementActionables();
+		actionables.readFromNbt(nbt);
+		return actionables;
+	}
+	
 	public AbilitySet value() { return this; }
 	
 	public Optional<Identifier> getFirstActivated()
@@ -216,38 +256,5 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 		if(((ActivatedAbility)inst.ability()).trigger(owner, inst) && !owner.getWorld().isClient())
 			SyncActionablesPacket.send((ServerPlayerEntity)owner, this);
 		
-	}
-	
-	private static class Cooldown
-	{
-		private final long start, end;
-		private final int duration;
-		
-		public Cooldown(long startTime, int length)
-		{
-			start = startTime;
-			duration = length;
-			end = start + duration;
-		}
-		
-		public boolean hasElapsed(long time) { return time > end; }
-		
-		public float progress(long time)
-		{
-			return Math.clamp((time - start) / (float)duration, 0F, 1F);
-		}
-		
-		public NbtCompound toNbt()
-		{
-			NbtCompound nbt = new NbtCompound();
-			nbt.putLong("Start", start);
-			nbt.putInt("Duration", duration);
-			return nbt;
-		}
-		
-		public static Cooldown fromNbt(NbtCompound nbt)
-		{
-			return new Cooldown(nbt.getLong("Start"), nbt.getInt("Duration"));
-		}
 	}
 }

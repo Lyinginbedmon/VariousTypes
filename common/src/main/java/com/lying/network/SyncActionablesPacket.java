@@ -1,10 +1,8 @@
 package com.lying.network;
 
-import com.lying.ability.AbilitySet;
+import com.lying.component.element.ElementActionables;
 
 import dev.architectury.networking.NetworkManager;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
@@ -17,23 +15,21 @@ public class SyncActionablesPacket
 	public static final CustomPayload.Id<Payload> PACKET_TYPE = new CustomPayload.Id<>(PACKET_ID);
 	public static final PacketCodec<RegistryByteBuf, Payload> PACKET_CODEC = CustomPayload.codecOf(Payload::write, Payload::new);
 	
-	public static void send(ServerPlayerEntity player, AbilitySet actionables)
+	public static void send(ServerPlayerEntity player, ElementActionables actionables)
 	{
 		NetworkManager.sendToPlayer(player, new Payload(actionables));
 	}
 	
-	public static record Payload(AbilitySet actionables) implements CustomPayload
+	public static record Payload(ElementActionables actionables) implements CustomPayload
 	{
 		public Payload(RegistryByteBuf buffer)
 		{
-			this(AbilitySet.readFromNbt(buffer.readNbt().getList("Abilities", NbtElement.COMPOUND_TYPE)));
+			this(ElementActionables.buildFromNbt(buffer.readNbt()));
 		}
 		
 		public void write(RegistryByteBuf buffer)
 		{
-			NbtCompound compound = new NbtCompound();
-			compound.put("Abilities", actionables.writeToNbt());
-			buffer.writeNbt(compound);
+			buffer.writeNbt(actionables.storeNbt());
 		}
 		
 		public Id<? extends CustomPayload> getId() { return PACKET_TYPE; }

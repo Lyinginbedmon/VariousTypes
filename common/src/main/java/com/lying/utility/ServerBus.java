@@ -78,7 +78,7 @@ public class ServerBus
 		{
 			sheet.buildAndSync();
 			SyncFatiguePacket.send(player, sheet.elementValue(VTSheetElements.NONLETHAL));
-			SyncActionablesPacket.send(player, sheet.elementValue(VTSheetElements.ACTIONABLES));
+			SyncActionablesPacket.send(player, sheet.element(VTSheetElements.ACTIONABLES));
 		}));
 		
 		// Update character sheet when changing dimension

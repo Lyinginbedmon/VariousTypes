@@ -11,9 +11,11 @@ import com.lying.type.TypeSet;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
+import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -105,6 +107,14 @@ public class ServerEvents
 		public interface PlayerInput
 		{
 			void onPlayerInput(ServerPlayerEntity player, float forward, float strafe, boolean jump, boolean sneak);
+		}
+		
+		public static final Event<OrbCollideEvent> ORB_COLLIDE_EVENT = EventFactory.createEventResult(OrbCollideEvent.class);
+		
+		@FunctionalInterface
+		public interface OrbCollideEvent
+		{
+			EventResult canOrbCollideWithPlayer(ExperienceOrbEntity orb, PlayerEntity player);
 		}
 	}
 	

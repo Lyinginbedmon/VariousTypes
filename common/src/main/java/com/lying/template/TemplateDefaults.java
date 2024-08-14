@@ -74,7 +74,7 @@ public class TemplateDefaults
 			.condition(TypeCondition.None.of(VTTypes.OOZE.get(), VTTypes.ADUAIN.get()))
 			.operation(TypesOperation.SetSupertypes.of(VTTypes.UNDEAD.get()))
 			.operation(Operation.LOSE_DUMMY_SUBTYPES.get())
-			.operation(AbilityOperation.Add.of(VTAbilities.BURN_IN_SUN.get()))
+			.operation(AbilityOperation.Add.of(VTAbilities.BURN_IN_SUN.get(), VTAbilities.MINDLESS.get()))
 			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(2))).build());
 	
 	private static Supplier<Template> register(Identifier name, Supplier<Template> template)

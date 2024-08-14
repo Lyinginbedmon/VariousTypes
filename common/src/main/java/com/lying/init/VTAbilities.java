@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
+import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityFastHeal;
@@ -27,13 +28,16 @@ import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
+import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
+import com.lying.ability.AbilitySet;
 import com.lying.ability.AbilityStatusEffectOnDemand;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
+import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
@@ -41,6 +45,7 @@ import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.Result;
 import com.lying.utility.VTUtils;
 
+import dev.architectury.event.EventResult;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -197,7 +202,7 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> RUN_CMD	= register("run_command", () -> new ActivatedAbility(prefix("run_command"), Category.UTILITY)
+	public static final Supplier<Ability> RUN_CMD		= register("run_command", () -> new ActivatedAbility(prefix("run_command"), Category.UTILITY)
 	{
 		protected boolean remappable() { return true; }
 		
@@ -211,7 +216,7 @@ public class VTAbilities
 			catch(Exception e) { }
 		}
 	});
-	public static final Supplier<Ability> PARIAH	= register("pariah", () -> new AbilityPariah(prefix("pariah"), Category.UTILITY));
+	public static final Supplier<Ability> PARIAH		= register("pariah", () -> new AbilityPariah(prefix("pariah"), Category.UTILITY));
 	public static final Supplier<Ability> GOLDHEARTED	= register("goldheart", () -> new Ability(prefix("goldheart"), Category.DEFENSE));
 	public static final Supplier<Ability> INDOMITABLE	= register("indomitable", () -> new Ability(prefix("indomitable"), Category.OFFENSE));
 	public static final Supplier<Ability> WATER_WALKING = register("water_walking", () -> new AbilityWaterWalking(prefix("water_walking"), Category.UTILITY));
@@ -249,6 +254,23 @@ public class VTAbilities
 			owner.getWorld().spawnEntity(projectile);
 		}
 	});
+	public static final Supplier<Ability> BERSERK		= register("berserk", () -> new AbilityBerserk(prefix("berserk"), Category.OFFENSE));
+	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new Ability(prefix("mindless"), Category.UTILITY) 
+	{
+		// TODO Expand most functions to events for ease of use elsewhere
+		
+		public void registerEventHandlers()
+		{
+			ServerEvents.LivingEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
+			{
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+					return EventResult.interruptFalse();
+				return EventResult.pass();
+			});
+		}
+	});
+	public static final Supplier<Ability> QUAKE			= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -260,7 +282,6 @@ public class VTAbilities
 	 	 * Constant status effect abilities
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
 		 * Bad Breath - Spawns a cloud of configurable status effect gas that spreads outward
-		 * Berserk - Temporarily gain more health and attack damage, but weak & fatigued afterwards (Orkin trademark ability)
 		 * Blink - Very temporary (read single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
@@ -272,11 +293,10 @@ public class VTAbilities
 		 * Gelatinous - Resistance to physical forms of damage, semi-transparent rendering
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
 		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable
-		 * Mindless - Cannot pick up XP, cannot craft, immune to mind-affecting effects
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Omniscient - Cannot pick up XP but always treated as having 999 levels
+		 * Omniscient - Cannot pick up XP but always treated as having 999 levels (note: experience does not have a getter function, public int only)
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
