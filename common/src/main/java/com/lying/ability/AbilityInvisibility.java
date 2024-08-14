@@ -15,9 +15,7 @@ public class AbilityInvisibility extends Ability implements IStatusEffectSpoofAb
 		super(regName, catIn);
 	}
 	
-	public boolean shouldApplyTo(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return effect == StatusEffects.INVISIBILITY; }
-	
-	public boolean hasSpoofed(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return true; }
+	public boolean isAffectingStatus(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return effect == StatusEffects.INVISIBILITY; }
 	
 	public StatusEffectInstance getSpoofed(RegistryEntry<StatusEffect> effect, AbilityInstance inst)
 	{

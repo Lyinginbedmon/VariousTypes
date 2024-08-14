@@ -1,9 +1,13 @@
 package com.lying.utility;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Optional;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.google.common.reflect.AbstractInvocationHandler;
 import com.lying.ability.AbilitySet;
 import com.lying.type.ActionHandler;
 import com.lying.type.TypeSet;
@@ -16,6 +20,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -63,7 +68,7 @@ public class ServerEvents
 		@FunctionalInterface
 		public interface CanHaveStatusEffectEvent
 		{
-			Result shouldDenyStatusEffect(StatusEffectInstance effect, AbilitySet abilities, Result result);
+			EventResult shouldDenyStatusEffect(StatusEffectInstance effect, AbilitySet abilities);
 		}
 		
 		public static final Event<GetMaxAirEvent> GET_MAX_AIR_EVENT = EventFactory.createLoop(GetMaxAirEvent.class);
@@ -74,14 +79,35 @@ public class ServerEvents
 			int maxAir(AbilitySet abilities, int maxAir);
 		}
 		
-		public static final Event<GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.createLoop(GetStatusEffectEvent.class);
-		/** Result of the latest call to GET_STATUS_EFFECT_EVENT */	// TODO Replace this with something more contained
-		public static StatusEffectInstance GetStatusEffectEventResult = null;
+		/** Called by LivingEntityMixin when checking if the given effect is present */
+		public static final Event<HasStatusEffectEvent> HAS_STATUS_EFFECT_EVENT = EventFactory.createEventResult(HasStatusEffectEvent.class);
+		
+		@FunctionalInterface
+		public interface HasStatusEffectEvent
+		{
+			EventResult hasStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final boolean truth);
+		}
+		
+		/** Called by LivingEntityMixin when attempting to retrieve a status effect */
+		public static final Event<GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.of(listeners -> (GetStatusEffectEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{GetStatusEffectEvent.class}, new AbstractInvocationHandler()
+		{
+			@SuppressWarnings("unchecked")
+			protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				for(GetStatusEffectEvent listener : listeners)
+				{
+					Result<StatusEffectInstance> result = listener.getStatusEffect((RegistryEntry<StatusEffect>)args[0], (LivingEntity)args[1], (AbilitySet)args[2], (StatusEffectInstance)args[3]);
+					if(result.interruptsFurtherEvaluation())
+						return result;
+				}
+				return Result.pass();
+			}
+		}));
 		
 		@FunctionalInterface
 		public interface GetStatusEffectEvent
 		{
-			void getStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final StatusEffectInstance actual);
+			Result<StatusEffectInstance> getStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final StatusEffectInstance actual);
 		}
 		
 		public static final Event<CanFly> CAN_FLY_EVENT = EventFactory.createEventResult(CanFly.class);
@@ -99,7 +125,10 @@ public class ServerEvents
 		{
 			EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
 		}
-		
+	}
+	
+	public static class PlayerEvents
+	{
 		/** Fired when the server receives a PlayerFlightInput packet from a flying player */
 		public static final Event<PlayerInput> PLAYER_FLIGHT_INPUT_EVENT = EventFactory.createLoop(PlayerInput.class);
 		
@@ -109,6 +138,7 @@ public class ServerEvents
 			void onPlayerInput(ServerPlayerEntity player, float forward, float strafe, boolean jump, boolean sneak);
 		}
 		
+		/** Called by ExperienceOrbEntity when determining contact with or attraction to a player */
 		public static final Event<OrbCollideEvent> ORB_COLLIDE_EVENT = EventFactory.createEventResult(OrbCollideEvent.class);
 		
 		@FunctionalInterface
@@ -116,12 +146,36 @@ public class ServerEvents
 		{
 			EventResult canOrbCollideWithPlayer(ExperienceOrbEntity orb, PlayerEntity player);
 		}
+		
+		public static final Event<CanCraftEvent> CAN_CRAFT_EVENT = EventFactory.createEventResult(CanCraftEvent.class);
+		
+		@FunctionalInterface
+		public interface CanCraftEvent
+		{
+			EventResult canPlayerCraft(PlayerEntity player, ItemStack crafted);
+		}
 	}
 	
-	public static enum Result
+	public static class Result<T extends Object>
 	{
-		PASS,
-		DENY,
-		ALLOW;
+		@Nullable
+		private final T resultValue;
+		@NotNull
+		private final boolean shouldInterrupt;
+		
+		public Result(T value, boolean interrupt)
+		{
+			resultValue = value;
+			shouldInterrupt = interrupt;
+		}
+		
+		public static <T extends Object> Result<T> interrupt(T value) { return new Result<>(value, true); }
+		public static <T extends Object> Result<T> pass() { return new Result<>(null, false); }
+		
+		public boolean interruptsFurtherEvaluation() { return shouldInterrupt; }
+		
+		public T value() { return resultValue; }
+		
+		public boolean isEmpty() { return resultValue == null; }
 	}
 }

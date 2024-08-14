@@ -57,7 +57,7 @@ public class AbilityFly extends Ability
 			return EventResult.interruptTrue();
 		});
 		
-		ServerEvents.LivingEvents.PLAYER_FLIGHT_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
+		ServerEvents.PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
 		{
 			if(player.getHungerManager().getFoodLevel() <= 3 || !player.isFallFlying())
 				return;

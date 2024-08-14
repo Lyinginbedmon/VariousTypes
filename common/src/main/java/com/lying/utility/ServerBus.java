@@ -3,6 +3,9 @@ package com.lying.utility;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
+import com.lying.ability.Ability;
+import com.lying.ability.AbilityInstance;
+import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.init.VTSheetElements;
@@ -11,6 +14,7 @@ import com.lying.init.VTTypes;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.reference.Reference;
+import com.lying.utility.ServerEvents.Result;
 
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.PlayerEvent;
@@ -28,6 +32,7 @@ public class ServerBus
 	public static void init()
 	{
 		characterSheetHandling();
+		spoofAbilityHandling();
 		
 		// Handle nonlethal damage and resulting fatigue
 		TickEvent.PLAYER_POST.register(player -> VariousTypes.getSheet(player).ifPresent(sheet -> 
@@ -52,6 +57,35 @@ public class ServerBus
 				return EventResult.interrupt(ElytraItem.isUsable(chest));
 			
 			return EventResult.interruptDefault();
+		});
+		
+	}
+	
+	/** Apply status effect spoof abilities in one central event listener */
+	private static void spoofAbilityHandling()
+	{
+		// Causes hasEffect to return true if a spoof ability is providing the given effect
+		ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.register((effect, living, abilities, truth) -> 
+		{
+			for(AbilityInstance inst : Ability.getAllOf(IStatusEffectSpoofAbility.class, living))
+			{
+				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
+				if(ability.isAffectingStatus(effect, inst))
+					return EventResult.interruptTrue();
+			}
+			return EventResult.pass();
+		});
+		
+		// Forces getStatusEffect to return a spoofed instance
+		ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect, living, abilities, actual) -> 
+		{
+			for(AbilityInstance inst : Ability.getAllOf(IStatusEffectSpoofAbility.class, living))
+			{
+				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
+				if(ability.isAffectingStatus(effect, inst))
+					return Result.interrupt(ability.getSpoofed(effect, inst));
+			}
+			return Result.pass();
 		});
 	}
 	

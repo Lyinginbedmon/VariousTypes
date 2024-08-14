@@ -43,17 +43,17 @@ public class ExperienceOrbEntityMixin extends EntityMixin
 					return false;
 				
 				// If we couldn't collide with the player, don't set them as our target in the first place
-				return !ServerEvents.LivingEvents.ORB_COLLIDE_EVENT.invoker().canOrbCollideWithPlayer(orb, player).isFalse();
+				return !ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.invoker().canOrbCollideWithPlayer(orb, player).isFalse();
 			});
 		
 		if(getWorld() instanceof ServerWorld)
 			getWorld().getEntitiesByType(TypeFilter.instanceOf(ExperienceOrbEntity.class), getBoundingBox().expand(0.5), this::isMergeable).forEach(other -> merge(other));
 	}
 	
-	@Inject(method = "onPlayerCollision(Lnet/miencraft/entity/player/PlayerEntity;)V", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "onPlayerCollision(Lnet/minecraft/entity/player/PlayerEntity;)V", at = @At("HEAD"), cancellable = true)
 	private void vt$playerCollision(PlayerEntity player, final CallbackInfo ci)
 	{
-		if(ServerEvents.LivingEvents.ORB_COLLIDE_EVENT.invoker().canOrbCollideWithPlayer((ExperienceOrbEntity)(Object)this, player).isFalse())
+		if(ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.invoker().canOrbCollideWithPlayer((ExperienceOrbEntity)(Object)this, player).isFalse())
 			ci.cancel();
 	}
 }

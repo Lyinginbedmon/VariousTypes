@@ -12,23 +12,51 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.Ability.AbilityType;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.JsonOps;
 
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
 /** Manager object for a set of ability instances */
 public class AbilitySet
 {
+	public static final Codec<AbilitySet> CODEC_VITALS = AbilityInstance.LIST_CODEC_VITALS.comapFlatMap(set -> { return DataResult.success(AbilitySet.listToSet(set)); }, AbilitySet::abilitiesList);
+	public static final Codec<AbilitySet> CODEC = AbilityInstance.LIST_CODEC.comapFlatMap(set -> { return DataResult.success(AbilitySet.listToSet(set)); }, AbilitySet::abilitiesList);
+	
 	private final Map<Identifier, AbilityInstance> abilities = new HashMap<>();
+	
+	public static AbilitySet listToSet(List<AbilityInstance> list)
+	{
+		AbilitySet abilities = new AbilitySet();
+		abilities.addAll(list);
+		return abilities;
+	}
 	
 	public AbilitySet copy()
 	{
 		AbilitySet copy = new AbilitySet();
 		abilities.values().forEach(inst -> copy.add(inst.copy()));
+		return copy;
+	}
+	
+	public AbilitySet replicateFor(AbilitySource source)
+	{
+		AbilitySet copy = new AbilitySet();
+		abilities.values().forEach(inst -> 
+		{
+			AbilityInstance dupe = inst.ability().instance(source);
+			dupe.copyDetails(inst);
+			copy.add(dupe);
+		});
 		return copy;
 	}
 	
@@ -48,6 +76,11 @@ public class AbilitySet
 			return true;
 		}
 		return false;
+	}
+	
+	public void addAll(Collection<AbilityInstance> abilities)
+	{
+		abilities.forEach(inst -> add(inst));
 	}
 	
 	/** Remove any ability with the given map name */
@@ -129,6 +162,8 @@ public class AbilitySet
 	
 	public Collection<AbilityInstance> abilities() { return abilities.values(); }
 	
+	protected List<AbilityInstance> abilitiesList() { return Lists.newArrayList(abilities()); }
+	
 	/** Returns a subset of abilities that are not hidden from displays */
 	public List<AbilityInstance> allNonHidden()
 	{
@@ -141,30 +176,21 @@ public class AbilitySet
 		return abilities;
 	}
 	
-	public NbtList writeToNbt()
+	public NbtElement writeToNbt()
 	{
-		NbtList list = new NbtList();
-		abilities().forEach(inst -> list.add(inst.writeToNbt(new NbtCompound())));
-		return list;
+		return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
 	}
 	
 	public static AbilitySet readFromNbt(NbtList list)
 	{
-		AbilitySet set = new AbilitySet();
-		for(int i=0; i<list.size(); i++)
-		{
-			AbilityInstance inst = AbilityInstance.readFromNbt(list.getCompound(i));
-			if(inst != null)
-				set.add(inst);
-		}
-		return set;
+		return CODEC.parse(NbtOps.INSTANCE, list).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 	}
 	
-	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
-		JsonArray list = new JsonArray();
-		abilities().forEach(inst -> list.add(inst.writeToJson(manager, vitalOnly)));
-		return list;
+		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
+		Codec<AbilitySet> codec = vitalOnly ? CODEC_VITALS : CODEC;
+		return codec.encodeStart(registryOps, this).getOrThrow();
 	}
 	
 	public static AbilitySet readFromJson(JsonArray list, AbilitySource forceSource)

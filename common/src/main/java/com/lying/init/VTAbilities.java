@@ -42,7 +42,6 @@ import com.lying.data.VTTags;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
 import com.lying.utility.ServerEvents;
-import com.lying.utility.ServerEvents.Result;
 import com.lying.utility.VTUtils;
 
 import dev.architectury.event.EventResult;
@@ -91,36 +90,9 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new AbilityNightVision(prefix("night_vision"), Category.UTILITY) 
-	{
-		public void registerEventHandlers()
-		{
-			ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect,living,abilities,actual) -> 
-			{
-				if(
-					effect == StatusEffects.NIGHT_VISION 
-					&& abilities.hasAbility(registryName()) 
-					&& ToggledAbility.hasActive(abilities, registryName())
-					)
-					ServerEvents.LivingEvents.GetStatusEffectEventResult = new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
-			});
-		}
-	});
+	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new AbilityNightVision(prefix("night_vision"), Category.UTILITY));
 	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight"), Category.UTILITY));
-	public static final Supplier<Ability> INVISIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE)
-	{
-		public void registerEventHandlers()
-		{
-			ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect,living,abilities,actual) -> 
-			{
-				if(
-					effect == StatusEffects.INVISIBILITY
-					&& abilities.hasAbility(registryName())
-					)
-					ServerEvents.LivingEvents.GetStatusEffectEventResult = new StatusEffectInstance(effect, Reference.Values.TICKS_PER_MINUTE, 0, true, false);
-			});
-		}
-	});
+	public static final Supplier<Ability> INVISIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new AbilityStatusEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
@@ -159,10 +131,10 @@ public class VTAbilities
 		
 		public void registerEventHandlers()
 		{
-			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities,result) -> 
+			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities) -> 
 			{
 				List<AbilityInstance> set = abilities.getAbilitiesOfType(registryName());
-				return set.stream().anyMatch(inst -> getTags(inst.memory()).stream().anyMatch(tag -> effect.getEffectType().isIn(tag))) ? Result.DENY : result;
+				return set.stream().anyMatch(inst -> getTags(inst.memory()).stream().anyMatch(tag -> effect.getEffectType().isIn(tag))) ? EventResult.interruptFalse() : EventResult.pass();
 			});
 		}
 		
@@ -257,11 +229,33 @@ public class VTAbilities
 	public static final Supplier<Ability> BERSERK		= register("berserk", () -> new AbilityBerserk(prefix("berserk"), Category.OFFENSE));
 	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new Ability(prefix("mindless"), Category.UTILITY) 
 	{
-		// TODO Expand most functions to events for ease of use elsewhere
-		
 		public void registerEventHandlers()
 		{
-			ServerEvents.LivingEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
+			ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
+			{
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+					return EventResult.interruptFalse();
+				return EventResult.pass();
+			});
+			
+			ServerEvents.PlayerEvents.CAN_CRAFT_EVENT.register((player,crafted) -> 
+			{
+				System.out.println("Crafting event fired, "+player.getDisplayName().getString()+" attempted to craft "+crafted.getName().getString());
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+					return EventResult.interruptFalse();
+				return EventResult.pass();
+			});
+		}
+	});
+	public static final Supplier<Ability> OMNISCIENT	= register("omniscient", () -> new Ability(prefix("omniscient"), Category.UTILITY)
+	{
+		public void registerEventHandlers()
+		{
+			// TODO Add maintaining XP at 999 levels
+			
+			ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))

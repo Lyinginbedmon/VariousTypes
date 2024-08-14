@@ -2,6 +2,7 @@ package com.lying.species;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -44,7 +45,7 @@ public class Species
 	private Optional<Identifier> creatorBacking;
 	
 	private int power;
-	private RegistryKey<World> homeDim;
+	private RegistryKey<World> homeDim = null;
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities = new AbilitySet();
 	
@@ -214,6 +215,12 @@ public class Species
 				conformed.copyDetails(inst);
 				abilities.add(inst);
 			}
+			return this;
+		}
+		
+		public Builder addAbilities(Collection<AbilityInstance> inst)
+		{
+			inst.forEach(instance -> addAbility(instance));
 			return this;
 		}
 		

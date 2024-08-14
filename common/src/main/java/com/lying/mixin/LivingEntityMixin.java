@@ -1,6 +1,5 @@
 package com.lying.mixin;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -14,10 +13,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.google.common.collect.Maps;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
-import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.IPhasingAbility;
-import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.ability.ITickingAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
@@ -198,18 +195,11 @@ public class LivingEntityMixin extends EntityMixin
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
 			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITES);
-			switch(LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities, ci.getReturnValue() ? Result.ALLOW : Result.DENY))
-			{
-				case Result.DENY:
-					ci.setReturnValue(false);
-					break;
-				case Result.ALLOW:
-					ci.setReturnValue(true);
-					break;
-				default:
-				case Result.PASS:
-					break;
-			}
+			EventResult result = LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities); 
+			if(result.isTrue())
+				ci.setReturnValue(false);
+			else if(result.isFalse())
+				ci.setReturnValue(true);
 		});
 	}
 	
@@ -242,15 +232,9 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			for(AbilityInstance inst : getSpoofAbilities(sheet))
-			{
-				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
-				if(ability.shouldApplyTo(effect, inst) && ability.hasSpoofed(effect, inst))
-				{
-					ci.setReturnValue(true);
-					return;
-				}
-			};
+			EventResult result = ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.invoker().hasStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITES), ci.getReturnValue());
+			if(!result.isEmpty())
+				ci.setReturnValue(result.value());
 		});
 	}
 	
@@ -267,24 +251,10 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			for(AbilityInstance inst : getSpoofAbilities(sheet))
-			{
-				IStatusEffectSpoofAbility ability = (IStatusEffectSpoofAbility)inst.ability();
-				if(ability.shouldApplyTo(effect, inst) && ability.hasSpoofed(effect, inst))
-				{
-					ci.setReturnValue(ability.getSpoofed(effect, inst));
-					return;
-				}
-			};
+			Result<StatusEffectInstance> result = ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITES), ci.getReturnValue());
+			if(!result.isEmpty())
+				ci.setReturnValue(result.value());
 		});
-	}
-	
-	/* Returns a list of all status effect spoofing abilities in the given sheet */
-	private static List<AbilityInstance> getSpoofAbilities(CharacterSheet sheet)
-	{
-		AbilitySet set = sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).copy();
-		sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).abilities().forEach(inst -> set.set(inst));
-		return set.getAbilitiesOfClass(IStatusEffectSpoofAbility.class);
 	}
 	
 	@Inject(method = "heal(F)V", at = @At("HEAD"), cancellable = true)

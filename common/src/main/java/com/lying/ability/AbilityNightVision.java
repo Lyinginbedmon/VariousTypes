@@ -15,9 +15,7 @@ public class AbilityNightVision extends ToggledAbility implements IStatusEffectS
 		super(regName, catIn);
 	}
 	
-	public boolean shouldApplyTo(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return effect == StatusEffects.NIGHT_VISION; }
-	
-	public boolean hasSpoofed(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return isActive(inst); }
+	public boolean isAffectingStatus(RegistryEntry<StatusEffect> effect, AbilityInstance inst) { return effect == StatusEffects.NIGHT_VISION && isActive(inst); }
 	
 	public StatusEffectInstance getSpoofed(RegistryEntry<StatusEffect> effect, AbilityInstance inst)
 	{

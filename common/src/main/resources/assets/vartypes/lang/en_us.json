@@ -172,6 +172,8 @@
 	"ability.vartypes.berserk.desc": "Your rage has kept you alive through dire circumstances. You gain Strength and Absorption for [%ss], but are weaker and slower for [%ss] afterwards.",
 	"ability.vartypes.mindless": "Mindless",
 	"ability.vartypes.mindless.desc": "Your mind is long gone, if it ever truly existed. You cannot collect experience and are incapable of crafting.",
+	"ability.vartypes.omniscient": "Omniscient",
+	"ability.vartypes.omniscient.desc": "Your knowledge is boundless. You have no need of experience, because you already have more than can be counted.",
 	"ability.vartypes.quake": "Quake",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",

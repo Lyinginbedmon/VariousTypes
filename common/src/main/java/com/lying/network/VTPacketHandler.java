@@ -73,7 +73,7 @@ public class VTPacketHandler
     	{
     		ServerPlayerEntity player = (ServerPlayerEntity)context.getPlayer();
     		if(player.isFallFlying())
-    			ServerEvents.LivingEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
+    			ServerEvents.PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
     	});
 	}
 }

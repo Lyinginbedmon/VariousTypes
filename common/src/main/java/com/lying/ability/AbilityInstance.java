@@ -1,6 +1,7 @@
 package com.lying.ability;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -49,6 +50,8 @@ public class AbilityInstance
 			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityInstance::display),
 			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
 				.apply(instance, AbilityInstance::new));
+	public static final Codec<List<AbilityInstance>> LIST_CODEC = CODEC.listOf();
+	public static final Codec<List<AbilityInstance>> LIST_CODEC_VITALS = CODEC_VITALS.listOf();
 	
 	/** Comparator for sorting abilities alphabetically by their display name */
 	public static final Comparator<AbilityInstance> SORT_FUNC = (a,b) -> {
