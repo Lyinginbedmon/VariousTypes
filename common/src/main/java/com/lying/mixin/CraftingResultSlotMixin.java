@@ -10,6 +10,7 @@ import com.lying.utility.ServerEvents;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.slot.CraftingResultSlot;
 import net.minecraft.screen.slot.Slot;
 
@@ -22,9 +23,8 @@ public class CraftingResultSlotMixin
 	@Inject(method = "canTakeItems(Lnet/minecraft/entity/player/PlayerEntity;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$canTakeItems(PlayerEntity playerEntity, final CallbackInfoReturnable<Boolean> ci)
 	{
-		// FIXME Ensure function in multiplayer contexts
 		if((Object)this instanceof CraftingResultSlot && ci.getReturnValueZ())
-			if(ServerEvents.PlayerEvents.CAN_CRAFT_EVENT.invoker().canPlayerCraft(playerEntity, getStack()).isFalse())
+			if(ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(playerEntity, ScreenHandlerType.CRAFTING).isFalse())
 				ci.setReturnValue(false);
 	}
 }

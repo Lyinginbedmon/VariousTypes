@@ -20,9 +20,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.world.World;
 
@@ -139,20 +139,21 @@ public class ServerEvents
 		}
 		
 		/** Called by ExperienceOrbEntity when determining contact with or attraction to a player */
-		public static final Event<OrbCollideEvent> ORB_COLLIDE_EVENT = EventFactory.createEventResult(OrbCollideEvent.class);
+		public static final Event<CanCollectXPEvent> CAN_COLLECT_XP_EVENT = EventFactory.createEventResult(CanCollectXPEvent.class);
 		
 		@FunctionalInterface
-		public interface OrbCollideEvent
+		public interface CanCollectXPEvent
 		{
-			EventResult canOrbCollideWithPlayer(ExperienceOrbEntity orb, PlayerEntity player);
+			EventResult canPlayerCollectExperienceOrbs(ExperienceOrbEntity orb, PlayerEntity player);
 		}
 		
-		public static final Event<CanCraftEvent> CAN_CRAFT_EVENT = EventFactory.createEventResult(CanCraftEvent.class);
+		/** Called by ServerPlayerEntity before opening a handled screen */
+		public static final Event<CanUseScreenEvent> CAN_USE_SCREEN_EVENT = EventFactory.createEventResult(CanUseScreenEvent.class);
 		
 		@FunctionalInterface
-		public interface CanCraftEvent
+		public interface CanUseScreenEvent
 		{
-			EventResult canPlayerCraft(PlayerEntity player, ItemStack crafted);
+			EventResult canPlayerUseScreen(PlayerEntity player, ScreenHandlerType<?> screen);
 		}
 	}
 	

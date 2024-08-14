@@ -13,6 +13,7 @@ public class VTDataGenerators implements DataGeneratorEntrypoint
 		pack.addProvider(VTStatusEffectTagsProvider::new);
 		pack.addProvider(VTBlockTagsProvider::new);
 		pack.addProvider(VTItemTagsProvider::new);
+		pack.addProvider(VTScreenHandlerTagsProvider::new);
 		pack.addProvider(VTRecipeProvider::new);
 	}
 }

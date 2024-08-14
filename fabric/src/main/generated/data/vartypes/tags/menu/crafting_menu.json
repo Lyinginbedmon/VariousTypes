@@ -1,0 +1,15 @@
+{
+  "values": [
+    "minecraft:crafting",
+    "minecraft:crafter_3x3",
+    "minecraft:brewing_stand",
+    "minecraft:cartography_table",
+    "minecraft:stonecutter",
+    "minecraft:grindstone",
+    "minecraft:anvil",
+    "minecraft:smithing",
+    "minecraft:beacon",
+    "minecraft:enchantment",
+    "minecraft:loom"
+  ]
+}

@@ -6,8 +6,11 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 
 public class VTTags
@@ -21,4 +24,12 @@ public class VTTags
 	
 	public static final TagKey<Block> SILVER_BLOCK = TagKey.of(RegistryKeys.BLOCK, prefix("silver"));
 	public static final TagKey<Block> UNPHASEABLE = TagKey.of(RegistryKeys.BLOCK, prefix("unphaseable"));
+	
+	public static final TagKey<ScreenHandlerType<?>> CRAFTING_MENU = TagKey.of(RegistryKeys.SCREEN_HANDLER, prefix("crafting_menu"));
+	
+	public static boolean isScreenIn(ScreenHandlerType<?> screen, TagKey<ScreenHandlerType<?>> tag)
+	{
+		RegistryEntry<ScreenHandlerType<?>> entry = Registries.SCREEN_HANDLER.getEntry(screen);
+		return entry.isIn(tag);
+	}
 }

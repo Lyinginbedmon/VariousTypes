@@ -23,7 +23,10 @@
     },
     "vartypes:lose_dummy_subtypes",
     {
-      "Ability": "vartypes:burn_in_sun",
+      "Ability": [
+        "vartypes:burn_in_sun",
+        "vartypes:mindless"
+      ],
       "Name": "vartypes:add_ability"
     },
     {

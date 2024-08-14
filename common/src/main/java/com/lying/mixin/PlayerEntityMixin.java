@@ -20,6 +20,7 @@ import dev.architectury.event.EventResult;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 
@@ -31,6 +32,9 @@ public class PlayerEntityMixin extends LivingEntityMixin
 	
 	@Shadow
 	public void startFallFlying() { }
+	
+	@Shadow
+	public PlayerInventory getInventory() { return null; }
 	
 	@Inject(method = "canFoodHeal()Z", at = @At("TAIL"), cancellable = true)
 	private void vt$canFoodHeal(final CallbackInfoReturnable<Boolean> ci)

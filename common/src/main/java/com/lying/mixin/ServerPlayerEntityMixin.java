@@ -1,5 +1,7 @@
 package com.lying.mixin;
 
+import java.util.OptionalInt;
+
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,10 +14,13 @@ import com.lying.VariousTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
+import com.lying.utility.ServerEvents;
 import com.mojang.datafixers.util.Either;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.stat.ServerStatHandler;
 import net.minecraft.stat.Stats;
@@ -55,6 +60,19 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 			// Prevents phantoms from spawning from players who cannot sleep
 			if(!sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).can(Action.SLEEP.get()))
 				getStatHandler().setStat(player, Stats.CUSTOM.getOrCreateStat(Stats.TIME_SINCE_REST), 0);
+		});
+	}
+	
+	@Inject(method = "openHandledScreen(Lnet/minecraft/screen/NamedScreenHandlerFactory;)Ljava/util/OptionalInt;", at = @At("HEAD"), cancellable = true)
+	private void vt$openHandledScreen(@Nullable NamedScreenHandlerFactory factory, final CallbackInfoReturnable<OptionalInt> ci)
+	{
+		if(factory == null) return;
+		ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
+		VariousTypes.getSheet(player).ifPresent(sheet -> 
+		{
+			ScreenHandlerType<?> type = factory.createMenu(0, getInventory(), player).getType();
+			if(ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(player, type).isFalse())
+				ci.setReturnValue(OptionalInt.empty());
 		});
 	}
 }

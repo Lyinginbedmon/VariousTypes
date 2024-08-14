@@ -14,13 +14,13 @@
 	"ExperienceOrbEntityMixin",
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
-	"DamageEnchantmentMixin"
+	"DamageEnchantmentMixin",
+	"CraftingResultSlotMixin"
   ],
   "client": [
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
-	"InGameOverlayRendererMixin",
-	"CraftingResultSlotMixin"
+	"InGameOverlayRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

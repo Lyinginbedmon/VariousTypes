@@ -8,7 +8,9 @@
         ]
       }
     },
-    "vartypes:teleport"
+    {
+      "Ability": "vartypes:teleport"
+    }
   ],
   "Background": "vartypes:textures/gui/sheet/creator_end_city.png",
   "Display": {

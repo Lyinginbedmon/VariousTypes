@@ -231,7 +231,7 @@ public class VTAbilities
 	{
 		public void registerEventHandlers()
 		{
-			ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
+			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
@@ -239,9 +239,11 @@ public class VTAbilities
 				return EventResult.pass();
 			});
 			
-			ServerEvents.PlayerEvents.CAN_CRAFT_EVENT.register((player,crafted) -> 
+			ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.register((player,screen) -> 
 			{
-				System.out.println("Crafting event fired, "+player.getDisplayName().getString()+" attempted to craft "+crafted.getName().getString());
+				if(!VTTags.isScreenIn(screen, VTTags.CRAFTING_MENU))
+					return EventResult.pass();
+				
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
 					return EventResult.interruptFalse();
@@ -255,7 +257,7 @@ public class VTAbilities
 		{
 			// TODO Add maintaining XP at 999 levels
 			
-			ServerEvents.PlayerEvents.ORB_COLLIDE_EVENT.register((orb,player) -> 
+			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
