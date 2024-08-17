@@ -17,12 +17,10 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.Ability.AbilityType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.JsonOps;
 
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.util.Identifier;
 
@@ -188,9 +186,9 @@ public class AbilitySet
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
-		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
-		Codec<AbilitySet> codec = vitalOnly ? CODEC_VITALS : CODEC;
-		return codec.encodeStart(registryOps, this).getOrThrow();
+		JsonArray list = new JsonArray();
+		abilities.values().forEach(inst -> list.add(inst.writeToJson(manager, vitalOnly)));
+		return list;
 	}
 	
 	public static AbilitySet readFromJson(JsonArray list, AbilitySource forceSource)

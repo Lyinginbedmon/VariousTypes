@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTKeybinds;
+import com.lying.client.renderer.AbilityRenderingRegistry;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
@@ -43,6 +44,7 @@ public class VariousTypesClient
 		config.read();
 		
 		ClientBus.init();
+		AbilityRenderingRegistry.init();
 		registerMenus();
 		registerS2CPacketReceivers();
 		registerEntityRenderers();

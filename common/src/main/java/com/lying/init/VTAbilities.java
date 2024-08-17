@@ -64,6 +64,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.MutableText;
@@ -241,14 +242,29 @@ public class VTAbilities
 			
 			ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.register((player,screen) -> 
 			{
-				if(!VTTags.isScreenIn(screen, VTTags.CRAFTING_MENU))
-					return EventResult.pass();
-				
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
-					return EventResult.interruptFalse();
+				{
+					AbilityInstance inst = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+					if(getTags(inst.memory()).stream().anyMatch(tag -> VTTags.isScreenIn(screen, tag)))
+						return EventResult.interruptFalse();
+				}
+				
 				return EventResult.pass();
 			});
+		}
+		
+		public static List<TagKey<ScreenHandlerType<?>>> getTags(NbtCompound memory)
+		{
+			List<TagKey<ScreenHandlerType<?>>> tags = Lists.newArrayList();
+			
+			if(memory.contains("Menus", NbtElement.LIST_TYPE))
+				for(NbtElement element : memory.getList("Menus", NbtElement.STRING_TYPE))
+					tags.add(TagKey.of(RegistryKeys.SCREEN_HANDLER, new Identifier(element.asString())));
+			else
+				tags.add(VTTags.CRAFTING_MENU);
+			
+			return tags;
 		}
 	});
 	public static final Supplier<Ability> OMNISCIENT	= register("omniscient", () -> new Ability(prefix("omniscient"), Category.UTILITY)

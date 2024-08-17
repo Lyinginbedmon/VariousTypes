@@ -20,7 +20,10 @@
   "client": [
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
-	"InGameOverlayRendererMixin"
+	"InGameOverlayRendererMixin",
+	"EntityRendererMixin",
+	"PlayerEntityRendererMixin",
+	"LivingEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1
