@@ -22,8 +22,8 @@
   	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin",
 	"EntityRendererMixin",
-	"PlayerEntityRendererMixin",
-	"LivingEntityRendererMixin"
+	"LivingEntityRendererMixin",
+	"PlayerEntityRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

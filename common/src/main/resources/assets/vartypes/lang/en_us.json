@@ -175,6 +175,7 @@
 	"ability.vartypes.omniscient": "Omniscient",
 	"ability.vartypes.omniscient.desc": "Your knowledge is boundless. You have no need of experience, because you already have more than can be counted.",
 	"ability.vartypes.quake": "Quake",
+	"ability.vartypes.gelatinous": "Gelatinous",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

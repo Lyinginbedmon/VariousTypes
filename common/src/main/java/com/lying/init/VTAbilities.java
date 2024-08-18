@@ -283,6 +283,7 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> QUAKE			= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
+	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{

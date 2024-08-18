@@ -1,17 +1,13 @@
 {
   "Abilities": [
-    {
-      "Ability": "vartypes:berserk"
-    },
+    "vartypes:berserk",
     {
       "Ability": "vartypes:bonus_health",
       "Memory": {
         "Amount": -4
       }
     },
-    {
-      "Ability": "vartypes:goldheart"
-    }
+    "vartypes:goldheart"
   ],
   "Background": "vartypes:textures/gui/sheet/creator_bastion.png",
   "Display": {

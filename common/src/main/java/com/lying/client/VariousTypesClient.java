@@ -20,13 +20,11 @@ import com.lying.init.VTSheetElements;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
-import com.lying.reference.Reference;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityPose;
 
@@ -34,9 +32,6 @@ public class VariousTypesClient
 {
 	public static MinecraftClient mc = MinecraftClient.getInstance();
 	public static ClientConfig config;
-	
-	public static final EntityModelLayer ANIMATED_PLAYER		= new EntityModelLayer(Reference.ModInfo.prefix("animated_player"), "player");
-	public static final EntityModelLayer ANIMATED_PLAYER_SLIM	= new EntityModelLayer(Reference.ModInfo.prefix("animated_player"), "player_slim");
 	
 	public static void clientInit()
 	{

@@ -1,7 +1,7 @@
 package com.lying.client.renderer;
 
-import com.lying.client.VariousTypesClient;
 import com.lying.client.entity.AnimatedPlayerEntity;
+import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 
 import net.minecraft.client.MinecraftClient;
@@ -23,9 +23,9 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 	
 	public AnimatedPlayerEntityRenderer(Context ctx)
 	{
-		super(ctx, new AnimatedPlayerEntityModel<AnimatedPlayerEntity>(ctx.getPart(VariousTypesClient.ANIMATED_PLAYER)), 0.5F);
+		super(ctx, new AnimatedPlayerEntityModel<AnimatedPlayerEntity>(ctx.getPart(VTModelLayerParts.ANIMATED_PLAYER)), 0.5F);
 		MODEL_WIDE = getModel();
-		MODEL_SLIM = new AnimatedPlayerEntityModel<AnimatedPlayerEntity>(ctx.getPart(VariousTypesClient.ANIMATED_PLAYER_SLIM));
+		MODEL_SLIM = new AnimatedPlayerEntityModel<AnimatedPlayerEntity>(ctx.getPart(VTModelLayerParts.ANIMATED_PLAYER_SLIM));
 	}
 	
 	public void render(AnimatedPlayerEntity animatedPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
