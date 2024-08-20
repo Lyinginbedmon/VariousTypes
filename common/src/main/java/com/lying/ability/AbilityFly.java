@@ -33,7 +33,7 @@ public class AbilityFly extends Ability
 				return EventResult.pass();
 			
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
-			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 				return EventResult.pass();
 			
 			PlayerEntity player = (PlayerEntity)living;
@@ -45,7 +45,7 @@ public class AbilityFly extends Ability
 				double input = Math.max(0, player.forwardSpeed);
 				if(input > 0)
 				{
-					AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+					AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName());
 					double multiplier = flight.memory().contains("Speed", NbtElement.DOUBLE_TYPE) ? flight.memory().getDouble("Speed") : DEFAULT_SPEED;
 					
 					Vec3d direction = player.getRotationVector();
@@ -63,10 +63,10 @@ public class AbilityFly extends Ability
 				return;
 			
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 				return;
 			
-			AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+			AbilityInstance flight = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName());
 			float exhaustion = flight.memory().contains("Food", NbtElement.FLOAT_TYPE) ? flight.memory().getFloat("Food") : DEFAULT_EXHAUSTION;
 			
 			double input = Math.max(0, forward);

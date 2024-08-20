@@ -1,10 +1,9 @@
-package com.lying.client.entity;
+package com.lying.entity;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.lying.client.utility.AnimationManager;
 import com.lying.init.VTEntityTypes;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;

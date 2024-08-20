@@ -3,6 +3,8 @@ package com.lying.client.renderer;
 import java.util.Optional;
 import java.util.OptionalInt;
 
+import com.lying.client.utility.VTUtilsClient;
+
 import net.minecraft.client.render.VertexConsumer;
 
 public class VertexConsumerWrapped implements VertexConsumer
@@ -29,23 +31,15 @@ public class VertexConsumerWrapped implements VertexConsumer
 		if(color.isPresent())
 		{
 			int col = color.getAsInt();
-			red = mixColors(red, (col & 0xFF0000) >> 16);
-			green = mixColors(green, (col & 0xFF00) >> 8);
-			blue = mixColors(blue, (col & 0xFF) >> 0);
+			red = VTUtilsClient.mixColors(red, (col & 0xFF0000) >> 16);
+			green = VTUtilsClient.mixColors(green, (col & 0xFF00) >> 8);
+			blue = VTUtilsClient.mixColors(blue, (col & 0xFF) >> 0);
 		}
 		
 		if(this.alpha.isPresent())
 			alpha *= this.alpha.get();
 		
 		return internal.color(red, green, blue, alpha);
-	}
-	
-	/** Multiply colour components together as percentiles and return equivalent integer form */
-	private static int mixColors(int colA, int colB)
-	{
-		float a = (float)colA / 255F;
-		float b = (float)colB / 255F;
-		return (int)(255 * (a * b));
 	}
 	
 	public VertexConsumer vertex(double var1, double var3, double var5) { return internal.vertex(var1, var3, var5); }

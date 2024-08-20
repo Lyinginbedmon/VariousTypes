@@ -1,8 +1,8 @@
 package com.lying.client.renderer;
 
-import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.entity.AnimatedPlayerEntity;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PlayerListEntry;

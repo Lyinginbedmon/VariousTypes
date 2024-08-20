@@ -8,7 +8,7 @@ import com.lying.type.TypeSet;
 
 public class ElementAbilitySet extends AbilitySet implements ISheetElement<AbilitySet>
 {
-	public SheetElement<?> registry(){ return VTSheetElements.ABILITES; }
+	public SheetElement<?> registry(){ return VTSheetElements.ABILITIES; }
 	
 	public AbilitySet value() { return this; }
 	

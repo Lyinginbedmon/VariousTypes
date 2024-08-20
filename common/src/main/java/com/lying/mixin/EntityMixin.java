@@ -49,6 +49,12 @@ public class EntityMixin
 	public boolean horizontalCollision;
 	
 	@Shadow
+	public float fallDistance;
+	
+	@Shadow
+	public int timeUntilRegen;
+	
+	@Shadow
 	public boolean isSpectator() { return false; }
 	
 	@Shadow
@@ -153,7 +159,7 @@ public class EntityMixin
 		if(!(ent instanceof LivingEntity) || getWorld() == null)
 			return;
 		
-		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES), ci.getReturnValueI())));
+		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES), ci.getReturnValueI())));
 	}
 	
 	@Inject(method = "canClimb(Lnet/minecraft/block/BlockState;)Z", at = @At("TAIL"), cancellable = true)
@@ -173,7 +179,7 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INVISIBILITY.get().registryName()))
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITIES).hasAbility(VTAbilities.INVISIBILITY.get().registryName()))
 					ci.setReturnValue(true);
 			});
 	}
@@ -184,7 +190,7 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITIES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
 					ci.setReturnValue(true);
 			});
 	}
@@ -195,7 +201,7 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITIES).hasAbility(VTAbilities.INDOMITABLE.get().registryName()))
 					ci.setReturnValue(false);
 			});
 	}
@@ -206,8 +212,15 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet ->
 			{
-				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITES).hasAbility(VTAbilities.INTANGIBLE.get().registryName()))
+				if(sheet.<ElementAbilitySet>element(VTSheetElements.ABILITIES).hasAbility(VTAbilities.INTANGIBLE.get().registryName()))
 					ci.setReturnValue(true);
 			});
+	}
+	
+	@Inject(method = "fall(DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V", at = @At("HEAD"))
+	private void vt$fall(double heightDifference, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition, final CallbackInfo ci)
+	{
+		if(this.fallDistance > 0F && (Entity)(Object) this instanceof LivingEntity && !getWorld().isClient())
+			ServerEvents.LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
 	}
 }

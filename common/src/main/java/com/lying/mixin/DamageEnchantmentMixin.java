@@ -28,8 +28,6 @@ public class DamageEnchantmentMixin
 	@Shadow
 	private Optional<TagKey<EntityType<?>>> applicableEntities;
 	
-	// FIXME Ensure Undead and Arthropod players are affected by Smite and Bane of Arthropods
-	
 	@Inject(method = "onTargetDamaged(Lnet/minecraft/entity/LivingEntity;Lnet/minecraft/entity/Entity;I)V", at = @At("HEAD"), cancellable = true)
 	private void vt$onTargetDamage(LivingEntity user, Entity target, int level, final CallbackInfo ci)
 	{

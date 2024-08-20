@@ -1,4 +1,4 @@
-package com.lying.client.entity;
+package com.lying.entity;
 
 import java.util.HashMap;
 import java.util.List;

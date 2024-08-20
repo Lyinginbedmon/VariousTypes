@@ -11,10 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
-import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
+import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;

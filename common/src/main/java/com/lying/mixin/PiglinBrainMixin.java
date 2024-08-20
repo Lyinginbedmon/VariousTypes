@@ -21,7 +21,7 @@ public class PiglinBrainMixin
 	{
 		VariousTypes.getSheet(living).ifPresent(sheet -> 
 		{
-			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(VTAbilities.GOLDHEARTED.get().registryName()))
+			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.GOLDHEARTED.get().registryName()))
 				ci.setReturnValue(true);
 		});
 	}

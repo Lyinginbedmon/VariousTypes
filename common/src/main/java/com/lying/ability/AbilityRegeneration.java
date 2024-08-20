@@ -45,10 +45,10 @@ public class AbilityRegeneration extends Ability implements IComplexAbility<Oper
 				{
 					if(!(player.getHealth() < player.getMaxHealth() || sheet.<Float>elementValue(VTSheetElements.NONLETHAL) > 0F))
 						return;
-					if(!sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+					if(!sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 						return;
 					
-					OperatingValuesRegeneration values = OperatingValuesRegeneration.fromNbt(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName()).memory());
+					OperatingValuesRegeneration values = OperatingValuesRegeneration.fromNbt(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName()).memory());
 					if(player.age%values.healRate == 0 && player.getHungerManager().getFoodLevel() >= values.minimumFood)
 						player.heal(values.healAmount);
 				});

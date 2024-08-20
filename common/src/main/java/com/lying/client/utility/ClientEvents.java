@@ -1,6 +1,11 @@
 package com.lying.client.utility;
 
-import com.lying.client.renderer.VertexConsumerProviderWrapped;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+import org.joml.Vector3f;
+
+import com.google.common.reflect.AbstractInvocationHandler;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
@@ -22,12 +27,50 @@ public class ClientEvents
 			EventResult shouldPlayerRender(PlayerEntity player);
 		}
 		
-		public static final Event<PlayerColorEvent> MODIFY_PLAYER_COLOR_EVENT = EventFactory.createLoop(PlayerColorEvent.class);
+		public static final Event<PlayerColorEvent> GET_PLAYER_COLOR_EVENT = EventFactory.of(listeners -> (PlayerColorEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{PlayerColorEvent.class}, new AbstractInvocationHandler()
+		{
+			protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				PlayerEntity player = (PlayerEntity)args[0];
+				float red = 1F;
+				float green = 1F;
+				float blue = 1F;
+				
+				for(PlayerColorEvent listener : listeners)
+				{
+					Vector3f result = listener.getColor(player);
+					red *= result.x();
+					green *= result.y();
+					blue = result.z();
+				}
+				return new Vector3f(red, green, blue);
+			}
+		}));
 		
 		@FunctionalInterface
 		public interface PlayerColorEvent
 		{
-			void modifyColor(PlayerEntity player, VertexConsumerProviderWrapped vertexConsumerProvider);
+			Vector3f getColor(PlayerEntity player);
+		}
+		
+		public static final Event<PlayerAlphaEvent> GET_PLAYER_ALPHA_EVENT = EventFactory.of(listeners -> (PlayerAlphaEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{PlayerAlphaEvent.class}, new AbstractInvocationHandler()
+		{
+			protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				PlayerEntity player = (PlayerEntity)args[0];
+				float alpha = 1F;
+				
+				for(PlayerAlphaEvent listener : listeners)
+					alpha *= listener.getAlpha(player);
+				
+				return alpha;
+			}
+		}));
+		
+		@FunctionalInterface
+		public interface PlayerAlphaEvent
+		{
+			float getAlpha(PlayerEntity player);
 		}
 		
 		public static final Event<RenderPlayerEvent> BEFORE_RENDER_PLAYER_EVENT = EventFactory.createLoop(RenderPlayerEvent.class);

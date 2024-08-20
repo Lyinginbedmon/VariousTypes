@@ -84,7 +84,7 @@ public class ModuleSpecies extends AbstractSheetModule
 				types.clear();			
 				types.addAll(species.types());
 			});
-		else if(element.registry() == VTSheetElements.ABILITES)
+		else if(element.registry() == VTSheetElements.ABILITIES)
 			spec.ifPresent(species -> 
 			{
 				AbilitySet abilities = (AbilitySet)element;

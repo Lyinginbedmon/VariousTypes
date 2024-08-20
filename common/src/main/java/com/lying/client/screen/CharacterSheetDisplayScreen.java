@@ -20,9 +20,9 @@ import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.VariousTypesClient;
-import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
+import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTTypes;
@@ -107,7 +107,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		
 		types = sheet.<TypeSet>elementValue(VTSheetElements.TYPES).copy();
 		actions = sheet.<ActionHandler>elementValue(VTSheetElements.ACTIONS).copy();
-		sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).allNonHidden().forEach(inst -> 
+		sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).allNonHidden().forEach(inst -> 
 		{
 			Category cat = inst.ability().category();
 			List<AbilityInstance> set = abilities(cat);

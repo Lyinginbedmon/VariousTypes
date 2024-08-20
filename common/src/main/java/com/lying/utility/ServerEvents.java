@@ -15,6 +15,7 @@ import com.lying.type.TypeSet;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
@@ -24,6 +25,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ServerEvents
@@ -124,6 +126,14 @@ public class ServerEvents
 		public interface CustomElytraCheck
 		{
 			EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
+		}
+		
+		public static final Event<LivingFallEvent> ON_FALL_EVENT = EventFactory.createLoop(LivingFallEvent.class);
+		
+		@FunctionalInterface
+		public interface LivingFallEvent
+		{
+			void onLivingFall(LivingEntity living, float fallDistance, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition);
 		}
 	}
 	

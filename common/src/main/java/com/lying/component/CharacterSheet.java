@@ -191,9 +191,9 @@ public class CharacterSheet
 	/** Reconstructs all sheet elements in build order */
 	public final void buildSheet()
 	{
-		owner.ifPresent(living -> ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITES)));
+		owner.ifPresent(living -> ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
 		VTSheetElements.buildOrder().forEach(element -> this.elements.get(element).rebuild(this));
-		owner.ifPresent(living -> ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITES)));
+		owner.ifPresent(living -> ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
 	}
 	
 	public final void buildAndSync()

@@ -235,7 +235,7 @@ public class VTAbilities
 			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 					return EventResult.interruptFalse();
 				return EventResult.pass();
 			});
@@ -243,9 +243,9 @@ public class VTAbilities
 			ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.register((player,screen) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 				{
-					AbilityInstance inst = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).get(registryName());
+					AbilityInstance inst = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName());
 					if(getTags(inst.memory()).stream().anyMatch(tag -> VTTags.isScreenIn(screen, tag)))
 						return EventResult.interruptFalse();
 				}
@@ -276,7 +276,7 @@ public class VTAbilities
 			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(registryName()))
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 					return EventResult.interruptFalse();
 				return EventResult.pass();
 			});
@@ -316,7 +316,6 @@ public class VTAbilities
 		 * Stonesense - Ping the locations of nearby ores
 		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
 		 * Thunderstep - Spawn lightning at current position and target position, teleporting from one to the other. Implicitly immune to lightning damage
-		 * Quake - Slams towards ground, on impact replaces nearby blocks radiating outward, relative to distance dropped, with falling blocks tossed upward
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */

@@ -66,7 +66,7 @@ public class ModuleCustomAbilities extends AbstractSheetModule
 	
 	public void affect(ISheetElement<?> element)
 	{
-		if(element.registry() == VTSheetElements.ABILITES && !customAbilities.isEmpty())
+		if(element.registry() == VTSheetElements.ABILITIES && !customAbilities.isEmpty())
 			customAbilities.abilities().forEach(inst -> ((AbilitySet)element).add(inst.copy()));
 	}
 	

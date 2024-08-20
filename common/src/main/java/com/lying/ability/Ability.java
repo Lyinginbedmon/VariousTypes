@@ -61,7 +61,7 @@ public class Ability
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{
 			// Collect all passive abilities from main ability set
-			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(classIn).stream().
+			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfClass(classIn).stream().
 				filter(inst -> inst.ability().type() == AbilityType.PASSIVE).
 					forEach(inst -> abilityMap.put(inst.mapName(), inst));
 			

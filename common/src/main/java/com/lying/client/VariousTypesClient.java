@@ -7,6 +7,7 @@ import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.renderer.AbilityRenderingRegistry;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
+import com.lying.client.renderer.ShakenBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
@@ -103,5 +104,6 @@ public class VariousTypesClient
 	private static void registerEntityRenderers()
 	{
 		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ShakenBlockEntityRenderer::new);
 	}
 }

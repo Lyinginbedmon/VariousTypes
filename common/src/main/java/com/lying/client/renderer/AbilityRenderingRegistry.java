@@ -3,9 +3,13 @@ package com.lying.client.renderer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joml.Vector3f;
+
 import com.lying.ability.AbilityInstance;
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.GelatinousPlayerEntityModel;
+import com.lying.client.utility.ClientEvents;
+import com.lying.client.utility.VTUtilsClient;
 import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
 
@@ -23,6 +27,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -43,36 +48,47 @@ public class AbilityRenderingRegistry
 	{
 		register(VTAbilities.INTANGIBLE.get().registryName(), new AbilityRenderFunc() 
 		{
-			public void modifyRGBA(PlayerEntity player, AbilityInstance instance, VertexConsumerProviderWrapped vertexConsumerProvider) { vertexConsumerProvider.setAlpha(0.5F); }
+			public float getAlpha(PlayerEntity player, AbilityInstance instance) { return 0.5F; }
 		});
 		register(VTAbilities.GELATINOUS.get().registryName(), new AbilityRenderFunc() 
 		{
 			private static final MinecraftClient mc = MinecraftClient.getInstance();
-			private static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/gelatinous_internals.png");
+			private static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/gelatinous.png");
+			private static EntityModel<AbstractClientPlayerEntity> MODEL = null;
 			
-			public void modifyRGBA(PlayerEntity player, AbilityInstance instance, VertexConsumerProviderWrapped vertexConsumerProvider)
-			{
-				vertexConsumerProvider.setRGB(instance.memory().contains("Color", NbtElement.INT_TYPE) ? instance.memory().getInt("Color") : 0x7BC35C);
-				vertexConsumerProvider.setAlpha(instance.memory().contains("Opacity", NbtElement.FLOAT_TYPE) ? instance.memory().getFloat("Opacity") : 0.5F);
-			}
+			public Vector3f getColor(PlayerEntity player, AbilityInstance instance) { return VTUtilsClient.decimalToVector(getColor(instance.memory())); }
+			public float getAlpha(PlayerEntity player, AbilityInstance instance) { return instance.memory().contains("Opacity", NbtElement.FLOAT_TYPE) ? instance.memory().getFloat("Opacity") : 0.5F; }
 			
 			public void beforeRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light)
 			{
 				if(player.isInvisible() || player.isSpectator())
 					return;
 				
-				// TODO Include colour reference
+				if(MODEL == null)
+					MODEL = new GelatinousPlayerEntityModel<AbstractClientPlayerEntity>(mc.getEntityModelLoader().getModelPart(VTModelLayerParts.PLAYER_SLIME));
+				
+				Vector3f color = ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(player);
 				AbilityRenderFunc.renderModel(
-					new GelatinousPlayerEntityModel<AbstractClientPlayerEntity>(mc.getEntityModelLoader().getModelPart(VTModelLayerParts.PLAYER_SLIME)), 
-					TEXTURE, player, matrices, vertexProvider, tickDelta, light);
+					MODEL, 
+					TEXTURE, player, matrices, vertexProvider, tickDelta, light, color.x(), color.y(), color.z(), 1F);
 			}
+			
+			private static int getColor(NbtCompound memory) { return memory.contains("Color", NbtElement.INT_TYPE) ? memory.getInt("Color") : 0x7BC35C; }
 		});
 	}
 	
-	public static void doColorMods(PlayerEntity player, AbilityInstance instance, VertexConsumerProviderWrapped vertexProvider)
+	public static Vector3f doColorMods(PlayerEntity player, AbilityInstance instance)
 	{
 		if(REGISTRY.containsKey(instance.ability().registryName()))
-			REGISTRY.get(instance.ability().registryName()).modifyRGBA(player, instance, vertexProvider);
+			return REGISTRY.get(instance.ability().registryName()).getColor(player, instance);
+		return new Vector3f(1F, 1F, 1F);
+	}
+	
+	public static float doAlphaMods(PlayerEntity player, AbilityInstance instance)
+	{
+		if(REGISTRY.containsKey(instance.ability().registryName()))
+			return REGISTRY.get(instance.ability().registryName()).getAlpha(player, instance);
+		return 1F;
 	}
 	
 	public static void doPreRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light)
@@ -89,11 +105,12 @@ public class AbilityRenderingRegistry
 	
 	public static interface AbilityRenderFunc
 	{
-		default void modifyRGBA(PlayerEntity player, AbilityInstance instance, VertexConsumerProviderWrapped vertexConsumerProvider) { }
+		default Vector3f getColor(PlayerEntity player, AbilityInstance instance) { return new Vector3f(1F, 1F, 1F); }
+		default float getAlpha(PlayerEntity player, AbilityInstance instance) { return 1F; }
 		default void beforeRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light) { }
 		default void afterRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light) { }
 		
-		public static void renderModel(EntityModel<AbstractClientPlayerEntity> model, Identifier texture, PlayerEntity player, MatrixStack matrices, VertexConsumerProvider vertexProvider, float tickDelta, int light)
+		public static void renderModel(EntityModel<AbstractClientPlayerEntity> model, Identifier texture, PlayerEntity player, MatrixStack matrices, VertexConsumerProvider vertexProvider, float tickDelta, int light, float red, float green, float blue, float alpha)
 		{
 			VertexConsumerProvider provider = vertexProvider instanceof VertexConsumerProviderWrapped ? ((VertexConsumerProviderWrapped)vertexProvider).internal() : vertexProvider;
 			VertexConsumer consumer = provider.getBuffer(RenderLayer.getEntityCutoutNoCull(texture));
@@ -133,7 +150,7 @@ public class AbilityRenderingRegistry
 				}
 				model.animateModel((AbstractClientPlayerEntity)player, p, o, tickDelta);
 				model.setAngles((AbstractClientPlayerEntity)player, p, o, n, k, m);
-				model.render(matrices, consumer, light, LivingEntityRenderer.getOverlay(player, 0F), 1F, 1F, 1F, 1F);
+				model.render(matrices, consumer, light, LivingEntityRenderer.getOverlay(player, 0F), red, green, blue, alpha);
 			matrices.pop();
 		}
 		

@@ -28,7 +28,8 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 	private VertexConsumerProvider vt$modifyVertexConsumerProvider(VertexConsumerProvider provider)
 	{
 		VertexConsumerProviderWrapped wrapped = new VertexConsumerProviderWrapped(provider);
-		ClientEvents.Rendering.MODIFY_PLAYER_COLOR_EVENT.invoker().modifyColor(currentRenderingPlayer, wrapped);
+		wrapped.modifyColor(ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(currentRenderingPlayer));
+		wrapped.modifyAlpha(ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(currentRenderingPlayer));
 		return wrapped;
 	}
 	
@@ -50,6 +51,4 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 	{
 		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
 	}
-	
-	
 }

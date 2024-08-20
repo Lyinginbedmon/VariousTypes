@@ -34,7 +34,7 @@ public class ElementActionHandler extends ActionHandler implements ISheetElement
 		TypeSet typeSet = sheet.elementValue(VTSheetElements.TYPES);
 		typeSet.forEach(type -> type.actions().stack(this, typeSet));
 		
-		AbilitySet abilitySet = sheet.elementValue(VTSheetElements.ABILITES);
+		AbilitySet abilitySet = sheet.elementValue(VTSheetElements.ABILITIES);
 		for(Ability ability : new Ability[] {VTAbilities.BREATHE_FLUID.get(), VTAbilities.SUFFOCATE_FLUID.get()})
 			abilitySet.getAbilitiesOfType(ability.registryName()).forEach(inst -> ((AbilityBreathing)ability).applyToActions(this, inst));
 		

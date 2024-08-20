@@ -25,11 +25,11 @@ public class GelatinousPlayerEntityModel<T extends LivingEntity> extends BipedEn
 		ModelPartData modelPartData = modelData.getRoot();
 		modelPartData.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create().uv(0, 0).cuboid(-4.0f, -8.0f, -4.0f, 8.0f, 8.0f, 8.0f, dilation.add(-1F)), ModelTransform.pivot(0.0f, 0.0f, 0.0f));
 		modelPartData.addChild(EntityModelPartNames.HAT, ModelPartBuilder.create(), ModelTransform.pivot(0.0f, 0.0f, 0.0f));
-		modelPartData.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create().uv(16, 16).cuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, dilation.add(-1F)), ModelTransform.pivot(0.0f, 0.0f, 0.0f));
+		modelPartData.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create().uv(0, 16).cuboid(-4.0f, 0.0f, -2.0f, 8.0f, 12.0f, 4.0f, dilation.add(-1F)), ModelTransform.pivot(0.0f, 0.0f, 0.0f));
 		modelPartData.addChild(EntityModelPartNames.RIGHT_ARM, ModelPartBuilder.create(), ModelTransform.pivot(-5.0f, 2.0f, 0.0f));
 		modelPartData.addChild(EntityModelPartNames.LEFT_ARM, ModelPartBuilder.create(), ModelTransform.pivot(5.0f, 2.0f, 0.0f));
 		modelPartData.addChild(EntityModelPartNames.RIGHT_LEG, ModelPartBuilder.create(), ModelTransform.pivot(-1.9f, 12.0f, 0.0f));
 		modelPartData.addChild(EntityModelPartNames.LEFT_LEG, ModelPartBuilder.create(), ModelTransform.pivot(1.9f, 12.0f, 0.0f));
-		return TexturedModelData.of(modelData, 16, 32);
+		return TexturedModelData.of(modelData, 32, 32);
 	}
 }

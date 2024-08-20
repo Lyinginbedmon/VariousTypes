@@ -10,17 +10,27 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
+import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTTypes;
 import com.lying.type.Action;
+import com.lying.type.TypeSet;
 import com.lying.utility.ServerEvents;
 import com.mojang.datafixers.util.Either;
 
 import dev.architectury.event.EventResult;
+import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 
@@ -102,6 +112,38 @@ public class PlayerEntityMixin extends LivingEntityMixin
 		{
 			startFallFlying();
 			ci.setReturnValue(true);
+		}
+	}
+	
+	@Inject(method = "applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V", at = @At("HEAD"), cancellable = true)
+	private void vt$applyDamage(final DamageSource source, float amount, final CallbackInfo ci)
+	{
+		/**
+		 * Applies Smite and Bane of Arthropods bonus damage to players with the UNDEAD or ARTHROPOD supertypes<br>
+		 * This doesn't perfectly replicate the same effect as for mobs, but it's as close as we can get.
+		 */
+		if(source.isOf(DamageTypes.MOB_ATTACK) || source.isOf(DamageTypes.PLAYER_ATTACK))
+		{
+			final PlayerEntity player = (PlayerEntity)(Object)this;
+			LivingEntity originator = (LivingEntity)source.getAttacker();
+			ItemStack heldStack = originator.getEquippedStack(EquipmentSlot.MAINHAND);
+			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+			if(sheetOpt.isEmpty()) return;
+			
+			float bonus = 0F;
+			TypeSet types = sheetOpt.get().elementValue(VTSheetElements.TYPES);
+			// XXX Find some approach to check without using hard-coded enchantments?
+			if(types.contains(VTTypes.UNDEAD.get()))
+				bonus += 2.5F * EnchantmentHelper.getLevel(Enchantments.SMITE, heldStack);
+			
+			if(types.contains(VTTypes.ARTHROPOD.get()))
+				bonus += 2.5F * EnchantmentHelper.getLevel(Enchantments.BANE_OF_ARTHROPODS, heldStack);
+			
+			if(bonus > 0F)
+			{
+				this.timeUntilRegen = 0;
+				applyDamage(player.getWorld().getDamageSources().magic(), bonus);
+			}
 		}
 	}
 }

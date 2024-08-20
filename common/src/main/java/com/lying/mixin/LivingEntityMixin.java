@@ -58,6 +58,9 @@ public class LivingEntityMixin extends EntityMixin
 	private Map<RegistryEntry<StatusEffect>, StatusEffectInstance> activeStatusEffects = Maps.newHashMap();
 	
 	@Shadow
+	protected float lastDamageTaken;
+	
+	@Shadow
 	public ItemStack getEquippedStack(EquipmentSlot slot) { return ItemStack.EMPTY; }
 	
 	@Shadow
@@ -89,6 +92,9 @@ public class LivingEntityMixin extends EntityMixin
 	@Shadow
 	public boolean hasStatusEffect(RegistryEntry<StatusEffect> entry) { return false; }
 	
+	@Shadow
+	protected void applyDamage(DamageSource source, float amount) { }
+	
 	@Inject(method = "hasInvertedHealingAndHarm()Z", at = @At("HEAD"), cancellable = true)
 	private void vt$hasInvertedHealingAndHarm(final CallbackInfoReturnable<Boolean> ci)
 	{
@@ -104,7 +110,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 			{
 				ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
 				if(!helmet.isEmpty())
@@ -194,7 +200,7 @@ public class LivingEntityMixin extends EntityMixin
 	{
 		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
 		{
-			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITES);
+			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
 			EventResult result = LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.invoker().shouldDenyStatusEffect(effect, abilities); 
 			if(result.isTrue())
 				ci.setReturnValue(false);
@@ -232,7 +238,7 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			EventResult result = ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.invoker().hasStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITES), ci.getReturnValue());
+			EventResult result = ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.invoker().hasStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
 			if(!result.isEmpty())
 				ci.setReturnValue(result.value());
 		});
@@ -251,7 +257,7 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			Result<StatusEffectInstance> result = ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITES), ci.getReturnValue());
+			Result<StatusEffectInstance> result = ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
 			if(!result.isEmpty())
 				ci.setReturnValue(result.value());
 		});

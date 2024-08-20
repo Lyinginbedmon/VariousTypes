@@ -35,7 +35,7 @@ public interface IPhasingAbility extends IBlockCollisionAbility
 	}
 	
 	/** Returns true if the block should never be considered phaseable due to datapack tags */
-	private static boolean cannotEverBePhased(BlockState state) { return state.isIn(VTTags.UNPHASEABLE) || state.isIn(BlockTags.WITHER_IMMUNE); }
+	public static boolean cannotEverBePhased(BlockState state) { return state.isIn(VTTags.UNPHASEABLE) || state.isIn(BlockTags.WITHER_IMMUNE); }
 	
 	/** Returns true if the player has any phasing ability */
 	public static boolean isPhasingAtAll(LivingEntity living) { return !getPhasingAbilities(living).isEmpty(); }
@@ -43,7 +43,7 @@ public interface IPhasingAbility extends IBlockCollisionAbility
 	/** Returns true if the given entity is phasing through any block within their bounding box */
 	public static boolean isActivelyPhasing(LivingEntity living)
 	{
-		return isActivelyPhasing(living, (state, world, mutable) -> state.isAir() || state.getBlock() instanceof FluidBlock);
+		return isActivelyPhasing(living, (state, world, mutable) -> state.isAir() || state.getBlock() instanceof FluidBlock || state.getCollisionShape(world, mutable).isEmpty());
 	}
 	
 	/** Returns true if the given entity is phasing through any block within their bounding box */

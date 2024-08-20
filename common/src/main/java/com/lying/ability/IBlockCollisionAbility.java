@@ -35,7 +35,7 @@ public interface IBlockCollisionAbility
 		VariousTypes.getSheet((LivingEntity)living).ifPresent(sheet -> 
 		{
 			// Collect all passive abilities from main ability set
-			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfClass(IBlockCollisionAbility.class).stream().filter(inst -> inst.ability().type() == AbilityType.PASSIVE).forEach(inst -> abilityMap.put(inst.mapName(), inst));
+			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfClass(IBlockCollisionAbility.class).stream().filter(inst -> inst.ability().type() == AbilityType.PASSIVE).forEach(inst -> abilityMap.put(inst.mapName(), inst));
 			
 			// Collect all activated abilities from actionable ability set
 			sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).getAbilitiesOfClass(IBlockCollisionAbility.class).forEach(inst -> abilityMap.put(inst.mapName(), inst));

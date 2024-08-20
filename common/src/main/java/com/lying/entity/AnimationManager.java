@@ -1,4 +1,4 @@
-package com.lying.client.utility;
+package com.lying.entity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.Entity;
 
-/** State handler for mobs with multiple animations */
+/** Finite State handler for mobs with multiple animations */
 public class AnimationManager<T extends Entity>
 {
 	private final Map<Integer, Pair<AnimationState, Float>> STATE_MAP = new HashMap<>();

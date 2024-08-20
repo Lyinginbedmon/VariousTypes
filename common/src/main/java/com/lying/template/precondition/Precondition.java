@@ -38,7 +38,7 @@ public abstract class Precondition
 	
 	public static final Supplier<Precondition> PHYSICAL		= register(prefix("is_physical"), () -> new SimpleCondition(prefix("is_physical"))
 	{
-		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
+		public boolean isValidFor(CharacterSheet sheet, LivingEntity owner) { return !sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.GHOSTLY.get().registryName()); }
 	});
 	
 	public static final Supplier<Precondition> HAS_ALL_TYPE	= register(prefix("has_all_of_types"), () -> new TypeCondition.All(prefix("has_all_of_types")));

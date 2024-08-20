@@ -1,7 +1,10 @@
 package com.lying.client.renderer;
 
-import java.util.Optional;
 import java.util.OptionalInt;
+
+import org.joml.Vector3f;
+
+import com.lying.client.utility.VTUtilsClient;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -12,7 +15,7 @@ public class VertexConsumerProviderWrapped implements VertexConsumerProvider
 	private final VertexConsumerProvider internal;
 	
 	private OptionalInt	color = OptionalInt.empty();
-	private Optional<Float>	alpha = Optional.empty();
+	private Float alpha = 1F;
 	
 	public VertexConsumerProviderWrapped(VertexConsumerProvider providerIn)
 	{
@@ -25,14 +28,15 @@ public class VertexConsumerProviderWrapped implements VertexConsumerProvider
 	{
 		VertexConsumerWrapped buffer = new VertexConsumerWrapped(internal.getBuffer(var1));
 		color.ifPresent(col -> buffer.setRGB(col));
-		alpha.ifPresent(alp -> buffer.setAlpha(alp));
+		buffer.setAlpha(alpha);
 		return buffer;
 	}
 	
-	public void setRGB(int color)
+	public void modifyColor(Vector3f colorIn)
 	{
-		this.color = OptionalInt.of(color);
+		int current = this.color.orElse(0xFFFFFF);
+		this.color = OptionalInt.of(VTUtilsClient.vectorToDecimal(VTUtilsClient.decimalToVector(current).mul(colorIn)));
 	}
 	
-	public void setAlpha(float a) { this.alpha = Optional.of(a); }
+	public void modifyAlpha(float a) { this.alpha *= a; }
 }

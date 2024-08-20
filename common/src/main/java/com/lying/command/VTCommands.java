@@ -208,7 +208,7 @@ public class VTCommands
 										else
 											sheetOpt.ifPresent(sheet -> 
 											{
-												AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITES);
+												AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
 												source.sendFeedback(() -> translate("command","get.abilities.success", player.getDisplayName(), abilities.size()), true);
 												
 												List<Text> entries = Lists.newArrayList();

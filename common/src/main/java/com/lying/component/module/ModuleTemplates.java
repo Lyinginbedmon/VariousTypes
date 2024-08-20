@@ -122,7 +122,7 @@ public class ModuleTemplates extends AbstractSheetModule
 			TypeSet types = (TypeSet)element;
 			templates.forEach(tem -> tem.applyTypeOperations(types));
 		}
-		else if(element.registry() == VTSheetElements.ABILITES)
+		else if(element.registry() == VTSheetElements.ABILITIES)
 		{
 			AbilitySet abilities = (AbilitySet)element;
 			templates.forEach(tem -> tem.applyAbilityOperations(abilities));

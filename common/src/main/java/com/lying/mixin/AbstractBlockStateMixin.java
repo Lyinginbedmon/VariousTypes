@@ -12,6 +12,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.IBlockCollisionAbility;
+import com.lying.ability.IPhasingAbility;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 
@@ -32,7 +33,7 @@ public class AbstractBlockStateMixin
 	@Inject(method = "getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;", at = @At("HEAD"), cancellable = true)
 	private void vt$getCollisionShape(BlockView world, BlockPos pos, ShapeContext context, final CallbackInfoReturnable<VoxelShape> ci)
 	{
-		if(!(context instanceof EntityShapeContext))
+		if(!(context instanceof EntityShapeContext) || IPhasingAbility.cannotEverBePhased(world.getBlockState(pos)) || pos.getY() <= world.getBottomY())
 			return;
 		
 		EntityShapeContext entityContext = (EntityShapeContext)context;
@@ -60,7 +61,7 @@ public class AbstractBlockStateMixin
 		if(entity instanceof LivingEntity)
 			VariousTypes.getSheet((LivingEntity)entity).ifPresent(sheet -> 
 			{
-				if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).hasAbility(VTAbilities.INTANGIBLE.get().registryName()))
+				if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.INTANGIBLE.get().registryName()))
 					ci.cancel();
 			});
 	}

@@ -220,7 +220,7 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	
 	public void rebuild(CharacterSheet sheet)
 	{
-		ElementAbilitySet abilities = sheet.element(VTSheetElements.ABILITES);
+		ElementAbilitySet abilities = sheet.element(VTSheetElements.ABILITIES);
 		abilities.mergeActivated(this);
 		
 		// Add all sub-abilities from activated abilities and re-merge

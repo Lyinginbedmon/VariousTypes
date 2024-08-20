@@ -175,6 +175,7 @@
 	"ability.vartypes.omniscient": "Omniscient",
 	"ability.vartypes.omniscient.desc": "Your knowledge is boundless. You have no need of experience, because you already have more than can be counted.",
 	"ability.vartypes.quake": "Quake",
+	"ability.vartypes.quake.desc": "You can use your bulk to rock the ground beneath you. If active when you land from a fall, you emit a shockwave through the earth out to a maximum of [%s] blocks.",
 	"ability.vartypes.gelatinous": "Gelatinous",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",

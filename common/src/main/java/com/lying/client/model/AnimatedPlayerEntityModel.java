@@ -3,8 +3,8 @@ package com.lying.client.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.lying.client.entity.AnimatedPlayerEntity;
 import com.lying.client.renderer.VTAnimations;
+import com.lying.entity.AnimatedPlayerEntity;
 
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;

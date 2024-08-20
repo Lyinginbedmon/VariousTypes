@@ -45,7 +45,7 @@ public class HatePariahsTask extends TrackTargetGoal
 			if(sheetOpt.isPresent())
 			{
 				CharacterSheet sheet = sheetOpt.get();
-				for(AbilityInstance inst : sheet.<AbilitySet>elementValue(VTSheetElements.ABILITES).getAbilitiesOfType(VTAbilities.PARIAH.get().registryName()))
+				for(AbilityInstance inst : sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfType(VTAbilities.PARIAH.get().registryName()))
 					if(AbilityPariah.includes(inst, this.mob.getType()))
 						return true;
 			}

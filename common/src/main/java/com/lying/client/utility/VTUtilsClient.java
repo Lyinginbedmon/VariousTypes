@@ -125,4 +125,28 @@ public class VTUtilsClient
 		set.forEach(entry -> entries.add(new Batch(provider.apply(entry))));
 		return new DetailObject(entries.toArray(new Batch[0]));
 	}
+	
+	/** Multiply colour components together as percentiles and return equivalent integer form */
+	public static int mixColors(int colA, int colB)
+	{
+		float a = (float)colA / 255F;
+		float b = (float)colB / 255F;
+		return (int)(255 * (a * b));
+	}
+	
+	public static Vector3f decimalToVector(int color)
+	{
+		int r = (color & 0xFF0000) >> 16;
+		int g = (color & 0xFF00) >> 8;
+		int b = (color & 0XFF) >> 0;
+		return new Vector3f((float)r / 255F, (float)g / 255F, (float)b / 255F);
+	}
+	
+	public static int vectorToDecimal(Vector3f color)
+	{
+		int r = (int)(255 * color.x());
+		int g = (int)(255 * color.y());
+		int b = (int)(255 * color.z());
+		return (r << 16) + (g << 8) + (b << 0);
+	}
 }
