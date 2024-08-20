@@ -188,9 +188,11 @@ public class Type
 			return this;
 		}
 		
-		public Builder addAbility(Ability ability)
+		public Builder addAbility(Ability... ability)
 		{
-			return addAbility(ability, Consumers.nop());
+			for(Ability inst : ability)
+				addAbility(inst, Consumers.nop());
+			return this;
 		}
 		
 		public Builder addAbility(Ability ability, Consumer<NbtCompound> modifier)

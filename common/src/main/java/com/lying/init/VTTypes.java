@@ -43,8 +43,7 @@ public class VTTypes
 	public static final Supplier<Type> CONSTRUCT		= register("construct", () -> Type.Builder.of(prefix("construct"), Tier.SUPERTYPE).colour(0xDB6D00)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
-			.addAbility(VTAbilities.NIGHT_VISION.get())
-			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
+			.addAbility(VTAbilities.NIGHT_VISION.get(), VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> DRAGON			= register("dragon", () -> Type.Builder.of(prefix("dragon"), Tier.SUPERTYPE).colour(0x920000)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
@@ -55,10 +54,9 @@ public class VTTypes
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, -5)).build());
 	public static final Supplier<Type> HUMAN			= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).colour(0x006DDB).build());
 	public static final Supplier<Type> OOZE				= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).colour(0xB6DBFF)
-			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
 			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
-			.addAbility(VTAbilities.MITHRIDATIC.get())
-			.addAbility(VTAbilities.SCULK_SIGHT.get()).build());
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
+			.addAbility(VTAbilities.MITHRIDATIC.get(), VTAbilities.GELATINOUS.get(), VTAbilities.SCULK_SIGHT.get()).build());
 	public static final Supplier<Type> OTHALL			= register("othall", () -> Type.Builder.of(prefix("othall"), Tier.SUPERTYPE).colour(0xB66DFF)
 			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
@@ -68,8 +66,7 @@ public class VTTypes
 	public static final Supplier<Type> UNDEAD			= register("undead", () -> Type.Builder.of(prefix("undead"), Tier.SUPERTYPE).colour(0x1F1F1F)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
-			.addAbility(VTAbilities.NIGHT_VISION.get())
-			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
+			.addAbility(VTAbilities.NIGHT_VISION.get(), VTAbilities.MITHRIDATIC.get()).build());
 	
 	public static final Supplier<Type> NATIVE			= register("native", () -> Type.Builder.of(prefix("native"), Tier.SUBTYPE).description(ModInfo.translate("type", "native.desc"))
 			.setActions(ActionHandler.of()

@@ -48,7 +48,7 @@ public class AbilityRenderingRegistry
 	{
 		register(VTAbilities.INTANGIBLE.get().registryName(), new AbilityRenderFunc() 
 		{
-			public float getAlpha(PlayerEntity player, AbilityInstance instance) { return 0.5F; }
+			public float getAlpha(LivingEntity player, AbilityInstance instance) { return 0.5F; }
 		});
 		register(VTAbilities.GELATINOUS.get().registryName(), new AbilityRenderFunc() 
 		{
@@ -56,8 +56,8 @@ public class AbilityRenderingRegistry
 			private static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/gelatinous.png");
 			private static EntityModel<AbstractClientPlayerEntity> MODEL = null;
 			
-			public Vector3f getColor(PlayerEntity player, AbilityInstance instance) { return VTUtilsClient.decimalToVector(getColor(instance.memory())); }
-			public float getAlpha(PlayerEntity player, AbilityInstance instance) { return instance.memory().contains("Opacity", NbtElement.FLOAT_TYPE) ? instance.memory().getFloat("Opacity") : 0.5F; }
+			public Vector3f getColor(LivingEntity player, AbilityInstance instance) { return VTUtilsClient.decimalToVector(getColor(instance.memory())); }
+			public float getAlpha(LivingEntity player, AbilityInstance instance) { return instance.memory().contains("Opacity", NbtElement.FLOAT_TYPE) ? instance.memory().getFloat("Opacity") : 0.5F; }
 			
 			public void beforeRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light)
 			{
@@ -77,14 +77,14 @@ public class AbilityRenderingRegistry
 		});
 	}
 	
-	public static Vector3f doColorMods(PlayerEntity player, AbilityInstance instance)
+	public static Vector3f doColorMods(LivingEntity player, AbilityInstance instance)
 	{
 		if(REGISTRY.containsKey(instance.ability().registryName()))
 			return REGISTRY.get(instance.ability().registryName()).getColor(player, instance);
 		return new Vector3f(1F, 1F, 1F);
 	}
 	
-	public static float doAlphaMods(PlayerEntity player, AbilityInstance instance)
+	public static float doAlphaMods(LivingEntity player, AbilityInstance instance)
 	{
 		if(REGISTRY.containsKey(instance.ability().registryName()))
 			return REGISTRY.get(instance.ability().registryName()).getAlpha(player, instance);
@@ -105,8 +105,8 @@ public class AbilityRenderingRegistry
 	
 	public static interface AbilityRenderFunc
 	{
-		default Vector3f getColor(PlayerEntity player, AbilityInstance instance) { return new Vector3f(1F, 1F, 1F); }
-		default float getAlpha(PlayerEntity player, AbilityInstance instance) { return 1F; }
+		default Vector3f getColor(LivingEntity player, AbilityInstance instance) { return new Vector3f(1F, 1F, 1F); }
+		default float getAlpha(LivingEntity player, AbilityInstance instance) { return 1F; }
 		default void beforeRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light) { }
 		default void afterRender(PlayerEntity player, AbilityInstance instance, MatrixStack matrices, VertexConsumerProvider vertexProvider, PlayerEntityRenderer renderer, float yaw, float tickDelta, int light) { }
 		

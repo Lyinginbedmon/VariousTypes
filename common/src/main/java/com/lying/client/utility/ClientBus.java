@@ -17,6 +17,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -59,7 +60,7 @@ public class ClientBus
 	/** Handles rendering effects applied by abilities that aren't already handled by supplementary feature renderers */
 	private static void registerAbilityRenderFuncs()
 	{	
-		ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.register((PlayerEntity player) -> 
+		ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.register((LivingEntity player) -> 
 		{
 			Vector3f color = new Vector3f(1F, 1F, 1F);
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
@@ -67,7 +68,7 @@ public class ClientBus
 			return color;
 		});
 		
-		ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.register((PlayerEntity player) -> 
+		ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.register((LivingEntity player) -> 
 		{
 			float alpha = 1F;
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))

@@ -10,6 +10,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 
+// TODO Add HUD display of current nonlethal damage total
 public class ElementNonLethal implements ISheetElement<Float>
 {
 	private float nonlethalDamage = 0F;

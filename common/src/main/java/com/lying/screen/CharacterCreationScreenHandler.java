@@ -92,6 +92,7 @@ public class CharacterCreationScreenHandler extends ScreenHandler
 		}
 		sheet.buildSheet();
 		testSheet = sheet;
+		testEntity.ifPresent(ent -> VariousTypes.setSheet(ent, testSheet));
 	}
 	
 	@Nullable

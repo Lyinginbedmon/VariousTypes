@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 
 import com.google.common.collect.Lists;
+import com.lying.VariousTypes;
 import com.lying.ability.Ability.Category;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
@@ -100,6 +101,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			ownerStats = Optional.of(new OwnerStats(sheet.getOwner().get()));
 			animatedPlayer = Optional.empty();
 		});
+		animatedPlayer.ifPresent(player -> VariousTypes.setSheet(player, sheet));
 		
 		power = sheet.power();
 		species = sheet.module(VTSheetModules.SPECIES).getMaybe();

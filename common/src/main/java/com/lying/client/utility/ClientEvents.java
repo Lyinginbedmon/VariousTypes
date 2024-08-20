@@ -13,6 +13,7 @@ import dev.architectury.event.EventResult;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class ClientEvents
@@ -50,14 +51,14 @@ public class ClientEvents
 		@FunctionalInterface
 		public interface PlayerColorEvent
 		{
-			Vector3f getColor(PlayerEntity player);
+			Vector3f getColor(LivingEntity player);
 		}
 		
 		public static final Event<PlayerAlphaEvent> GET_PLAYER_ALPHA_EVENT = EventFactory.of(listeners -> (PlayerAlphaEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{PlayerAlphaEvent.class}, new AbstractInvocationHandler()
 		{
 			protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
 			{
-				PlayerEntity player = (PlayerEntity)args[0];
+				LivingEntity player = (LivingEntity)args[0];
 				float alpha = 1F;
 				
 				for(PlayerAlphaEvent listener : listeners)
@@ -70,7 +71,7 @@ public class ClientEvents
 		@FunctionalInterface
 		public interface PlayerAlphaEvent
 		{
-			float getAlpha(PlayerEntity player);
+			float getAlpha(LivingEntity player);
 		}
 		
 		public static final Event<RenderPlayerEvent> BEFORE_RENDER_PLAYER_EVENT = EventFactory.createLoop(RenderPlayerEvent.class);

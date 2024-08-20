@@ -61,17 +61,17 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<com.lyin
 					.apply(instance, OperatingValuesFastHeal::new));
 		
 		/** Ticks between operations */
-		protected int healRate = Reference.Values.TICKS_PER_SECOND * 3;
+		protected final int healRate;
 		/** Amount healed each operation */
-		protected int healAmount = 1;
+		protected final int healAmount;
 		/** Minimum player food amount to operate */
-		protected int minimumFood = 1;
+		protected final int minimumFood;
 		
 		public OperatingValuesFastHeal(Optional<Integer> rateIn, Optional<Integer> amountIn, Optional<Integer> foodIn)
 		{
-			rateIn.ifPresent(val -> healRate = val);
-			amountIn.ifPresent(val -> healAmount = val);
-			foodIn.ifPresent(val -> minimumFood = val);
+			healRate = rateIn.orElse(Reference.Values.TICKS_PER_SECOND * 3);
+			healAmount = amountIn.orElse(1);
+			minimumFood = foodIn.orElse(1);
 		}
 		
 		protected Optional<Integer> healRate(){ return Optional.of(healRate); }

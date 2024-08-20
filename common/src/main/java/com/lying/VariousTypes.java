@@ -1,6 +1,8 @@
 package com.lying;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,11 +26,13 @@ import com.lying.reference.Reference;
 import com.lying.utility.ServerBus;
 import com.lying.utility.XPlatHandler;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 
 public class VariousTypes
 {
     public static final Logger LOGGER = LoggerFactory.getLogger(Reference.ModInfo.MOD_ID);
+    public static final Supplier<List<EntityType<? extends LivingEntity>>> SHEETED_ENTITIES = () -> List.of(EntityType.PLAYER, VTEntityTypes.ANIMATED_PLAYER.get());
     
     public static ServerConfig config;
     

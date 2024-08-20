@@ -2,6 +2,7 @@ package com.lying.client.renderer;
 
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.client.utility.ClientEvents;
 import com.lying.entity.AnimatedPlayerEntity;
 
 import net.minecraft.client.MinecraftClient;
@@ -30,6 +31,12 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 	
 	public void render(AnimatedPlayerEntity animatedPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
 	{
+		VertexConsumerProviderWrapped wrapped = new VertexConsumerProviderWrapped(vertexConsumerProvider);
+		wrapped.modifyColor(ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(animatedPlayerEntity));
+		wrapped.modifyAlpha(ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(animatedPlayerEntity));
+		
+		// TODO Add compatibility with pre/post player rendering events
+		
 		switch(getSkinTextures(animatedPlayerEntity).model())
 		{
 			case WIDE:
@@ -41,7 +48,7 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 		}
 		
 		setModelPose(animatedPlayerEntity);
-		super.render(animatedPlayerEntity, f, g, matrixStack, vertexConsumerProvider, i);
+		super.render(animatedPlayerEntity, f, g, matrixStack, wrapped, i);
 	}
 	
 	@SuppressWarnings("rawtypes")
