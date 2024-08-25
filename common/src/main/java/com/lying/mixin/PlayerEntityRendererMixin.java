@@ -33,7 +33,7 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 		return wrapped;
 	}
 	
-	@Inject(method = "render(Lnet/minecraft/entity/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
+	@Inject(method = "render(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
 	private void vt$renderPlayerHead(AbstractClientPlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, final CallbackInfo ci)
 	{
 		currentRenderingPlayer = player;
@@ -46,7 +46,7 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 		ClientEvents.Rendering.BEFORE_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
 	}
 	
-	@Inject(method = "render(Lnet/minecraft/entity/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
+	@Inject(method = "render(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
 	private void vt$renderPlayerTail(AbstractClientPlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, final CallbackInfo ci)
 	{
 		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);

@@ -113,6 +113,6 @@ public class VariousTypesClient
 	
 	private static void registerParticleFactories()
 	{
-		ParticleProviderRegistry.register(VTParticles.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
+		ParticleProviderRegistry.register(VTParticles.SHOCKWAVE, ShockwaveParticle.Factory::new);
 	}
 }
