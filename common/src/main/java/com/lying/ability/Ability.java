@@ -61,13 +61,13 @@ public class Ability
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{
 			// Collect all passive abilities from main ability set
-			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfClass(classIn).stream().
-				filter(inst -> inst.ability().type() == AbilityType.PASSIVE).
-					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+			sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfClass(classIn).stream()
+				.filter(inst -> inst.ability().type() == AbilityType.PASSIVE)
+					.forEach(inst -> abilityMap.put(inst.mapName(), inst));
 			
 			// Collect all activated abilities from actionable ability set
-			sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).getAbilitiesOfClass(classIn).
-					forEach(inst -> abilityMap.put(inst.mapName(), inst));
+			sheet.<AbilitySet>elementValue(VTSheetElements.ACTIONABLES).getAbilitiesOfClass(classIn)
+					.forEach(inst -> abilityMap.put(inst.mapName(), inst));
 		});
 		
 		return abilityMap.isEmpty() ? Lists.newArrayList() : abilityMap.values();

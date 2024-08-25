@@ -3,7 +3,7 @@ package com.lying.client.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.lying.client.renderer.VTAnimations;
+import com.lying.client.init.VTAnimations;
 import com.lying.entity.AnimatedPlayerEntity;
 
 import net.minecraft.client.model.Dilation;
@@ -15,9 +15,8 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
-import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 
-public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends SinglePartEntityModel<E>
+public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends AnimatedBipedEntityModel<E>
 {
 	private static final Map<Integer, Animation> ANIMS = new HashMap<>();
 	
@@ -40,27 +39,17 @@ public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends S
 			ANIMS.put(AnimatedPlayerEntity.ANIM_WAVE, VTAnimations.PLAYER_WAVE);
 	}
 	
-	final ModelPart root;
-	public final ModelPart head, hat;
-	public final ModelPart body, jacket;
-	public final ModelPart rightArm, rightSleeve, leftArm, leftSleeve;
-	public final ModelPart rightLeg, rightPants, leftLeg, leftPants;
+	public final ModelPart jacket;
+	public final ModelPart rightSleeve, leftSleeve;
+	public final ModelPart rightPants, leftPants;
 	
 	public AnimatedPlayerEntityModel(ModelPart part)
 	{
-		root = part.getChild(EntityModelPartNames.ROOT);
-		
-		head = root.getChild(EntityModelPartNames.HEAD);
-		hat = head.getChild(EntityModelPartNames.HAT);
-		body = root.getChild(EntityModelPartNames.BODY);
+		super(part);
 		jacket = body.getChild(EntityModelPartNames.JACKET);
-		rightArm = root.getChild(EntityModelPartNames.RIGHT_ARM);
 		rightSleeve = rightArm.getChild("right_sleeve");
-		leftArm = root.getChild(EntityModelPartNames.LEFT_ARM);
 		leftSleeve = leftArm.getChild("left_sleeve");
-		rightLeg = root.getChild(EntityModelPartNames.RIGHT_LEG);
 		rightPants = rightLeg.getChild("right_pants");
-		leftLeg = root.getChild(EntityModelPartNames.LEFT_LEG);
 		leftPants = leftLeg.getChild("left_pants");
 	}
 	
@@ -103,16 +92,9 @@ public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends S
 		return TexturedModelData.of(modelData, 64, 64);
 	}
 	
-	public ModelPart getPart() { return root; }
-	
 	public void setAngles(E playerEntity, float limbSwing, float limbSwingAmount, float ageInTicks, float headYaw, float headPitch)
 	{
 		getPart().traverse().forEach(ModelPart::resetTransform);
 		ANIMS.entrySet().forEach(entry -> updateAnimation(playerEntity.animations.get(entry.getKey()), entry.getValue(), ageInTicks));
-	}
-	
-	public void setVisible(boolean visible)
-	{
-		getPart().traverse().forEach(part -> part.visible = visible);
 	}
 }

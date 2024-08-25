@@ -6,7 +6,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import com.lying.client.model.AnimatedPlayerEntityModel;
-import com.lying.client.model.GelatinousPlayerEntityModel;
+import com.lying.client.model.GelatinousBipedEntityModel;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.model.Dilation;
@@ -19,7 +19,7 @@ public class VTModelLayerParts
 	
 	public static final EntityModelLayer ANIMATED_PLAYER		= make("animated_player", "player", () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, false));
 	public static final EntityModelLayer ANIMATED_PLAYER_SLIM	= make("animated_player", "player_slim", () -> AnimatedPlayerEntityModel.createBodyLayer(Dilation.NONE, true));
-	public static final EntityModelLayer PLAYER_SLIME			= make("player", "slime", GelatinousPlayerEntityModel::getTexturedModelData);
+	public static final EntityModelLayer PLAYER_SLIME			= make("player", "slime", GelatinousBipedEntityModel::getTexturedModelData);
 	
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)
 	{

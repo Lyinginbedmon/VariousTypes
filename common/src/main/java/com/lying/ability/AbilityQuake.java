@@ -93,7 +93,11 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 				values.originPos = living.getBlockPos().down();
 				values.distanceFallen = fallDistance;
 				instance.setMemory(values.toNbt());
+				
 				// TODO Add impact particle & SFX
+//				World world = living.getWorld();
+//				if(!world.isClient())
+//					((ServerWorld)world).spawnParticles(VTParticles.SHOCKWAVE.get(), living.getX(), living.getY(), living.getZ(), 1, 0, 0, 0, 1);
 			}
 		});
 	}

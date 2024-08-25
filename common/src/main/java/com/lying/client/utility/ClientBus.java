@@ -7,18 +7,14 @@ import org.joml.Vector3f;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
-import com.lying.client.renderer.AbilityRenderingRegistry;
+import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.PlayerEntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -64,7 +60,7 @@ public class ClientBus
 		{
 			Vector3f color = new Vector3f(1F, 1F, 1F);
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
-				color.mul(AbilityRenderingRegistry.doColorMods(player, inst));
+				color.mul(VTAbilityRenderingRegistry.doColorMods(player, inst));
 			return color;
 		});
 		
@@ -72,14 +68,16 @@ public class ClientBus
 		{
 			float alpha = 1F;
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
-				alpha *= AbilityRenderingRegistry.doAlphaMods(player, inst);
+				alpha *= VTAbilityRenderingRegistry.doAlphaMods(player, inst);
 			return alpha;
 		});
 		
-		ClientEvents.Rendering.BEFORE_RENDER_PLAYER_EVENT.register((PlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, PlayerEntityRenderer renderer) -> 
-			VariousTypes.getSheet(player).ifPresent(sheet -> Ability.getAllOf(Ability.class, player).forEach(inst -> AbilityRenderingRegistry.doPreRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+		ClientEvents.Rendering.BEFORE_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
+			VariousTypes.getSheet(player).ifPresent(sheet -> 
+				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPreRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 		
-		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.register((PlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, PlayerEntityRenderer renderer) -> 
-			VariousTypes.getSheet(player).ifPresent(sheet -> Ability.getAllOf(Ability.class, player).forEach(inst -> AbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
+			VariousTypes.getSheet(player).ifPresent(sheet -> 
+				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 	}
 }

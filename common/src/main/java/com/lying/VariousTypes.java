@@ -14,6 +14,7 @@ import com.lying.config.ServerConfig;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTItems;
+import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
@@ -61,6 +62,7 @@ public class VariousTypes
     	VTItems.init();
     	VTStatusEffects.init();
     	VTCommands.init();
+    	VTParticles.init();
     	ServerBus.init();
     	
     	VTPacketHandler.initServer();

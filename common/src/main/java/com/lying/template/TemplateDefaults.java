@@ -42,7 +42,7 @@ public class TemplateDefaults
 			.power(2)
 			.condition(Precondition.IS_LIVING.get())
 			.condition(TypeCondition.All.of(VTTypes.HUMAN.get()))
-			.operation(TypesOperation.SetSupertypes.of(VTTypes.ADUAIN.get()))
+			.operation(TypesOperation.SetSupertypes.of(VTTypes.ARTHROPOD.get()))
 			.operation(AbilityOperation.Add.of(VTAbilities.CLIMB.get(), VTAbilities.SCULK_SIGHT.get()))
 			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(2))).build());
 	public static final Supplier<Template> SIAR			= register(prefix("siar"), () -> Template.Builder.of(prefix("siar"))	// Lich
