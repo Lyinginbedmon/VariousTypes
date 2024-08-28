@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
+import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
@@ -32,6 +33,7 @@ import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.AbilityStatusEffectOnDemand;
+import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.SingleAttributeAbility;
@@ -271,8 +273,6 @@ public class VTAbilities
 	{
 		public void registerEventHandlers()
 		{
-			// TODO Add maintaining XP at 999 levels
-			
 			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
@@ -283,7 +283,9 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> QUAKE			= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
-	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY));
+	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY));	// TODO Add physical damage resistance
+	public static final Supplier<Ability> THUNDERSTEP	= register("thunderstep", () -> new AbilityThunderstep(prefix("thunderstep"), Category.OFFENSE));
+	public static final Supplier<Ability> BAD_BREATH	= register("bad_breath", () -> new AbilityBadBreath(prefix("bad_breath"), Category.OFFENSE));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -309,13 +311,11 @@ public class VTAbilities
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Omniscient - Cannot pick up XP but always treated as having 999 levels (note: experience does not have a getter function, public int only)
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
 		 * Stonesense - Ping the locations of nearby ores
 		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
-		 * Thunderstep - Spawn lightning at current position and target position, teleporting from one to the other. Implicitly immune to lightning damage
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */

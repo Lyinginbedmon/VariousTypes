@@ -53,7 +53,7 @@ public class AbilityLoSTeleport extends ActivatedAbility
 		return Optional.of(translate("ability",registryName().getPath()+".desc", (int)range(instance.memory())));
 	}
 	
-	public int defaultCooldown() { return Reference.Values.TICKS_PER_SECOND * 2; }
+	public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 2; }
 	
 	public boolean canTrigger(LivingEntity owner, AbilityInstance instance)
 	{
