@@ -11,7 +11,7 @@ import org.joml.Vector2i;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.ability.AbilityQuake.OperatingValuesQuake;
+import com.lying.ability.AbilityQuake.ConfigQuake;
 import com.lying.component.CharacterSheet;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.init.VTSheetElements;
@@ -35,7 +35,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
-public class AbilityQuake extends ActivatedAbility implements ITickingAbility, IComplexAbility<OperatingValuesQuake>
+public class AbilityQuake extends ActivatedAbility implements ITickingAbility, IComplexAbility<ConfigQuake>
 {
 	/** The rate of expansion of the shockwave */
 	public static final int INTERVAL = Reference.Values.TICKS_PER_SECOND / 10;
@@ -47,7 +47,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		OperatingValuesQuake values = memoryToValues(instance.memory());
+		ConfigQuake values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.maxRange + 2));
 	}
 	
@@ -62,7 +62,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public boolean shouldTick(final LivingEntity owner, final AbilityInstance instance)
 	{
-		return OperatingValuesQuake.fromNbt(instance.memory()).phase >= 0;
+		return ConfigQuake.fromNbt(instance.memory()).phase >= 0;
 	}
 	
 	public void registerEventHandlers()
@@ -83,7 +83,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	{
 		set.getAbilitiesOfType(registryName()).forEach(instance -> 
 		{
-			OperatingValuesQuake values = memoryToValues(instance.memory());
+			ConfigQuake values = memoryToValues(instance.memory());
 			if(values.phase >= 0 && Phase.values()[values.phase] == Phase.FALLING)
 			{
 				// Trigger shockwave on landing proportional to distance fallen
@@ -104,7 +104,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public void onTick(AbilityInstance instance, final CharacterSheet sheet, final LivingEntity owner)
 	{
-		OperatingValuesQuake values = memoryToValues(instance.memory());
+		ConfigQuake values = memoryToValues(instance.memory());
 		ServerWorld world = (ServerWorld)owner.getWorld();
 		switch(Phase.values()[values.phase])
 		{
@@ -168,7 +168,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	private void startTicking(AbilityInstance instance, LivingEntity owner)
 	{
-		OperatingValuesQuake values = memoryToValues(instance.memory());
+		ConfigQuake values = memoryToValues(instance.memory());
 		values.phase = 0;
 		instance.setMemory(values.toNbt());
 		
@@ -177,31 +177,31 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	private void stopTicking(AbilityInstance instance, LivingEntity owner)
 	{
-		OperatingValuesQuake values = memoryToValues(instance.memory());
-		instance.setMemory(OperatingValuesQuake.ofRange(values.maxRange).toNbt());
+		ConfigQuake values = memoryToValues(instance.memory());
+		instance.setMemory(ConfigQuake.ofRange(values.maxRange).toNbt());
 		ITickingAbility.tryPutOnCooldown(instance, owner);
 	}
 	
 	/** Returns how many ticks until this ability finishes its function */
 	private int getTicksRemaining(AbilityInstance instance, long currentTime)
 	{
-		OperatingValuesQuake values = memoryToValues(instance.memory());
+		ConfigQuake values = memoryToValues(instance.memory());
 		long finish = values.time().orElse(currentTime - 1);
-		values.time().ifPresentOrElse(Consumers.nop(), () -> instance.setMemory(OperatingValuesQuake.ofRange(values.maxRange).toNbt()));
+		values.time().ifPresentOrElse(Consumers.nop(), () -> instance.setMemory(ConfigQuake.ofRange(values.maxRange).toNbt()));
 		return (int)(finish - currentTime);
 	}
 	
-	public OperatingValuesQuake memoryToValues(NbtCompound data) { return OperatingValuesQuake.fromNbt(data); }
+	public ConfigQuake memoryToValues(NbtCompound data) { return ConfigQuake.fromNbt(data); }
 	
-	public static class OperatingValuesQuake
+	public static class ConfigQuake
 	{
-		protected static final Codec<OperatingValuesQuake> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("Phase").forGetter(OperatingValuesQuake::phase),
-				Codec.LONG.optionalFieldOf("Time").forGetter(OperatingValuesQuake::time), 
-				BlockPos.CODEC.optionalFieldOf("Origin").forGetter(OperatingValuesQuake::origin),
-				Codec.FLOAT.optionalFieldOf("Distance").forGetter(OperatingValuesQuake::distance),
-				Codec.INT.optionalFieldOf("Range").forGetter(OperatingValuesQuake::range))
-					.apply(instance, OperatingValuesQuake::new));
+		protected static final Codec<ConfigQuake> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.INT.optionalFieldOf("Phase").forGetter(ConfigQuake::phase),
+				Codec.LONG.optionalFieldOf("Time").forGetter(ConfigQuake::time), 
+				BlockPos.CODEC.optionalFieldOf("Origin").forGetter(ConfigQuake::origin),
+				Codec.FLOAT.optionalFieldOf("Distance").forGetter(ConfigQuake::distance),
+				Codec.INT.optionalFieldOf("Range").forGetter(ConfigQuake::range))
+					.apply(instance, ConfigQuake::new));
 		
 		/** The configured limit on how far the shockwave can spread, between 0 and 32 blocks */
 		protected int maxRange;
@@ -212,12 +212,12 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		protected BlockPos originPos;
 		protected float distanceFallen;
 		
-		private OperatingValuesQuake(int range)
+		private ConfigQuake(int range)
 		{
 			this(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(range));
 		}
 		
-		public OperatingValuesQuake(Optional<Integer> phaseIn, Optional<Long> finishIn, Optional<BlockPos> originIn, Optional<Float> distanceIn, Optional<Integer> rangeIn)
+		public ConfigQuake(Optional<Integer> phaseIn, Optional<Long> finishIn, Optional<BlockPos> originIn, Optional<Float> distanceIn, Optional<Integer> rangeIn)
 		{
 			phase = phaseIn.orElse(-1);
 			endTime = finishIn.orElse(0L);
@@ -226,7 +226,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 			maxRange = MathHelper.clamp(rangeIn.orElse(4), 0, 32);
 		}
 		
-		public static OperatingValuesQuake ofRange(int rangeIn) { return new OperatingValuesQuake(rangeIn); }
+		public static ConfigQuake ofRange(int rangeIn) { return new ConfigQuake(rangeIn); }
 		
 		protected Optional<Integer> phase() { return Optional.of(phase); }
 		protected Optional<Long> time() { return Optional.of(endTime); }
@@ -241,7 +241,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 			return (NbtCompound)CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
 		}
 		
-		public static OperatingValuesQuake fromNbt(NbtCompound nbt)
+		public static ConfigQuake fromNbt(NbtCompound nbt)
 		{
 			return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		}

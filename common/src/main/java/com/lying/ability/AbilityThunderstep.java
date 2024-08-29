@@ -5,7 +5,7 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
-import com.lying.ability.AbilityThunderstep.OperatingValuesThunderstep;
+import com.lying.ability.AbilityThunderstep.ConfigThunderstep;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
@@ -29,7 +29,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class AbilityThunderstep extends ActivatedAbility implements IComplexAbility<OperatingValuesThunderstep>
+public class AbilityThunderstep extends ActivatedAbility implements IComplexAbility<ConfigThunderstep>
 {
 	public AbilityThunderstep(Identifier regName, Category catIn)
 	{
@@ -38,7 +38,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		OperatingValuesThunderstep values = memoryToValues(instance.memory());
+		ConfigThunderstep values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc_"+(values.needsThundering ? "thunder" : "no_thunder"), 
 				(int)values.minRange, 
 				(int)values.maxRange));
@@ -50,7 +50,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 	{
 		if(!owner.getWorld().isSkyVisible(owner.getBlockPos())) return false;
 		
-		OperatingValuesThunderstep config = memoryToValues(instance.memory());
+		ConfigThunderstep config = memoryToValues(instance.memory());
 		if(!owner.getWorld().isThundering() && config.needsThundering) return false;
 		
 		HitResult trace = owner.raycast(config.maxRange, 1F, true);
@@ -66,7 +66,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 		if(!canTrigger(owner, instance))
 			return;
 		
-		OperatingValuesThunderstep config = memoryToValues(instance.memory());
+		ConfigThunderstep config = memoryToValues(instance.memory());
 		HitResult trace = owner.raycast(config.maxRange, 1F, true);
 		World world = owner.getWorld();
 		Vec3d destination = trace.getPos();
@@ -101,21 +101,21 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
         return lightningEntity;
 	}
 	
-	public OperatingValuesThunderstep memoryToValues(NbtCompound data) { return OperatingValuesThunderstep.fromNbt(data); }
+	public ConfigThunderstep memoryToValues(NbtCompound data) { return ConfigThunderstep.fromNbt(data); }
 	
-	public static class OperatingValuesThunderstep
+	public static class ConfigThunderstep
 	{
-		protected static final Codec<OperatingValuesThunderstep> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.DOUBLE.optionalFieldOf("RangeMax").forGetter(OperatingValuesThunderstep::rangeMax), 
-				Codec.DOUBLE.optionalFieldOf("RangeMin").forGetter(OperatingValuesThunderstep::rangeMin),
-				Codec.BOOL.optionalFieldOf("NeedsThundering").forGetter(OperatingValuesThunderstep::needsThunder))
-					.apply(instance, OperatingValuesThunderstep::new));
+		protected static final Codec<ConfigThunderstep> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.DOUBLE.optionalFieldOf("RangeMax").forGetter(ConfigThunderstep::rangeMax), 
+				Codec.DOUBLE.optionalFieldOf("RangeMin").forGetter(ConfigThunderstep::rangeMin),
+				Codec.BOOL.optionalFieldOf("NeedsThundering").forGetter(ConfigThunderstep::needsThunder))
+					.apply(instance, ConfigThunderstep::new));
 		
 		protected double maxRange = 128;
 		protected double minRange = 32;
 		protected boolean needsThundering = true;
 		
-		public OperatingValuesThunderstep(Optional<Double> maxIn, Optional<Double> minIn, Optional<Boolean> needsThunderIn)
+		public ConfigThunderstep(Optional<Double> maxIn, Optional<Double> minIn, Optional<Boolean> needsThunderIn)
 		{
 			needsThunderIn.ifPresent(val -> needsThundering = val);
 			maxIn.ifPresent(val -> maxRange = val);
@@ -134,7 +134,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 		
 		public double minSquared() { return minRange * minRange; }
 		
-		public static OperatingValuesThunderstep fromNbt(NbtCompound nbt)
+		public static ConfigThunderstep fromNbt(NbtCompound nbt)
 		{
 			return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		}

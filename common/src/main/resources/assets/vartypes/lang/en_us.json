@@ -189,6 +189,8 @@
 	"ability.vartypes.herbivore.desc_allow": "Your body is specially capable of processing certain foods others may find unpalatable. You can eat any [%s] item.",
 	"ability.vartypes.herbivore.desc_both": "Your body is specialised to consume certain foods, to the exclusion of others. You can eat any [%s] item but cannot digest any [%s] item.",
 	"ability.vartypes.herbivore.desc": "Your diet seems at a glance to be the same as any omnivore, but something strange is at work behind the scenes...",
+	"ability.vartypes.flameproof": "Flameproof",
+	"ability.vartypes.flameproof.desc": "You are particularly resistent to certain forms of harm. You take [%s] percent less damage from [%s] sources.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.ability.AbilityDietRestriction.OperatingValuesDiet;
+import com.lying.ability.AbilityDietRestriction.ConfigDiet;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
 import com.lying.init.VTAbilities;
@@ -27,7 +27,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class AbilityDietRestriction extends Ability implements IComplexAbility<OperatingValuesDiet>
+public class AbilityDietRestriction extends Ability implements IComplexAbility<ConfigDiet>
 {
 	public AbilityDietRestriction(Identifier regName, Category catIn)
 	{
@@ -36,7 +36,7 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<O
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		OperatingValuesDiet values = memoryToValues(instance.memory());
+		ConfigDiet values = memoryToValues(instance.memory());
 		boolean allows = values.allows();
 		boolean denies = values.denies();
 		
@@ -60,7 +60,7 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<O
 			if(sheetOpt.isEmpty()) return EventResult.pass();
 			
 			CharacterSheet sheet = sheetOpt.get();
-			OperatingValuesDiet values = memoryToValues(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(VTAbilities.HERBIVORE.get().registryName()).memory());
+			ConfigDiet values = memoryToValues(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(VTAbilities.HERBIVORE.get().registryName()).memory());
 			if(values.isBlank()) return EventResult.pass();
 			
 			if(values.denies() && values.deniedTags.stream().anyMatch(tag -> stack.isIn(tag)))
@@ -73,19 +73,19 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<O
 		});
 	}
 	
-	public OperatingValuesDiet memoryToValues(NbtCompound data) { return OperatingValuesDiet.fromNbt(data); }
+	public ConfigDiet memoryToValues(NbtCompound data) { return ConfigDiet.fromNbt(data); }
 	
-	public static class OperatingValuesDiet
+	public static class ConfigDiet
 	{
-		protected static final Codec<OperatingValuesDiet> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+		protected static final Codec<ConfigDiet> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Allowed").forGetter(v -> Optional.of(v.allowedTags)),
 				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Denied").forGetter(v -> Optional.of(v.deniedTags)))
-					.apply(instance, OperatingValuesDiet::new));
+					.apply(instance, ConfigDiet::new));
 		
 		protected List<TagKey<Item>> allowedTags = Lists.newArrayList();
 		protected List<TagKey<Item>> deniedTags = Lists.newArrayList();
 		
-		public OperatingValuesDiet(Optional<List<TagKey<Item>>> allowIn, Optional<List<TagKey<Item>>> denyIn)
+		public ConfigDiet(Optional<List<TagKey<Item>>> allowIn, Optional<List<TagKey<Item>>> denyIn)
 		{
 			allowIn.ifPresentOrElse(val -> allowedTags.addAll(val), () -> allowedTags.add(VTTags.VEGETARIAN));
 			denyIn.ifPresentOrElse(val -> deniedTags.addAll(val), () -> deniedTags.addAll(List.of(ItemTags.MEAT, ItemTags.FISHES)));
@@ -95,7 +95,7 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<O
 		public boolean allows() { return !allowedTags.isEmpty(); }
 		public boolean denies() { return !deniedTags.isEmpty(); }
 		
-		public static OperatingValuesDiet fromNbt(NbtCompound nbt)
+		public static ConfigDiet fromNbt(NbtCompound nbt)
 		{
 			return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		}

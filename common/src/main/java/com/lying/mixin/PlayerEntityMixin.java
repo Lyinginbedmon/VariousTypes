@@ -264,32 +264,32 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	@Inject(method = "applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V", at = @At("HEAD"), cancellable = true)
 	private void vt$applyDamage(final DamageSource source, float amount, final CallbackInfo ci)
 	{
+		final PlayerEntity player = (PlayerEntity)(Object)this;
+		
+		amount = ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount);
+		
 		/**
 		 * Applies Smite and Bane of Arthropods bonus damage to players with the UNDEAD or ARTHROPOD supertypes<br>
-		 * This doesn't perfectly replicate the same effect as for mobs, but it's as close as we can get.
+		 * This doesn't perfectly replicate the same effect as for mobs, but it's as close as we can get.<br>
+		 * Note that since is applied AFTER damage is modified, these enchantments can bypass normal invulnerabilities.
 		 */
 		if(source.isOf(DamageTypes.MOB_ATTACK) || source.isOf(DamageTypes.PLAYER_ATTACK))
 		{
-			final PlayerEntity player = (PlayerEntity)(Object)this;
 			LivingEntity originator = (LivingEntity)source.getAttacker();
 			ItemStack heldStack = originator.getEquippedStack(EquipmentSlot.MAINHAND);
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 			if(sheetOpt.isEmpty()) return;
 			
-			float bonus = 0F;
 			TypeSet types = sheetOpt.get().elementValue(VTSheetElements.TYPES);
 			// XXX Find some approach to check without using hard-coded enchantments?
 			if(types.contains(VTTypes.UNDEAD.get()))
-				bonus += 2.5F * EnchantmentHelper.getLevel(Enchantments.SMITE, heldStack);
+				amount += 2.5F * EnchantmentHelper.getLevel(Enchantments.SMITE, heldStack);
 			
 			if(types.contains(VTTypes.ARTHROPOD.get()))
-				bonus += 2.5F * EnchantmentHelper.getLevel(Enchantments.BANE_OF_ARTHROPODS, heldStack);
-			
-			if(bonus > 0F)
-			{
-				this.timeUntilRegen = 0;
-				applyDamage(player.getWorld().getDamageSources().magic(), bonus);
-			}
+				amount += 2.5F * EnchantmentHelper.getLevel(Enchantments.BANE_OF_ARTHROPODS, heldStack);
 		}
+		
+		if(amount <= 0)
+			ci.cancel();
 	}
 }

@@ -5,7 +5,7 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Optional;
 
 import com.lying.VariousTypes;
-import com.lying.ability.AbilityBerserk.OperatingValuesBerserk;
+import com.lying.ability.AbilityBerserk.ConfigBerserk;
 import com.lying.component.CharacterSheet;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -24,7 +24,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
 
-public class AbilityBerserk extends ActivatedAbility implements ITickingAbility, IComplexAbility<OperatingValuesBerserk>
+public class AbilityBerserk extends ActivatedAbility implements ITickingAbility, IComplexAbility<ConfigBerserk>
 {
 	private static final String TIME = "Time";
 	
@@ -35,7 +35,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		OperatingValuesBerserk values = memoryToValues(instance.memory());
+		ConfigBerserk values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToSeconds(values.buffTime), VTUtils.ticksToSeconds(values.debuffTime)));
 	}
 	
@@ -45,7 +45,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	{
 		startTicking(instance, owner);
 		
-		OperatingValuesBerserk values = memoryToValues(instance.memory());
+		ConfigBerserk values = memoryToValues(instance.memory());
 		owner.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, values.buffTime, 1));
 		owner.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, values.buffTime, 8));
 	}
@@ -56,7 +56,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	
 	public void onTick(AbilityInstance instance, final CharacterSheet sheet, final LivingEntity owner)
 	{
-		OperatingValuesBerserk values = memoryToValues(instance.memory());
+		ConfigBerserk values = memoryToValues(instance.memory());
 		ServerWorld world = (ServerWorld)owner.getWorld();
 		switch(getCurrentTick(instance, world.getTime()))
 		{
@@ -106,19 +106,19 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 		return (int)(finish - currentTime);
 	}
 	
-	public OperatingValuesBerserk memoryToValues(NbtCompound data) { return OperatingValuesBerserk.fromNbt(data); }
+	public ConfigBerserk memoryToValues(NbtCompound data) { return ConfigBerserk.fromNbt(data); }
 	
-	public static class OperatingValuesBerserk
+	public static class ConfigBerserk
 	{
-		protected static final Codec<OperatingValuesBerserk> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("BuffTime").forGetter(OperatingValuesBerserk::buffTime), 
-				Codec.INT.optionalFieldOf("DebuffTime").forGetter(OperatingValuesBerserk::debuffTime))
-					.apply(instance, OperatingValuesBerserk::new));
+		protected static final Codec<ConfigBerserk> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				Codec.INT.optionalFieldOf("BuffTime").forGetter(ConfigBerserk::buffTime), 
+				Codec.INT.optionalFieldOf("DebuffTime").forGetter(ConfigBerserk::debuffTime))
+					.apply(instance, ConfigBerserk::new));
 		
 		protected int buffTime = 12 * Reference.Values.TICKS_PER_SECOND;
 		protected int debuffTime = 15 * Reference.Values.TICKS_PER_SECOND;
 		
-		public OperatingValuesBerserk(Optional<Integer> rateIn, Optional<Integer> amountIn)
+		public ConfigBerserk(Optional<Integer> rateIn, Optional<Integer> amountIn)
 		{
 			rateIn.ifPresent(val -> buffTime = val);
 			amountIn.ifPresent(val -> debuffTime = val);
@@ -127,7 +127,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 		protected Optional<Integer> buffTime(){ return Optional.of(buffTime); }
 		protected Optional<Integer> debuffTime(){ return Optional.of(debuffTime); }
 		
-		public static OperatingValuesBerserk fromNbt(NbtCompound nbt)
+		public static ConfigBerserk fromNbt(NbtCompound nbt)
 		{
 			return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		}

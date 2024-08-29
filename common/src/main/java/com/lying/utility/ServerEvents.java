@@ -18,6 +18,7 @@ import dev.architectury.event.EventResult;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
@@ -183,6 +184,27 @@ public class ServerEvents
 		public interface CanEatItemEvent
 		{
 			EventResult canEat(PlayerEntity user, ItemStack stack);
+		}
+		
+		public static final Event<PlayerTakeDamageEvent> MODIFY_DAMAGE_TAKEN_EVENT = EventFactory.of(listeners -> (PlayerTakeDamageEvent)Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{PlayerTakeDamageEvent.class}, new AbstractInvocationHandler()
+		{
+			protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
+			{
+				PlayerEntity player = (PlayerEntity)args[0];
+				DamageSource source = (DamageSource)args[1];
+				float amount = (float)args[2];
+				
+				float result = amount;
+				for(PlayerTakeDamageEvent listener : listeners)
+					result = listener.getModifiedDamage(player, source, result);
+				return result;
+			}
+		}));
+		
+		@FunctionalInterface
+		public interface PlayerTakeDamageEvent
+		{
+			float getModifiedDamage(PlayerEntity living, DamageSource source, float amount);
 		}
 	}
 	

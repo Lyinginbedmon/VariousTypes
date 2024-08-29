@@ -6,4 +6,6 @@ import net.minecraft.nbt.NbtCompound;
 public interface IComplexAbility<T extends Object>
 {
 	public T memoryToValues(NbtCompound data);
+	
+	public default T instanceToValues(AbilityInstance inst) { return memoryToValues(inst.memory()); }
 }

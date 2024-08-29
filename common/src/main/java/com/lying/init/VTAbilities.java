@@ -19,6 +19,7 @@ import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
+import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityFly;
@@ -211,11 +212,26 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> QUAKE			= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
-	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY));	// TODO Add physical damage resistance
+	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY)
+	{
+		public void registerEventHandlers()
+		{
+			ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
+			{
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
+					if(damage.isIn(VTTags.PHYSICAL))
+						return amount * 0.85F;
+				
+				return amount;
+			});
+		}
+	});
 	public static final Supplier<Ability> THUNDERSTEP	= register("thunderstep", () -> new AbilityThunderstep(prefix("thunderstep"), Category.OFFENSE));
 	public static final Supplier<Ability> BAD_BREATH	= register("bad_breath", () -> new AbilityBadBreath(prefix("bad_breath"), Category.OFFENSE));
 	public static final Supplier<Ability> WEBWEAVER		= register("webweaver", () -> new AbilityIgnoreSlowdown(prefix("webweaver"), Category.UTILITY));
 	public static final Supplier<Ability> HERBIVORE		= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
+	public static final Supplier<Ability> FLAMEPROOF	= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -225,15 +241,21 @@ public class VTAbilities
 	/*
 	 * TODO Implement more abilities
 	 	 * Constant status effect abilities
+	 	 * 
+	 	 * Analgesic - No hurt sound or animation, health display in HUD is inaccurate
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
 		 * Bad Breath - Spawns a cloud of configurable status effect gas that spreads outward
 		 * Blink - Very temporary (read single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
+		 * Cold-Blooded - Weak and slow in warm environments (configurable)
 		 * Enchain - Locks a target in place with a set of magical chains
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
 		 * Faeskin - Take extra damage from attacks with items tagged as #vartypes:silver and hurt by contact with #vartypes:silver blocks, which also function like fences to them
+		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
+		 * Flitting - Creative-style flight
+		 * Forgetful - Reduced XP gain and cannot unlock recipes
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Gelatinous - Resistance to physical forms of damage, semi-transparent rendering
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
@@ -241,6 +263,7 @@ public class VTAbilities
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
+		 * Photosynth - Regain hunger from standing in direct sunlight in clear weather
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack

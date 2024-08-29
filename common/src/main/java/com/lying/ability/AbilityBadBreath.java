@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.ability.AbilityBadBreath.OperatingValuesBadBreath;
+import com.lying.ability.AbilityBadBreath.ConfigBadBreath;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -23,7 +23,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class AbilityBadBreath extends ActivatedAbility implements IComplexAbility<OperatingValuesBadBreath>
+public class AbilityBadBreath extends ActivatedAbility implements IComplexAbility<ConfigBadBreath>
 {
 	public AbilityBadBreath(Identifier regName, Category catIn)
 	{
@@ -32,7 +32,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		OperatingValuesBadBreath values = memoryToValues(instance.memory());
+		ConfigBadBreath values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 
 				(int)values.maxRadius, 
 				values.getEffectNames(), 
@@ -43,7 +43,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 	
 	protected void activate(LivingEntity owner, AbilityInstance instance)
 	{
-		OperatingValuesBadBreath config = memoryToValues(instance.memory());
+		ConfigBadBreath config = memoryToValues(instance.memory());
 		AreaEffectCloudEntity cloud = new AreaEffectCloudEntity(owner.getWorld(), owner.getX(), owner.getY(), owner.getZ());
 		cloud.setOwner(owner);
 		cloud.setRadius(3F);
@@ -53,21 +53,21 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 		owner.getWorld().spawnEntity(cloud);
 	}
 	
-	public OperatingValuesBadBreath memoryToValues(NbtCompound data) { return OperatingValuesBadBreath.fromNbt(data); }
+	public ConfigBadBreath memoryToValues(NbtCompound data) { return ConfigBadBreath.fromNbt(data); }
 	
-	public static class OperatingValuesBadBreath
+	public static class ConfigBadBreath
 	{
-		protected static final Codec<OperatingValuesBadBreath> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				StatusEffectInstance.CODEC.listOf().optionalFieldOf("Effects").forGetter(OperatingValuesBadBreath::effectsList),
-				Codec.INT.optionalFieldOf("Duration").forGetter(OperatingValuesBadBreath::duration),
-				Codec.FLOAT.optionalFieldOf("MaxRadius").forGetter(OperatingValuesBadBreath::maxRadius))
-					.apply(instance, OperatingValuesBadBreath::new));
+		protected static final Codec<ConfigBadBreath> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+				StatusEffectInstance.CODEC.listOf().optionalFieldOf("Effects").forGetter(ConfigBadBreath::effectsList),
+				Codec.INT.optionalFieldOf("Duration").forGetter(ConfigBadBreath::duration),
+				Codec.FLOAT.optionalFieldOf("MaxRadius").forGetter(ConfigBadBreath::maxRadius))
+					.apply(instance, ConfigBadBreath::new));
 		
 		protected List<StatusEffectInstance> effects = Lists.newArrayList();
 		protected int duration = 10 * Reference.Values.TICKS_PER_SECOND;
 		protected float maxRadius = 3F;
 		
-		public OperatingValuesBadBreath(Optional<List<StatusEffectInstance>> listIn, Optional<Integer> durationIn, Optional<Float> radiusIn)
+		public ConfigBadBreath(Optional<List<StatusEffectInstance>> listIn, Optional<Integer> durationIn, Optional<Float> radiusIn)
 		{
 			listIn.ifPresentOrElse(val -> effects.addAll(val), () -> effects.add(new StatusEffectInstance(StatusEffects.POISON, 15 * Reference.Values.TICKS_PER_SECOND)));
 			durationIn.ifPresent(val -> duration = val);
@@ -98,7 +98,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 			return text;
 		}
 		
-		public static OperatingValuesBadBreath fromNbt(NbtCompound nbt)
+		public static ConfigBadBreath fromNbt(NbtCompound nbt)
 		{
 			return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 		}
