@@ -34,6 +34,11 @@ public class VTScreenHandlerTagsProvider extends TagProvider<ScreenHandlerType<?
 				ScreenHandlerType.BEACON,
 				ScreenHandlerType.ENCHANTMENT,
 				ScreenHandlerType.LOOM);
+		registerToTag(VTTags.COOKING_MENU,
+				ScreenHandlerType.FURNACE,
+				ScreenHandlerType.BLAST_FURNACE,
+				ScreenHandlerType.SMOKER,
+				ScreenHandlerType.BREWING_STAND);
 	}
 	
 	private void registerToTag(TagKey<ScreenHandlerType<?>> tag, ScreenHandlerType<?>... types)

@@ -30,7 +30,8 @@
   },
   "custom": {
 	"cardinal-components": [
-		"vartypes:character_sheet"
+		"vartypes:character_sheet",
+		"vartypes:mob_character_sheet"
 	]
   },
   "mixins": [

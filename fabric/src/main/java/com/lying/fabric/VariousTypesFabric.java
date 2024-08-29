@@ -15,6 +15,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
 
 public final class VariousTypesFabric implements ModInitializer
 {
@@ -33,16 +34,22 @@ public final class VariousTypesFabric implements ModInitializer
 		{
 			public Optional<CharacterSheet> getSheet(@NotNull LivingEntity entity)
 			{
-				return
-						entity.getType() != EntityType.PLAYER ?
-							Optional.empty() :
-							Optional.of(VTComponents.CHARACTER_SHEET.get(entity));
+				if(!VariousTypes.SHEETED_ENTITIES.get().contains(entity.getType()))
+					return Optional.empty();
+				else if(entity.getType() == EntityType.PLAYER)
+					return Optional.of(VTComponents.CHARACTER_SHEET_PLAYER.get(entity));
+				else if(entity.getType() == VTEntityTypes.ANIMATED_PLAYER.get())
+					return Optional.of(VTComponents.CHARACTER_SHEET_MOB.get(entity));
+				return Optional.empty();
 			}
 			
 			public void setSheet(LivingEntity entity, CharacterSheet sheet)
 			{
-				if(entity.getType() == EntityType.PLAYER)
-					VTComponents.CHARACTER_SHEET.sync(entity);
+				if(VariousTypes.SHEETED_ENTITIES.get().contains(entity.getType()))
+					if(entity.getType() == EntityType.PLAYER)
+						VTComponents.CHARACTER_SHEET_PLAYER.sync(entity);
+					else
+						getSheet(entity).ifPresent(sheetB -> sheetB.readSheetFromNbt(sheet.writeSheetToNbt(new NbtCompound())));
 			}
 		});
 	}

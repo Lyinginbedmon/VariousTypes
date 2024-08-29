@@ -1,7 +1,6 @@
 package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
-import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +12,6 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Supplier;
-import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
@@ -21,18 +19,22 @@ import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
+import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityFly;
+import com.lying.ability.AbilityIgnoreSlowdown;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityIntangible;
 import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
+import com.lying.ability.AbilityMindless;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.AbilityStatusEffectOnDemand;
+import com.lying.ability.AbilityStatusTagImmune;
 import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
@@ -51,7 +53,6 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -62,15 +63,9 @@ import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.Vec3d;
@@ -124,36 +119,7 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> INTANGIBLE	= register("intangible", () -> new AbilityIntangible(prefix("intangible"), Category.UTILITY));
 	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
-	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new Ability(prefix("mithridatic"), Category.DEFENSE) 
-	{
-		public Optional<Text> description(AbilityInstance instance)
-		{
-			MutableText names = VTUtils.listToString(getTags(instance.memory()), tag -> Text.literal(tag.id().toString()), ", ");
-			return Optional.of(translate("ability",registryName().getPath()+".desc", names));
-		}
-		
-		public void registerEventHandlers()
-		{
-			ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities) -> 
-			{
-				List<AbilityInstance> set = abilities.getAbilitiesOfType(registryName());
-				return set.stream().anyMatch(inst -> getTags(inst.memory()).stream().anyMatch(tag -> effect.getEffectType().isIn(tag))) ? EventResult.interruptFalse() : EventResult.pass();
-			});
-		}
-		
-		public static List<TagKey<StatusEffect>> getTags(NbtCompound memory)
-		{
-			List<TagKey<StatusEffect>> tags = Lists.newArrayList();
-			
-			if(memory.contains("Effects", NbtElement.LIST_TYPE))
-				for(NbtElement element : memory.getList("Effects", NbtElement.STRING_TYPE))
-					tags.add(TagKey.of(RegistryKeys.STATUS_EFFECT, new Identifier(element.asString())));
-			else
-				tags.add(VTTags.POISONS);
-			
-			return tags;
-		}
-	});
+	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new AbilityStatusTagImmune(prefix("mithridatic"), Category.DEFENSE));
 	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
 	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new AbilityRegeneration(prefix("regeneration"), Category.DEFENSE));
 	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new SingleAttributeAbility.Armour(prefix("natural_armour"), Category.DEFENSE));
@@ -230,45 +196,7 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> BERSERK		= register("berserk", () -> new AbilityBerserk(prefix("berserk"), Category.OFFENSE));
-	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new Ability(prefix("mindless"), Category.UTILITY) 
-	{
-		public void registerEventHandlers()
-		{
-			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
-			{
-				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
-					return EventResult.interruptFalse();
-				return EventResult.pass();
-			});
-			
-			ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.register((player,screen) -> 
-			{
-				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
-				{
-					AbilityInstance inst = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName());
-					if(getTags(inst.memory()).stream().anyMatch(tag -> VTTags.isScreenIn(screen, tag)))
-						return EventResult.interruptFalse();
-				}
-				
-				return EventResult.pass();
-			});
-		}
-		
-		public static List<TagKey<ScreenHandlerType<?>>> getTags(NbtCompound memory)
-		{
-			List<TagKey<ScreenHandlerType<?>>> tags = Lists.newArrayList();
-			
-			if(memory.contains("Menus", NbtElement.LIST_TYPE))
-				for(NbtElement element : memory.getList("Menus", NbtElement.STRING_TYPE))
-					tags.add(TagKey.of(RegistryKeys.SCREEN_HANDLER, new Identifier(element.asString())));
-			else
-				tags.add(VTTags.CRAFTING_MENU);
-			
-			return tags;
-		}
-	});
+	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new AbilityMindless(prefix("mindless"), Category.UTILITY));
 	public static final Supplier<Ability> OMNISCIENT	= register("omniscient", () -> new Ability(prefix("omniscient"), Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -286,6 +214,8 @@ public class VTAbilities
 	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY));	// TODO Add physical damage resistance
 	public static final Supplier<Ability> THUNDERSTEP	= register("thunderstep", () -> new AbilityThunderstep(prefix("thunderstep"), Category.OFFENSE));
 	public static final Supplier<Ability> BAD_BREATH	= register("bad_breath", () -> new AbilityBadBreath(prefix("bad_breath"), Category.OFFENSE));
+	public static final Supplier<Ability> WEBWEAVER		= register("webweaver", () -> new AbilityIgnoreSlowdown(prefix("webweaver"), Category.UTILITY));
+	public static final Supplier<Ability> HERBIVORE		= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{

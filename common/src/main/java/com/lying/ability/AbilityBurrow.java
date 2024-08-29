@@ -5,7 +5,6 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.element.ElementSpecialPose;
 import com.lying.init.VTAbilities;
@@ -18,7 +17,6 @@ import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.RegistryKeys;
@@ -50,7 +48,7 @@ public class AbilityBurrow extends ToggledAbility implements IPhasingAbility
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		MutableText names = VTUtils.listToString(getBurrowables(instance.memory()), tag -> Text.literal(tag.id().toString()), ", ");
+		MutableText names = VTUtils.tagListToString(getBurrowables(instance.memory()), ", ");
 		return Optional.of(translate("ability",registryName().getPath()+".desc", names));
 	}
 	
@@ -88,14 +86,6 @@ public class AbilityBurrow extends ToggledAbility implements IPhasingAbility
 	
 	public static List<TagKey<Block>> getBurrowables(NbtCompound memory)
 	{
-		List<TagKey<Block>> tags = Lists.newArrayList();
-		
-		if(memory.contains("Blocks", NbtElement.LIST_TYPE))
-			for(NbtElement element : memory.getList("Blocks", NbtElement.STRING_TYPE))
-				tags.add(TagKey.of(RegistryKeys.BLOCK, new Identifier(element.asString())));
-		else
-			tags.add(BlockTags.DIRT);
-		
-		return tags;
+		return AbilityHelper.getTags(memory, "Blocks", RegistryKeys.BLOCK, () -> List.of(BlockTags.DIRT));
 	}
 }

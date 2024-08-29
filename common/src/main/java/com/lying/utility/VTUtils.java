@@ -25,6 +25,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
@@ -155,6 +156,11 @@ public class VTUtils
 		else
 			tooltip.append(registry);
 		return tooltip;
+	}
+	
+	public static <T> MutableText tagListToString(List<TagKey<T>> set, String bridge)
+	{
+		return listToString(set, t -> Text.literal(t.id().toString()), bridge);
 	}
 	
 	public static <T extends Object> MutableText listToString(List<T> set, Function<T,Text> getter, String bridge)

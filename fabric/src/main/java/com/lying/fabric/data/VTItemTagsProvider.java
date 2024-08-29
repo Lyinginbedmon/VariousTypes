@@ -11,6 +11,8 @@ import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.registry.tag.TagKey;
 
 public class VTItemTagsProvider extends TagProvider<Item>
 {
@@ -19,15 +21,55 @@ public class VTItemTagsProvider extends TagProvider<Item>
 		super(output, RegistryKeys.ITEM, completableFuture);
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void configure(WrapperLookup lookup)
 	{
-		getOrCreateTagBuilder(VTTags.SILVER_ITEM).add(
-				Items.IRON_AXE.getRegistryEntry().registryKey(), 
-				Items.IRON_SWORD.getRegistryEntry().registryKey(), 
-				Items.IRON_PICKAXE.getRegistryEntry().registryKey(), 
-				Items.IRON_SHOVEL.getRegistryEntry().registryKey(), 
-				Items.IRON_HOE.getRegistryEntry().registryKey(), 
-				Items.SHEARS.getRegistryEntry().registryKey());
+		// Pregen vanilla tags we need
+		getOrCreateTagBuilder(ItemTags.MEAT);
+		getOrCreateTagBuilder(ItemTags.FISHES);
+		
+		registerToTag(VTTags.SILVER_ITEM, 
+				Items.IRON_AXE, 
+				Items.IRON_SWORD, 
+				Items.IRON_PICKAXE, 
+				Items.IRON_SHOVEL, 
+				Items.IRON_HOE, 
+				Items.SHEARS);
+		registerToTag(VTTags.FRUIT, 
+				Items.APPLE,
+				Items.CHORUS_FRUIT,
+				Items.ENCHANTED_GOLDEN_APPLE,
+				Items.GOLDEN_APPLE,
+				Items.GLOW_BERRIES,
+				Items.MELON_SLICE,
+				Items.PUMPKIN_PIE,
+				Items.SWEET_BERRIES);
+		registerToTag(VTTags.VEGETABLE, 
+				Items.BAKED_POTATO,
+				Items.BEETROOT,
+				Items.BEETROOT_SOUP,
+				Items.CARROT,
+				Items.DRIED_KELP,
+				Items.GOLDEN_CARROT,
+				Items.MUSHROOM_STEW,
+				Items.POISONOUS_POTATO,
+				Items.POTATO,
+				Items.SUSPICIOUS_STEW);
+		
+		registerToTag(VTTags.VEGETARIAN, Items.CAKE);
+		getOrCreateTagBuilder(VTTags.VEGETARIAN).addTag(VTTags.VEGETABLE).addTag(VTTags.FRUIT);
+		
+		registerToTag(VTTags.CARNIVORE, Items.EGG, Items.SNIFFER_EGG);
+		getOrCreateTagBuilder(VTTags.CARNIVORE).addTag(ItemTags.MEAT);
+		
+		getOrCreateTagBuilder(VTTags.PESCETARIAN).addTag(VTTags.VEGETARIAN).addTag(ItemTags.FISHES);
+		
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void registerToTag(TagKey<Item> tag, Item... types)
+	{
+		ProvidedTagBuilder<Item> builder = getOrCreateTagBuilder(tag);
+		for(Item type : types)
+			builder.add(type.getRegistryEntry().registryKey());
 	}
 }

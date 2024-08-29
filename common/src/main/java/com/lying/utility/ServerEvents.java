@@ -21,6 +21,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.screen.ScreenHandlerType;
@@ -135,6 +136,15 @@ public class ServerEvents
 		{
 			void onLivingFall(LivingEntity living, float fallDistance, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition);
 		}
+		
+		/** If true, prevents slowdown being applied by the given blockstate to the given living entity */
+		public static final Event<LivingSlowEvent> IGNORE_SLOW_EVENT = EventFactory.createEventResult(LivingSlowEvent.class);
+		
+		@FunctionalInterface
+		public interface LivingSlowEvent
+		{
+			EventResult shouldIgnoreSlowingFrom(LivingEntity living, BlockState state);
+		}
 	}
 	
 	public static class PlayerEvents
@@ -164,6 +174,15 @@ public class ServerEvents
 		public interface CanUseScreenEvent
 		{
 			EventResult canPlayerUseScreen(PlayerEntity player, ScreenHandlerType<?> screen);
+		}
+		
+		/** Called by Item before testing for eating an item, return true to allow it (even inedible items) or false to deny it outright */
+		public static final Event<CanEatItemEvent> CAN_EAT_EVENT = EventFactory.createEventResult(CanEatItemEvent.class);
+		
+		@FunctionalInterface
+		public interface CanEatItemEvent
+		{
+			EventResult canEat(PlayerEntity user, ItemStack stack);
 		}
 	}
 	

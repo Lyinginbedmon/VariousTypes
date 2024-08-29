@@ -1,17 +1,16 @@
 package com.lying.fabric.component;
 
 import org.ladysnake.cca.api.v3.component.sync.AutoSyncedComponent;
-import org.ladysnake.cca.api.v3.entity.RespawnableComponent;
 
 import com.lying.component.CharacterSheet;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 
-public class PlayerSheetHandler extends CharacterSheet implements AutoSyncedComponent, RespawnableComponent<PlayerSheetHandler>
+public class MobSheetHandler extends CharacterSheet implements AutoSyncedComponent
 {
-	public PlayerSheetHandler(PlayerEntity entity)
+	public MobSheetHandler(LivingEntity entity)
 	{
 		super(entity);
 	}
@@ -26,5 +25,9 @@ public class PlayerSheetHandler extends CharacterSheet implements AutoSyncedComp
 		super.readSheetFromNbt(tag);
 	}
 	
-	public boolean shouldCopyForRespawn(boolean lossless, boolean keepInventory, boolean sameCharacter) { return true; }
+	public int timesCreated() { return 1; }
+	
+	public void incEdits() { }
+	
+	public void markDirty() { }
 }

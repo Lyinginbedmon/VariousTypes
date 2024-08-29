@@ -25,11 +25,13 @@ import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.TypeSet;
+import com.lying.utility.InedibleFoodHelper;
 import com.lying.utility.ServerEvents;
 import com.lying.utility.ServerEvents.LivingEvents;
 import com.lying.utility.ServerEvents.Result;
 
 import dev.architectury.event.EventResult;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -43,8 +45,12 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin extends EntityMixin
@@ -94,6 +100,9 @@ public class LivingEntityMixin extends EntityMixin
 	
 	@Shadow
 	protected void applyDamage(DamageSource source, float amount) { }
+	
+	@Shadow
+	public SoundEvent getEatSound(ItemStack stack) { return stack.getEatSound(); }
 	
 	@Inject(method = "hasInvertedHealingAndHarm()Z", at = @At("HEAD"), cancellable = true)
 	private void vt$hasInvertedHealingAndHarm(final CallbackInfoReturnable<Boolean> ci)
@@ -296,5 +305,74 @@ public class LivingEntityMixin extends EntityMixin
 		
 		if(ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(living, true) == EventResult.interruptTrue())
 			ci.cancel();
+	}
+	
+	@Inject(method = "getItemUseTime()I", at = @At("HEAD"))
+	private void vt$getUseTimeHead(final CallbackInfoReturnable<Integer> ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.setPlayer((PlayerEntity)(Object)this);
+	}
+	
+	@Inject(method = "getItemUseTime()I", at = @At("TAIL"))
+	private void vt$getUseTimeTail(final CallbackInfoReturnable<Integer> ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.clearPlayer();
+	}
+	
+	@Inject(method = "setCurrentHand(Lnet/minecraft/util/Hand;)V", at = @At("HEAD"))
+	private void vt$setCurrentHandHead(Hand hand, final CallbackInfo ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.setPlayer((PlayerEntity)(Object)this);
+	}
+	
+	@Inject(method = "setCurrentHand(Lnet/minecraft/util/Hand;)V", at = @At("TAIL"))
+	private void vt$setCurrentHandTail(Hand hand, final CallbackInfo ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.clearPlayer();
+	}
+	
+	@Inject(method = "shouldSpawnConsumptionEffects()Z", at = @At("HEAD"))
+	private void vt$shouldConsumptionEffectsHead(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.setPlayer((PlayerEntity)(Object)this);
+	}
+	
+	@Inject(method = "shouldSpawnConsumptionEffects()Z", at = @At("TAIL"))
+	private void vt$shouldConsumptionEffectsTail(final CallbackInfoReturnable<Boolean> ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.clearPlayer();
+	}
+	
+	@Inject(method = "spawnConsumptionEffects(Lnet/minecraft/item/ItemStack;I)V", at = @At("HEAD"))
+	private void vt$consumptionEffectsHead(ItemStack stack, int particleCount, final CallbackInfo ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.setPlayer((PlayerEntity)(Object)this);
+	}
+	
+	@Inject(method = "spawnConsumptionEffects(Lnet/minecraft/item/ItemStack;I)V", at = @At("TAIL"))
+	private void vt$consumptionEffectsTail(ItemStack stack, int particleCount, final CallbackInfo ci)
+	{
+		if(getType() == EntityType.PLAYER)
+			InedibleFoodHelper.clearPlayer();
+	}
+	
+	@Inject(method = "eatFood(Lnet/minecraft/world/World;Lnet/minecraft/item/ItemStack;)Lnet/minecraft/item/ItemStack;", at = @At("TAIL"), cancellable = true)
+	private void vt$eatFood(World world, ItemStack stack, final CallbackInfoReturnable<ItemStack> ci)
+	{
+		if(stack.get(DataComponentTypes.FOOD) == null && getType() == EntityType.PLAYER)
+		{
+			PlayerEntity player = (PlayerEntity)(Object)this;
+			world.playSound(null, getX(), getY(), getZ(), getEatSound(stack), SoundCategory.NEUTRAL, 1.0f, 1.0f + (world.random.nextFloat() - world.random.nextFloat()) * 0.4f);
+			stack.decrementUnlessCreative(1, player);
+			emitGameEvent(GameEvent.EAT);
+			ci.setReturnValue(stack);
+		}
 	}
 }

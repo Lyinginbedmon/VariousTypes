@@ -15,7 +15,9 @@
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
 	"DamageEnchantmentMixin",
-	"CraftingResultSlotMixin"
+	"CraftingResultSlotMixin",
+	"ItemMixin",
+	"HungerManagerMixin"
   ],
   "client": [
 	"ClientPlayerEntityMixin",

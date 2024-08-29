@@ -5,7 +5,6 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.List;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
 import com.lying.data.VTTags;
 import com.lying.utility.VTUtils;
 
@@ -13,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
@@ -51,21 +49,6 @@ public class AbilityWaterWalking extends Ability implements IBlockCollisionAbili
 	
 	public static List<TagKey<Fluid>> getFluidList(NbtCompound memory)
 	{
-		List<TagKey<Fluid>> fluidTags = Lists.newArrayList();
-		if(memory.contains("Fluids", NbtElement.LIST_TYPE))
-			memory.getList("Fluids", NbtElement.STRING_TYPE).forEach(element -> 
-			{
-				TagKey<Fluid> tag = null;
-				try
-				{
-					tag = TagKey.of(RegistryKeys.FLUID, new Identifier(element.asString()));
-				}
-				catch(Exception e) { }
-				if(tag != null)
-					fluidTags.add(tag);
-			});
-		if(fluidTags.isEmpty())
-			fluidTags.add(FluidTags.WATER);
-		return fluidTags;
+		return AbilityHelper.getTags(memory, "Fluids", RegistryKeys.FLUID, () -> List.of(FluidTags.WATER));
 	}
 }

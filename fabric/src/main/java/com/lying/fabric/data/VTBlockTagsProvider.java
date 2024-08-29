@@ -11,6 +11,7 @@ import net.minecraft.data.server.tag.TagProvider;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.registry.tag.TagKey;
 
 public class VTBlockTagsProvider extends TagProvider<Block>
 {
@@ -19,14 +20,22 @@ public class VTBlockTagsProvider extends TagProvider<Block>
 		super(output, RegistryKeys.BLOCK, registryLookupFuture);
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected void configure(WrapperLookup lookup)
 	{
-		getOrCreateTagBuilder(VTTags.SILVER_BLOCK).add(
-				Blocks.IRON_BARS.getRegistryEntry().registryKey(), 
-				Blocks.IRON_BLOCK.getRegistryEntry().registryKey(), 
-				Blocks.IRON_DOOR.getRegistryEntry().registryKey(), 
-				Blocks.IRON_TRAPDOOR.getRegistryEntry().registryKey());
+		registerToTag(VTTags.WEBS, Blocks.COBWEB);
+		registerToTag(VTTags.SILVER_BLOCK,
+				Blocks.IRON_BARS, 
+				Blocks.IRON_BLOCK, 
+				Blocks.IRON_DOOR, 
+				Blocks.IRON_TRAPDOOR);
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void registerToTag(TagKey<Block> tag, Block... types)
+	{
+		ProvidedTagBuilder<Block> builder = getOrCreateTagBuilder(tag);
+		for(Block type : types)
+			builder.add(type.getRegistryEntry().registryKey());
 	}
 
 }

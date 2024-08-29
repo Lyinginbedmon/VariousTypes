@@ -25,16 +25,19 @@ import com.lying.utility.ServerEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.fluid.Fluid;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
+import net.minecraft.world.event.GameEvent;
 
 @Mixin(Entity.class)
 public class EntityMixin
@@ -119,6 +122,12 @@ public class EntityMixin
 	
 	@Shadow
 	protected void setFlag(int index, boolean value) { }
+	
+	@Shadow
+	public EntityType<?> getType() { return null; }
+	
+	@Shadow
+	public void emitGameEvent(RegistryEntry<GameEvent> event) { }
 	
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
@@ -222,5 +231,13 @@ public class EntityMixin
 	{
 		if(this.fallDistance > 0F && (Entity)(Object) this instanceof LivingEntity && !getWorld().isClient())
 			ServerEvents.LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
+	}
+	
+	@Inject(method = "slowMovement(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), cancellable = true)
+	private void vt$ignoresSlowdown(BlockState state, Vec3d slow, final CallbackInfo ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+			if(ServerEvents.LivingEvents.IGNORE_SLOW_EVENT.invoker().shouldIgnoreSlowingFrom((LivingEntity)(Object)this, state).isTrue())
+				ci.cancel();
 	}
 }
