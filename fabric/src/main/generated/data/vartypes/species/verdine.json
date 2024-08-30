@@ -1,4 +1,7 @@
 {
+  "Abilities": [
+    "vartypes:herbivore"
+  ],
   "Background": "vartypes:textures/gui/sheet/creator_default.png",
   "Display": {
     "Title": {

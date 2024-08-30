@@ -266,7 +266,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	{
 		final PlayerEntity player = (PlayerEntity)(Object)this;
 		
-		amount = ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount);
+		amount = Math.max(0, ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount));
 		
 		/**
 		 * Applies Smite and Bane of Arthropods bonus damage to players with the UNDEAD or ARTHROPOD supertypes<br>

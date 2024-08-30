@@ -15,6 +15,7 @@ import com.lying.type.TypeSet;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.EntityEvent.LivingHurt;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.LivingEntity;
@@ -146,6 +147,9 @@ public class ServerEvents
 		{
 			EventResult shouldIgnoreSlowingFrom(LivingEntity living, BlockState state);
 		}
+		
+		/** Identical to the native LIVING_HURT event, but excludes void and /kill damage events */
+		public static final Event<LivingHurt> LIVING_HURT_EVENT = EventFactory.createEventResult();
 	}
 	
 	public static class PlayerEvents
@@ -193,6 +197,7 @@ public class ServerEvents
 				PlayerEntity player = (PlayerEntity)args[0];
 				DamageSource source = (DamageSource)args[1];
 				float amount = (float)args[2];
+				if(VTUtils.isDamageInviolable(source, player)) return amount;
 				
 				float result = amount;
 				for(PlayerTakeDamageEvent listener : listeners)

@@ -17,10 +17,12 @@ import com.lying.reference.Reference;
 import com.lying.utility.ServerEvents.Result;
 
 import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
@@ -59,6 +61,9 @@ public class ServerBus
 			return EventResult.interruptDefault();
 		});
 		
+		// Prevents any later handling from affecting damage necessary for stable gameplay
+		EntityEvent.LIVING_HURT.register((LivingEntity entity, DamageSource source, float amount) -> 
+			VTUtils.isDamageInviolable(source, entity) ? EventResult.pass() : ServerEvents.LivingEvents.LIVING_HURT_EVENT.invoker().hurt(entity, source, amount));
 	}
 	
 	/** Apply status effect spoof abilities in one central event listener */

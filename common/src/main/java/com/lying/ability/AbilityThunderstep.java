@@ -9,11 +9,11 @@ import com.lying.ability.AbilityThunderstep.ConfigThunderstep;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
+import com.lying.utility.ServerEvents;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LightningEntity;
 import net.minecraft.entity.LivingEntity;
@@ -78,10 +78,10 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 		owner.teleport(destination.getX(), destination.getY(), destination.getZ());
 		world.spawnEntity(makeAt(destination, world));
 	}
-
+	
 	public void registerEventHandlers()
 	{
-		EntityEvent.LIVING_HURT.register((LivingEntity entity, DamageSource source, float amount) -> 
+		ServerEvents.LivingEvents.LIVING_HURT_EVENT.register((LivingEntity entity, DamageSource source, float amount) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(entity);
 			if(sheetOpt.isEmpty()) return EventResult.pass();

@@ -1,4 +1,22 @@
 {
+  "Abilities": [
+    {
+      "Ability": "vartypes:herbivore",
+      "Display": {
+        "Title": {
+          "translate": "ability.vartypes.carnivore"
+        }
+      },
+      "Memory": {
+        "Allowed": [
+          "#minecraft:meat"
+        ],
+        "Denied": []
+      },
+      "ReadOnly": false,
+      "Source": "misc"
+    }
+  ],
   "Background": "vartypes:textures/gui/sheet/creator_end_island.png",
   "Display": {
     "Title": {

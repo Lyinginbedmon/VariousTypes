@@ -22,6 +22,8 @@ import com.lying.type.Type;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -182,5 +184,16 @@ public class VTUtils
 		double cos = Math.cos(rads);
 		double sin = Math.sin(rads);
 		return new Vector2i((int)(vec.x * cos - vec.y * sin), (int)(vec.x * sin + vec.y * cos));
+	}
+	
+	/** Returns true if the given damage is system damage necessary for stable gameplay */
+	public static boolean isDamageInviolable(DamageSource source, Entity entity)
+	{
+		DamageSources types = entity.getWorld().getDamageSources();
+		List<DamageSource> system = List.of(
+				types.genericKill(), 
+				types.outsideBorder(), 
+				types.outOfWorld());
+		return system.contains(source);
 	}
 }
