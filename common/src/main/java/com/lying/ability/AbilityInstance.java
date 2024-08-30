@@ -32,8 +32,8 @@ public class AbilityInstance
 	/** Used for storing the absolute bare minimum operational information only */
 	public static final Codec<AbilityInstance> CODEC_VITALS = RecordCodecBuilder.create(instance -> instance.group(
 			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
-			Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityInstance::cooldownMaybe),
-			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
+			Codec.INT.optionalFieldOf("Cooldown").forGetter(v -> v.cooldown),
+			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(v -> Optional.of(v.memory)))
 				.apply(instance, (a,b,c) -> 
 				{
 					AbilityInstance inst = a.instance();
@@ -44,11 +44,11 @@ public class AbilityInstance
 	/** Used for storing absolutely everything about an AbilityInstance */
 	public static final Codec<AbilityInstance> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Ability.CODEC.fieldOf("Ability").forGetter(AbilityInstance::ability),
-			AbilitySource.CODEC.optionalFieldOf("Source").forGetter(AbilityInstance::sourceMaybe),
-			Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityInstance::cooldownMaybe),
-			Codec.BOOL.optionalFieldOf("ReadOnly").forGetter(AbilityInstance::lockedMaybe),
+			AbilitySource.CODEC.optionalFieldOf("Source").forGetter(v -> Optional.of(v.source)),
+			Codec.INT.optionalFieldOf("Cooldown").forGetter(v -> v.cooldown),
+			Codec.BOOL.optionalFieldOf("ReadOnly").forGetter(v -> Optional.of(v.locked)),
 			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityInstance::display),
-			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityInstance::memoryMaybe))
+			NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(v -> Optional.of(v.memory)))
 				.apply(instance, AbilityInstance::new));
 	public static final Codec<List<AbilityInstance>> LIST_CODEC = CODEC.listOf();
 	public static final Codec<List<AbilityInstance>> LIST_CODEC_VITALS = CODEC_VITALS.listOf();
@@ -102,13 +102,11 @@ public class AbilityInstance
 	
 	public AbilitySource source() { return source; }
 	
-	private Optional<AbilitySource> sourceMaybe() { return Optional.of(source); }
-	
-	public void setDisplay(LoreDisplay displayIn) { display = Optional.of(displayIn); }
+	public AbilityInstance setDisplay(LoreDisplay displayIn) { display = Optional.of(displayIn); return this; }
 	
 	public Optional<LoreDisplay> display() { return display; }
 	
-	public void setCooldown(int cooldown) { this.cooldown = Optional.of(cooldown); }
+	public AbilityInstance setCooldown(int cooldown) { this.cooldown = Optional.of(cooldown); return this; }
 	
 	public Text displayName()
 	{
@@ -146,11 +144,11 @@ public class AbilityInstance
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
-		if(vitalOnly && memoryMaybe().isEmpty() && cooldownMaybe().isEmpty())
+		if(vitalOnly && display.isEmpty() && memory.isEmpty() && cooldown.isEmpty())
 			return Ability.CODEC.encodeStart(JsonOps.INSTANCE, ability).getOrThrow();
 		
 		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
-		Codec<AbilityInstance> codec = vitalOnly ? CODEC_VITALS : CODEC;
+		Codec<AbilityInstance> codec = vitalOnly && display.isEmpty() ? CODEC_VITALS : CODEC;
 		return codec.encodeStart(registryOps, this).getOrThrow();
 	}
 	
@@ -221,9 +219,9 @@ public class AbilityInstance
 	public static class AbilityNbt
 	{
 		public static final Codec<AbilityNbt> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(AbilityNbt::display),
-				Codec.INT.optionalFieldOf("Cooldown").forGetter(AbilityNbt::cooldownMaybe),
-				NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(AbilityNbt::memoryMaybe))
+				LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(v -> v.display),
+				Codec.INT.optionalFieldOf("Cooldown").forGetter(v -> v.cooldown),
+				NbtCompound.CODEC.optionalFieldOf("Memory").forGetter(v -> v.memory))
 					.apply(instance, AbilityNbt::new));
 		
 		private final Optional<LoreDisplay> display;
@@ -236,10 +234,6 @@ public class AbilityInstance
 			cooldown = coolIn;
 			memory = memoryIn;
 		}
-		
-		public Optional<LoreDisplay> display() { return display; }
-		public Optional<Integer> cooldownMaybe() { return cooldown; }
-		public Optional<NbtCompound> memoryMaybe() { return memory; }
 		
 		public void applyTo(AbilityInstance inst)
 		{

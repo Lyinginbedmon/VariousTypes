@@ -5,6 +5,8 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.List;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityDietRestriction.ConfigDiet;
@@ -52,22 +54,30 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 			return Optional.of(translate("ability", registryName().getPath()+".desc"));
 	}
 	
+	public static AbilityInstance ofTags(@Nullable List<TagKey<Item>> allow, @Nullable List<TagKey<Item>> deny)
+	{
+		ConfigDiet config = new ConfigDiet(allow == null ? Optional.empty() : Optional.of(allow), deny == null ? Optional.empty() : Optional.of(deny));
+		AbilityInstance inst = VTAbilities.HERBIVORE.get().instance();
+		inst.setMemory(config.toNbt());
+		return inst;
+	}
+	
 	public void registerEventHandlers()
 	{
 		ServerEvents.PlayerEvents.CAN_EAT_EVENT.register((player, stack) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-			if(sheetOpt.isEmpty()) return EventResult.pass();
+			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.HERBIVORE.get().registryName())) return EventResult.pass();
 			
 			CharacterSheet sheet = sheetOpt.get();
 			ConfigDiet values = memoryToValues(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(VTAbilities.HERBIVORE.get().registryName()).memory());
 			if(values.isBlank()) return EventResult.pass();
 			
-			if(values.denies() && values.deniedTags.stream().anyMatch(tag -> stack.isIn(tag)))
-				return EventResult.interruptFalse();
-			
 			if(values.allows() && values.allowedTags.stream().anyMatch(tag -> stack.isIn(tag)))
 				return EventResult.interruptTrue();
+			
+			if(values.denies() && values.deniedTags.stream().anyMatch(tag -> stack.isIn(tag)))
+				return EventResult.interruptFalse();
 			
 			return EventResult.pass();
 		});
@@ -91,9 +101,13 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 			denyIn.ifPresentOrElse(val -> deniedTags.addAll(val), () -> deniedTags.addAll(List.of(ItemTags.MEAT, ItemTags.FISHES)));
 		}
 		
+		public Codec<ConfigDiet> codec() { return CODEC; }
+		
 		public boolean isBlank() { return !allows() && !denies(); }
 		public boolean allows() { return !allowedTags.isEmpty(); }
 		public boolean denies() { return !deniedTags.isEmpty(); }
+		
+		public NbtCompound toNbt() { return (NbtCompound)CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow(); }
 		
 		public static ConfigDiet fromNbt(NbtCompound nbt)
 		{

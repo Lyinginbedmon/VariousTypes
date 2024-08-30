@@ -4,18 +4,22 @@ import static com.lying.reference.Reference.ModInfo.prefix;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
+import com.lying.utility.LoreDisplay;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -57,11 +61,13 @@ public class SpeciesDefaults
 	
 	public static final Supplier<Species> DRAGAN	= register(prefix("dragan"), () -> Species.Builder.of(prefix("dragan"))
 			.texture(Species.BACKING_END_ISLAND)
-			.setTypes(VTTypes.DRAGON.get()).build());
+			.setTypes(VTTypes.DRAGON.get())
+			.addAbility(AbilityDietRestriction.ofTags(List.of(ItemTags.MEAT), List.of()).setDisplay(new LoreDisplay(Reference.ModInfo.translate("ability", "carnivore")))).build());
 	
 	public static final Supplier<Species> VERDINE	= register(prefix("verdine"), () -> Species.Builder.of(prefix("verdine"))
 			.texture(Species.BACKING_DEFAULT)
-			.setTypes(VTTypes.HUMAN.get(), VTTypes.VERDINE.get()).build());
+			.setTypes(VTTypes.HUMAN.get(), VTTypes.VERDINE.get())
+			.addAbility(VTAbilities.HERBIVORE.get()).build());
 	
 	private static Supplier<Species> register(Identifier registryName, Supplier<Species> species)
 	{

@@ -22,6 +22,7 @@ import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFastHeal;
+import com.lying.ability.AbilityFleece;
 import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityIgnoreSlowdown;
 import com.lying.ability.AbilityInstance;
@@ -232,6 +233,7 @@ public class VTAbilities
 	public static final Supplier<Ability> WEBWEAVER		= register("webweaver", () -> new AbilityIgnoreSlowdown(prefix("webweaver"), Category.UTILITY));
 	public static final Supplier<Ability> HERBIVORE		= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
 	public static final Supplier<Ability> FLAMEPROOF	= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
+	public static final Supplier<Ability> FLEECE		= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
