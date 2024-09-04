@@ -2,6 +2,7 @@ package com.lying.client.utility;
 
 import java.util.Optional;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.lying.VariousTypes;
@@ -13,7 +14,14 @@ import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
+import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.common.PlayerEvent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -25,6 +33,7 @@ public class ClientBus
 	public static void init()
 	{
 		registerAbilityRenderFuncs();
+		registerHighlights();
 		
 		ClientGuiEvent.RENDER_HUD.register((context, tickDelta) -> VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 		{
@@ -79,5 +88,26 @@ public class ClientBus
 		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
 				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+	}
+	
+	private static void registerHighlights()
+	{
+		ClientTickEvent.CLIENT_POST.register(client -> 
+		{
+			if(client.player == null || client.player.getWorld() == null) return;
+			BlockHighlights.tick(client.player.getWorld().getTime());
+		});
+		
+		ClientEvents.Rendering.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
+		{
+			if(mc.player == null || mc.player.getWorld() == null) return;
+			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, camera);
+		});
+		
+		PlayerEvent.PLAYER_QUIT.register(player -> 
+		{
+			if(player.getUuid() == mc.player.getUuid())
+				BlockHighlights.clear();
+		});
 	}
 }

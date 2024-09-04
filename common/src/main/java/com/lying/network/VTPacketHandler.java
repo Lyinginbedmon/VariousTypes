@@ -30,6 +30,7 @@ public class VTPacketHandler
 	public static final Identifier SYNC_ACTIONABLES_ID	= prefix("s2c_sync_actionables");
 	public static final Identifier SYNC_FATIGUE_ID	= prefix("s2c_sync_fatigue");
 	public static final Identifier SYNC_POSE_ID		= prefix("s2c_sync_pose");
+	public static final Identifier HIGHLIGHT_BLOCK_ID	= prefix("s2c_highlight_block");
 	
 	public static void initServer()
 	{

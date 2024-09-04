@@ -25,7 +25,8 @@
 	"InGameOverlayRendererMixin",
 	"EntityRendererMixin",
 	"LivingEntityRendererMixin",
-	"PlayerEntityRendererMixin"
+	"PlayerEntityRendererMixin",
+	"WorldRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

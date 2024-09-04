@@ -3,6 +3,7 @@ package com.lying.client.utility;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.google.common.reflect.AbstractInvocationHandler;
@@ -10,6 +11,9 @@ import com.google.common.reflect.AbstractInvocationHandler;
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
@@ -81,6 +85,14 @@ public class ClientEvents
 		public interface RenderPlayerEvent
 		{
 			void onRender(PlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, PlayerEntityRenderer renderer);
+		}
+		
+		public static final Event<WorldRenderEvent> BEFORE_WORLD_RENDER_EVENT = EventFactory.createLoop(WorldRenderEvent.class);
+		public static final Event<WorldRenderEvent> AFTER_WORLD_RENDER_EVENT = EventFactory.createLoop(WorldRenderEvent.class);
+		
+		public interface WorldRenderEvent
+		{
+			void onRender(float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider);
 		}
 	}
 }

@@ -22,6 +22,7 @@ import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFastHeal;
+import com.lying.ability.AbilityFavouredTerrain;
 import com.lying.ability.AbilityFleece;
 import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityIgnoreSlowdown;
@@ -31,6 +32,7 @@ import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityMindless;
 import com.lying.ability.AbilityNightVision;
+import com.lying.ability.AbilityOresight;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
@@ -234,6 +236,8 @@ public class VTAbilities
 	public static final Supplier<Ability> HERBIVORE		= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
 	public static final Supplier<Ability> FLAMEPROOF	= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
 	public static final Supplier<Ability> FLEECE		= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
+	public static final Supplier<Ability> ORESIGHT		= register("oresight", () -> new AbilityOresight(prefix("oresight"), Category.UTILITY));
+	public static final Supplier<Ability> FAVOURED_TERRAIN	= register("favoured_terrain", () -> new AbilityFavouredTerrain(prefix("favoured_terrain"), Category.DEFENSE));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -269,7 +273,6 @@ public class VTAbilities
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
-		 * Stonesense - Ping the locations of nearby ores
 		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made

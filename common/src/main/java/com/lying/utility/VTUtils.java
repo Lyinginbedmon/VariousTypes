@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -195,5 +196,25 @@ public class VTUtils
 				types.outsideBorder(), 
 				types.outOfWorld());
 		return system.contains(source);
+	}
+	
+	public static MutableText getEffectName(StatusEffectInstance inst)
+	{
+		MutableText text = inst.getEffectType().value().getName().copy();
+		if(inst.getAmplifier() > 0 && inst.getAmplifier() <= 9)
+			text.append(Text.literal(" ")).append(Text.translatable("enchantment.level." + (inst.getAmplifier() + 1)));
+		return text;
+	}
+	
+	public static Text getEffectNames(List<StatusEffectInstance> effects)
+	{
+		if(effects.isEmpty())
+			return Text.empty();
+		
+		MutableText names = getEffectName(effects.get(0));
+		if(effects.size() > 1)
+			for(int i=1; i<effects.size(); i++)
+				names.append(Text.literal(", ")).append(getEffectName(effects.get(i)));
+		return names;
 	}
 }

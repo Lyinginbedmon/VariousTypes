@@ -12,6 +12,7 @@ import com.lying.client.renderer.ShakenBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
+import com.lying.client.utility.BlockHighlights;
 import com.lying.client.utility.ClientBus;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementNonLethal;
@@ -20,9 +21,11 @@ import com.lying.init.VTEntityTypes;
 import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
+import com.lying.network.HighlightBlockPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
+import com.lying.reference.Reference;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
@@ -31,6 +34,7 @@ import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.world.World;
 
 public class VariousTypesClient
 {
@@ -93,6 +97,12 @@ public class VariousTypesClient
     				mc.player.setPose(EntityPose.STANDING);
     			}
     		});
+    	});
+    	NetworkManager.registerReceiver(NetworkManager.s2c(), HighlightBlockPacket.PACKET_TYPE, HighlightBlockPacket.PACKET_CODEC, (value, context) -> 
+    	{
+    		World world = mc.player.getWorld();
+    		if(world == null) return;
+    		BlockHighlights.add(value.pos(), world, Reference.Values.TICKS_PER_SECOND * 5);
     	});
 	}
 	

@@ -19,7 +19,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -35,7 +34,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 		ConfigBadBreath values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 
 				(int)values.maxRadius, 
-				values.getEffectNames(), 
+				VTUtils.getEffectNames(values.effects), 
 				VTUtils.ticksToSeconds(values.duration)));
 	}
 	
@@ -58,9 +57,9 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 	public static class ConfigBadBreath
 	{
 		protected static final Codec<ConfigBadBreath> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				StatusEffectInstance.CODEC.listOf().optionalFieldOf("Effects").forGetter(ConfigBadBreath::effectsList),
-				Codec.INT.optionalFieldOf("Duration").forGetter(ConfigBadBreath::duration),
-				Codec.FLOAT.optionalFieldOf("MaxRadius").forGetter(ConfigBadBreath::maxRadius))
+				StatusEffectInstance.CODEC.listOf().optionalFieldOf("Effects").forGetter(v -> Optional.of(v.effects)),
+				Codec.INT.optionalFieldOf("Duration").forGetter(v -> Optional.of(v.duration)),
+				Codec.FLOAT.optionalFieldOf("MaxRadius").forGetter(v -> Optional.of(v.maxRadius)))
 					.apply(instance, ConfigBadBreath::new));
 		
 		protected List<StatusEffectInstance> effects = Lists.newArrayList();
@@ -72,30 +71,6 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 			listIn.ifPresentOrElse(val -> effects.addAll(val), () -> effects.add(new StatusEffectInstance(StatusEffects.POISON, 15 * Reference.Values.TICKS_PER_SECOND)));
 			durationIn.ifPresent(val -> duration = val);
 			radiusIn.ifPresent(val -> maxRadius = val);
-		}
-		
-		protected Optional<List<StatusEffectInstance>> effectsList(){ return Optional.of(effects); }
-		protected Optional<Integer> duration() { return Optional.of(duration); }
-		protected Optional<Float> maxRadius() { return Optional.of(maxRadius); }
-		
-		public Text getEffectNames()
-		{
-			if(effects.isEmpty())
-				return Text.empty();
-			
-			MutableText names = getEffectName(effects.get(0));
-			if(effects.size() > 1)
-				for(int i=1; i<effects.size(); i++)
-					names.append(Text.literal(", ")).append(getEffectName(effects.get(i)));
-			return names;
-		}
-		
-		private MutableText getEffectName(StatusEffectInstance inst)
-		{
-			MutableText text = inst.getEffectType().value().getName().copy();
-			if(inst.getAmplifier() > 0 && inst.getAmplifier() <= 9)
-				text.append(Text.literal(" ")).append(Text.translatable("enchantment.level." + (inst.getAmplifier() + 1)));
-			return text;
 		}
 		
 		public static ConfigBadBreath fromNbt(NbtCompound nbt)
