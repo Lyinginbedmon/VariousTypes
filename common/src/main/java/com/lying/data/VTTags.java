@@ -33,7 +33,7 @@ public class VTTags
 	public static final TagKey<Block> UNPHASEABLE	= TagKey.of(RegistryKeys.BLOCK, prefix("unphaseable"));
 	public static final TagKey<Block> SILVER_BLOCK	= TagKey.of(RegistryKeys.BLOCK, prefix("silver"));
 	public static final TagKey<Block> WEBS			= TagKey.of(RegistryKeys.BLOCK, prefix("webs"));
-	public static final TagKey<Block> ORES			= TagKey.of(RegistryKeys.BLOCK, prefix("ore"));
+	public static final TagKey<Block> ORES			= TagKey.of(RegistryKeys.BLOCK, new Identifier("c","ores"));
 	
 	public static final TagKey<ScreenHandlerType<?>> CRAFTING_MENU = TagKey.of(RegistryKeys.SCREEN_HANDLER, prefix("crafting"));
 	public static final TagKey<ScreenHandlerType<?>> COOKING_MENU = TagKey.of(RegistryKeys.SCREEN_HANDLER, prefix("cooking"));

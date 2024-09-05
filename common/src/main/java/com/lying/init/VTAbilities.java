@@ -237,7 +237,7 @@ public class VTAbilities
 	public static final Supplier<Ability> FLAMEPROOF	= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
 	public static final Supplier<Ability> FLEECE		= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
 	public static final Supplier<Ability> ORESIGHT		= register("oresight", () -> new AbilityOresight(prefix("oresight"), Category.UTILITY));
-	public static final Supplier<Ability> FAVOURED_TERRAIN	= register("favoured_terrain", () -> new AbilityFavouredTerrain(prefix("favoured_terrain"), Category.DEFENSE));
+	public static final Supplier<Ability> HOME_TURF		= register("home_turf", () -> new AbilityFavouredTerrain(prefix("home_turf"), Category.DEFENSE));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -263,7 +263,6 @@ public class VTAbilities
 		 * Flitting - Creative-style flight
 		 * Forgetful - Reduced XP gain and cannot unlock recipes
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
-		 * Gelatinous - Resistance to physical forms of damage, semi-transparent rendering
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
 		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)

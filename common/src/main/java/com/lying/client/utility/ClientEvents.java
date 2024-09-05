@@ -14,9 +14,11 @@ import dev.architectury.event.EventResult;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 
@@ -93,6 +95,14 @@ public class ClientEvents
 		public interface WorldRenderEvent
 		{
 			void onRender(float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider);
+		}
+		
+		public static final Event<OutlineRenderEvent> BEFORE_OUTLINE_RENDER_EVENT = EventFactory.createLoop(OutlineRenderEvent.class);
+		public static final Event<OutlineRenderEvent> AFTER_OUTLINE_RENDER_EVENT = EventFactory.createLoop(OutlineRenderEvent.class);
+		
+		public interface OutlineRenderEvent
+		{
+			void onRender(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ);
 		}
 	}
 }

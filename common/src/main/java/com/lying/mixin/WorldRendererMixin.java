@@ -9,12 +9,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.lying.client.utility.ClientEvents;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin
@@ -34,5 +39,17 @@ public class WorldRendererMixin
 	{
 		VertexConsumerProvider.Immediate vertexConsumerProvider = this.bufferBuilders.getEntityVertexConsumers();
 		ClientEvents.Rendering.AFTER_WORLD_RENDER_EVENT.invoker().onRender(tickDelta, camera, gameRenderer, lightmapTextureManager, matrix4f, matrix4f2, vertexConsumerProvider);
+	}
+	
+	@Inject(method = "drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/entity/Entity;DDDLnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", at = @At("HEAD"))
+	private void outlineHead(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, final CallbackInfo ci)
+	{
+		ClientEvents.Rendering.BEFORE_OUTLINE_RENDER_EVENT.invoker().onRender(matrices, vertexConsumer, entity, cameraX, cameraY, cameraZ);
+	}
+	
+	@Inject(method = "drawBlockOutline(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/entity/Entity;DDDLnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;)V", at = @At("TAIL"))
+	private void outlineTail(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ, BlockPos pos, BlockState state, final CallbackInfo ci)
+	{
+		ClientEvents.Rendering.AFTER_OUTLINE_RENDER_EVENT.invoker().onRender(matrices, vertexConsumer, entity, cameraX, cameraY, cameraZ);
 	}
 }

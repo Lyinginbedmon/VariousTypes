@@ -101,7 +101,7 @@ public class ClientBus
 		ClientEvents.Rendering.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
 		{
 			if(mc.player == null || mc.player.getWorld() == null) return;
-			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, camera);
+			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, camera, tickDelta);
 		});
 		
 		PlayerEvent.PLAYER_QUIT.register(player -> 

@@ -25,7 +25,6 @@ import com.lying.network.HighlightBlockPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
-import com.lying.reference.Reference;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
@@ -102,7 +101,7 @@ public class VariousTypesClient
     	{
     		World world = mc.player.getWorld();
     		if(world == null) return;
-    		BlockHighlights.add(value.pos(), world, Reference.Values.TICKS_PER_SECOND * 5);
+    		value.highlights().forEach(highlight -> BlockHighlights.add(highlight, world));
     	});
 	}
 	

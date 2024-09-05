@@ -5,6 +5,11 @@
 	"effect.vartypes.fatigue": "Fatigue",
 	// Item tags
 	"tag.item.vartypes.silver": "silver",
+	"tag.item.vartypes.vegetarian": "vegetarian",
+	"tag.item.vartypes.pescetarian": "pescetarian",
+	"tag.item.vartypes.carnivore": "carnivore",
+	"tag.item.vartypes.fruit": "fruit",
+	"tag.item.vartypes.vegetable": "vegetable",
 	// Supertypes
 	"type.vartypes.animal": "Animal",
 	"type.vartypes.animal.desc": "Animals are abundant and diverse creatures, typically possessed of a blissful state of ignorance that fills their days with idle comfort and joy. But when their stomach grows empty, nature often gifts them with the teeth and claws to rival any blade and sunder any armour. Fortunate indeed then that they need only overcome their neighbour, far less often you, to see their belly filled.",
@@ -201,7 +206,7 @@
 	"ability.vartypes.favoured_terrain.desc_both": "You are especially adapted to your environment. You receive [%s] when your surroundings are at least [%s] percent made of [%s] blocks inside [%s] biomes.",
 	"ability.vartypes.favoured_terrain.desc": "You are especially adapted to your environment. You receive [%s] at all times.",
 	"ability.vartypes.oresight": "Oresight",
-	"ability.vartypes.oresight.desc": "You are keenly attuned to the presence of certain materials. When activated, identifies all [%s] blocks within a [%s] block radius.",
+	"ability.vartypes.oresight.desc": "You are keenly attuned to the presence of certain materials. When activated, identifies all [%s] blocks within a [%s] block radius for [%s] seconds.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",
@@ -276,6 +281,7 @@
 	"gui.vartypes.clear_favourite": "Right-click to clear",
 	"gui.vartypes.ghostly_turned_on": "You are now %s",
 	"gui.vartypes.ghostly_turned_off": "You are no longer %s",
+	"gui.vartypes.oresight_tally": "Oresight detected %s blocks",
 	// Keybinds
 	"category.vartypes.keybindings": "Various Types",
 	"key.vartypes.open_abilities": "Open ability menu",
