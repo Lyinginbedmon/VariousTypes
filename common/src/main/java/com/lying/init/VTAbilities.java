@@ -30,10 +30,10 @@ import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityIntangible;
 import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
-import com.lying.ability.AbilityMindless;
 import com.lying.ability.AbilityNightVision;
 import com.lying.ability.AbilityOresight;
 import com.lying.ability.AbilityPariah;
+import com.lying.ability.AbilityPhotosynth;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilitySet;
@@ -42,17 +42,19 @@ import com.lying.ability.AbilityStatusTagImmune;
 import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
+import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
+import com.lying.event.LivingEvents;
+import com.lying.event.PlayerEvents;
+import com.lying.event.SheetEvents;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 
-import dev.architectury.event.EventResult;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -84,7 +86,7 @@ public class VTAbilities
 	{
 		public void registerEventHandlers()
 		{
-			ServerEvents.SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
+			SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
 			{
 				// Adds the ability to breathe air after it may have been denied by other breathing abilities
 				if(!handler.canBreathe(Fluids.EMPTY) && abilities.hasAbility(registryName()))
@@ -132,14 +134,14 @@ public class VTAbilities
 	{
 		public void registerEventHandlers()
 		{
-			ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(prefix("deep_breath")) ? air * 2 : air);
+			LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(prefix("deep_breath")) ? air * 2 : air);
 		}
 	});
 	public static final Supplier<Ability> MENDING		= register("mending", () -> new Ability(prefix("mending"), Category.DEFENSE)
 	{
 		public void registerEventHandlers()
 		{
-			ServerEvents.SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
+			SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
 			{
 				// Adds the ability to regenerate health after it may have been denied
 				if(!handler.can(Action.REGEN.get()) && abilities.hasAbility(registryName()))
@@ -200,26 +202,15 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> BERSERK		= register("berserk", () -> new AbilityBerserk(prefix("berserk"), Category.OFFENSE));
-	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new AbilityMindless(prefix("mindless"), Category.UTILITY));
-	public static final Supplier<Ability> OMNISCIENT	= register("omniscient", () -> new Ability(prefix("omniscient"), Category.UTILITY)
-	{
-		public void registerEventHandlers()
-		{
-			ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.register((orb,player) -> 
-			{
-				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
-					return EventResult.interruptFalse();
-				return EventResult.pass();
-			});
-		}
-	});
+	public static final Supplier<Ability> MINDLESS		= register("mindless", () -> new PassiveNoXP.Mindless(prefix("mindless"), Category.UTILITY));
+	public static final Supplier<Ability> OMNISCIENT	= register("omniscient", () -> new PassiveNoXP.Omniscient(prefix("omniscient"), Category.UTILITY));
+	public static final Supplier<Ability> FORGETFUL		= register("forgetful", () -> new PassiveNoXP.Forgetful(prefix("forgetful"), Category.UTILITY));
 	public static final Supplier<Ability> QUAKE			= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
 	public static final Supplier<Ability> GELATINOUS	= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY)
 	{
 		public void registerEventHandlers()
 		{
-			ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
+			PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
 			{
 				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
@@ -238,6 +229,7 @@ public class VTAbilities
 	public static final Supplier<Ability> FLEECE		= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
 	public static final Supplier<Ability> ORESIGHT		= register("oresight", () -> new AbilityOresight(prefix("oresight"), Category.UTILITY));
 	public static final Supplier<Ability> HOME_TURF		= register("home_turf", () -> new AbilityFavouredTerrain(prefix("home_turf"), Category.DEFENSE));
+	public static final Supplier<Ability> PHOTOSYNTH	= register("photosynth", () -> new AbilityPhotosynth(prefix("photosynth"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -250,7 +242,6 @@ public class VTAbilities
 	 	 * 
 	 	 * Analgesic - No hurt sound or animation, health display in HUD is inaccurate
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
-		 * Bad Breath - Spawns a cloud of configurable status effect gas that spreads outward
 		 * Blink - Very temporary (read single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
@@ -268,7 +259,6 @@ public class VTAbilities
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Photosynth - Regain hunger from standing in direct sunlight in clear weather
 		 * Poison Hand - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack

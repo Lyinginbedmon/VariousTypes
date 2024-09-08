@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.lying.event.PlayerEvents;
 import com.lying.utility.InedibleFoodHelper;
-import com.lying.utility.ServerEvents;
 
 import dev.architectury.event.EventResult;
 import net.minecraft.component.DataComponentTypes;
@@ -28,7 +28,7 @@ public class ItemMixin
 	private void vt$useCanEat(World world, PlayerEntity user, Hand hand, final CallbackInfoReturnable<TypedActionResult<ItemStack>> ci)
 	{
 		ItemStack stack = user.getStackInHand(hand);
-		EventResult result = ServerEvents.PlayerEvents.CAN_EAT_EVENT.invoker().canEat(user, stack);
+		EventResult result = PlayerEvents.CAN_EAT_EVENT.invoker().canEat(user, stack);
 		if(result.interruptsFurtherEvaluation())
 		{
 			if(result.isTrue())
@@ -62,7 +62,7 @@ public class ItemMixin
 	{
 		if(user.getType() != EntityType.PLAYER) return;
 		PlayerEntity player = (PlayerEntity)user;
-		EventResult result = ServerEvents.PlayerEvents.CAN_EAT_EVENT.invoker().canEat(player, stack);
+		EventResult result = PlayerEvents.CAN_EAT_EVENT.invoker().canEat(player, stack);
 		if(result.interruptsFurtherEvaluation())
 			if(result.isTrue())
 			{

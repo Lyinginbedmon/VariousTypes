@@ -15,12 +15,13 @@ import com.lying.ability.AbilitySet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.entity.PlayerXPInterface;
+import com.lying.event.LivingEvents;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.Action;
 import com.lying.type.TypeSet;
-import com.lying.utility.ServerEvents;
 import com.mojang.datafixers.util.Either;
 
 import dev.architectury.event.EventResult;
@@ -248,13 +249,13 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	private void vt$checkFallFlying(final CallbackInfoReturnable<Boolean> ci)
 	{
 		PlayerEntity player = (PlayerEntity)(Object)this;
-		if(ServerEvents.LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(player) == EventResult.interruptFalse())
+		if(LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(player) == EventResult.interruptFalse())
 		{
 			ci.setReturnValue(false);
 			return;
 		}
 		
-		if(!isOnGround() && !isFallFlying() && !isTouchingWater() && !hasStatusEffect(StatusEffects.LEVITATION) && ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(player, false) == EventResult.interruptTrue())
+		if(!isOnGround() && !isFallFlying() && !isTouchingWater() && !hasStatusEffect(StatusEffects.LEVITATION) && LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(player, false) == EventResult.interruptTrue())
 		{
 			startFallFlying();
 			ci.setReturnValue(true);
@@ -266,7 +267,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	{
 		final PlayerEntity player = (PlayerEntity)(Object)this;
 		
-		amount = Math.max(0, ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount));
+		amount = Math.max(0, PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount));
 		
 		/**
 		 * Applies Smite and Bane of Arthropods bonus damage to players with the UNDEAD or ARTHROPOD supertypes<br>

@@ -9,9 +9,9 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityDamageResist.ConfigDamageResist;
 import com.lying.component.CharacterSheet;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -43,7 +43,7 @@ public class AbilityDamageResist extends Ability implements IComplexAbility<Conf
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((living, source, amount) -> 
+		PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((living, source, amount) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
 			if(sheetOpt.isEmpty())

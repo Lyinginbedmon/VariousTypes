@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
+import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.component.element.ElementActionables;
@@ -65,7 +66,7 @@ public class ClientBus
 	/** Handles rendering effects applied by abilities that aren't already handled by supplementary feature renderers */
 	private static void registerAbilityRenderFuncs()
 	{	
-		ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.register((LivingEntity player) -> 
+		RenderEvents.GET_PLAYER_COLOR_EVENT.register((LivingEntity player) -> 
 		{
 			Vector3f color = new Vector3f(1F, 1F, 1F);
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
@@ -73,7 +74,7 @@ public class ClientBus
 			return color;
 		});
 		
-		ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.register((LivingEntity player) -> 
+		RenderEvents.GET_PLAYER_ALPHA_EVENT.register((LivingEntity player) -> 
 		{
 			float alpha = 1F;
 			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
@@ -81,11 +82,11 @@ public class ClientBus
 			return alpha;
 		});
 		
-		ClientEvents.Rendering.BEFORE_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
+		RenderEvents.BEFORE_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
 				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPreRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 		
-		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
+		RenderEvents.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
 				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 	}
@@ -98,10 +99,10 @@ public class ClientBus
 			BlockHighlights.tick(client.player.getWorld().getTime());
 		});
 		
-		ClientEvents.Rendering.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
+		RenderEvents.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
 		{
 			if(mc.player == null || mc.player.getWorld() == null) return;
-			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, camera, tickDelta);
+			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, matrix4f1, matrix4f2, camera, tickDelta);
 		});
 		
 		PlayerEvent.PLAYER_QUIT.register(player -> 

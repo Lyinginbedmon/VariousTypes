@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.lying.data.VTTags;
-import com.lying.utility.ServerEvents;
+import com.lying.event.LivingEvents;
 import com.lying.utility.VTUtils;
 
 import dev.architectury.event.EventResult;
@@ -31,7 +31,7 @@ public class AbilityStatusTagImmune extends Ability
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities) -> 
+		LivingEvents.CAN_HAVE_STATUS_EFFECT_EVENT.register((effect,abilities) -> 
 		{
 			List<AbilityInstance> set = abilities.getAbilitiesOfType(registryName());
 			return set.stream().anyMatch(inst -> getTags(inst.memory()).stream().anyMatch(tag -> effect.getEffectType().isIn(tag))) ? EventResult.interruptFalse() : EventResult.pass();

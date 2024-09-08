@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.lying.client.utility.ClientEvents;
+import com.lying.client.event.RenderEvents;
 
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
@@ -18,7 +18,7 @@ public class EntityRendererMixin
 	@Inject(method = "getShadowRadius(Lnet/minecraft/entity/Entity;)F", at = @At("HEAD"), cancellable = true)
 	private void vt$getShadowRadius(Entity entity, final CallbackInfoReturnable<Float> ci)
 	{
-		if(entity.getType() == EntityType.PLAYER && ClientEvents.Rendering.PLAYER_RENDER_PERMISSION.invoker().shouldPlayerRender((PlayerEntity)entity).isFalse())
+		if(entity.getType() == EntityType.PLAYER && RenderEvents.PLAYER_RENDER_PERMISSION.invoker().shouldPlayerRender((PlayerEntity)entity).isFalse())
 			ci.setReturnValue(0F);
 	}
 }

@@ -16,11 +16,11 @@ import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionables;
+import com.lying.event.LivingEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
-import com.lying.utility.ServerEvents;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -168,7 +168,7 @@ public class EntityMixin
 		if(!(ent instanceof LivingEntity) || getWorld() == null)
 			return;
 		
-		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(ServerEvents.LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES), ci.getReturnValueI())));
+		VariousTypes.getSheet((LivingEntity)ent).ifPresent(sheet -> ci.setReturnValue(LivingEvents.GET_MAX_AIR_EVENT.invoker().maxAir(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES), ci.getReturnValueI())));
 	}
 	
 	@Inject(method = "canClimb(Lnet/minecraft/block/BlockState;)Z", at = @At("TAIL"), cancellable = true)
@@ -230,14 +230,14 @@ public class EntityMixin
 	private void vt$fall(double heightDifference, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition, final CallbackInfo ci)
 	{
 		if(this.fallDistance > 0F && (Entity)(Object) this instanceof LivingEntity && !getWorld().isClient())
-			ServerEvents.LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
+			LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
 	}
 	
 	@Inject(method = "slowMovement(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), cancellable = true)
 	private void vt$ignoresSlowdown(BlockState state, Vec3d slow, final CallbackInfo ci)
 	{
 		if((Entity)(Object) this instanceof LivingEntity)
-			if(ServerEvents.LivingEvents.IGNORE_SLOW_EVENT.invoker().shouldIgnoreSlowingFrom((LivingEntity)(Object)this, state).isTrue())
+			if(LivingEvents.IGNORE_SLOW_EVENT.invoker().shouldIgnoreSlowingFrom((LivingEntity)(Object)this, state).isTrue())
 				ci.cancel();
 	}
 }

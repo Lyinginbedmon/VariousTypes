@@ -1,8 +1,8 @@
 package com.lying.client.renderer;
 
+import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.AnimatedPlayerEntityModel;
-import com.lying.client.utility.ClientEvents;
 import com.lying.entity.AnimatedPlayerEntity;
 
 import net.minecraft.client.MinecraftClient;
@@ -32,8 +32,8 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 	public void render(AnimatedPlayerEntity animatedPlayerEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i)
 	{
 		VertexConsumerProviderWrapped wrapped = new VertexConsumerProviderWrapped(vertexConsumerProvider);
-		wrapped.modifyColor(ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(animatedPlayerEntity));
-		wrapped.modifyAlpha(ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(animatedPlayerEntity));
+		wrapped.modifyColor(RenderEvents.GET_PLAYER_COLOR_EVENT.invoker().getColor(animatedPlayerEntity));
+		wrapped.modifyAlpha(RenderEvents.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(animatedPlayerEntity));
 		
 		// TODO Add compatibility with pre/post player rendering events?
 		

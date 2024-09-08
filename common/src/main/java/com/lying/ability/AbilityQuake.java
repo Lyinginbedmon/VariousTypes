@@ -14,9 +14,9 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilityQuake.ConfigQuake;
 import com.lying.component.CharacterSheet;
 import com.lying.entity.ShakenBlockEntity;
+import com.lying.event.LivingEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -47,7 +47,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
-		ConfigQuake values = memoryToValues(instance.memory());
+		ConfigQuake values = instanceToValues(instance);
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.maxRange + 2));
 	}
 	
@@ -67,7 +67,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.LivingEvents.ON_FALL_EVENT.register((living, fallDistance, onGround, landedOnState, landedPosition) -> 
+		LivingEvents.ON_FALL_EVENT.register((living, fallDistance, onGround, landedOnState, landedPosition) -> 
 		{
 			if(!onGround || living.getWorld().isClient()) return;
 			

@@ -8,8 +8,8 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
+import com.lying.event.LivingEvents;
 import com.lying.init.VTSheetElements;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 
 import dev.architectury.event.EventResult;
@@ -34,7 +34,7 @@ public class AbilityIgnoreSlowdown extends Ability
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.LivingEvents.IGNORE_SLOW_EVENT.register((living, state) -> 
+		LivingEvents.IGNORE_SLOW_EVENT.register((living, state) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
 			if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))

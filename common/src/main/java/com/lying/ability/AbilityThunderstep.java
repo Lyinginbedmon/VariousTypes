@@ -7,9 +7,9 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityThunderstep.ConfigThunderstep;
 import com.lying.component.CharacterSheet;
+import com.lying.event.LivingEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
-import com.lying.utility.ServerEvents;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -81,7 +81,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.LivingEvents.LIVING_HURT_EVENT.register((LivingEntity entity, DamageSource source, float amount) -> 
+		LivingEvents.LIVING_HURT_EVENT.register((LivingEntity entity, DamageSource source, float amount) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(entity);
 			if(sheetOpt.isEmpty()) return EventResult.pass();

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix4f;
+
 import com.google.common.collect.Lists;
 import com.lying.utility.BlockHighlight;
 
@@ -13,6 +15,7 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.math.BlockPos;
@@ -79,16 +82,18 @@ public class BlockHighlights
 	}
 	
 	/** Called in {@link WorldRenderer.render} via the AFTER_WORLD_RENDER event in ClientBus */
-	public static void renderHighlightedBlocks(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Camera camera, float tickDelta)
+	public static void renderHighlightedBlocks(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Matrix4f matrix4f1, Matrix4f matrix4f2, Camera camera, float tickDelta)
 	{
-		renderHighlightedBlocks(matrixStack, vertexConsumerProvider.getBuffer(RenderLayer.getLines()), camera.getPos());
+		renderHighlightedBlocks(matrixStack, matrix4f2, vertexConsumerProvider.getBuffer(RenderLayer.getLines()), camera.getPos());
 	}
 	
-	public static void renderHighlightedBlocks(MatrixStack matrixStack, VertexConsumer vertexConsumer, Vec3d cameraPos)
+	public static void renderHighlightedBlocks(MatrixStack matrixStack, Matrix4f matrix4f, VertexConsumer vertexConsumer, Vec3d cameraPos)
 	{
 		if(!shouldRender()) return;
 		
 		List<Line> linesToRender = Lists.newArrayList();
+		
+		// Build a set of all lines from each block (typically size 12n)
 		for(BlockHighlight block : get(mc.player.getWorld().getRegistryKey()))
 		{
 			BlockPos pos = block.pos();
@@ -96,6 +101,7 @@ public class BlockHighlights
 			
 			float alpha = block.alpha(mc.player.getWorld().getTime());
 			Vec3d min = new Vec3d(pos.getX(), pos.getY(), pos.getZ());
+			// Horizontal planes at the top and bottom faces
 			for(int y=0; y<2; y++)
 				for(int x=0; x<2; x++)
 				{
@@ -103,27 +109,35 @@ public class BlockHighlights
 					linesToRender.add(new Line(min.add(x, y, x), min.add(0, y, 1), alpha));
 				}
 			
+			// Vertical, joining the two horizontal planes into 6 total faces
 			for(int x=0; x<2; x++)
 				for(int z=0; z<2; z++)
 					linesToRender.add(new Line(min.add(x, 0, z), min.add(x, 1, z), alpha));
 		};
 		
-		// XXX Merge connecting parallel lines to reduce draw volume?
-		removeAllDuplicate(linesToRender).forEach(line -> 
-		{
-			MatrixStack.Entry entry = matrixStack.peek();
-			Vec3d v1 = line.start.subtract(cameraPos);
-			Vec3d v2 = line.end.subtract(cameraPos);
-			float a = line.alpha();
-			vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(entry, 1F, 0F, 0F).next();
-			vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(entry, 1F, 0F, 0F).next();
+		// FIXME Ensure rendered outlines remain fixed to the block grid when running or view bobbing
+		matrixStack.push();
+			matrixStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+			Matrix4f entry = matrixStack.peek().getPositionMatrix();
 			
-			vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(entry, 0F, 1F, 0F).next();
-			vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(entry, 0F, 1F, 0F).next();
+			// XXX Merge connecting parallel lines to reduce draw volume?
+			removeAllDuplicate(linesToRender).forEach(line -> 
+			{
+				Vec3d v1 = line.start;
+				Vec3d v2 = line.end;
+				float a = line.alpha();
+				
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(1F, 0F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(1F, 0F, 0F).next();
+				
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(0F, 1F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(0F, 1F, 0F).next();
+				
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(0F, 0F, 1F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(0F, 0F, 1F).next();
+			});
 			
-			vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(entry, 0F, 0F, 1F).next();
-			vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(entry, 0F, 0F, 1F).next();
-		});
+		matrixStack.pop();
 	}
 	
 	/** Returns a list of unique lines from the original list, resulting in an aggregate outline of highlighted blocks */

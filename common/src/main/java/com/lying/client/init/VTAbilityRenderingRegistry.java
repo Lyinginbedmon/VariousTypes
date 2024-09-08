@@ -6,9 +6,9 @@ import java.util.Map;
 import org.joml.Vector3f;
 
 import com.lying.ability.AbilityInstance;
+import com.lying.client.event.RenderEvents;
 import com.lying.client.model.GelatinousBipedEntityModel;
 import com.lying.client.renderer.AbilityRenderFunc;
-import com.lying.client.utility.ClientEvents;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.init.VTAbilities;
 import com.lying.reference.Reference;
@@ -58,7 +58,7 @@ public class VTAbilityRenderingRegistry
 				if(MODEL == null)
 					MODEL = new GelatinousBipedEntityModel<AbstractClientPlayerEntity>(mc.getEntityModelLoader().getModelPart(VTModelLayerParts.PLAYER_SLIME));
 				
-				Vector3f color = ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(player);
+				Vector3f color = RenderEvents.GET_PLAYER_COLOR_EVENT.invoker().getColor(player);
 				AbilityRenderFunc.renderModel(
 					MODEL, 
 					TEXTURE, player, matrices, vertexProvider, tickDelta, light, color.x(), color.y(), color.z(), 1F);

@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.lying.utility.ServerEvents;
+import com.lying.event.PlayerEvents;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -24,7 +24,7 @@ public class CraftingResultSlotMixin
 	private void vt$canTakeItems(PlayerEntity playerEntity, final CallbackInfoReturnable<Boolean> ci)
 	{
 		if((Object)this instanceof CraftingResultSlot && ci.getReturnValueZ())
-			if(ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(playerEntity, ScreenHandlerType.CRAFTING).isFalse())
+			if(PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(playerEntity, ScreenHandlerType.CRAFTING).isFalse())
 				ci.setReturnValue(false);
 	}
 }

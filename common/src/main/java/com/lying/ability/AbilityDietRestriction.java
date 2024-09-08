@@ -12,9 +12,9 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilityDietRestriction.ConfigDiet;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -64,7 +64,7 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.PlayerEvents.CAN_EAT_EVENT.register((player, stack) -> 
+		PlayerEvents.CAN_EAT_EVENT.register((player, stack) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 			if(sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.HERBIVORE.get().registryName())) return EventResult.pass();

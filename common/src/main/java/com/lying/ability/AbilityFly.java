@@ -4,8 +4,9 @@ import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
+import com.lying.event.LivingEvents;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTSheetElements;
-import com.lying.utility.ServerEvents;
 
 import dev.architectury.event.EventResult;
 import net.minecraft.entity.EntityType;
@@ -27,7 +28,7 @@ public class AbilityFly extends Ability
 	
 	public void registerEventHandlers()
 	{
-		ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.register((living, ticking) -> 
+		LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.register((living, ticking) -> 
 		{
 			if(living.getType() != EntityType.PLAYER)
 				return EventResult.pass();
@@ -57,7 +58,7 @@ public class AbilityFly extends Ability
 			return EventResult.interruptTrue();
 		});
 		
-		ServerEvents.PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
+		PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.register((player, forward, strafe, jump, sneak) -> 
 		{
 			if(player.getHungerManager().getFoodLevel() <= 3 || !player.isFallFlying())
 				return;

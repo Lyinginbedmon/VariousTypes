@@ -2,6 +2,8 @@ package com.lying.utility;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.lying.event.PlayerEvents;
+
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FoodComponent;
 import net.minecraft.component.type.FoodComponents;
@@ -32,7 +34,7 @@ public class InedibleFoodHelper
 			return comp.getEatTicks();
 		
 		// Item is ordinarily inedible, check if we can eat it
-		if(checkingPlayer != null && ServerEvents.PlayerEvents.CAN_EAT_EVENT.invoker().canEat(InedibleFoodHelper.checkingPlayer(), stack).isTrue())
+		if(checkingPlayer != null && PlayerEvents.CAN_EAT_EVENT.invoker().canEat(InedibleFoodHelper.checkingPlayer(), stack).isTrue())
 			return INEDIBLE_STANDIN.getEatTicks();
 		
 		return vanilla;
@@ -48,7 +50,7 @@ public class InedibleFoodHelper
 			return UseAction.EAT;
 
 		// Item is ordinarily inedible, check if we can eat it
-		if(checkingPlayer != null && ServerEvents.PlayerEvents.CAN_EAT_EVENT.invoker().canEat(InedibleFoodHelper.checkingPlayer(), stack).isTrue())
+		if(checkingPlayer != null && PlayerEvents.CAN_EAT_EVENT.invoker().canEat(InedibleFoodHelper.checkingPlayer(), stack).isTrue())
 			return UseAction.EAT;
 		
 		return vanilla;

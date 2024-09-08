@@ -1,5 +1,7 @@
 package com.lying.mixin;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.OptionalInt;
 
 import org.jetbrains.annotations.Nullable;
@@ -11,17 +13,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.VariousTypes;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
-import com.lying.utility.ServerEvents;
 import com.mojang.datafixers.util.Either;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.recipe.RecipeEntry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.network.ServerRecipeBook;
 import net.minecraft.stat.ServerStatHandler;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Unit;
@@ -36,6 +40,9 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 	
 	@Shadow
 	public ServerStatHandler getStatHandler() { return null; }
+	
+	@Shadow
+	public ServerRecipeBook getRecipeBook() { return null; }
 	
 	@Inject(method = "trySleep(Lnet/minecraft/util/math/BlockPos;)Lcom/mojang/datafixers/util/Either;", at = @At("HEAD"), cancellable = true)
 	private void vt$trySleep(BlockPos pos, final CallbackInfoReturnable<Either<PlayerEntity.SleepFailureReason, Unit>> ci)
@@ -71,8 +78,21 @@ public class ServerPlayerEntityMixin extends PlayerEntityMixin
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
 			ScreenHandlerType<?> type = factory.createMenu(0, getInventory(), player).getType();
-			if(ServerEvents.PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(player, type).isFalse())
+			if(PlayerEvents.CAN_USE_SCREEN_EVENT.invoker().canPlayerUseScreen(player, type).isFalse())
 				ci.setReturnValue(OptionalInt.empty());
 		});
+	}
+	
+	@Inject(method = "unlockRecipes(Ljava/util/Collection;)I", at = @At("HEAD"), cancellable = true)
+	private void vt$unlockRecipes(Collection<RecipeEntry<?>> recipes, final CallbackInfoReturnable<Integer> ci)
+	{
+		ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
+		int tally = 0;
+		for(RecipeEntry<?> recipe : recipes)
+		{
+			if(PlayerEvents.CAN_UNLOCK_RECIPE_EVENT.invoker().canPlayerUnlockRecipeEvent(recipe, player).isFalse()) continue;
+			tally += getRecipeBook().unlockRecipes(List.of(recipe), player);
+		}
+		ci.setReturnValue(tally);
 	}
 }

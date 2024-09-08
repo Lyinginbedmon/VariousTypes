@@ -12,13 +12,13 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.component.element.ISheetElement;
 import com.lying.component.module.AbstractSheetModule;
+import com.lying.event.SheetEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetElements.SheetElement;
 import com.lying.init.VTSheetModules;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
-import com.lying.utility.ServerEvents;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -191,9 +191,9 @@ public class CharacterSheet
 	/** Reconstructs all sheet elements in build order */
 	public final void buildSheet()
 	{
-		owner.ifPresent(living -> ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
+		owner.ifPresent(living -> SheetEvents.BEFORE_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
 		VTSheetElements.buildOrder().forEach(element -> this.elements.get(element).rebuild(this));
-		owner.ifPresent(living -> ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
+		owner.ifPresent(living -> SheetEvents.AFTER_REBUILD_EVENT.invoker().process(living, elementValue(VTSheetElements.ABILITIES)));
 	}
 	
 	public final void buildAndSync()

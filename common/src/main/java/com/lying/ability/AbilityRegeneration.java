@@ -10,8 +10,8 @@ import com.lying.ability.AbilityFastHeal.ConfigFastHeal;
 import com.lying.ability.AbilityRegeneration.ConfigRegeneration;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementNonLethal;
+import com.lying.event.LivingEvents;
 import com.lying.init.VTSheetElements;
-import com.lying.utility.ServerEvents;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -48,7 +48,7 @@ public class AbilityRegeneration extends Ability implements IComplexAbility<Conf
 	{
 		TickEvent.PLAYER_POST.register(player -> AbilityFastHeal.processFastHealing(player, registryName(), this::instanceToValues));
 		
-		ServerEvents.LivingEvents.LIVING_HURT_EVENT.register((LivingEntity entity, DamageSource source, float amount) -> 
+		LivingEvents.LIVING_HURT_EVENT.register((LivingEntity entity, DamageSource source, float amount) -> 
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(entity);
 			if(sheetOpt.isEmpty()) return EventResult.pass();

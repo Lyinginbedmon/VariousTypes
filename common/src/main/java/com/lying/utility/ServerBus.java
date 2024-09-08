@@ -8,13 +8,15 @@ import com.lying.ability.AbilityInstance;
 import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementNonLethal;
+import com.lying.event.LivingEvents;
+import com.lying.event.Result;
+import com.lying.event.SheetEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
 import com.lying.init.VTTypes;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.reference.Reference;
-import com.lying.utility.ServerEvents.Result;
 
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.EntityEvent;
@@ -52,7 +54,7 @@ public class ServerBus
 		}));
 		
 		// Implement custom fall-flying function (basically the same as Fabric natively, but cross-platform)
-		ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.register((living, ticking) -> 
+		LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.register((living, ticking) -> 
 		{
 			ItemStack chest = living.getEquippedStack(EquipmentSlot.CHEST);
 			if(!chest.isEmpty() && chest.isOf(Items.ELYTRA))
@@ -63,14 +65,14 @@ public class ServerBus
 		
 		// Prevents any later handling from affecting damage necessary for stable gameplay
 		EntityEvent.LIVING_HURT.register((LivingEntity entity, DamageSource source, float amount) -> 
-			VTUtils.isDamageInviolable(source, entity) ? EventResult.pass() : ServerEvents.LivingEvents.LIVING_HURT_EVENT.invoker().hurt(entity, source, amount));
+			VTUtils.isDamageInviolable(source, entity) ? EventResult.pass() : LivingEvents.LIVING_HURT_EVENT.invoker().hurt(entity, source, amount));
 	}
 	
 	/** Apply status effect spoof abilities in one central event listener */
 	private static void spoofAbilityHandling()
 	{
 		// Causes hasEffect to return true if a spoof ability is providing the given effect
-		ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.register((effect, living, abilities, truth) -> 
+		LivingEvents.HAS_STATUS_EFFECT_EVENT.register((effect, living, abilities, truth) -> 
 		{
 			for(AbilityInstance inst : Ability.getAllOf(IStatusEffectSpoofAbility.class, living))
 			{
@@ -82,7 +84,7 @@ public class ServerBus
 		});
 		
 		// Forces getStatusEffect to return a spoofed instance
-		ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect, living, abilities, actual) -> 
+		LivingEvents.GET_STATUS_EFFECT_EVENT.register((effect, living, abilities, actual) -> 
 		{
 			for(AbilityInstance inst : Ability.getAllOf(IStatusEffectSpoofAbility.class, living))
 			{
@@ -124,7 +126,7 @@ public class ServerBus
 		PlayerEvent.CHANGE_DIMENSION.register((player, oldLevel, newLevel) -> VariousTypes.getSheet(player).ifPresent(sheet -> sheet.buildSheet()));
 		
 		// Automatically add NATIVE or OTHAKIN depending on relation to home dimension
-		ServerEvents.SheetEvents.GET_TYPES_EVENT.register((entity, home, types) -> 
+		SheetEvents.GET_TYPES_EVENT.register((entity, home, types) -> 
 		{
 			if(types.contains(VTTypes.NATIVE.get()) || types.contains(VTTypes.OTHAKIN.get()))
 				return;
@@ -133,8 +135,8 @@ public class ServerBus
 		});
 		
 		// Attribute modifier handling
-		ServerEvents.SheetEvents.BEFORE_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().removeAttributeModifiers(living, inst)));
-		ServerEvents.SheetEvents.AFTER_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().applyAttributeModifiers(living, inst)));
+		SheetEvents.BEFORE_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().removeAttributeModifiers(living, inst)));
+		SheetEvents.AFTER_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().applyAttributeModifiers(living, inst)));
 	}
 	
 	private static void handleFatigue(int amplifier, LivingEntity player)

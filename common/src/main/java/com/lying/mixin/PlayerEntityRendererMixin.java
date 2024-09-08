@@ -6,8 +6,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.lying.client.event.RenderEvents;
 import com.lying.client.renderer.VertexConsumerProviderWrapped;
-import com.lying.client.utility.ClientEvents;
 
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -28,8 +28,8 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 	private VertexConsumerProvider vt$modifyVertexConsumerProvider(VertexConsumerProvider provider)
 	{
 		VertexConsumerProviderWrapped wrapped = new VertexConsumerProviderWrapped(provider);
-		wrapped.modifyColor(ClientEvents.Rendering.GET_PLAYER_COLOR_EVENT.invoker().getColor(currentRenderingPlayer));
-		wrapped.modifyAlpha(ClientEvents.Rendering.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(currentRenderingPlayer));
+		wrapped.modifyColor(RenderEvents.GET_PLAYER_COLOR_EVENT.invoker().getColor(currentRenderingPlayer));
+		wrapped.modifyAlpha(RenderEvents.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(currentRenderingPlayer));
 		return wrapped;
 	}
 	
@@ -37,18 +37,18 @@ public class PlayerEntityRendererMixin extends LivingEntityRendererMixin
 	private void vt$renderPlayerHead(AbstractClientPlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, final CallbackInfo ci)
 	{
 		currentRenderingPlayer = player;
-		if(ClientEvents.Rendering.PLAYER_RENDER_PERMISSION.invoker().shouldPlayerRender(player).isFalse())
+		if(RenderEvents.PLAYER_RENDER_PERMISSION.invoker().shouldPlayerRender(player).isFalse())
 		{
 			ci.cancel();
 			return;
 		}
 		
-		ClientEvents.Rendering.BEFORE_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
+		RenderEvents.BEFORE_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
 	}
 	
 	@Inject(method = "render(Lnet/minecraft/client/network/AbstractClientPlayerEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("TAIL"))
 	private void vt$renderPlayerTail(AbstractClientPlayerEntity player, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumerProvider, int light, final CallbackInfo ci)
 	{
-		ClientEvents.Rendering.AFTER_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
+		RenderEvents.AFTER_RENDER_PLAYER_EVENT.invoker().onRender(player, yaw, tickDelta, matrices, vertexConsumerProvider, light, (PlayerEntityRenderer)(Object)this);
 	}
 }

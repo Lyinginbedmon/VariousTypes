@@ -6,10 +6,10 @@ import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.component.element.ElementActionables;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.screen.AbilityMenuHandler;
-import com.lying.utility.ServerEvents;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.platform.Platform;
@@ -74,7 +74,7 @@ public class VTPacketHandler
     	{
     		ServerPlayerEntity player = (ServerPlayerEntity)context.getPlayer();
     		if(player.isFallFlying())
-    			ServerEvents.PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
+    			PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
     	});
 	}
 }

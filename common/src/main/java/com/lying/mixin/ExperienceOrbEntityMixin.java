@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.lying.utility.ServerEvents;
+import com.lying.event.PlayerEvents;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -43,7 +43,7 @@ public class ExperienceOrbEntityMixin extends EntityMixin
 					return false;
 				
 				// If we couldn't collide with the player, don't set them as our target in the first place
-				return !ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.invoker().canPlayerCollectExperienceOrbs(orb, player).isFalse();
+				return !PlayerEvents.CAN_COLLECT_XP_EVENT.invoker().canPlayerCollectExperienceOrbs(orb, player).isFalse();
 			});
 		
 		if(getWorld() instanceof ServerWorld)
@@ -53,7 +53,7 @@ public class ExperienceOrbEntityMixin extends EntityMixin
 	@Inject(method = "onPlayerCollision(Lnet/minecraft/entity/player/PlayerEntity;)V", at = @At("HEAD"), cancellable = true)
 	private void vt$playerCollision(PlayerEntity player, final CallbackInfo ci)
 	{
-		if(ServerEvents.PlayerEvents.CAN_COLLECT_XP_EVENT.invoker().canPlayerCollectExperienceOrbs((ExperienceOrbEntity)(Object)this, player).isFalse())
+		if(PlayerEvents.CAN_COLLECT_XP_EVENT.invoker().canPlayerCollectExperienceOrbs((ExperienceOrbEntity)(Object)this, player).isFalse())
 			ci.cancel();
 	}
 }

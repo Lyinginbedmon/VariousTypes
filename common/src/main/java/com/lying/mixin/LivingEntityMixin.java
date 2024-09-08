@@ -21,14 +21,13 @@ import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementNonLethal;
+import com.lying.event.LivingEvents;
+import com.lying.event.Result;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.TypeSet;
 import com.lying.utility.InedibleFoodHelper;
-import com.lying.utility.ServerEvents;
-import com.lying.utility.ServerEvents.LivingEvents;
-import com.lying.utility.ServerEvents.Result;
 
 import dev.architectury.event.EventResult;
 import net.minecraft.component.DataComponentTypes;
@@ -247,7 +246,7 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			EventResult result = ServerEvents.LivingEvents.HAS_STATUS_EFFECT_EVENT.invoker().hasStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
+			EventResult result = LivingEvents.HAS_STATUS_EFFECT_EVENT.invoker().hasStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
 			if(!result.isEmpty())
 				ci.setReturnValue(result.value());
 		});
@@ -266,7 +265,7 @@ public class LivingEntityMixin extends EntityMixin
 		
 		VariousTypes.getSheet(living).ifPresent(sheet ->
 		{
-			Result<StatusEffectInstance> result = ServerEvents.LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
+			Result<StatusEffectInstance> result = LivingEvents.GET_STATUS_EFFECT_EVENT.invoker().getStatusEffect(effect, living, sheet.element(VTSheetElements.ABILITIES), ci.getReturnValue());
 			if(!result.isEmpty())
 				ci.setReturnValue(result.value());
 		});
@@ -295,7 +294,7 @@ public class LivingEntityMixin extends EntityMixin
 	private void vt$tickFallFlying(final CallbackInfo ci)
 	{
 		final LivingEntity living = (LivingEntity)(Object)this;
-		if(ServerEvents.LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(living) == EventResult.interruptFalse())
+		if(LivingEvents.CAN_FLY_EVENT.invoker().canCurrentlyFly(living) == EventResult.interruptFalse())
 		{
 			if(!getWorld().isClient())
 				setFlag(FALL_FLYING_FLAG_INDEX, false);
@@ -303,7 +302,7 @@ public class LivingEntityMixin extends EntityMixin
 			ci.cancel();
 		}
 		
-		if(ServerEvents.LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(living, true) == EventResult.interruptTrue())
+		if(LivingEvents.CUSTOM_ELYTRA_CHECK_EVENT.invoker().passesElytraCheck(living, true) == EventResult.interruptTrue())
 			ci.cancel();
 	}
 	
