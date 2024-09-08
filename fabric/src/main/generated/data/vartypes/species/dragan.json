@@ -12,9 +12,7 @@
           "#minecraft:meat"
         ],
         "Denied": []
-      },
-      "ReadOnly": false,
-      "Source": "misc"
+      }
     }
   ],
   "Background": "vartypes:textures/gui/sheet/creator_end_island.png",

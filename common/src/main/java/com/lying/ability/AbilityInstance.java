@@ -2,12 +2,14 @@ package com.lying.ability;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.Ability.AbilityType;
@@ -144,12 +146,29 @@ public class AbilityInstance
 	
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager, boolean vitalOnly)
 	{
-		if(vitalOnly && display.isEmpty() && memory.isEmpty() && cooldown.isEmpty())
+		if(vitalOnly && display().isEmpty() && memory().isEmpty() && cooldown.isEmpty())
 			return Ability.CODEC.encodeStart(JsonOps.INSTANCE, ability).getOrThrow();
 		
 		RegistryOps<JsonElement> registryOps = manager.getOps(JsonOps.INSTANCE);
 		Codec<AbilityInstance> codec = vitalOnly && display.isEmpty() ? CODEC_VITALS : CODEC;
-		return codec.encodeStart(registryOps, this).getOrThrow();
+		JsonObject json = (JsonObject) codec.encodeStart(registryOps, this).getOrThrow();
+		
+		// Codec includes blank entries for empty optional fields, so strip those out if necessary to reduce file bloat
+		Map<String, Boolean> excesses = Map.of(
+				"Memory", memory().isEmpty(), 
+				"Cooldown", cooldown.isEmpty(),
+				"Display", display().isEmpty(),
+				"ReadOnly", !isReadOnly(),
+				"Source", source() == AbilitySource.MISC
+				);
+		excesses.entrySet().forEach(entry -> 
+		{
+			if(json.has(entry.getKey()) && entry.getValue())
+				json.remove(entry.getKey());
+		});
+		
+		// If removal of excess data results in just the ability ID, return that
+		return json.size() == 1 && json.has("Ability") ? Ability.CODEC.encodeStart(JsonOps.INSTANCE, ability).getOrThrow() : json;
 	}
 	
 	public static AbilityInstance readFromJson(JsonElement element, AbilitySource forceSource)

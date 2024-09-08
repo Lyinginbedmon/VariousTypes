@@ -28,6 +28,12 @@ public class VTBlockTagsProvider extends TagProvider<Block>
 				Blocks.IRON_BLOCK, 
 				Blocks.IRON_DOOR, 
 				Blocks.IRON_TRAPDOOR);
+		registerToTag(VTTags.UNPHASEABLE, 
+				Blocks.BARRIER, Blocks.BEDROCK, 
+				Blocks.END_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.END_GATEWAY, 
+				Blocks.COMMAND_BLOCK, Blocks.REPEATING_COMMAND_BLOCK, Blocks.CHAIN_COMMAND_BLOCK, 
+				Blocks.STRUCTURE_BLOCK, Blocks.JIGSAW, Blocks.LIGHT, 
+				Blocks.REINFORCED_DEEPSLATE);
 	}
 	
 	@SuppressWarnings("deprecation")
