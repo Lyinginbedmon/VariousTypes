@@ -1,6 +1,15 @@
 {
   "Abilities": [
-    "vartypes:herbivore"
+    {
+      "Ability": "vartypes:herbivore",
+      "Memory": {
+        "Allowed": [
+          "#vartypes:vegetarian"
+        ],
+        "Denied": []
+      }
+    },
+    "vartypes:photosynth"
   ],
   "Background": "vartypes:textures/gui/sheet/creator_default.png",
   "Display": {

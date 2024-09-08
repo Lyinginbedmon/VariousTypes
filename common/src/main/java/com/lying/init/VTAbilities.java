@@ -252,7 +252,6 @@ public class VTAbilities
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
 		 * Flitting - Creative-style flight
-		 * Forgetful - Reduced XP gain and cannot unlock recipes
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
 		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable

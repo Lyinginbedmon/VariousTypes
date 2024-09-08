@@ -24,13 +24,19 @@ public class VTTags
 	public static final TagKey<DamageType> PHYSICAL = TagKey.of(RegistryKeys.DAMAGE_TYPE, prefix("physical"));
 	
 	public static final TagKey<Item> SILVER_ITEM = TagKey.of(RegistryKeys.ITEM, prefix("silver"));
+	
 	public static final TagKey<Item> VEGETARIAN		= TagKey.of(RegistryKeys.ITEM, prefix("vegetarian"));
 	public static final TagKey<Item> PESCETARIAN	= TagKey.of(RegistryKeys.ITEM, prefix("pescetarian"));
 	public static final TagKey<Item> CARNIVORE		= TagKey.of(RegistryKeys.ITEM, prefix("carnivore"));
-	public static final TagKey<Item> FRUIT		= TagKey.of(RegistryKeys.ITEM, prefix("fruit"));
-	public static final TagKey<Item> VEGETABLE	= TagKey.of(RegistryKeys.ITEM, prefix("vegetable"));
+	public static final TagKey<Item> FRUIT			= TagKey.of(RegistryKeys.ITEM, prefix("fruit"));
+	public static final TagKey<Item> VEGETABLE		= TagKey.of(RegistryKeys.ITEM, prefix("vegetable"));
 	
+	/** Items that completely ignore any special handling of food eating */
+	public static final TagKey<Item> IGNORE_DIET	= TagKey.of(RegistryKeys.ITEM, prefix("ignores_diet"));
+	
+	/** Blocks that should never be considered valid for any form of phasing */
 	public static final TagKey<Block> UNPHASEABLE	= TagKey.of(RegistryKeys.BLOCK, prefix("unphaseable"));
+	
 	public static final TagKey<Block> SILVER_BLOCK	= TagKey.of(RegistryKeys.BLOCK, prefix("silver"));
 	public static final TagKey<Block> WEBS			= TagKey.of(RegistryKeys.BLOCK, prefix("webs"));
 	public static final TagKey<Block> ORES			= TagKey.of(RegistryKeys.BLOCK, new Identifier("c","ores"));

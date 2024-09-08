@@ -112,7 +112,7 @@ public class VTUtilsClient
 		entries.add(instance.displayName().copy().formatted(Formatting.BOLD));
 		entries.add(instance.ability().type().translate().copy());
 		if(instance.cooldown() > 0)
-			entries.add(Reference.ModInfo.translate("gui","ability_cooldown", VTUtils.ticksToSeconds(instance.cooldown())).copy());
+			entries.add(Reference.ModInfo.translate("gui","ability_cooldown", VTUtils.ticksToTime(instance.cooldown())).copy());
 		instance.description().ifPresent(text -> entries.add(text.copy().formatted(Formatting.GRAY)));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(instance.mapName().toString()).copy().formatted(Formatting.DARK_GRAY));

@@ -41,7 +41,7 @@ public class AbilityOresight extends ActivatedAbility implements IComplexAbility
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigOresight values = instanceToValues(instance);
-		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.tagListToString(values.blockTags, ", "), values.radius, VTUtils.ticksToSeconds(values.duration)));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.tagListToString(values.blockTags, ", "), values.radius, VTUtils.ticksToTime(values.duration)));
 	}
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 30; }

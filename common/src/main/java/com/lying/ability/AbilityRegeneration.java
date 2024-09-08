@@ -41,7 +41,7 @@ public class AbilityRegeneration extends Ability implements IComplexAbility<Conf
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigRegeneration values = ConfigRegeneration.fromNbt(instance.memory());
-		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToSeconds(values.healRate), values.minimumFood));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToTime(values.healRate), values.minimumFood));
 	}
 	
 	public void registerEventHandlers()

@@ -30,7 +30,7 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<ConfigFa
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigFastHeal values = ConfigFastHeal.fromNbt(instance.memory());
-		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToSeconds(values.healRate), values.minimumFood));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToTime(values.healRate), values.minimumFood));
 	}
 	
 	public ConfigFastHeal memoryToValues(NbtCompound data) { return ConfigFastHeal.fromNbt(data); }

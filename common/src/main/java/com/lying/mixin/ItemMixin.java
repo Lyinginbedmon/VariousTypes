@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import com.lying.data.VTTags;
 import com.lying.event.PlayerEvents;
 import com.lying.utility.InedibleFoodHelper;
 
@@ -28,6 +29,9 @@ public class ItemMixin
 	private void vt$useCanEat(World world, PlayerEntity user, Hand hand, final CallbackInfoReturnable<TypedActionResult<ItemStack>> ci)
 	{
 		ItemStack stack = user.getStackInHand(hand);
+		if(stack.isIn(VTTags.IGNORE_DIET))
+			return;
+		
 		EventResult result = PlayerEvents.CAN_EAT_EVENT.invoker().canEat(user, stack);
 		if(result.interruptsFurtherEvaluation())
 		{

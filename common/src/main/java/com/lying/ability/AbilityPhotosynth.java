@@ -9,6 +9,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilityPhotosynth.ConfigPhotosynth;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
+import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -36,7 +37,7 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigPhotosynth values = instanceToValues(instance);
-		return Optional.of(translate("ability", registryName().getPath()+".desc", values.food, values.saturation, values.rate));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", values.food, values.saturation, VTUtils.ticksToTime(values.rate)));
 	}
 	
 	public void registerEventHandlers()

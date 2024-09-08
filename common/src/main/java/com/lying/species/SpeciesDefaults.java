@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.SingleAttributeAbility;
+import com.lying.data.VTTags;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
@@ -67,7 +68,8 @@ public class SpeciesDefaults
 	public static final Supplier<Species> VERDINE	= register(prefix("verdine"), () -> Species.Builder.of(prefix("verdine"))
 			.texture(Species.BACKING_DEFAULT)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.VERDINE.get())
-			.addAbility(VTAbilities.HERBIVORE.get()).build());
+			.addAbility(AbilityDietRestriction.ofTags(List.of(VTTags.VEGETARIAN), List.of()))
+			.addAbility(VTAbilities.PHOTOSYNTH.get()).build());
 	
 	private static Supplier<Species> register(Identifier registryName, Supplier<Species> species)
 	{

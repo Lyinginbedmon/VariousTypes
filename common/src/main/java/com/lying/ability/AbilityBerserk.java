@@ -36,7 +36,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigBerserk values = memoryToValues(instance.memory());
-		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToSeconds(values.buffTime), VTUtils.ticksToSeconds(values.debuffTime)));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToTime(values.buffTime), VTUtils.ticksToTime(values.debuffTime)));
 	}
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_MINUTE * 5; }

@@ -63,6 +63,7 @@ public class VTItemTagsProvider extends TagProvider<Item>
 		
 		getOrCreateTagBuilder(VTTags.PESCETARIAN).addTag(VTTags.VEGETARIAN).addTag(ItemTags.FISHES);
 		
+		registerToTag(VTTags.IGNORE_DIET, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE, Items.POTION);
 	}
 	
 	@SuppressWarnings("deprecation")

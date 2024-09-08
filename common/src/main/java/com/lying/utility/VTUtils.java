@@ -1,5 +1,7 @@
 package com.lying.utility;
 
+import static com.lying.reference.Reference.ModInfo.translate;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -127,7 +129,7 @@ public class VTUtils
 		MutableText tooltip = Text.empty().append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n");
 		MutableText registry = Text.literal(inst.mapName().toString()).formatted(Formatting.DARK_GRAY);
 		if(inst.cooldown() > 0)
-			tooltip.append(Reference.ModInfo.translate("gui","ability_cooldown", ticksToSeconds(inst.cooldown()))).append("\n");
+			tooltip.append(Reference.ModInfo.translate("gui","ability_cooldown", ticksToTime(inst.cooldown()))).append("\n");
 		
 		if(inst.description().isPresent())
 			tooltip.append(inst.description().get().copy().formatted(Formatting.ITALIC, Formatting.GRAY)).append("\n").append(registry);
@@ -136,13 +138,47 @@ public class VTUtils
 		return inst.displayName().copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
 	}
 	
-	public static Object ticksToSeconds(int ticks)
+	/** Converts game ticks into human-readable time in hours, minutes, and seconds */
+	public static Text ticksToTime(int ticks)
 	{
-		double seconds = (double)ticks / (double)Reference.Values.TICKS_PER_SECOND;
-		if(seconds%1 == 0)
-			return (int)seconds;
-		else
-			return seconds;
+		int s = Math.floorDiv(ticks, Reference.Values.TICKS_PER_SECOND);
+		int m = Math.floorDiv(s, 60);
+		int h = Math.floorDiv(m, 60);
+		
+		s = s%60;
+		m = m%60;
+		
+		MutableText time = Text.empty();
+		Text prefix = Text.literal(" ");
+		boolean prepend = false;
+		if(h > 0)
+		{
+			time.append(translate("gui", "hours", h));
+			prepend = true;
+		}
+		
+		if(m > 0)
+		{
+			if(prepend) time.append(prefix);
+			time.append(translate("gui", "minutes", m));
+			prepend = true;
+		}
+		
+		if(s > 0)
+		{
+			if(prepend) time.append(prefix);
+			time.append(translate("gui", "seconds", s));
+			prepend = true;
+		}
+		
+		if(ticks%Reference.Values.TICKS_PER_SECOND > 0)
+		{
+			if(prepend) time.append(prefix);
+			double excess = (double)(ticks%Reference.Values.TICKS_PER_SECOND) / (double)Reference.Values.TICKS_PER_SECOND;
+			time.append(translate("gui", "milliseconds", excess * 1000));
+		}
+		
+		return time;
 	}
 	
 	private static Text describe(Text display, Identifier regName, Optional<Text> desc)

@@ -35,7 +35,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 
 				(int)values.maxRadius, 
 				VTUtils.getEffectNames(values.effects), 
-				VTUtils.ticksToSeconds(values.duration)));
+				VTUtils.ticksToTime(values.duration)));
 	}
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 20; }

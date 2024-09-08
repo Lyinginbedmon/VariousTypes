@@ -71,7 +71,8 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 			
 			CharacterSheet sheet = sheetOpt.get();
 			ConfigDiet values = memoryToValues(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(VTAbilities.HERBIVORE.get().registryName()).memory());
-			if(values.isBlank()) return EventResult.pass();
+			if(values.isBlank())
+				return EventResult.pass();
 			
 			if(values.allows() && values.allowedTags.stream().anyMatch(tag -> stack.isIn(tag)))
 				return EventResult.interruptTrue();
