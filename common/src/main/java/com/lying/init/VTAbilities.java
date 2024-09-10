@@ -21,6 +21,7 @@ import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
+import com.lying.ability.AbilityFaeskin;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityFavouredTerrain;
 import com.lying.ability.AbilityFleece;
@@ -223,13 +224,14 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> THUNDERSTEP	= register("thunderstep", () -> new AbilityThunderstep(prefix("thunderstep"), Category.OFFENSE));
 	public static final Supplier<Ability> BAD_BREATH	= register("bad_breath", () -> new AbilityBadBreath(prefix("bad_breath"), Category.OFFENSE));
-	public static final Supplier<Ability> WEBWEAVER		= register("webweaver", () -> new AbilityIgnoreSlowdown(prefix("webweaver"), Category.UTILITY));
+	public static final Supplier<Ability> WEBWALKER		= register("webwalker", () -> new AbilityIgnoreSlowdown(prefix("webwalker"), Category.UTILITY));
 	public static final Supplier<Ability> HERBIVORE		= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
 	public static final Supplier<Ability> FLAMEPROOF	= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
 	public static final Supplier<Ability> FLEECE		= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
 	public static final Supplier<Ability> ORESIGHT		= register("oresight", () -> new AbilityOresight(prefix("oresight"), Category.UTILITY));
 	public static final Supplier<Ability> HOME_TURF		= register("home_turf", () -> new AbilityFavouredTerrain(prefix("home_turf"), Category.DEFENSE));
 	public static final Supplier<Ability> PHOTOSYNTH	= register("photosynth", () -> new AbilityPhotosynth(prefix("photosynth"), Category.UTILITY));
+	public static final Supplier<Ability> FAESKIN		= register("faeskin", () -> new AbilityFaeskin(prefix("faeskin"), Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{

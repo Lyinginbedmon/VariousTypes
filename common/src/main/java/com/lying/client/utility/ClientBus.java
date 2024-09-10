@@ -1,29 +1,52 @@
 package com.lying.client.utility;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
+import com.lying.ability.AbilityFaeskin;
 import com.lying.ability.AbilityInstance;
+import com.lying.ability.AbilitySet;
 import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTAbilityRenderingRegistry;
+import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
+import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
+import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
+import com.lying.entity.AnimatedPlayerEntity;
+import com.lying.init.VTAbilities;
+import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
+import com.lying.mixin.AccessorEntityRenderDispatcher;
+import com.lying.mixin.AccessorLivingEntityRenderer;
+import com.lying.reference.Reference;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.client.ClientTooltipEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.PlayerEntityRenderer;
+import net.minecraft.client.render.entity.feature.FeatureRendererContext;
+import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 
@@ -61,6 +84,47 @@ public class ClientBus
 				f1.render(context, 0, 0, tickDelta);
 			}
 		}));
+		
+		ClientTooltipEvent.ITEM.register((stack, lines, tooltipContext, flag) -> 
+		{
+			PlayerEntity player = mc.player;
+			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+			if(sheetOpt.isEmpty())
+				return;
+			
+			CharacterSheet sheet = sheetOpt.get();
+			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+			Identifier id = VTAbilities.FAESKIN.get().registryName();
+			if(!abilities.hasAbility(id))
+				return;
+			
+			AbilityInstance inst = abilities.get(id);
+			AbilityFaeskin faeskin = (AbilityFaeskin)inst.ability();
+			if(faeskin.instanceToValues(inst).penalisesItem(stack))
+			{
+				Text name = lines.get(0).copy().formatted(Formatting.RED);
+				List<Text> remainder = Lists.newArrayList();
+				if(lines.size() > 1)
+					remainder.addAll(lines.subList(1, lines.size()));
+				lines.clear();
+				lines.add(name);
+				lines.add(Reference.ModInfo.translate("gui", "faeskin_penalty").copy().formatted(Formatting.RED, Formatting.ITALIC));
+				lines.addAll(remainder);
+			}
+		});
+		
+		RenderEvents.ADD_FEATURE_RENDERERS_EVENT.register((dispatcher) -> 
+		{
+			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;
+			PlayerEntityRenderer wide = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.WIDE);
+			((AccessorLivingEntityRenderer)wide).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)wide));
+			
+			PlayerEntityRenderer slim = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.SLIM);
+			((AccessorLivingEntityRenderer)slim).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)slim));
+			
+			AnimatedPlayerEntityRenderer animPlayer = (AnimatedPlayerEntityRenderer) accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get());
+			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
+		});
 	}
 	
 	/** Handles rendering effects applied by abilities that aren't already handled by supplementary feature renderers */

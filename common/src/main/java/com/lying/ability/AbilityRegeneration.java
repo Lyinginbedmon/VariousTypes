@@ -72,9 +72,9 @@ public class AbilityRegeneration extends Ability implements IComplexAbility<Conf
 	public static class ConfigRegeneration extends ConfigFastHeal
 	{
 		private static final Codec<ConfigRegeneration> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("Rate").forGetter(ConfigRegeneration::healRate), 
-				Codec.INT.optionalFieldOf("Amount").forGetter(ConfigRegeneration::healAmount),
-				Codec.INT.optionalFieldOf("MinFood").forGetter(ConfigRegeneration::minFood),
+				Codec.INT.optionalFieldOf("Rate").forGetter(v -> Optional.of(v.healRate)), 
+				Codec.INT.optionalFieldOf("Amount").forGetter(v -> Optional.of(v.healAmount)),
+				Codec.INT.optionalFieldOf("MinFood").forGetter(v -> Optional.of(v.minimumFood)),
 				TagKey.codec(RegistryKeys.DAMAGE_TYPE).listOf().optionalFieldOf("DamageTags").forGetter(v -> Optional.of(v.tags)))
 				.apply(instance, ConfigRegeneration::new));
 		

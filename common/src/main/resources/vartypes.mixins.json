@@ -14,12 +14,16 @@
 	"ExperienceOrbEntityMixin",
 	"PiglinBrainMixin",
 	"AbstractBlockStateMixin",
+	"BlockMixin",
 	"DamageEnchantmentMixin",
 	"CraftingResultSlotMixin",
 	"ItemMixin",
 	"HungerManagerMixin"
   ],
   "client": [
+	"AccessorEntityRenderDispatcher",
+	"AccessorLivingEntityRenderer",
+	"EntityRenderDispatcherMixin",
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin",

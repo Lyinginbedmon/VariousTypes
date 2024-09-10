@@ -199,7 +199,7 @@ public class VTUtils
 	
 	public static <T> MutableText tagListToString(List<TagKey<T>> set, String bridge)
 	{
-		return listToString(set, t -> Text.literal(t.id().toString()), bridge);
+		return listToString(set, t -> Text.literal("#" + t.id().toString()), bridge);
 	}
 	
 	public static <T extends Object> MutableText listToString(List<T> set, Function<T,Text> getter, String bridge)

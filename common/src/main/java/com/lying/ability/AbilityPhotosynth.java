@@ -13,7 +13,10 @@ import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.TickEvent;
+import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
@@ -27,7 +30,7 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 	private static final BiPredicate<World, BlockPos> GOOD_SKY = (world, position) -> 
 		world.isDay() && !world.isRaining() && world.isSkyVisible(position);
 	private static final BiPredicate<PlayerEntity, BlockPos> GOOD_PLAYER = (player, position) -> 
-		player.isOnGround() && (position == null || position.withY(player.getBlockY()).getSquaredDistance(player.getBlockPos()) == 0D);
+		player.isOnGround() && (player.getHungerManager().getFoodLevel() < 20 || player.getHungerManager().getSaturationLevel() < 20) && (position == null || position.withY(player.getBlockY()).getSquaredDistance(player.getBlockPos()) == 0D);
 	
 	public AbilityPhotosynth(Identifier regName, Category catIn)
 	{
@@ -42,14 +45,34 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 	
 	public void registerEventHandlers()
 	{
+		// Restart tracking whenever we take damage
+		EntityEvent.LIVING_HURT.register((living,source,amount) -> 
+		{
+			VariousTypes.getSheet(living).ifPresent(sheet -> 
+			{
+				AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+				if(!abilities.hasAbility(registryName())) return;
+				
+				AbilityInstance inst = abilities.get(registryName());
+				ConfigPhotosynth config = ((AbilityPhotosynth)inst.ability()).instanceToValues(inst);
+				if(config.isTracking())
+				{
+					config.startTime = Optional.of(living.getWorld().getTime());
+					inst.setMemory(config.toNbt());
+				}
+			});
+			return EventResult.pass();
+		});
 		TickEvent.PLAYER_POST.register(player -> VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
+			World world = player.getWorld();
+			if(world.isClient()) return;
+			
 			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
 			if(!abilities.hasAbility(registryName())) return;
 			
 			AbilityInstance inst = abilities.get(registryName());
 			ConfigPhotosynth config = ((AbilityPhotosynth)inst.ability()).instanceToValues(inst);
-			World world = player.getWorld();
 			BlockPos playerPos = player.getBlockPos();
 			if(config.isTracking())
 			{
@@ -64,7 +87,10 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 				
 				int time = (int)(world.getTime() - config.startTime.get());
 				if(time > 0 && time%config.rate == 0)
-					player.getHungerManager().add(config.food, (float)config.saturation);
+				{
+					HungerManager manager = player.getHungerManager();
+					manager.add(manager.getFoodLevel() < 20 ? config.food : 0, manager.getSaturationLevel() < 20 ? (float)config.saturation : 0F);
+				}
 			}
 			else if(player.age%Reference.Values.TICKS_PER_SECOND == 0)
 				if(GOOD_PLAYER.test(player, null) && GOOD_SKY.test(world, playerPos))

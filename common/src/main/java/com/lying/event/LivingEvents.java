@@ -16,10 +16,11 @@ import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class LivingEvents
 {
-	public static final Event<LivingEvents.CanHaveStatusEffectEvent> CAN_HAVE_STATUS_EFFECT_EVENT = EventFactory.createLoop(LivingEvents.CanHaveStatusEffectEvent.class);
+	public static final Event<CanHaveStatusEffectEvent> CAN_HAVE_STATUS_EFFECT_EVENT = EventFactory.createLoop(CanHaveStatusEffectEvent.class);
 	
 	@FunctionalInterface
 	public interface CanHaveStatusEffectEvent
@@ -27,7 +28,7 @@ public class LivingEvents
 		EventResult shouldDenyStatusEffect(StatusEffectInstance effect, AbilitySet abilities);
 	}
 	
-	public static final Event<LivingEvents.GetMaxAirEvent> GET_MAX_AIR_EVENT = EventFactory.createLoop(LivingEvents.GetMaxAirEvent.class);
+	public static final Event<GetMaxAirEvent> GET_MAX_AIR_EVENT = EventFactory.createLoop(GetMaxAirEvent.class);
 	
 	@FunctionalInterface
 	public interface GetMaxAirEvent
@@ -36,7 +37,7 @@ public class LivingEvents
 	}
 	
 	/** Called by LivingEntityMixin when checking if the given effect is present */
-	public static final Event<LivingEvents.HasStatusEffectEvent> HAS_STATUS_EFFECT_EVENT = EventFactory.createEventResult(LivingEvents.HasStatusEffectEvent.class);
+	public static final Event<HasStatusEffectEvent> HAS_STATUS_EFFECT_EVENT = EventFactory.createEventResult(HasStatusEffectEvent.class);
 	
 	@FunctionalInterface
 	public interface HasStatusEffectEvent
@@ -45,12 +46,12 @@ public class LivingEvents
 	}
 	
 	/** Called by LivingEntityMixin when attempting to retrieve a status effect */
-	public static final Event<LivingEvents.GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.of(listeners -> (LivingEvents.GetStatusEffectEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{LivingEvents.GetStatusEffectEvent.class}, new AbstractInvocationHandler()
+	public static final Event<GetStatusEffectEvent> GET_STATUS_EFFECT_EVENT = EventFactory.of(listeners -> (GetStatusEffectEvent) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{GetStatusEffectEvent.class}, new AbstractInvocationHandler()
 	{
 		@SuppressWarnings("unchecked")
 		protected Object handleInvocation(Object proxy, Method method, Object[] args) throws Throwable
 		{
-			for(LivingEvents.GetStatusEffectEvent listener : listeners)
+			for(GetStatusEffectEvent listener : listeners)
 			{
 				Result<StatusEffectInstance> result = listener.getStatusEffect((RegistryEntry<StatusEffect>)args[0], (LivingEntity)args[1], (AbilitySet)args[2], (StatusEffectInstance)args[3]);
 				if(result.interruptsFurtherEvaluation())
@@ -66,7 +67,7 @@ public class LivingEvents
 		Result<StatusEffectInstance> getStatusEffect(final RegistryEntry<StatusEffect> effect, final LivingEntity entity, final AbilitySet abilities, final StatusEffectInstance actual);
 	}
 	
-	public static final Event<LivingEvents.CanFly> CAN_FLY_EVENT = EventFactory.createEventResult(LivingEvents.CanFly.class);
+	public static final Event<CanFly> CAN_FLY_EVENT = EventFactory.createEventResult(CanFly.class);
 	
 	@FunctionalInterface
 	public interface CanFly
@@ -74,7 +75,7 @@ public class LivingEvents
 		EventResult canCurrentlyFly(LivingEntity entity);
 	}
 	
-	public static final Event<LivingEvents.CustomElytraCheck> CUSTOM_ELYTRA_CHECK_EVENT = EventFactory.createEventResult(LivingEvents.CustomElytraCheck.class);
+	public static final Event<CustomElytraCheck> CUSTOM_ELYTRA_CHECK_EVENT = EventFactory.createEventResult(CustomElytraCheck.class);
 	
 	@FunctionalInterface
 	public interface CustomElytraCheck
@@ -82,7 +83,7 @@ public class LivingEvents
 		EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
 	}
 	
-	public static final Event<LivingEvents.LivingFallEvent> ON_FALL_EVENT = EventFactory.createLoop(LivingEvents.LivingFallEvent.class);
+	public static final Event<LivingFallEvent> ON_FALL_EVENT = EventFactory.createLoop(LivingFallEvent.class);
 	
 	@FunctionalInterface
 	public interface LivingFallEvent
@@ -91,7 +92,7 @@ public class LivingEvents
 	}
 	
 	/** If true, prevents slowdown being applied by the given blockstate to the given living entity */
-	public static final Event<LivingEvents.LivingSlowEvent> IGNORE_SLOW_EVENT = EventFactory.createEventResult(LivingEvents.LivingSlowEvent.class);
+	public static final Event<LivingSlowEvent> IGNORE_SLOW_EVENT = EventFactory.createEventResult(LivingSlowEvent.class);
 	
 	@FunctionalInterface
 	public interface LivingSlowEvent
@@ -101,4 +102,11 @@ public class LivingEvents
 	
 	/** Identical to the native LIVING_HURT event, but excludes void and /kill damage events */
 	public static final Event<LivingHurt> LIVING_HURT_EVENT = EventFactory.createEventResult();
+	
+	public static final Event<LivingSteppedOnEvent> ON_STEP_ON_BLOCK_EVENT = EventFactory.createLoop(LivingSteppedOnEvent.class);
+	
+	public interface LivingSteppedOnEvent
+	{
+		void onBlockSteppedOn(LivingEntity living, BlockState state, BlockPos pos, World world);
+	}
 }

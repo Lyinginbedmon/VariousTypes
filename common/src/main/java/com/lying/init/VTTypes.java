@@ -51,7 +51,8 @@ public class VTTypes
 			.setActions(ActionHandler.REGEN_ONLY)
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
 	public static final Supplier<Type> FAE				= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).colour(0xDDB6DB)
-			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, -5)).build());
+			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, -5))
+			.addAbility(VTAbilities.FAESKIN.get()).build());
 	public static final Supplier<Type> HUMAN			= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).colour(0x006DDB).build());
 	public static final Supplier<Type> OOZE				= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).colour(0xB6DBFF)
 			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))

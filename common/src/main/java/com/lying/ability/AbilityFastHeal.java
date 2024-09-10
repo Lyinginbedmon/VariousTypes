@@ -61,9 +61,9 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<ConfigFa
 	public static class ConfigFastHeal
 	{
 		protected static final Codec<ConfigFastHeal> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("Rate").forGetter(ConfigFastHeal::healRate), 
-				Codec.INT.optionalFieldOf("Amount").forGetter(ConfigFastHeal::healAmount),
-				Codec.INT.optionalFieldOf("MinFood").forGetter(ConfigFastHeal::minFood))
+				Codec.INT.optionalFieldOf("Rate").forGetter(v -> Optional.of(v.healRate)), 
+				Codec.INT.optionalFieldOf("Amount").forGetter(v -> Optional.of(v.healAmount)),
+				Codec.INT.optionalFieldOf("MinFood").forGetter(v -> Optional.of(v.minimumFood)))
 					.apply(instance, ConfigFastHeal::new));
 		
 		/** Ticks between operations */
@@ -79,10 +79,6 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<ConfigFa
 			healAmount = amountIn.orElse(1);
 			minimumFood = foodIn.orElse(1);
 		}
-		
-		protected Optional<Integer> healRate(){ return Optional.of(healRate); }
-		protected Optional<Integer> healAmount(){ return Optional.of(healAmount); }
-		protected Optional<Integer> minFood(){ return Optional.of(minimumFood); }
 		
 		public static ConfigFastHeal fromNbt(NbtCompound nbt)
 		{
