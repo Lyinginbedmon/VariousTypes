@@ -22,7 +22,6 @@ public class AnimatedPlayerEntity extends LivingEntity
 
 	public static final int ANIM_IDLE = 0;
 	public static final int ANIM_TPOSE = 1;
-	public static final int ANIM_WALK = 2;
 	public static final int ANIM_LOOK_AROUND = 3;
 	public static final int ANIM_FGAME_START = 4;
 	public static final int ANIM_FGAME_MAIN = 5;
@@ -38,7 +37,6 @@ public class AnimatedPlayerEntity extends LivingEntity
 	public final AnimationManager<AnimatedPlayerEntity> animations = new AnimationManager<>(
 			Pair.of(ANIM_IDLE, 2F), 
 			Pair.of(ANIM_TPOSE, 3F), 
-			Pair.of(ANIM_WALK, 3F), 
 			Pair.of(ANIM_LOOK_AROUND, 2F), 
 			Pair.of(ANIM_FGAME_START, 0.3333F),
 			Pair.of(ANIM_FGAME_MAIN, 2.25F),

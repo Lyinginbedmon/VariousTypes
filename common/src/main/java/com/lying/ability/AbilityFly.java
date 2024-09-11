@@ -114,7 +114,7 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		protected double speed;
 		protected float food;
 		
-		protected WingType type = WingType.BUTTERFLY;
+		protected WingType type;
 		protected Optional<Integer> color;
 		
 		public ConfigFly(Optional<Double> speedIn, Optional<Float> foodIn, Optional<WingType> typeIn, Optional<Integer> colorIn)

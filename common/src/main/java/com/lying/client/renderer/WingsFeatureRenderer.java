@@ -16,6 +16,8 @@ import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.AnimatedBipedEntityModel;
+import com.lying.client.model.IBipedLikeModel;
+import com.lying.client.model.IModelWithRoot;
 import com.lying.client.model.WingsButterflyModel;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.component.CharacterSheet;
@@ -34,6 +36,7 @@ import net.minecraft.client.render.entity.model.ElytraEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
@@ -43,13 +46,13 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 {
 	private final Map<WingType, WingData<?>> wingsMap = new HashMap<>();
 	
-	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
+	public WingsFeatureRenderer(FeatureRendererContext<E, M> context, boolean isPlayer)
 	{
 		super(context);
-		populateWingsMap();
+		populateWingsMap(isPlayer);
 	}
 	
-	private void populateWingsMap()
+	private void populateWingsMap(boolean isPlayer)
 	{
 		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
 		wingsMap.put(
@@ -77,7 +80,7 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		
 		AbilityInstance inst = abilities.get(regName);
 		ConfigFly config = ((AbilityFly)inst.ability()).instanceToValues(inst);
-		if(config.type() == WingType.NONE)
+		if(!wingsMap.containsKey(config.type()))
 			return;
 		
 		WingData<?> wingData = wingsMap.getOrDefault(config.type(), null);
@@ -87,14 +90,26 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		M contextModel = getContextModel();
 		EntityModel<E> wingModel = wingData.model;
 		
-		if(wingModel instanceof BipedEntityModel)
-			if(contextModel instanceof BipedEntityModel)
-				((BipedEntityModel<E>)contextModel).copyBipedStateTo((BipedEntityModel<E>)wingModel);
-			else if(contextModel instanceof AnimatedBipedEntityModel)
-				((AnimatedBipedEntityModel<E>)contextModel).copyTransformsTo((BipedEntityModel<E>)wingModel);
-		
 		wingModel.animateModel(entity, limbAngle, limbDistance, tickDelta);
 		wingModel.setAngles(entity, limbAngle, limbDistance, (float)entity.age + tickDelta, headYaw, headPitch);
+		
+		
+		if(wingModel instanceof IBipedLikeModel)
+		{
+			IBipedLikeModel<E> bipedLike = (IBipedLikeModel<E>)wingModel;
+			if(contextModel instanceof BipedEntityModel)
+				bipedLike.copyTransforms((BipedEntityModel<E>)contextModel);
+			else if(contextModel instanceof AnimatedBipedEntityModel)
+				bipedLike.copyTransforms((AnimatedBipedEntityModel<E>)contextModel);
+		}
+		else if(wingModel instanceof IModelWithRoot)
+		{
+			IModelWithRoot rootModel = (IModelWithRoot)wingModel;
+			if(contextModel instanceof IModelWithRoot)
+				rootModel.getRoot().copyTransform(((IModelWithRoot)contextModel).getRoot());
+			else if(contextModel instanceof SinglePartEntityModel)
+				rootModel.getRoot().copyTransform(((SinglePartEntityModel<E>)contextModel).getPart());
+		}
 		
 		float r = 1F, g = 1F, b = 1F;
 		if(config.colour().isPresent())

@@ -6,8 +6,8 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.math.MathHelper;
 
-/** Utilit class specifically for making models that can be mapped on to either BipedEntityModel or AnimatedBipedEntityModel */
-public interface BipedLikeModel<E extends LivingEntity>
+/** Utility class specifically for making models that can be mapped on to either BipedEntityModel or AnimatedBipedEntityModel */
+public interface IBipedLikeModel<E extends LivingEntity>
 {
 	public default void copyTransforms(EntityModel<E> parent)
 	{
@@ -54,8 +54,8 @@ public interface BipedLikeModel<E extends LivingEntity>
 		// Cloneable context models
 		if(contextModel instanceof BipedEntityModel || contextModel instanceof AnimatedBipedEntityModel)
 		{
-			if(model instanceof BipedLikeModel)
-				((BipedLikeModel<T>)model).copyTransforms(contextModel);
+			if(model instanceof IBipedLikeModel)
+				((IBipedLikeModel<T>)model).copyTransforms(contextModel);
 			else if(contextModel instanceof BipedEntityModel)
 			{
 				BipedEntityModel<T> parent = (BipedEntityModel<T>)contextModel;

@@ -11,7 +11,7 @@ import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.entity.LivingEntity;
 
-public class GelatinousBipedEntityModel<T extends LivingEntity> extends BipedEntityModel<T> implements BipedLikeModel<T>
+public class GelatinousBipedEntityModel<T extends LivingEntity> extends BipedEntityModel<T> implements IBipedLikeModel<T>
 {
 	public GelatinousBipedEntityModel(ModelPart root)
 	{
