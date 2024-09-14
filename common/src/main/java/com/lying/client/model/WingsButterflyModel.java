@@ -9,17 +9,13 @@ import net.minecraft.client.model.ModelTransform;
 import net.minecraft.client.model.TexturedModelData;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.util.math.Vec3d;
 
-public class WingsButterflyModel<E extends LivingEntity> extends AnimatedBipedEntityModel<E> implements IModelWithRoot, IBipedLikeModel<E>
+public class WingsButterflyModel<E extends LivingEntity> extends AbstractWingsModel<E>
 {
-	private final ModelPart wingLeft;
-	private final ModelPart wingRight;
-	
 	public WingsButterflyModel(ModelPart root)
 	{
 		super(root);
-		this.wingLeft = body.getChild(EntityModelPartNames.LEFT_WING);
-		this.wingRight = body.getChild(EntityModelPartNames.RIGHT_WING);
 	}
 	
 	public static TexturedModelData createBodyLayer()
@@ -27,22 +23,39 @@ public class WingsButterflyModel<E extends LivingEntity> extends AnimatedBipedEn
 		ModelData modelData = getRig();
 		ModelPartData modelPartData = modelData.getRoot();
 		
-		ModelPartData body = modelPartData.addChild(EntityModelPartNames.BODY, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
-		body.addChild(EntityModelPartNames.LEFT_WING, ModelPartBuilder.create().uv(0, -9).mirrored().cuboid(0.0F, -8.0F, 0.0F, 0.0F, 11.0F, 9.0F, Dilation.NONE).mirrored(false)
-			.uv(0, 2).mirrored().cuboid(0.25F, 0.0F, 0.0F, 0.0F, 9.0F, 9.0F, Dilation.NONE).mirrored(false), ModelTransform.of(1.0F, 6.0F, 2.0F, 0.0F, 0.7854F, 0.0F));
-		body.addChild(EntityModelPartNames.RIGHT_WING, ModelPartBuilder.create().uv(0, -9).cuboid(0.0F, -8.0F, 0.0F, 0.0F, 11.0F, 9.0F, Dilation.NONE)
-			.uv(0, 2).cuboid(-0.25F, 0.0F, 0.0F, 0.0F, 9.0F, 9.0F, Dilation.NONE), ModelTransform.of(-1.0F, 6.0F, 2.0F, 0.0F, -0.7854F, 0.0F));
+		ModelPartData body = modelPartData.getChild(EntityModelPartNames.BODY);
+		body.addChild(LEFT_WING, ModelPartBuilder.create().uv(0, -11).mirrored().cuboid(0.0F, -8.0F, 0.0F, 0.0F, 14.0F, 11.0F, Dilation.NONE).mirrored(false)
+			.uv(0, 6).mirrored().cuboid(-0.25F, 4.0F, 0.0F, 0.0F, 8.0F, 8.0F, Dilation.NONE).mirrored(false), ModelTransform.pivot(1.0F, 3.0F, 2.0F));
+		body.addChild(RIGHT_WING, ModelPartBuilder.create().uv(0, -11).cuboid(0.0F, -8.0F, 0.0F, 0.0F, 14.0F, 11.0F, Dilation.NONE)
+			.uv(0, 6).cuboid(0.25F, 4.0F, 0.0F, 0.0F, 8.0F, 8.0F, Dilation.NONE), ModelTransform.pivot(-1.0F, 3.0F, 2.0F));
 		
-		modelPartData.addChild(EntityModelPartNames.HEAD, ModelPartBuilder.create(), ModelTransform.pivot(0F, 0F, 0F));
-		
-		return TexturedModelData.of(modelData, 64, 32);
+		return TexturedModelData.of(modelData, 32, 32);
 	}
 	
 	public void setAngles(E livingEntity, float limbAngle, float limbDistance, float age, float headYaw, float headPitch)
 	{
-		float time = (float)(Math.sin(age / 5) + 1) / 2;
-		float flutter = time * (float)Math.toRadians(30D) + (float)Math.toRadians(15D);
-		wingLeft.yaw = flutter;
-		wingRight.yaw = -flutter;
+		if(livingEntity.isFallFlying())
+		{
+			wingLeft.yaw = (float)Math.toRadians(85D);
+			Vec3d vel = livingEntity.getVelocity();
+			if(vel.y > 0)
+			{
+				float time = (float)Math.abs(Math.sin(age));
+				wingLeft.yaw -= Math.toRadians(80D) * time;
+			}
+		}
+		else if(livingEntity.isInSneakingPose())
+		{
+			float time = (float)Math.abs(Math.sin(age / 30));
+			wingLeft.yaw = (float)Math.toRadians(45D) + time * (float)Math.toRadians(15D);
+		}
+		else
+		{
+			float time = (float)(Math.sin(age / 15) + 1) / 2;
+			float flutter = time * (float)Math.toRadians(60D) + (float)Math.toRadians(15D);
+			wingLeft.yaw = flutter;
+		}
+		
+		wingRight.yaw = -wingLeft.yaw;
 	}
 }

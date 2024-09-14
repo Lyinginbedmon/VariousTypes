@@ -127,14 +127,11 @@ public class VTUtils
 	public static Text describeAbility(AbilityInstance inst)
 	{
 		MutableText tooltip = Text.empty().append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n");
-		MutableText registry = Text.literal(inst.mapName().toString()).formatted(Formatting.DARK_GRAY);
 		if(inst.cooldown() > 0)
 			tooltip.append(Reference.ModInfo.translate("gui","ability_cooldown", ticksToTime(inst.cooldown()))).append("\n");
 		
-		if(inst.description().isPresent())
-			tooltip.append(inst.description().get().copy().formatted(Formatting.ITALIC, Formatting.GRAY)).append("\n").append(registry);
-		else
-			tooltip.append(registry);
+		inst.tooltip().forEach(line -> tooltip.append(line.copy().formatted(Formatting.ITALIC, Formatting.GRAY).append("\n")));
+		tooltip.append(Text.literal(inst.mapName().toString()).formatted(Formatting.DARK_GRAY));
 		return inst.displayName().copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
 	}
 	

@@ -133,6 +133,7 @@
 	"ability.vartypes.climb": "Climb",
 	"ability.vartypes.climb.desc": "You are able to surmount almost any vertical surface with ease.",
 	"ability.vartypes.fly": "Fly",
+	"ability.vartypes.fly.desc": "You are capable of self-propelled flight through the air, at the cost of a bit of hunger.",
 	"ability.vartypes.burrow": "Burrow",
 	"ability.vartypes.burrow.desc": "You can move through the ground with ease. You can pass through all [%s] blocks.",
 	"ability.vartypes.teleport": "Teleport",
@@ -297,6 +298,13 @@
 	"gui.vartypes.ghostly_turned_off": "You are no longer %s",
 	"gui.vartypes.oresight_tally": "Oresight detected %s blocks",
 	"gui.vartypes.faeskin_penalty": "Your hands sting from holding it",
+	"gui.vartypes.wing_style": "Style: %s",
+	"gui.vartypes.colour": "Colour: %s",
+	// Enums
+	"wings.vartypes.butterfly": "Butterfly",
+	"wings.vartypes.dragonfly": "Dragonfly",
+	"wings.vartypes.elytra": "Elytra",
+	"wings.vartypes.none": "None",
 	// Keybinds
 	"category.vartypes.keybindings": "Various Types",
 	"key.vartypes.open_abilities": "Open ability menu",

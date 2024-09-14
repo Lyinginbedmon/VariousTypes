@@ -124,6 +124,11 @@ public class AbilityInstance
 		return ability.description(this);
 	}
 	
+	public List<Text> tooltip()
+	{
+		return ability.tooltip(this);
+	}
+	
 	protected Optional<Integer> cooldownMaybe() { return cooldown; }
 	
 	public int cooldown()

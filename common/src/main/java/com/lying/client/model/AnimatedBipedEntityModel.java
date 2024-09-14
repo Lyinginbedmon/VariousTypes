@@ -58,6 +58,7 @@ public abstract class AnimatedBipedEntityModel<E extends LivingEntity> extends S
 		return modelData;
 	}
 	
+	/* Returns ModelData representing an otherwise-blank biped structure in line with PlayerEntityModel */
 	public static ModelData getRig()
 	{
 		ModelData modelData = new ModelData();

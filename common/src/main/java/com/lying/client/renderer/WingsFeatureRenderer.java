@@ -5,13 +5,14 @@ import static com.lying.reference.Reference.ModInfo.prefix;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.joml.Vector3f;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityFly.ConfigFly;
-import com.lying.ability.AbilityFly.WingType;
+import com.lying.ability.AbilityFly.WingStyle;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.init.VTModelLayerParts;
@@ -19,32 +20,30 @@ import com.lying.client.model.AnimatedBipedEntityModel;
 import com.lying.client.model.IBipedLikeModel;
 import com.lying.client.model.IModelWithRoot;
 import com.lying.client.model.WingsButterflyModel;
+import com.lying.client.model.WingsElytraModel;
 import com.lying.client.utility.VTUtilsClient;
-import com.lying.component.CharacterSheet;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
-import net.minecraft.client.render.entity.model.ElytraEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
-import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
-import net.minecraft.client.render.item.ItemRenderer;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends FeatureRenderer<E, M>
 {
-	private final Map<WingType, WingData<?>> wingsMap = new HashMap<>();
+	private final Map<WingStyle, WingData<?>> wingsMap = new HashMap<>();
+	private static final Function<AbilityInstance, ConfigFly> configGetter = inst -> ((AbilityFly)VTAbilities.FLY.get()).instanceToValues(inst);
 	
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context, boolean isPlayer)
 	{
@@ -56,34 +55,46 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 	{
 		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
 		wingsMap.put(
-				WingType.BUTTERFLY, 
+				WingStyle.BUTTERFLY, 
 				new WingData<>(
 					new WingsButterflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BUTTERFLY)), 
 					prefix("textures/entity/wings/butterfly.png"), 
 					prefix("textures/entity/wings/butterfly_tinted.png")));
 		wingsMap.put(
-				WingType.ELYTRA, 
-				new ElytraWingData(loader));
+				WingStyle.ELYTRA, 
+				new WingData<>(
+					new WingsElytraModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ELYTRA)),
+					prefix("textures/entity/wings/elytra.png"),
+					prefix("textures/entity/wings/elytra_tinted.png")));
+	}
+	
+	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, E entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch)
+	{
+		ItemStack chestplate = entity.getEquippedStack(EquipmentSlot.BODY);
+		if(!chestplate.isEmpty() && chestplate.isOf(Items.ELYTRA))
+			return;
+		
+		VariousTypes.getSheet(entity).ifPresent(sheet -> 
+		{
+			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+			for(Identifier regName : new Identifier[] { VTAbilities.FLY.get().registryName() })
+			{
+				if(!abilities.hasAbility(regName))
+					continue;
+				
+				ConfigFly config = configGetter.apply(abilities.get(regName));
+				handleWingRendering(entity, config.type(), config.colour(), limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light);
+			}
+		});
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, E entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch)
+	protected void handleWingRendering(E entity, WingStyle style, Optional<Integer> colour, float limbAngle, float limbDistance, float headYaw, float headPitch, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)
 	{
-		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(entity);
-		if(sheetOpt.isEmpty())
+		if(!wingsMap.containsKey(style))
 			return;
 		
-		Identifier regName = VTAbilities.FLY.get().registryName();
-		AbilitySet abilities = sheetOpt.get().elementValue(VTSheetElements.ABILITIES);
-		if(!abilities.hasAbility(regName))
-			return;
-		
-		AbilityInstance inst = abilities.get(regName);
-		ConfigFly config = ((AbilityFly)inst.ability()).instanceToValues(inst);
-		if(!wingsMap.containsKey(config.type()))
-			return;
-		
-		WingData<?> wingData = wingsMap.getOrDefault(config.type(), null);
+		WingData<?> wingData = wingsMap.getOrDefault(style, null);
 		if(wingData == null)
 			return;
 		
@@ -92,7 +103,6 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		
 		wingModel.animateModel(entity, limbAngle, limbDistance, tickDelta);
 		wingModel.setAngles(entity, limbAngle, limbDistance, (float)entity.age + tickDelta, headYaw, headPitch);
-		
 		
 		if(wingModel instanceof IBipedLikeModel)
 		{
@@ -112,21 +122,21 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		}
 		
 		float r = 1F, g = 1F, b = 1F;
-		if(config.colour().isPresent())
+		if(colour.isPresent())
 		{
-			int colour = config.colour().get();
-			Vector3f vec = VTUtilsClient.decimalToVector(colour);
+			int col = colour.get();
+			Vector3f vec = VTUtilsClient.decimalToVector(col);
 			r = vec.x;
 			g = vec.y;
 			b = vec.z;
 		}
 		
-		wingData.renderFor(matrices, vertexConsumers, light, entity, config.colour().isPresent(), r, g, b);
+		wingData.renderFor(matrices, vertexConsumers, light, entity, colour.isPresent(), r, g, b);
 	}
 	
-	public EntityModel<E> getModel(WingType type) { return wingsMap.get(type).model; }
+	public EntityModel<E> getModel(WingStyle type) { return wingsMap.get(type).model; }
 	
-	public Identifier getTexture(WingType type, boolean tinted) { return tinted ? wingsMap.get(type).tintedTexture : wingsMap.get(type).colourTexture; }
+	public Identifier getTexture(WingStyle type, boolean tinted) { return tinted ? wingsMap.get(type).tintedTexture : wingsMap.get(type).colourTexture; }
 	
 	private class WingData<T extends EntityModel<E>>
 	{
@@ -144,23 +154,6 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
 		{
 			renderModel(model, tinted ? tintedTexture : colourTexture, matrixStack, vertexConsumerProvider, light, entity, r, g, b);
-		}
-	}
-	
-	public class ElytraWingData extends WingData<ElytraEntityModel<E>>
-	{
-		public ElytraWingData(EntityModelLoader loader)
-		{
-			super(new ElytraEntityModel<>(loader.getModelPart(EntityModelLayers.ELYTRA)), new Identifier("textures/entity/elytra.png"), prefix("textures/entity/wings/elytra_tinted.png"));
-		}
-		
-		public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
-		{
-			matrixStack.push();
-				matrixStack.translate(0F, 0F, 0.125F);
-				VertexConsumer vertexConsumer = ItemRenderer.getArmorGlintConsumer(vertexConsumerProvider, RenderLayer.getArmorCutoutNoCull(tinted ? tintedTexture : colourTexture), false, false);
-				model.render(matrixStack, vertexConsumer, light, OverlayTexture.DEFAULT_UV, r, g, b, 1.0f);
-			matrixStack.pop();
 		}
 	}
 }

@@ -5,6 +5,7 @@ import static com.lying.reference.Reference.ModInfo.translate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -112,6 +113,16 @@ public class Ability
 	public Text displayName(AbilityInstance instance) { return translate("ability",registryName.getPath()); }
 	
 	public Optional<Text> description(AbilityInstance instance) { return Optional.of(translate("ability", registryName.getPath()+".desc")); }
+	
+	public final List<Text> tooltip(AbilityInstance instance)
+	{
+		List<Text> tooltip = Lists.newArrayList();
+		description(instance).ifPresent(text -> tooltip.add(text.copy()));
+		addTooltipDetails(instance).forEach(detail -> tooltip.add(Text.literal("   ").append(detail.copy())));
+		return tooltip;
+	}
+	
+	protected List<Text> addTooltipDetails(AbilityInstance instance) { return Lists.newArrayList(); }
 	
 	/** Registers any event handlers needed by this ability to operate. Called during initialisation. */
 	public void registerEventHandlers() { }
