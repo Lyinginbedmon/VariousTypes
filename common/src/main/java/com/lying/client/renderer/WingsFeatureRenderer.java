@@ -20,6 +20,7 @@ import com.lying.client.model.AnimatedBipedEntityModel;
 import com.lying.client.model.IBipedLikeModel;
 import com.lying.client.model.IModelWithRoot;
 import com.lying.client.model.WingsButterflyModel;
+import com.lying.client.model.WingsDragonflyModel;
 import com.lying.client.model.WingsElytraModel;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.init.VTAbilities;
@@ -42,6 +43,7 @@ import net.minecraft.util.Identifier;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends FeatureRenderer<E, M>
 {
+	private static Identifier[] WING_ABILITIES = null;
 	private final Map<WingStyle, WingData<?>> wingsMap = new HashMap<>();
 	private static final Function<AbilityInstance, ConfigFly> configGetter = inst -> ((AbilityFly)VTAbilities.FLY.get()).instanceToValues(inst);
 	
@@ -66,6 +68,11 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 					new WingsElytraModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ELYTRA)),
 					prefix("textures/entity/wings/elytra.png"),
 					prefix("textures/entity/wings/elytra_tinted.png")));
+		wingsMap.put(WingStyle.DRAGONFLY, 
+				new WingData<>(
+					new WingsDragonflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGONFLY)),
+					prefix("textures/entity/wings/dragonfly.png"),
+					prefix("textures/entity/wings/dragonfly_tinted.png")));
 	}
 	
 	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, E entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch)
@@ -74,10 +81,13 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		if(!chestplate.isEmpty() && chestplate.isOf(Items.ELYTRA))
 			return;
 		
+		if(WING_ABILITIES == null)
+			WING_ABILITIES = new Identifier[] { VTAbilities.FLY.get().registryName(), VTAbilities.COS_WINGS.get().registryName() };
+		
 		VariousTypes.getSheet(entity).ifPresent(sheet -> 
 		{
 			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
-			for(Identifier regName : new Identifier[] { VTAbilities.FLY.get().registryName() })
+			for(Identifier regName : WING_ABILITIES)
 			{
 				if(!abilities.hasAbility(regName))
 					continue;

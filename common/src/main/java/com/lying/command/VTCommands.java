@@ -306,34 +306,27 @@ public class VTCommands
 									{
 										ServerCommandSource source = context.getSource();
 										PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+										
 										Identifier abilityID = IdentifierArgumentType.getIdentifier(context, ABILITY);
-										Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-										if(sheetOpt.isEmpty() || VTAbilities.get(abilityID) == null)
+										if(VTAbilities.get(abilityID) == null)
 											throw FAILED_GENERIC.create();
 										
-										AbilityInstance inst = VTAbilities.get(abilityID).instance(AbilitySource.CUSTOM);
-										ModuleCustomAbilities custAbilities = sheetOpt.get().module(VTSheetModules.ABILITIES);
-										custAbilities.add(inst);
-										source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
-										return 15;
+										return tryApplyAbility(player, VTAbilities.get(abilityID).instance(AbilitySource.CUSTOM), source);
 									})
 									.then(argument("nbt", NbtCompoundArgumentType.nbtCompound())
 										.executes(context -> 
 										{
 											ServerCommandSource source = context.getSource();
 											PlayerEntity player = EntityArgumentType.getPlayer(context, PLAYER);
+											
 											Identifier abilityID = IdentifierArgumentType.getIdentifier(context, ABILITY);
-											Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-											if(sheetOpt.isEmpty() || VTAbilities.get(abilityID) == null)
+											if(VTAbilities.get(abilityID) == null)
 												throw FAILED_GENERIC.create();
 											
 											AbilityInstance inst = VTAbilities.get(abilityID).instance(AbilitySource.CUSTOM);
 											AbilityNbt.readFromNbt(NbtCompoundArgumentType.getNbtCompound(context, "nbt")).applyTo(inst);
 											
-											ModuleCustomAbilities custAbilities = sheetOpt.get().module(VTSheetModules.ABILITIES);
-											custAbilities.add(inst);
-											source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
-											return 15;
+											return tryApplyAbility(player, inst, source);
 										}))))
 							.then(literal("nonlethal")
 								.then(argument("amount", FloatArgumentType.floatArg())
@@ -581,6 +574,21 @@ public class VTCommands
 										return 15;
 									}))))));
 		});
+	}
+	
+	private static int tryApplyAbility(PlayerEntity player, AbilityInstance inst, ServerCommandSource source) throws CommandSyntaxException
+	{
+		Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+		if(sheetOpt.isEmpty())
+			throw FAILED_GENERIC.create();
+		
+		ModuleCustomAbilities custAbilities = sheetOpt.get().module(VTSheetModules.ABILITIES);
+		if(custAbilities.has(inst.mapName()))
+				custAbilities.remove(inst.mapName());
+		
+		custAbilities.add(inst);
+		source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
+		return 15;
 	}
 	
 	private static int tryApplyTemplate(PlayerEntity player, Identifier template, boolean force, ServerCommandSource source) throws CommandSyntaxException

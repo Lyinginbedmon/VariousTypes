@@ -218,6 +218,8 @@
 	"ability.vartypes.faeskin.desc_items": "Your skin sizzles when in contact with certain materials. You are penalised for making contact with [%s] items.",
 	"ability.vartypes.faeskin.desc_both": "Your skin sizzles when in contact with certain materials. You are penalised for making contact with [%s] blocks or [%s] items.",
 	"ability.vartypes.faeskin.desc": "Your skin sizzles when in contact with certain materials. At least, you're reasonably sure of that...",
+	"ability.vartypes.cosmetic_wings": "Vestigial Wings",
+	"ability.vartypes.cosmetic_wings.desc": "Though pretty to look at, these wings are incapable of actually supporting you in flight.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

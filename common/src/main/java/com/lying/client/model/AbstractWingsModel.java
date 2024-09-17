@@ -18,4 +18,11 @@ public abstract class AbstractWingsModel<E extends LivingEntity> extends Animate
 		this.wingLeft = body.getChild(LEFT_WING);
 		this.wingRight = body.getChild(RIGHT_WING);
 	}
+	
+	protected static void copyRotation(ModelPart from, ModelPart to)
+	{
+		to.pitch = from.pitch;
+		to.yaw = from.yaw;
+		to.roll = from.roll;
+	}
 }

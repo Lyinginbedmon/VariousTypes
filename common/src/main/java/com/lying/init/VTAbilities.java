@@ -232,6 +232,10 @@ public class VTAbilities
 	public static final Supplier<Ability> HOME_TURF		= register("home_turf", () -> new AbilityFavouredTerrain(prefix("home_turf"), Category.DEFENSE));
 	public static final Supplier<Ability> PHOTOSYNTH	= register("photosynth", () -> new AbilityPhotosynth(prefix("photosynth"), Category.UTILITY));
 	public static final Supplier<Ability> FAESKIN		= register("faeskin", () -> new AbilityFaeskin(prefix("faeskin"), Category.UTILITY));
+	public static final Supplier<Ability> COS_WINGS		= register("cosmetic_wings", () -> new Ability(prefix("cosmetic_wings"), Category.UTILITY)
+	{
+		public boolean isHidden(AbilityInstance instance) { return true; }
+	});
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{

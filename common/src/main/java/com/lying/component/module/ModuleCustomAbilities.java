@@ -52,6 +52,8 @@ public class ModuleCustomAbilities extends AbstractSheetModule
 		return customAbilities.get(mapName);
 	}
 	
+	public boolean has(Identifier mapName) { return customAbilities.get(mapName) != null; }
+	
 	public void add(AbilityInstance instance)
 	{
 		customAbilities.set(instance);
