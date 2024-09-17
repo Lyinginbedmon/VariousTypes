@@ -7,6 +7,9 @@ import java.util.function.Supplier;
 
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.model.GelatinousBipedEntityModel;
+import com.lying.client.model.WingsBatModel;
+import com.lying.client.model.WingsBeetleModel;
+import com.lying.client.model.WingsBirdModel;
 import com.lying.client.model.WingsButterflyModel;
 import com.lying.client.model.WingsDragonflyModel;
 import com.lying.client.model.WingsElytraModel;
@@ -28,7 +31,11 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_BUTTERFLY		= make("player", "wings_butterfly", WingsButterflyModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_ELYTRA			= make("player", "wings_elytra", WingsElytraModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_DRAGONFLY		= make("player", "wings_dragonfly", WingsDragonflyModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_BAT				= make("player", "wings_bat", WingsBatModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_BIRD				= make("player", "wings_bird", WingsBirdModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_BEETLE			= make("player", "wings_beetle", WingsBeetleModel::createBodyLayer);
 	
+	/** Creates a new model layer and registers its supplier for generation */
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)
 	{
 		EntityModelLayer layer = new EntityModelLayer(Reference.ModInfo.prefix(id), name);

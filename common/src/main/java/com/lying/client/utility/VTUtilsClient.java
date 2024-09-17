@@ -134,6 +134,7 @@ public class VTUtilsClient
 		return (int)(255 * (a * b));
 	}
 	
+	/** Returns a float vector containing the RGB colours of the given decimal, ranged 0 to 1 */
 	public static Vector3f decimalToVector(int color)
 	{
 		int r = (color & 0xFF0000) >> 16;

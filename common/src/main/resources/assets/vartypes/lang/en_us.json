@@ -305,6 +305,9 @@
 	// Enums
 	"wings.vartypes.butterfly": "Butterfly",
 	"wings.vartypes.dragonfly": "Dragonfly",
+	"wings.vartypes.beetle": "Beetle",
+	"wings.vartypes.bat": "Bat",
+	"wings.vartypes.bird": "Bird",
 	"wings.vartypes.elytra": "Elytra",
 	"wings.vartypes.none": "None",
 	// Keybinds

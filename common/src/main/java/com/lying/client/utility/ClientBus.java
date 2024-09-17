@@ -117,13 +117,13 @@ public class ClientBus
 		{
 			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;
 			PlayerEntityRenderer wide = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.WIDE);
-			((AccessorLivingEntityRenderer)wide).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)wide, true));
+			((AccessorLivingEntityRenderer)wide).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)wide));
 			
 			PlayerEntityRenderer slim = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.SLIM);
-			((AccessorLivingEntityRenderer)slim).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)slim, true));
+			((AccessorLivingEntityRenderer)slim).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)slim));
 			
 			AnimatedPlayerEntityRenderer animPlayer = (AnimatedPlayerEntityRenderer) accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get());
-			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer, false));
+			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
 		});
 	}
 	
