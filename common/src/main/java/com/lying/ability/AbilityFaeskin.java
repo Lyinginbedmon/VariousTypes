@@ -56,21 +56,41 @@ public class AbilityFaeskin extends Ability implements IComplexAbility<ConfigFae
 	{
 		LivingEvents.ON_STEP_ON_BLOCK_EVENT.register((living, state, pos, world) -> 
 		{
-			if(!world.isClient())
-				VariousTypes.getSheet(living).ifPresent(sheet -> 
-				{
-					AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
-					if(!abilities.hasAbility(registryName()))
-						return;
-					
-					AbilityInstance inst = abilities.get(registryName());
-					ConfigFaeskin config = instanceToValues(inst);
-					if(config.badBlocks.stream().anyMatch(tag -> state.isIn(tag)))
-						config.applyPenalties(living);
-				});
+			if(living.getWorld().isClient())
+				return;
+			
+			VariousTypes.getSheet(living).ifPresent(sheet -> 
+			{
+				AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+				if(!abilities.hasAbility(registryName()))
+					return;
+				
+				ConfigFaeskin config = instanceToValues(abilities.get(registryName()));
+				if(config.badBlocks.stream().anyMatch(tag -> state.isIn(tag)))
+					config.applyPenalties(living);
+			});
 		});
 		
-		// FIXME Add handling for item penalising
+		LivingEvents.LIVING_MOVE_EVENT.register((living, type, move, sheetOpt) -> 
+		{
+			if(living.getWorld().isClient())
+				return;
+			
+			sheetOpt.ifPresent(sheet -> 
+			{
+				AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+				if(!abilities.hasAbility(registryName()))
+					return;
+				
+				ConfigFaeskin config = instanceToValues(abilities.get(registryName()));
+				for(ItemStack stack : living.getEquippedItems())
+					if(!stack.isEmpty() && config.badItems.stream().anyMatch(tag -> stack.isIn(tag)))
+					{
+						config.applyPenalties(living);
+						break;
+					}
+			});
+		});
 	}
 	
 	public ConfigFaeskin memoryToValues(NbtCompound data) { return ConfigFaeskin.fromNbt(data); }

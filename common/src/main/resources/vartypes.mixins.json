@@ -27,6 +27,7 @@
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin",
+	"InGameHudMixin",
 	"EntityRendererMixin",
 	"LivingEntityRendererMixin",
 	"PlayerEntityRendererMixin",

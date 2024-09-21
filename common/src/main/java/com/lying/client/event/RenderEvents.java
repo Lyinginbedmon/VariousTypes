@@ -2,15 +2,19 @@ package com.lying.client.event;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Optional;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.google.common.reflect.AbstractInvocationHandler;
+import com.lying.component.CharacterSheet;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -110,5 +114,13 @@ public class RenderEvents
 	public interface OutlineRenderEvent
 	{
 		void onRender(MatrixStack matrices, VertexConsumer vertexConsumer, Entity entity, double cameraX, double cameraY, double cameraZ);
+	}
+	
+	public static final Event<HudRenderEvent> BEFORE_HUD_RENDER_EVENT = EventFactory.createLoop(HudRenderEvent.class);
+	public static final Event<HudRenderEvent> AFTER_HUD_RENDER_EVENT = EventFactory.createLoop(HudRenderEvent.class);
+	
+	public interface HudRenderEvent
+	{
+		void render(MinecraftClient mc, PlayerEntity player, Optional<CharacterSheet> sheetOpt, float tickDelta, DrawContext context);
 	}
 }

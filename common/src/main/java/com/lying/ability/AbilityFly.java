@@ -105,7 +105,7 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		FAIRY,	//
 		ENERGY,	//
 		BEETLE,	// FIXME Proper texture
-		BIRD,	// FIXME Proper texture, finalised animations
+		BIRD,
 		ANGEL,	//
 		BAT,	// FIXME Proper texture, finalised animations
 		DRAGON,	//

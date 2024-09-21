@@ -59,6 +59,7 @@ import com.lying.utility.VTUtils;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -125,7 +126,30 @@ public class VTAbilities
 		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
 	});
 	public static final Supplier<Ability> INTANGIBLE	= register("intangible", () -> new AbilityIntangible(prefix("intangible"), Category.UTILITY));
-	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY));
+	public static final Supplier<Ability> BURN_IN_SUN	= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY)
+	{
+		public void registerEventHandlers()
+		{
+			LivingEvents.LIVING_MOVE_TICK_EVENT.register((living, sheetOpt) -> 
+			{
+				if(living.isInvisible() || sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+					return;
+				
+				ItemStack helmet = living.getEquippedStack(EquipmentSlot.HEAD);
+				if(helmet.isEmpty())
+					living.setOnFireFor(8);
+				else if(helmet.isDamageable())
+				{					
+					helmet.setDamage(helmet.getDamage() + living.getRandom().nextInt(2));
+					if(helmet.getDamage() >= helmet.getMaxDamage())
+					{
+						living.sendEquipmentBreakStatus(EquipmentSlot.HEAD);
+						living.equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY);
+					}
+				}
+			});
+		}
+	});
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new AbilityStatusTagImmune(prefix("mithridatic"), Category.DEFENSE));
 	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
 	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new AbilityRegeneration(prefix("regeneration"), Category.DEFENSE));
@@ -254,7 +278,6 @@ public class VTAbilities
 		 * Cold-Blooded - Weak and slow in warm environments (configurable)
 		 * Enchain - Locks a target in place with a set of magical chains
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
-		 * Faeskin - Take extra damage from attacks with items tagged as #vartypes:silver and hurt by contact with #vartypes:silver blocks, which also function like fences to them
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
 		 * Flitting - Creative-style flight

@@ -2,9 +2,11 @@ package com.lying.event;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Optional;
 
 import com.google.common.reflect.AbstractInvocationHandler;
 import com.lying.ability.AbilitySet;
+import com.lying.component.CharacterSheet;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
@@ -12,10 +14,12 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.EntityEvent.LivingHurt;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class LivingEvents
@@ -108,5 +112,19 @@ public class LivingEvents
 	public interface LivingSteppedOnEvent
 	{
 		void onBlockSteppedOn(LivingEntity living, BlockState state, BlockPos pos, World world);
+	}
+	
+	public static final Event<LivingMoveTickEvent> LIVING_MOVE_TICK_EVENT = EventFactory.createLoop(LivingMoveTickEvent.class);
+	
+	public interface LivingMoveTickEvent
+	{
+		void onLivingMoveTick(LivingEntity living, Optional<CharacterSheet> sheetOpt);
+	}
+	
+	public static final Event<LivingMoveEvent> LIVING_MOVE_EVENT = EventFactory.createLoop(LivingMoveEvent.class);
+	
+	public interface LivingMoveEvent
+	{
+		void onLivingMove(LivingEntity living, MovementType type, Vec3d move, Optional<CharacterSheet> sheetOpt);
 	}
 }

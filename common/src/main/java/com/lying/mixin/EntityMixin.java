@@ -27,6 +27,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.fluid.Fluid;
@@ -239,5 +240,15 @@ public class EntityMixin
 		if((Entity)(Object) this instanceof LivingEntity)
 			if(LivingEvents.IGNORE_SLOW_EVENT.invoker().shouldIgnoreSlowingFrom((LivingEntity)(Object)this, state).isTrue())
 				ci.cancel();
+	}
+	
+	@Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At("TAIL"))
+	private void vt$move(MovementType type, Vec3d move, final CallbackInfo ci)
+	{
+		if((Entity)(Object) this instanceof LivingEntity)
+		{
+			LivingEntity living = (LivingEntity)(Object)this;
+			LivingEvents.LIVING_MOVE_EVENT.invoker().onLivingMove(living, type, move, VariousTypes.getSheet(living));
+		}
 	}
 }

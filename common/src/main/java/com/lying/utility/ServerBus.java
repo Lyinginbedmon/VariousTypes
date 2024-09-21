@@ -25,10 +25,12 @@ import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 public class ServerBus
@@ -147,10 +149,11 @@ public class ServerBus
 		// If the player already has a stronger instance of Fatigue, remove it so the weaker instance (if any) will take effect
 		if(amplifier >= 0)
 		{
-			if(player.hasStatusEffect(VTStatusEffects.FATIGUE) && player.getStatusEffect(VTStatusEffects.FATIGUE).getAmplifier() > amplifier)
-				player.removeStatusEffect(VTStatusEffects.FATIGUE);
+			RegistryEntry<StatusEffect> fatigue = VTStatusEffects.getEntry(VTStatusEffects.FATIGUE);
+			if(player.hasStatusEffect(fatigue) && player.getStatusEffect(fatigue).getAmplifier() > amplifier)
+				player.removeStatusEffect(fatigue);
 			
-			player.addStatusEffect(new StatusEffectInstance(VTStatusEffects.FATIGUE, Reference.Values.TICKS_PER_SECOND * 3, amplifier));
+			player.addStatusEffect(new StatusEffectInstance(fatigue, Reference.Values.TICKS_PER_SECOND * 3, amplifier));
 		}
 	}
 }

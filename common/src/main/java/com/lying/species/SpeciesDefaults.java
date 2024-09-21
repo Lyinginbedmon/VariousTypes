@@ -54,10 +54,10 @@ public class SpeciesDefaults
 			.addAbility(SingleAttributeAbility.Health.of(-4))
 			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get()).build());
 	
-	public static final Supplier<Species> MUCKIE	= register(prefix("muckie"), () -> Species.Builder.of(prefix("muckie"))
+	public static final Supplier<Species> MERROW	= register(prefix("merrow"), () -> Species.Builder.of(prefix("merrow"))
 			.texture(Species.BACKING_SHIPWRECK)
 			.power(1)
-			.setTypes(VTTypes.HUMAN.get(), VTTypes.REPTILIAN.get())
+			.setTypes(VTTypes.HUMAN.get(), VTTypes.AQUATIC.get())
 			.addAbility(VTAbilities.DEEP_BREATH.get(), VTAbilities.SWIM.get()).build());
 	
 	public static final Supplier<Species> DRAGAN	= register(prefix("dragan"), () -> Species.Builder.of(prefix("dragan"))

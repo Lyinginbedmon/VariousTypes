@@ -116,27 +116,8 @@ public class LivingEntityMixin extends EntityMixin
 	@Inject(method = "tickMovement()V", at = @At("RETURN"))
 	private void vt$tickMovement(final CallbackInfo ci)
 	{
-		VariousTypes.getSheet((LivingEntity)(Object)this).ifPresent(sheet -> 
-		{
-			if(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
-			{
-				ItemStack helmet = getEquippedStack(EquipmentSlot.HEAD);
-				if(!helmet.isEmpty())
-				{
-					if(helmet.isDamageable())
-					{
-						helmet.setDamage(helmet.getDamage() + random.nextInt(2));
-						if(helmet.getDamage() >= helmet.getMaxDamage())
-						{
-							sendEquipmentBreakStatus(EquipmentSlot.HEAD);
-							equipStack(EquipmentSlot.HEAD, ItemStack.EMPTY);
-						}
-					}
-				}
-				else
-					setOnFireFor(8);
-			}
-		});
+		LivingEntity living = (LivingEntity)(Object)this;
+		LivingEvents.LIVING_MOVE_TICK_EVENT.invoker().onLivingMoveTick(living, VariousTypes.getSheet(living));
 	}
 	
 	@Inject(method = "canBreatheInWater()Z", at = @At("HEAD"), cancellable = true)

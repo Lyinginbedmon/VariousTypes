@@ -20,13 +20,16 @@ import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
+import com.lying.effect.DazzledStatusEffect;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTStatusEffects;
 import com.lying.mixin.AccessorEntityRenderDispatcher;
 import com.lying.mixin.AccessorLivingEntityRenderer;
 import com.lying.reference.Reference;
+import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
@@ -44,7 +47,9 @@ import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -59,6 +64,7 @@ public class ClientBus
 		registerAbilityRenderFuncs();
 		registerHighlights();
 		
+		// Favourite ability slots
 		ClientGuiEvent.RENDER_HUD.register((context, tickDelta) -> VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 		{
 			if(mc.options.hudHidden)
@@ -85,6 +91,28 @@ public class ClientBus
 			}
 		}));
 		
+		// Dazzled vignette
+		RenderEvents.BEFORE_HUD_RENDER_EVENT.register((mc, player, sheetOpt, tickDelta, context) -> 
+		{
+			if(player == null || mc.options.hudHidden)
+				return;
+			
+			RegistryEntry<StatusEffect> effect = VTStatusEffects.getEntry(VTStatusEffects.DAZZLED);
+			if(!player.hasStatusEffect(effect) || player.getStatusEffect(effect).getDuration() <= 0)
+				return;
+			
+			RenderSystem.disableDepthTest();
+			RenderSystem.depthMask(false);
+			RenderSystem.enableBlend();
+			context.setShaderColor(1F, 1F, 1F, player.getStatusEffect(effect).getFadeFactor(player, tickDelta));
+			context.drawTexture(DazzledStatusEffect.VIGNETTE, 0, 0, -100, 0F, 0F, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight());
+			RenderSystem.disableBlend();
+			RenderSystem.depthMask(true);
+			RenderSystem.enableDepthTest();
+			context.setShaderColor(1F, 1F, 1F, 1F);
+		});
+		
+		// Faeskin item tooltip
 		ClientTooltipEvent.ITEM.register((stack, lines, tooltipContext, flag) -> 
 		{
 			PlayerEntity player = mc.player;
@@ -113,6 +141,7 @@ public class ClientBus
 			}
 		});
 		
+		// Additional render layers
 		RenderEvents.ADD_FEATURE_RENDERERS_EVENT.register((dispatcher) -> 
 		{
 			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;

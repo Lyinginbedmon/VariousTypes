@@ -3,6 +3,8 @@
 	"item.vartypes.character_sheet": "Character Sheet",
 	// Status effects
 	"effect.vartypes.fatigue": "Fatigue",
+	"effect.vartypes.dazzled": "Dazzled",
+	"effect.vartypes.anchored": "Anchored",
 	// Item tags
 	"tag.item.vartypes.silver": "silver",
 	"tag.item.vartypes.vegetarian": "vegetarian",
@@ -67,7 +69,7 @@
 	"species.vartypes.human": "Linn",
 	"species.vartypes.human.desc": "Though believed to be the oldest of the dominant races, they don't record their history much. As a major trading power, they're found almost everywhere.",
 	"species.vartypes.orkin": "Orkin",
-	"species.vartypes.muckie": "Muckie",
+	"species.vartypes.merrow": "Merrow",
 	"species.vartypes.crioch": "Crioch",
 	"species.vartypes.dragan": "Dragan",
 	"species.vartypes.verdine": "Verdine",

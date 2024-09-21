@@ -18,6 +18,6 @@ public class AbilityStatusEffectOnDemand extends ActivatedAbility
 	{
 		if(!owner.getWorld().isClient())
 			for(StatusEffectInstance effect : effects)
-				owner.addStatusEffect(effect);
+				owner.addStatusEffect(new StatusEffectInstance(effect.getEffectType(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.shouldShowParticles()));
 	}
 }
