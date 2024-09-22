@@ -5,20 +5,16 @@
   ],
   "Background": "vartypes:textures/gui/sheet/creator_shipwreck.png",
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.merrow.desc"
+    },
     "Title": {
-      "translate": "species.vartypes.muckie"
+      "translate": "species.vartypes.merrow"
     }
   },
   "Power": 1,
   "Types": [
     "vartypes:human",
-    {
-      "Display": {
-        "Title": {
-          "translate": "subtype.vartypes.reptilian"
-        }
-      },
-      "ID": "vartypes:reptilian"
-    }
+    "vartypes:aquatic"
   ]
 }

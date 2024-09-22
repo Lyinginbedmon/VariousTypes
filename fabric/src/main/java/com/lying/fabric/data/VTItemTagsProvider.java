@@ -33,7 +33,16 @@ public class VTItemTagsProvider extends TagProvider<Item>
 				Items.IRON_PICKAXE, 
 				Items.IRON_SHOVEL, 
 				Items.IRON_HOE, 
-				Items.SHEARS);
+				Items.SHEARS,
+				Items.IRON_HELMET,
+				Items.IRON_CHESTPLATE,
+				Items.IRON_LEGGINGS,
+				Items.IRON_BOOTS,
+				Items.IRON_INGOT,
+				Items.IRON_BLOCK,
+				Items.IRON_BARS,
+				Items.IRON_DOOR,
+				Items.IRON_TRAPDOOR);
 		registerToTag(VTTags.FRUIT, 
 				Items.APPLE,
 				Items.CHORUS_FRUIT,

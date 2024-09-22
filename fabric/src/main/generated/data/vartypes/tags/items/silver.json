@@ -5,6 +5,15 @@
     "minecraft:iron_pickaxe",
     "minecraft:iron_shovel",
     "minecraft:iron_hoe",
-    "minecraft:shears"
+    "minecraft:shears",
+    "minecraft:iron_helmet",
+    "minecraft:iron_chestplate",
+    "minecraft:iron_leggings",
+    "minecraft:iron_boots",
+    "minecraft:iron_ingot",
+    "minecraft:iron_block",
+    "minecraft:iron_bars",
+    "minecraft:iron_door",
+    "minecraft:iron_trapdoor"
   ]
 }

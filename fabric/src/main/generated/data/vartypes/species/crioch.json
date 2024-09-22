@@ -12,6 +12,9 @@
   ],
   "Background": "vartypes:textures/gui/sheet/creator_end_city.png",
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.crioch.desc"
+    },
     "Title": {
       "translate": "species.vartypes.crioch"
     }

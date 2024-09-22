@@ -13,14 +13,30 @@
         ],
         "Denied": []
       }
+    },
+    {
+      "Ability": "vartypes:bonus_damage",
+      "Memory": {
+        "Amount": 2
+      }
+    },
+    {
+      "Ability": "vartypes:scale",
+      "Memory": {
+        "Amount": 0.1
+      }
     }
   ],
   "Background": "vartypes:textures/gui/sheet/creator_end_island.png",
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.dragan.desc"
+    },
     "Title": {
       "translate": "species.vartypes.dragan"
     }
   },
+  "Power": 3,
   "Types": [
     "vartypes:dragon"
   ]

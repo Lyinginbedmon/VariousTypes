@@ -52,7 +52,7 @@ public class TypeSet
 			switch(types.size())
 			{
 				case 0:
-					vars[tier.ordinal()] = Text.literal("N/A");
+					vars[tier.ordinal()] = tier == Tier.SUPERTYPE ? Text.literal("N/A") : null;
 					break;
 				case 1:
 					vars[tier.ordinal()] = VTUtils.describeType(types.get(0)).copy();

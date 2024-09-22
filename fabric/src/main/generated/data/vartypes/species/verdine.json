@@ -13,6 +13,9 @@
   ],
   "Background": "vartypes:textures/gui/sheet/creator_default.png",
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.verdine.desc"
+    },
     "Title": {
       "translate": "species.vartypes.verdine"
     }

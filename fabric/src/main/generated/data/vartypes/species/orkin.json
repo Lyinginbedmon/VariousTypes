@@ -11,6 +11,9 @@
   ],
   "Background": "vartypes:textures/gui/sheet/creator_bastion.png",
   "Display": {
+    "Description": {
+      "translate": "species.vartypes.orkin.desc"
+    },
     "Title": {
       "translate": "species.vartypes.orkin"
     }

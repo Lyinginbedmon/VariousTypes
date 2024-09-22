@@ -153,8 +153,10 @@ public class VTAbilities
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new AbilityStatusTagImmune(prefix("mithridatic"), Category.DEFENSE));
 	public static final Supplier<Ability> FAST_HEALING	= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
 	public static final Supplier<Ability> REGENERATION	= register("regeneration", () -> new AbilityRegeneration(prefix("regeneration"), Category.DEFENSE));
+	public static final Supplier<Ability> BONUS_DMG		= register("bonus_damage", () -> new SingleAttributeAbility.Damage(prefix("bonus_damage"), Category.OFFENSE));
 	public static final Supplier<Ability> NAT_ARMOUR	= register("natural_armour", () -> new SingleAttributeAbility.Armour(prefix("natural_armour"), Category.DEFENSE));
 	public static final Supplier<Ability> BONUS_HEALTH	= register("bonus_health", () -> new SingleAttributeAbility.Health(prefix("bonus_health"), Category.DEFENSE));
+	public static final Supplier<Ability> SCALE			= register("scale", () -> new SingleAttributeAbility.Scale(prefix("scale"), Category.UTILITY));
 	public static final Supplier<Ability> DEEP_BREATH	= register("deep_breath", () -> new Ability(prefix("deep_breath"), Category.UTILITY)
 	{
 		public void registerEventHandlers()

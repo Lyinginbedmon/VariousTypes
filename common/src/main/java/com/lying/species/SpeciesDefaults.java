@@ -37,6 +37,7 @@ public class SpeciesDefaults
 	
 	public static final Supplier<Species> CRIOCH = register(prefix("crioch"), () -> Species.Builder.of(prefix("crioch"))
 			.texture(Species.BACKING_END_CITY)
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".crioch.desc"))
 			.from(World.END)
 			.setTypes(VTTypes.OTHALL.get())
 			.addAbility(VTAbilities.TELEPORT.get())
@@ -49,6 +50,7 @@ public class SpeciesDefaults
 	
 	public static final Supplier<Species> ORKIN	= register(prefix("orkin"), () -> Species.Builder.of(prefix("orkin"))
 			.texture(Species.BACKING_BASTION)
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".orkin.desc"))
 			.from(World.NETHER)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
 			.addAbility(SingleAttributeAbility.Health.of(-4))
@@ -56,17 +58,23 @@ public class SpeciesDefaults
 	
 	public static final Supplier<Species> MERROW	= register(prefix("merrow"), () -> Species.Builder.of(prefix("merrow"))
 			.texture(Species.BACKING_SHIPWRECK)
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".merrow.desc"))
 			.power(1)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.AQUATIC.get())
 			.addAbility(VTAbilities.DEEP_BREATH.get(), VTAbilities.SWIM.get()).build());
 	
 	public static final Supplier<Species> DRAGAN	= register(prefix("dragan"), () -> Species.Builder.of(prefix("dragan"))
 			.texture(Species.BACKING_END_ISLAND)
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".dragan.desc"))
+			.power(3)
 			.setTypes(VTTypes.DRAGON.get())
+			.addAbility(SingleAttributeAbility.Scale.of(0.1F))
+			.addAbility(SingleAttributeAbility.Damage.of(2))
 			.addAbility(AbilityDietRestriction.ofTags(List.of(ItemTags.MEAT), List.of()).setDisplay(new LoreDisplay(Reference.ModInfo.translate("ability", "carnivore")))).build());
 	
 	public static final Supplier<Species> VERDINE	= register(prefix("verdine"), () -> Species.Builder.of(prefix("verdine"))
 			.texture(Species.BACKING_DEFAULT)
+			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".verdine.desc"))
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.VERDINE.get())
 			.addAbility(AbilityDietRestriction.ofTags(List.of(VTTags.VEGETARIAN), List.of()))
 			.addAbility(VTAbilities.PHOTOSYNTH.get()).build());
