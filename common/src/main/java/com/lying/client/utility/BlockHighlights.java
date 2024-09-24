@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
 import com.lying.utility.BlockHighlight;
@@ -41,6 +42,8 @@ public class BlockHighlights
 	}
 	
 	public static void clear() { BLOCKS.clear(); }
+	
+	public static void clear(RegistryKey<World> world) { BLOCKS.remove(world); }
 	
 	public static boolean isEmpty() { return BLOCKS.isEmpty() || BLOCKS.values().stream().allMatch(list -> list.isEmpty()); }
 	
@@ -105,14 +108,14 @@ public class BlockHighlights
 			for(int y=0; y<2; y++)
 				for(int x=0; x<2; x++)
 				{
-					linesToRender.add(new Line(min.add(x, y, x), min.add(1, y, 0), alpha));
-					linesToRender.add(new Line(min.add(x, y, x), min.add(0, y, 1), alpha));
+					linesToRender.add(new Line(min.add(x, y, x), min.add(1, y, 0), block.color(), alpha));
+					linesToRender.add(new Line(min.add(x, y, x), min.add(0, y, 1), block.color(), alpha));
 				}
 			
 			// Vertical, joining the two horizontal planes into 6 total faces
 			for(int x=0; x<2; x++)
 				for(int z=0; z<2; z++)
-					linesToRender.add(new Line(min.add(x, 0, z), min.add(x, 1, z), alpha));
+					linesToRender.add(new Line(min.add(x, 0, z), min.add(x, 1, z), block.color(), alpha));
 		};
 		
 		// FIXME Ensure rendered outlines remain fixed to the block grid when running or view bobbing
@@ -125,16 +128,18 @@ public class BlockHighlights
 			{
 				Vec3d v1 = line.start;
 				Vec3d v2 = line.end;
+				
+				Vector3f color = VTUtilsClient.decimalToVector(line.color());
 				float a = line.alpha();
 				
-				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(1F, 0F, 0F).next();
-				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(1F, 0F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(color.x, color.y, color.z, a).normal(1F, 0F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(color.x, color.y, color.z, a).normal(1F, 0F, 0F).next();
 				
-				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(0F, 1F, 0F).next();
-				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(0F, 1F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(color.x, color.y, color.z, a).normal(0F, 1F, 0F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(color.x, color.y, color.z, a).normal(0F, 1F, 0F).next();
 				
-				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(1F, 1F, 1F, a).normal(0F, 0F, 1F).next();
-				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(1F, 1F, 1F, a).normal(0F, 0F, 1F).next();
+				vertexConsumer.vertex(entry, (float)v1.x, (float)v1.y, (float)v1.z).color(color.x, color.y, color.z, a).normal(0F, 0F, 1F).next();
+				vertexConsumer.vertex(entry, (float)v2.x, (float)v2.y, (float)v2.z).color(color.x, color.y, color.z, a).normal(0F, 0F, 1F).next();
 			});
 			
 		matrixStack.pop();
@@ -160,7 +165,7 @@ public class BlockHighlights
 		return set;
 	}
 	
-	private static record Line(Vec3d start, Vec3d end, float alpha)
+	private static record Line(Vec3d start, Vec3d end, int color, float alpha)
 	{
 		/** Returns true if the given position occurs at some point on this line */
 		public boolean intersects(Vec3d point)

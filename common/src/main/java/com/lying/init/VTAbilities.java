@@ -25,6 +25,7 @@ import com.lying.ability.AbilityFaeskin;
 import com.lying.ability.AbilityFastHeal;
 import com.lying.ability.AbilityFavouredTerrain;
 import com.lying.ability.AbilityFleece;
+import com.lying.ability.AbilityFlexible;
 import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityIgnoreSlowdown;
 import com.lying.ability.AbilityInstance;
@@ -37,6 +38,7 @@ import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityPhotosynth;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
+import com.lying.ability.AbilitySculksight;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.AbilityStatusEffectOnDemand;
 import com.lying.ability.AbilityStatusTagImmune;
@@ -76,6 +78,7 @@ import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 public class VTAbilities
@@ -97,7 +100,7 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> NIGHT_VISION	= register("night_vision", () -> new AbilityNightVision(prefix("night_vision"), Category.UTILITY));
-	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new ToggledAbility(prefix("sculk_sight"), Category.UTILITY));
+	public static final Supplier<Ability> SCULK_SIGHT	= register("sculk_sight", () -> new AbilitySculksight(prefix("sculk_sight"), Category.UTILITY));
 	public static final Supplier<Ability> INVISIBILITY	= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE));
 	public static final Supplier<Ability> SWIM			= register("swim", () -> new AbilityStatusEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
@@ -132,7 +135,7 @@ public class VTAbilities
 		{
 			LivingEvents.LIVING_MOVE_TICK_EVENT.register((living, sheetOpt) -> 
 			{
-				if(living.isInvisible() || sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
+				if(living.isInvisible() || !isAffectedByDaylight(living) || sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.BURN_IN_SUN.get().registryName()))
 					return;
 				
 				ItemStack helmet = living.getEquippedStack(EquipmentSlot.HEAD);
@@ -148,6 +151,19 @@ public class VTAbilities
 					}
 				}
 			});
+		}
+		
+		@SuppressWarnings("deprecation")
+		private static boolean isAffectedByDaylight(Entity ent)
+		{
+			if(ent.getWorld().isDay() && !ent.getWorld().isClient())
+			{
+				float f = ent.getBrightnessAtEyes();
+				BlockPos pos = BlockPos.ofFloored(ent.getX(), ent.getEyeY(), ent.getZ());
+				boolean unaffected = ent.isWet() || ent.inPowderSnow || ent.wasInPowderSnow;
+				return f > 0.5F && !unaffected && ent.getWorld().isSkyVisible(pos) && ent.getWorld().getRandom().nextFloat() * 30F < (f - 0.4F) * 2F;
+			}
+			return false;
 		}
 	});
 	public static final Supplier<Ability> MITHRIDATIC	= register("mithridatic", () -> new AbilityStatusTagImmune(prefix("mithridatic"), Category.DEFENSE));
@@ -262,6 +278,32 @@ public class VTAbilities
 	{
 		public boolean isHidden(AbilityInstance instance) { return true; }
 	});
+	public static final Supplier<Ability> FLEXIBLE		= register("flexible", () -> new AbilityFlexible(prefix("flexible"), Category.UTILITY));
+	public static final Supplier<Ability> SUNBLIND	= register("sunblind", () -> new Ability(prefix("sunblind"), Category.UTILITY)
+	{
+		public void registerEventHandlers()
+		{
+			LivingEvents.LIVING_MOVE_TICK_EVENT.register((living, sheetOpt) -> 
+			{
+				if(living.isInvisible() || !isAffectedByDaylight(living) || sheetOpt.isEmpty() || !sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(VTAbilities.SUNBLIND.get().registryName()))
+					return;
+				
+				living.addStatusEffect(new StatusEffectInstance(VTStatusEffects.getEntry(VTStatusEffects.DAZZLED), Reference.Values.TICKS_PER_SECOND * 10, 0, true, false));
+			});
+		}
+		
+		@SuppressWarnings("deprecation")
+		private static boolean isAffectedByDaylight(Entity ent)
+		{
+			if(ent.getWorld().isDay() && !ent.getWorld().isClient())
+			{
+				float f = ent.getBrightnessAtEyes();
+				BlockPos pos = BlockPos.ofFloored(ent.getX(), ent.getEyeY(), ent.getZ());
+				return f > 0.5F && ent.getWorld().isSkyVisible(pos) && ent.getWorld().getRandom().nextFloat() * 30F < (f - 0.4F) * 2F;
+			}
+			return false;
+		}
+	});
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
 	{
@@ -274,8 +316,9 @@ public class VTAbilities
 	 	 * 
 	 	 * Analgesic - No hurt sound or animation, health display in HUD is inaccurate
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
-		 * Blink - Very temporary (read single digit seconds) Spectator mode with no menu access, moderate cooldown
+		 * Blink - Very temporary (read: single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
+		 * Camouflage - Perfect Invisibility with unlimited duration whilst within certain conditions or until attack/ed
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
 		 * Cold-Blooded - Weak and slow in warm environments (configurable)
 		 * Enchain - Locks a target in place with a set of magical chains
@@ -283,16 +326,20 @@ public class VTAbilities
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
 		 * Flitting - Creative-style flight
+		 * Fury - Temporary mild damage buff and resistance, ends after configured duration OR if owner deals no damage after 5 seconds
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
 		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable
+		 * Flexible - Toggled, applies a configured scale modifier (up or down)
+		 * Mindeater - Melee-range attack on players that drains XP levels or kills outright
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Poison Hand - Applies configurable status effects to target on melee hit
+		 * Poison - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
+		 * Roar - AoE damage effect
+		 * Smokescreen - Spawn an AoE particle cloud obscuring vision
 		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
-		 * Sunblind - Afflicted with Dazzled status effect when exposed to direct sunlight, sharply reducing attack damage
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */

@@ -14,6 +14,7 @@ import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
 import com.lying.client.utility.BlockHighlights;
 import com.lying.client.utility.ClientBus;
+import com.lying.client.utility.EntityHighlights;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.component.element.ElementSpecialPose;
@@ -22,6 +23,7 @@ import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.network.HighlightBlockPacket;
+import com.lying.network.HighlightEntityPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
@@ -102,6 +104,10 @@ public class VariousTypesClient
     		World world = mc.player.getWorld();
     		if(world == null) return;
     		value.highlights().forEach(highlight -> BlockHighlights.add(highlight, world));
+    	});
+    	NetworkManager.registerReceiver(NetworkManager.s2c(), HighlightEntityPacket.PACKET_TYPE, HighlightEntityPacket.PACKET_CODEC, (value, context) -> 
+    	{
+    		value.highlights().forEach(highlight -> EntityHighlights.add(highlight));
     	});
 	}
 	

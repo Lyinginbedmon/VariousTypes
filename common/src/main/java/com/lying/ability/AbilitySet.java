@@ -14,7 +14,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
-import com.lying.ability.Ability.AbilityType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 
@@ -30,7 +29,7 @@ public class AbilitySet
 	public static final Codec<AbilitySet> CODEC_VITALS = AbilityInstance.LIST_CODEC_VITALS.comapFlatMap(set -> { return DataResult.success(AbilitySet.listToSet(set)); }, AbilitySet::abilitiesList);
 	public static final Codec<AbilitySet> CODEC = AbilityInstance.LIST_CODEC.comapFlatMap(set -> { return DataResult.success(AbilitySet.listToSet(set)); }, AbilitySet::abilitiesList);
 	
-	private final Map<Identifier, AbilityInstance> abilities = new HashMap<>();
+	protected final Map<Identifier, AbilityInstance> abilities = new HashMap<>();
 	
 	public static AbilitySet listToSet(List<AbilityInstance> list)
 	{
@@ -131,7 +130,8 @@ public class AbilitySet
 	protected Map<Identifier, AbilityInstance> activatedAbilities()
 	{
 		Map<Identifier, AbilityInstance> activatedAbilities = new HashMap<>();
-		abilities.values().stream().filter(inst -> inst.ability().type() != AbilityType.PASSIVE).forEach(inst -> activatedAbilities.put(inst.mapName(), inst));
+		abilities.values().stream()
+			.filter(inst -> Ability.isActivatedAbility(inst.ability())).forEach(inst -> activatedAbilities.put(inst.mapName(), inst));
 		return activatedAbilities;
 	}
 	

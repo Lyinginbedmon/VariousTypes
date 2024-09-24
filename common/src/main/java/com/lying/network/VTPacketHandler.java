@@ -21,16 +21,17 @@ import net.minecraft.util.Identifier;
 
 public class VTPacketHandler
 {
-	public static final Identifier FINISH_CHARACTER_ID	= prefix("c2s_finish_character_creation");
-	public static final Identifier OPEN_ABILITY_MENU_ID	= prefix("c2s_open_ability_menu");
+	public static final Identifier FINISH_CHARACTER_ID		= prefix("c2s_finish_character_creation");
+	public static final Identifier OPEN_ABILITY_MENU_ID		= prefix("c2s_open_ability_menu");
 	public static final Identifier SET_FAVOURITE_ABILITY_ID	= prefix("c2s_set_favourite_ability");
-	public static final Identifier ACTIVATE_ABILITY_ID	= prefix("c2s_activate_ability");
+	public static final Identifier ACTIVATE_ABILITY_ID		= prefix("c2s_activate_ability");
 	public static final Identifier PLAYER_FLYING_INPUT_ID	= prefix("c2s_player_flying_input");
 	
 	public static final Identifier SYNC_ACTIONABLES_ID	= prefix("s2c_sync_actionables");
-	public static final Identifier SYNC_FATIGUE_ID	= prefix("s2c_sync_fatigue");
-	public static final Identifier SYNC_POSE_ID		= prefix("s2c_sync_pose");
+	public static final Identifier SYNC_FATIGUE_ID		= prefix("s2c_sync_fatigue");
+	public static final Identifier SYNC_POSE_ID			= prefix("s2c_sync_pose");
 	public static final Identifier HIGHLIGHT_BLOCK_ID	= prefix("s2c_highlight_block");
+	public static final Identifier HIGHLIGHT_ENTITY_ID	= prefix("s2c_highlight_entity");
 	
 	public static void initServer()
 	{

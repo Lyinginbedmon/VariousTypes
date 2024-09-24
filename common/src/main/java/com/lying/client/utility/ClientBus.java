@@ -189,7 +189,9 @@ public class ClientBus
 		ClientTickEvent.CLIENT_POST.register(client -> 
 		{
 			if(client.player == null || client.player.getWorld() == null) return;
-			BlockHighlights.tick(client.player.getWorld().getTime());
+			long currentTime = client.player.getWorld().getTime();
+			BlockHighlights.tick(currentTime);
+			EntityHighlights.tick(currentTime);
 		});
 		
 		RenderEvents.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
@@ -201,7 +203,19 @@ public class ClientBus
 		PlayerEvent.PLAYER_QUIT.register(player -> 
 		{
 			if(player.getUuid() == mc.player.getUuid())
+			{
 				BlockHighlights.clear();
+				EntityHighlights.clear();
+			}
+		});
+		
+		PlayerEvent.CHANGE_DIMENSION.register((player, w1, w2) -> 
+		{
+			if(player.getUuid() == mc.player.getUuid())
+			{
+				BlockHighlights.clear(w1);
+				EntityHighlights.clear();
+			}
 		});
 	}
 }

@@ -18,12 +18,14 @@
 	"DamageEnchantmentMixin",
 	"CraftingResultSlotMixin",
 	"ItemMixin",
-	"HungerManagerMixin"
+	"HungerManagerMixin",
+	"WorldMixin"
   ],
   "client": [
 	"AccessorEntityRenderDispatcher",
 	"AccessorLivingEntityRenderer",
 	"EntityRenderDispatcherMixin",
+	"MinecraftClientMixin",
 	"ClientPlayerEntityMixin",
   	"IDrawContextInvoker",
 	"InGameOverlayRendererMixin",

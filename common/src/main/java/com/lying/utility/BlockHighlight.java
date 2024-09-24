@@ -9,12 +9,13 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
-public record BlockHighlight(BlockPos pos, long start, int duration)
+public record BlockHighlight(BlockPos pos, long start, int duration, int color)
 {
 	public static final Codec<BlockHighlight> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			BlockPos.CODEC.fieldOf("Pos").forGetter(v -> v.pos), 
 			Codec.LONG.fieldOf("Start").forGetter(v -> v.start),
-			Codec.INT.fieldOf("Duration").forGetter(v -> v.duration))
+			Codec.INT.fieldOf("Duration").forGetter(v -> v.duration),
+			Codec.INT.fieldOf("Color").forGetter(v -> v.color))
 				.apply(instance, BlockHighlight::new));
 	
 	public boolean hasExpired(long currentTime) { return currentTime > expiry(); }

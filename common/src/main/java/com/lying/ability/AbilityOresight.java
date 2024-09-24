@@ -74,7 +74,7 @@ public class AbilityOresight extends ActivatedAbility implements IComplexAbility
 		
 		long time = world.getTime();
 		int duration = config.duration;
-		HighlightBlockPacket.send(player, ores.stream().map(position -> new BlockHighlight((BlockPos)position, time, duration)).collect(Collectors.toList()));
+		HighlightBlockPacket.send(player, ores.stream().map(position -> new BlockHighlight((BlockPos)position, time, duration, 0xFFFFFF)).collect(Collectors.toList()));
 		player.sendMessage(Text.translatable("gui.vartypes.oresight_tally", ores.size()), false);
 	}
 	

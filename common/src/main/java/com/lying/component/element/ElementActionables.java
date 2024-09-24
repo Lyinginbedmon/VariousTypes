@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
+import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.ability.ActivatedAbility;
@@ -39,6 +40,11 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 	public SheetElement<?> registry(){ return VTSheetElements.ACTIONABLES; }
 	
 	public static AbilitySet getActivated(CharacterSheet sheet) { return sheet.elementValue(VTSheetElements.ACTIONABLES); }
+	
+	public boolean add(AbilityInstance ability)
+	{
+		return Ability.isActivatedAbility(ability.ability()) ? super.add(ability) : false;
+	}
 	
 	public boolean isAvailable(Identifier mapName)
 	{
@@ -237,8 +243,6 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 					favourites.set(index, Optional.empty());
 			});
 		}
-		
-		
 	}
 	
 	/** Called client and server-side to interact with activated abilities */
