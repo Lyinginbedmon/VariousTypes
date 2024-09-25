@@ -12,12 +12,14 @@ import com.lying.ability.Ability;
 import com.lying.ability.AbilityFaeskin;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
+import com.lying.client.VariousTypesClient;
 import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
+import com.lying.client.utility.highlights.HighlightManager;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
 import com.lying.effect.DazzledStatusEffect;
@@ -190,31 +192,29 @@ public class ClientBus
 		{
 			if(client.player == null || client.player.getWorld() == null) return;
 			long currentTime = client.player.getWorld().getTime();
-			BlockHighlights.tick(currentTime);
-			EntityHighlights.tick(currentTime);
+			for(HighlightManager<?> manager : VariousTypesClient.HIGHLIGHTS)
+				manager.tick(currentTime);
 		});
 		
 		RenderEvents.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
 		{
 			if(mc.player == null || mc.player.getWorld() == null) return;
-			BlockHighlights.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, matrix4f1, matrix4f2, camera, tickDelta);
+			VariousTypesClient.BLOCK_HIGHLIGHTS.renderHighlightedBlocks(new MatrixStack(), vertexConsumerProvider, matrix4f1, matrix4f2, camera, tickDelta);
 		});
 		
 		PlayerEvent.PLAYER_QUIT.register(player -> 
 		{
 			if(player.getUuid() == mc.player.getUuid())
-			{
-				BlockHighlights.clear();
-				EntityHighlights.clear();
-			}
+				for(HighlightManager<?> manager : VariousTypesClient.HIGHLIGHTS)
+					manager.clear();
 		});
 		
 		PlayerEvent.CHANGE_DIMENSION.register((player, w1, w2) -> 
 		{
 			if(player.getUuid() == mc.player.getUuid())
 			{
-				BlockHighlights.clear(w1);
-				EntityHighlights.clear();
+				VariousTypesClient.BLOCK_HIGHLIGHTS.clear(w1);
+				VariousTypesClient.ENTITY_HIGHLIGHTS.clear();
 			}
 		});
 	}

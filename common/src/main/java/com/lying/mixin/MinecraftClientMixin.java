@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.lying.client.utility.EntityHighlights;
+import com.lying.client.VariousTypesClient;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
@@ -16,7 +16,7 @@ public class MinecraftClientMixin
 	@Inject(method = "hasOutline(Lnet/minecraft/entity/Entity;)Z", at = @At("RETURN"), cancellable = true)
 	private void vt$hasOutline(Entity entity, final CallbackInfoReturnable<Boolean> ci)
 	{
-		if(!ci.getReturnValueZ() && EntityHighlights.isHighlighted(entity.getUuid()))
+		if(!ci.getReturnValueZ() && VariousTypesClient.ENTITY_HIGHLIGHTS.isHighlighted(entity.getUuid()))
 			ci.setReturnValue(true);
 	}
 }

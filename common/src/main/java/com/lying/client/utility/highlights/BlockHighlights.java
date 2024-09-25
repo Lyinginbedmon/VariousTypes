@@ -1,4 +1,4 @@
-package com.lying.client.utility;
+package com.lying.client.utility.highlights;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,9 +9,10 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
-import com.lying.utility.BlockHighlight;
+import com.lying.client.utility.VTUtilsClient;
+import com.lying.utility.Highlight;
+import com.lying.utility.Highlight.Block;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -23,42 +24,45 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class BlockHighlights
+public class BlockHighlights extends HighlightManager<Highlight.Block>
 {
-	private static final MinecraftClient mc = MinecraftClient.getInstance();
-	private static final Map<RegistryKey<World>, Map<BlockPos, BlockHighlight>> BLOCKS = new HashMap<>();
+	private final Map<RegistryKey<World>, Map<BlockPos, Highlight.Block>> BLOCKS = new HashMap<>();
 	
-	public static void add(BlockHighlight highlight, World world)
+	public BlockHighlights() { super(Highlight.Type.BLOCK); }
+	
+	public void add(Block highlight) { }
+	
+	public void add(Block highlight, World world)
 	{
 		long time = world.getTime();
 		if(highlight.pos().getY() < world.getBottomY() || highlight.pos().getY() > 256 || highlight.hasExpired(time))
 			return;
 		
-		Map<BlockPos, BlockHighlight> blocks = BLOCKS.getOrDefault(world.getRegistryKey(), new HashMap<>());
+		Map<BlockPos, Highlight.Block> blocks = BLOCKS.getOrDefault(world.getRegistryKey(), new HashMap<>());
 		BlockPos pos = highlight.pos();
 		if(!blocks.containsKey(pos) || highlight.expiry() > blocks.get(pos).expiry())
 			blocks.put(pos, highlight);
 		BLOCKS.put(world.getRegistryKey(), blocks);
 	}
 	
-	public static void clear() { BLOCKS.clear(); }
+	public void clear() { BLOCKS.clear(); }
 	
-	public static void clear(RegistryKey<World> world) { BLOCKS.remove(world); }
+	public void clear(RegistryKey<World> world) { BLOCKS.remove(world); }
 	
-	public static boolean isEmpty() { return BLOCKS.isEmpty() || BLOCKS.values().stream().allMatch(list -> list.isEmpty()); }
+	public boolean isEmpty() { return BLOCKS.isEmpty() || BLOCKS.values().stream().allMatch(list -> list.isEmpty()); }
 	
-	public static boolean isEmpty(RegistryKey<World> world) { return !BLOCKS.containsKey(world) || BLOCKS.getOrDefault(world, new HashMap<>()).isEmpty(); }
+	public boolean isEmpty(RegistryKey<World> world) { return !BLOCKS.containsKey(world) || BLOCKS.getOrDefault(world, new HashMap<>()).isEmpty(); }
 	
-	public static void tick(long currentTime)
+	public void tick(long currentTime)
 	{
 		// Remove all highlights that have completely expired across all worlds
 		List<RegistryKey<World>> emptied = Lists.newArrayList();
 		for(RegistryKey<World> world : BLOCKS.keySet())
 		{
-			Map<BlockPos, BlockHighlight> blocks = BLOCKS.getOrDefault(world, new HashMap<>());
+			Map<BlockPos, Highlight.Block> blocks = BLOCKS.getOrDefault(world, new HashMap<>());
 			if(blocks.isEmpty()) continue;
 			
-			List<BlockHighlight> highlights = Lists.newArrayList();
+			List<Highlight.Block> highlights = Lists.newArrayList();
 			highlights.addAll(get(world));
 			highlights.forEach(highlight -> 
 			{
@@ -74,30 +78,30 @@ public class BlockHighlights
 		emptied.forEach(world -> BLOCKS.remove(world));
 	}
 	
-	public static boolean shouldRender()
+	public boolean shouldRender()
 	{
 		return !isEmpty() && mc.player.getWorld() != null && !isEmpty(mc.player.getWorld().getRegistryKey());
 	}
 	
-	public static Collection<BlockHighlight> get(RegistryKey<World> world)
+	public Collection<Highlight.Block> get(RegistryKey<World> world)
 	{
 		return BLOCKS.containsKey(world) ? BLOCKS.get(world).values() : Lists.newArrayList();
 	}
 	
 	/** Called in {@link WorldRenderer.render} via the AFTER_WORLD_RENDER event in ClientBus */
-	public static void renderHighlightedBlocks(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Matrix4f matrix4f1, Matrix4f matrix4f2, Camera camera, float tickDelta)
+	public void renderHighlightedBlocks(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, Matrix4f matrix4f1, Matrix4f matrix4f2, Camera camera, float tickDelta)
 	{
 		renderHighlightedBlocks(matrixStack, matrix4f2, vertexConsumerProvider.getBuffer(RenderLayer.getLines()), camera.getPos());
 	}
 	
-	public static void renderHighlightedBlocks(MatrixStack matrixStack, Matrix4f matrix4f, VertexConsumer vertexConsumer, Vec3d cameraPos)
+	public void renderHighlightedBlocks(MatrixStack matrixStack, Matrix4f matrix4f, VertexConsumer vertexConsumer, Vec3d cameraPos)
 	{
 		if(!shouldRender()) return;
 		
 		List<Line> linesToRender = Lists.newArrayList();
 		
 		// Build a set of all lines from each block (typically size 12n)
-		for(BlockHighlight block : get(mc.player.getWorld().getRegistryKey()))
+		for(Block block : get(mc.player.getWorld().getRegistryKey()))
 		{
 			BlockPos pos = block.pos();
 			if(cameraPos.distanceTo(new Vec3d(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D)) > 32D) continue;

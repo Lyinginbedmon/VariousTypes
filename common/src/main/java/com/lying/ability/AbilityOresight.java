@@ -10,9 +10,9 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityOresight.ConfigOresight;
 import com.lying.data.VTTags;
-import com.lying.network.HighlightBlockPacket;
+import com.lying.network.HighlightPacket;
 import com.lying.reference.Reference;
-import com.lying.utility.BlockHighlight;
+import com.lying.utility.Highlight;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -74,7 +74,7 @@ public class AbilityOresight extends ActivatedAbility implements IComplexAbility
 		
 		long time = world.getTime();
 		int duration = config.duration;
-		HighlightBlockPacket.send(player, ores.stream().map(position -> new BlockHighlight((BlockPos)position, time, duration, 0xFFFFFF)).collect(Collectors.toList()));
+		HighlightPacket.send(player, ores.stream().map(position -> new Highlight.Block((BlockPos)position, time, duration, 0xFFFFFF)).collect(Collectors.toList()));
 		player.sendMessage(Text.translatable("gui.vartypes.oresight_tally", ores.size()), false);
 	}
 	

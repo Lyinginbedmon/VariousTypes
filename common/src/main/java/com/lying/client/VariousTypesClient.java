@@ -12,9 +12,10 @@ import com.lying.client.renderer.ShakenBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
-import com.lying.client.utility.BlockHighlights;
 import com.lying.client.utility.ClientBus;
-import com.lying.client.utility.EntityHighlights;
+import com.lying.client.utility.highlights.BlockHighlights;
+import com.lying.client.utility.highlights.EntityHighlights;
+import com.lying.client.utility.highlights.HighlightManager;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.component.element.ElementSpecialPose;
@@ -22,11 +23,11 @@ import com.lying.init.VTEntityTypes;
 import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
-import com.lying.network.HighlightBlockPacket;
-import com.lying.network.HighlightEntityPacket;
+import com.lying.network.HighlightPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
+import com.lying.utility.Highlight;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
@@ -41,6 +42,10 @@ public class VariousTypesClient
 {
 	public static MinecraftClient mc = MinecraftClient.getInstance();
 	public static ClientConfig config;
+	
+	public static final BlockHighlights BLOCK_HIGHLIGHTS = new BlockHighlights();
+	public static final EntityHighlights ENTITY_HIGHLIGHTS = new EntityHighlights();
+	public static final HighlightManager<?>[] HIGHLIGHTS = new HighlightManager[] { BLOCK_HIGHLIGHTS, ENTITY_HIGHLIGHTS };
 	
 	public static void clientInit()
 	{
@@ -99,15 +104,17 @@ public class VariousTypesClient
     			}
     		});
     	});
-    	NetworkManager.registerReceiver(NetworkManager.s2c(), HighlightBlockPacket.PACKET_TYPE, HighlightBlockPacket.PACKET_CODEC, (value, context) -> 
+    	NetworkManager.registerReceiver(NetworkManager.s2c(), HighlightPacket.PACKET_TYPE, HighlightPacket.PACKET_CODEC, (value, context) -> 
     	{
     		World world = mc.player.getWorld();
-    		if(world == null) return;
-    		value.highlights().forEach(highlight -> BlockHighlights.add(highlight, world));
-    	});
-    	NetworkManager.registerReceiver(NetworkManager.s2c(), HighlightEntityPacket.PACKET_TYPE, HighlightEntityPacket.PACKET_CODEC, (value, context) -> 
-    	{
-    		value.highlights().forEach(highlight -> EntityHighlights.add(highlight));
+    		value.highlights().forEach(highlight -> 
+    		{
+    			if(world != null && BLOCK_HIGHLIGHTS.canAccept(highlight))
+					BLOCK_HIGHLIGHTS.add((Highlight.Block)highlight, world);
+    			
+    			if(ENTITY_HIGHLIGHTS.canAccept(highlight))
+					ENTITY_HIGHLIGHTS.add((Highlight.Entity)highlight);
+    		});
     	});
 	}
 	

@@ -16,6 +16,6 @@ public class MiscEvents
 	
 	public interface VibrationEvent
 	{
-		void onVibration(RegistryEntry<GameEvent> gameEvent, Optional<Entity> entity, Optional<BlockPos> block, World world);
+		void onVibration(RegistryEntry<GameEvent> gameEvent, Optional<Entity> entity, BlockPos block, World world);
 	}
 }

@@ -35,8 +35,6 @@ public class AnimatedPlayerEntityRenderer extends LivingEntityRenderer<AnimatedP
 		wrapped.modifyColor(RenderEvents.GET_PLAYER_COLOR_EVENT.invoker().getColor(animatedPlayerEntity));
 		wrapped.modifyAlpha(RenderEvents.GET_PLAYER_ALPHA_EVENT.invoker().getAlpha(animatedPlayerEntity));
 		
-		// TODO Add compatibility with pre/post player rendering events?
-		
 		switch(getSkinTextures(animatedPlayerEntity).model())
 		{
 			case WIDE:

@@ -23,6 +23,13 @@ public class AbilityFlexible extends ToggledAbility
 		super(regName, catIn);
 	}
 	
+	public Identifier mapName(AbilityInstance inst)
+	{
+		Identifier regName = inst.ability().registryName();
+		boolean isBonus = getScale(inst.memory()) >= 0;
+		return new Identifier(regName.getNamespace(), regName.getPath()+"_"+(isBonus ? "bonus" : "penalty"));
+	}
+	
 	protected void onActivation(LivingEntity owner, AbilityInstance instance)
 	{
 		float amount = getScale(instance.memory());

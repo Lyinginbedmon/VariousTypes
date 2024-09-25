@@ -421,9 +421,13 @@ public class VTCommands
 												throw FAILED_GENERIC.create();
 											
 											ModuleCustomAbilities custAbilities = sheetOpt.get().module(VTSheetModules.ABILITIES);
-											AbilityInstance inst = custAbilities.get(abilityID);
-											custAbilities.remove(abilityID);
-											source.sendFeedback(() -> translate("command", "custom_abilities.remove.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
+											try
+											{
+												AbilityInstance inst = custAbilities.get(abilityID).copy();
+												custAbilities.remove(abilityID);
+												source.sendFeedback(() -> translate("command", "custom_abilities.remove.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
+											}
+											catch(Exception e) { source.sendFeedback(() -> translate("command", "custom_abilities.remove.failed", abilityID.toString(), player.getDisplayName()), true); }
 											return 15;
 										}))
 									.then(literal("all")
