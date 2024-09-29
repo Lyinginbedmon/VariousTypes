@@ -9,20 +9,23 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.function.Consumers;
 
 import com.google.gson.JsonObject;
-import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.type.Type;
 import com.lying.type.TypeSet;
+import com.lying.utility.LootBag;
 import com.lying.utility.LoreDisplay;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -41,19 +44,37 @@ public class Species
 	public static final Identifier BACKING_TRIAL = prefix("textures/gui/sheet/creator_trial.png");
 	
 	private final Identifier id;
-	private LoreDisplay display;
-	private Optional<Identifier> creatorBacking;
+	private final LoreDisplay display;
+	private final Optional<Identifier> creatorBacking;
 	
 	private int power;
 	private RegistryKey<World> homeDim = null;
 	private TypeSet types = new TypeSet();
 	private AbilitySet abilities = new AbilitySet();
 	
+	private Optional<LootBag> lootOnApplied = Optional.empty();
+	
 	private Species(Identifier idIn, LoreDisplay displayIn, Optional<Identifier> textureIn)
 	{
 		id = idIn;
 		display = displayIn;
 		creatorBacking = textureIn;
+	}
+	
+	public Builder toBuilder()
+	{
+		Builder builder = new Builder(id);
+		builder.displayName = display.title();
+		builder.displayDesc = display.description();
+		creatorBacking.ifPresent(tex -> builder.texture(tex));
+		
+		builder.power(power);
+		builder.from(homeDim);
+		builder.setTypes(types.contents().toArray(new Type[0]));
+		builder.addAbilities(abilities.abilities());
+		builder.startingLoot = lootOnApplied;
+		
+		return builder;
 	}
 	
 	public Identifier registryName() { return id; }
@@ -74,60 +95,43 @@ public class Species
 	
 	public AbilitySet abilities() { return abilities.copy(); }
 	
+	public boolean hasStartingGear() { return lootOnApplied.isPresent(); }
+	
+	public void giveLootTo(ServerPlayerEntity player) { lootOnApplied.ifPresent(loot -> loot.giveTo(player)); }
+	
 	public JsonObject writeToJson(RegistryWrapper.WrapperLookup lookup)
 	{
-		JsonObject obj = new JsonObject();
-		obj.add("Display", display.toJson(lookup));
-		creatorBacking.ifPresent(tex -> obj.addProperty("Background", tex.toString()));
-		
-		if(power > 0)
-			obj.addProperty("Power", power);
-		if(homeDim != null)
-			obj.addProperty("Home", homeDim.getValue().toString());
-		if(!types.isEmpty())
-			obj.add("Types", types.writeToJson(lookup));
+		JsonObject obj = (JsonObject)Builder.CODEC.encodeStart(JsonOps.INSTANCE, toBuilder()).getOrThrow();
+		obj.remove("ID");
 		if(!abilities.isEmpty())
 			obj.add("Abilities", abilities.writeToJson(lookup, true));
-		
 		return obj;
 	}
 	
 	public static Species readFromJson(Identifier registryName, JsonObject data)
 	{
-		Species.Builder builder = Builder.of(registryName);
-		
-		if(data.has("Background"))
-			builder.texture(new Identifier(data.get("Background").getAsString()));
-		
-		Species species = builder.build();
-		species.display = LoreDisplay.fromJson(data.get("Display"));
-		
-		if(data.has("Power"))
-			species.power = data.get("Power").getAsInt();
-		
-		if(data.has("Home"))
-			species.homeDim = World.CODEC.parse(NbtOps.INSTANCE, NbtString.of(data.get("Home").getAsString())).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
-		
-		if(data.has("Types"))
-			species.types = TypeSet.readFromJson(data.get("Types").getAsJsonArray());
+		data.addProperty("ID", registryName.toString());
+		Species.Builder builder = Builder.CODEC.parse(JsonOps.INSTANCE, data).getOrThrow();
 		
 		if(data.has("Abilities"))
-			species.abilities = AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), AbilitySource.SPECIES);
+			builder.addAbilities(AbilitySet.readFromJson(data.get("Abilities").getAsJsonArray(), AbilitySource.SPECIES).abilities());
 		
-		return species;
-	}
-	
-	public void clear()
-	{
-		power = 0;
-		homeDim = null;
-		types.clear();
-		abilities.clear();
+		return builder.build();
 	}
 	
 	public static class Builder
 	{
-		private Identifier id;
+		public static final Codec<Builder> CODEC	= RecordCodecBuilder.create(instance -> instance.group(
+				Identifier.CODEC.fieldOf("ID").forGetter(v -> v.id),
+				LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(v -> Optional.of(new LoreDisplay(v.displayName, v.displayDesc))),
+				Identifier.CODEC.optionalFieldOf("Background").forGetter(v -> v.creatorTexture),
+				Codec.INT.optionalFieldOf("Power").forGetter(v -> Optional.of(v.power)),
+				RegistryKey.createCodec(RegistryKeys.WORLD).optionalFieldOf("Home").forGetter(v -> v.homeDim == null ? Optional.empty() : Optional.of(v.homeDim)),
+				TypeSet.CODEC.optionalFieldOf("Types").forGetter(v -> Optional.of(v.types)),
+				LootBag.CODEC.optionalFieldOf("StartingLoot").forGetter(v -> v.startingLoot))
+					.apply(instance, Builder::new));
+		
+		private final Identifier id;
 		
 		private Text displayName;
 		private Optional<Text> displayDesc = Optional.empty();
@@ -138,6 +142,24 @@ public class Species
 		private TypeSet types = new TypeSet();
 		private AbilitySet abilities = new AbilitySet();
 		
+		private Optional<LootBag> startingLoot = Optional.empty();
+		
+		protected Builder(Identifier idIn, Optional<LoreDisplay> displayIn, Optional<Identifier> backingIn, Optional<Integer> powerIn, Optional<RegistryKey<World>> homeIn, Optional<TypeSet> typesIn, Optional<LootBag> lootIn)
+		{
+			this(idIn);
+			power(powerIn.orElse(0));
+			
+			LoreDisplay display = displayIn.orElse(new LoreDisplay(Text.translatable("species."+idIn.getNamespace()+"."+idIn.getPath()), Optional.empty()));
+			display(display.title());
+			display.description().ifPresent(desc -> description(desc));
+			backingIn.ifPresent(tex -> texture(tex));
+			
+			homeIn.ifPresent(dim -> from(dim));
+			types = typesIn.orElse(new TypeSet());
+			
+			startingLoot = lootIn;
+		}
+		
 		protected Builder(Identifier idIn)
 		{
 			id = idIn;
@@ -147,6 +169,17 @@ public class Species
 		public static Builder of(Identifier idIn)
 		{
 			return new Builder(idIn);
+		}
+		
+		public Species build()
+		{
+			Species species = new Species(id, new LoreDisplay(displayName, displayDesc), creatorTexture);
+			species.power = power;
+			species.homeDim = homeDim;
+			species.types = types;
+			species.abilities = abilities;
+			species.lootOnApplied = startingLoot;
+			return species;
 		}
 		
 		public Builder display(Text nameIn)
@@ -170,6 +203,12 @@ public class Species
 		public Builder power(int powerIn)
 		{
 			power = Math.max(0, powerIn);
+			return this;
+		}
+		
+		public Builder startingLoot(LootBag bagIn)
+		{
+			startingLoot = bagIn == null ? Optional.empty() : Optional.of(bagIn);
 			return this;
 		}
 		
@@ -222,16 +261,6 @@ public class Species
 		{
 			inst.forEach(instance -> addAbility(instance));
 			return this;
-		}
-		
-		public Species build()
-		{
-			Species species = new Species(id, new LoreDisplay(displayName, displayDesc), creatorTexture);
-			species.power = power;
-			species.homeDim = homeDim;
-			species.types = types;
-			species.abilities = abilities;
-			return species;
 		}
 	}
 }

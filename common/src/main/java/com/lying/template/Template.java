@@ -12,10 +12,12 @@ import com.lying.component.CharacterSheet;
 import com.lying.template.operation.Operation;
 import com.lying.template.precondition.Precondition;
 import com.lying.type.TypeSet;
+import com.lying.utility.LootBag;
 import com.lying.utility.LoreDisplay;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -29,13 +31,16 @@ public class Template
 	private final List<Precondition> preconditions = Lists.newArrayList();
 	private final List<Operation> operations = Lists.newArrayList();
 	
-	private Template(Identifier nameIn, int powerIn, LoreDisplay displayIn, List<Precondition> conditionsIn, List<Operation> operationsIn)
+	private final Optional<LootBag> lootOnApplied;
+	
+	private Template(Identifier nameIn, int powerIn, LoreDisplay displayIn, List<Precondition> conditionsIn, List<Operation> operationsIn, Optional<LootBag> lootIn)
 	{
 		registryName = nameIn;
 		power = powerIn;
 		display = displayIn;
 		preconditions.addAll(conditionsIn);
 		operations.addAll(operationsIn);
+		lootOnApplied = lootIn;
 	}
 	
 	public Identifier registryName() { return registryName; }
@@ -51,6 +56,10 @@ public class Template
 	public LoreDisplay display() { return display; }
 	
 	public boolean validFor(CharacterSheet sheet, LivingEntity owner) { return preconditions.stream().allMatch(condition -> condition.isValidFor(sheet, owner)); }
+	
+	public boolean hasLoot() { return lootOnApplied.isPresent(); }
+	
+	public void giveLootTo(ServerPlayerEntity player) { lootOnApplied.ifPresent(loot -> loot.giveTo(player)); }
 	
 	public void applyTypeOperations(TypeSet typeSet) { operations.forEach(operation -> operation.applyToTypes(typeSet)); }
 	
@@ -77,6 +86,8 @@ public class Template
 			operations.forEach(operation -> list.add(operation.writeToJson(manager)));
 			data.add("Operations", list);
 		}
+		
+		lootOnApplied.ifPresent(lootBag -> data.add("GiftLoot", lootBag.toJson()));
 		
 		return data;
 	}
@@ -115,6 +126,9 @@ public class Template
 			}
 		}
 		
+		if(data.has("GiftLoot"))
+			builder.loot(LootBag.fromJson(data.get("GiftLoot")));
+		
 		return builder.build();
 	}
 	
@@ -128,6 +142,8 @@ public class Template
 		private int power = 0;
 		private final List<Precondition> preconditions = Lists.newArrayList();
 		private final List<Operation> operations = Lists.newArrayList();
+		
+		private Optional<LootBag> loot = Optional.empty();
 		
 		private Builder(Identifier nameIn)
 		{
@@ -167,9 +183,15 @@ public class Template
 			return this;
 		}
 		
+		public Builder loot(LootBag bagIn)
+		{
+			loot = bagIn == null ? Optional.empty() : Optional.of(bagIn);
+			return this;
+		}
+		
 		public Template build()
 		{
-			return new Template(name, power, new LoreDisplay(displayName, displayDesc), preconditions, operations);
+			return new Template(name, power, new LoreDisplay(displayName, displayDesc), preconditions, operations, loot);
 		}
 	}
 }

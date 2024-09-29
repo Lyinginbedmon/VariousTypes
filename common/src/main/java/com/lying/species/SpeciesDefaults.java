@@ -14,9 +14,12 @@ import com.lying.data.VTTags;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
+import com.lying.utility.LootBag;
 import com.lying.utility.LoreDisplay;
 
 import net.minecraft.entity.EntityType;
+import net.minecraft.item.Items;
+import net.minecraft.loot.LootTables;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
@@ -54,7 +57,8 @@ public class SpeciesDefaults
 			.from(World.NETHER)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
 			.addAbility(SingleAttributeAbility.Health.of(-4))
-			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get()).build());
+			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get())
+			.startingLoot(LootBag.ofItems(Items.CROSSBOW, Items.GOLDEN_SWORD).withSystemTable(LootTables.JUNGLE_TEMPLE_DISPENSER_CHEST)).build());
 	
 	public static final Supplier<Species> MERROW	= register(prefix("merrow"), () -> Species.Builder.of(prefix("merrow"))
 			.texture(Species.BACKING_SHIPWRECK)

@@ -6,9 +6,11 @@ import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.component.element.ElementActionables;
+import com.lying.component.module.ModuleTemplates;
 import com.lying.event.PlayerEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
+import com.lying.init.VTSpeciesRegistry;
 import com.lying.screen.AbilityMenuHandler;
 
 import dev.architectury.networking.NetworkManager;
@@ -48,9 +50,17 @@ public class VTPacketHandler
     			sheet.clear();
     			
     			if(value.speciesId() != null)
+    			{
     				sheet.module(VTSheetModules.SPECIES).set(value.speciesId());
+    				if(sheet.timesCreated() < 1 || context.getPlayer().isCreative())
+    					VTSpeciesRegistry.instance().get(value.speciesId()).ifPresent(species -> species.giveLootTo((ServerPlayerEntity)context.getPlayer()));
+    			}
     			
-    			sheet.module(VTSheetModules.TEMPLATES).set(value.templateIds().toArray(new Identifier[0]));
+    			if(!value.templateIds().isEmpty())
+    			{
+	    			ModuleTemplates templateModule = sheet.module(VTSheetModules.TEMPLATES);
+	    			value.templateIds().forEach(id -> templateModule.addTemplate(id, (ServerPlayerEntity)context.getPlayer()));
+    			}
     			
     			sheet.buildSheet();
     			sheet.incEdits();

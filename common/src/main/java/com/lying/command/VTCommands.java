@@ -62,6 +62,7 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -609,11 +610,12 @@ public class VTCommands
 		else if(!tem.get().validFor(sheetOpt.get(), player) && !force)
 			throw new SimpleCommandExceptionType(translate("command", "template.apply.failed.invalid", describeTemplate(tem.get()), player.getDisplayName())).create();
 		
-		sheetOpt.ifPresent(sheet -> 
-		{
-			sheet.module(VTSheetModules.TEMPLATES).add(template);
+		ModuleTemplates templates = sheetOpt.get().module(VTSheetModules.TEMPLATES);
+		if(templates.addTemplate(template, (ServerPlayerEntity)player))
 			source.sendFeedback(() -> translate("command", "template.apply.success", describeTemplate(tem.get()), player.getDisplayName()), true);
-		});
+		else
+			throw new SimpleCommandExceptionType(translate("command", "template.apply.failed.present", player.getDisplayName(), describeTemplate(tem.get()))).create();
+		
 		return 15;
 	}
 	

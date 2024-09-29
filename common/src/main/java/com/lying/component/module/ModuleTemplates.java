@@ -24,6 +24,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -79,7 +80,7 @@ public class ModuleTemplates extends AbstractSheetModule
 			updateSheet();
 	}
 	
-	public void add(Identifier... idIn)
+	public boolean add(Identifier... idIn)
 	{
 		boolean shouldUpdate = false;
 		for(Identifier id : idIn)
@@ -90,6 +91,18 @@ public class ModuleTemplates extends AbstractSheetModule
 			}
 		if(shouldUpdate)
 			updateSheet();
+		return shouldUpdate;
+	}
+	
+	/** Applies the given template, providing any loot if specified */
+	public boolean addTemplate(Identifier idIn, ServerPlayerEntity player)
+	{
+		if(add(idIn))
+		{
+			VTTemplateRegistry.instance().get(idIn).ifPresent(template -> template.giveLootTo(player));
+			return true;
+		}
+		return false;
 	}
 	
 	public void remove(Identifier... idIn)
