@@ -125,7 +125,7 @@ public class Species
 				Identifier.CODEC.fieldOf("ID").forGetter(v -> v.id),
 				LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(v -> Optional.of(new LoreDisplay(v.displayName, v.displayDesc))),
 				Identifier.CODEC.optionalFieldOf("Background").forGetter(v -> v.creatorTexture),
-				Codec.INT.optionalFieldOf("Power").forGetter(v -> Optional.of(v.power)),
+				Codec.INT.optionalFieldOf("Power").forGetter(v -> v.power == 0 ? Optional.empty() : Optional.of(v.power)),
 				RegistryKey.createCodec(RegistryKeys.WORLD).optionalFieldOf("Home").forGetter(v -> v.homeDim == null ? Optional.empty() : Optional.of(v.homeDim)),
 				TypeSet.CODEC.optionalFieldOf("Types").forGetter(v -> Optional.of(v.types)),
 				LootBag.CODEC.optionalFieldOf("StartingLoot").forGetter(v -> v.startingLoot))

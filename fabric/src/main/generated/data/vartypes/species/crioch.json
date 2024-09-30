@@ -20,7 +20,6 @@
     }
   },
   "Home": "minecraft:the_end",
-  "Power": 0,
   "Types": [
     "vartypes:othall"
   ]

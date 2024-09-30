@@ -89,8 +89,8 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 	public static class ConfigDiet
 	{
 		protected static final Codec<ConfigDiet> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Allowed").forGetter(v -> Optional.of(v.allowedTags)),
-				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Denied").forGetter(v -> Optional.of(v.deniedTags)))
+				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Allowed").forGetter(v -> v.allowedTags.isEmpty() ? Optional.empty() : Optional.of(v.allowedTags)),
+				TagKey.codec(RegistryKeys.ITEM).listOf().optionalFieldOf("Denied").forGetter(v -> v.deniedTags.isEmpty() ? Optional.empty() : Optional.of(v.deniedTags)))
 					.apply(instance, ConfigDiet::new));
 		
 		protected List<TagKey<Item>> allowedTags = Lists.newArrayList();

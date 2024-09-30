@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
@@ -19,6 +18,8 @@ import com.lying.init.VTTypes;
 import com.lying.reference.Reference;
 import com.lying.type.Type.Tier;
 import com.lying.utility.VTUtils;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.JsonOps;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -31,7 +32,14 @@ import net.minecraft.util.Identifier;
 /** Manager object for a set of unique types */
 public class TypeSet
 {
+	public static final Codec<TypeSet> CODEC	= Type.CODEC.listOf().xmap(TypeSet::new, TypeSet::contents);
+	
 	private final List<Type> types = Lists.newArrayList();
+	
+	public TypeSet(List<Type> typesIn)
+	{
+		typesIn.forEach(type -> add(type));
+	}
 	
 	public TypeSet(Type... typesIn)
 	{
@@ -125,23 +133,23 @@ public class TypeSet
 		return set;
 	}
 	
-	public JsonArray writeToJson(RegistryWrapper.WrapperLookup manager)
+	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
-		JsonArray list = new JsonArray();
-		types.forEach(inst -> list.add(inst.writeToJson(manager)));
-		return list;
+//		JsonArray list = new JsonArray();
+//		types.forEach(inst -> list.add(inst.writeToJson(manager)));
+		return CODEC.encodeStart(JsonOps.INSTANCE, this).getOrThrow();
 	}
 	
-	public static TypeSet readFromJson(JsonArray list)
+	public static TypeSet readFromJson(JsonElement list)
 	{
-		TypeSet set = new TypeSet();
-		for(JsonElement entry : list.asList())
-		{
-			Type inst = Type.readFromJson(entry);
-			if(inst != null)
-				set.add(inst);
-		}
-		return set;
+//		TypeSet set = new TypeSet();
+//		for(JsonElement entry : list.asList())
+//		{
+//			Type inst = Type.readFromJson(entry);
+//			if(inst != null)
+//				set.add(inst);
+//		}
+		return CODEC.parse(JsonOps.INSTANCE, list).getOrThrow();
 	}
 	
 	public void forEach(Consumer<Type> actionIn)

@@ -5,8 +5,7 @@
       "Memory": {
         "Allowed": [
           "#vartypes:vegetarian"
-        ],
-        "Denied": []
+        ]
       }
     },
     "vartypes:photosynth"
@@ -22,13 +21,6 @@
   },
   "Types": [
     "vartypes:human",
-    {
-      "Display": {
-        "Title": {
-          "translate": "subtype.vartypes.verdine"
-        }
-      },
-      "ID": "vartypes:verdine"
-    }
+    "vartypes:dummy"
   ]
 }

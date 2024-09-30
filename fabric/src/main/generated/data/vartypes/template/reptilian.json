@@ -10,14 +10,7 @@
     {
       "Name": "vartypes:has_none_of_types",
       "Types": [
-        {
-          "Display": {
-            "Title": {
-              "translate": "subtype.vartypes.reptilian"
-            }
-          },
-          "ID": "vartypes:reptilian"
-        }
+        "vartypes:dummy"
       ]
     }
   ],
@@ -33,14 +26,7 @@
     {
       "Name": "vartypes:add_types",
       "Types": [
-        {
-          "Display": {
-            "Title": {
-              "translate": "subtype.vartypes.reptilian"
-            }
-          },
-          "ID": "vartypes:reptilian"
-        }
+        "vartypes:dummy"
       ]
     },
     {

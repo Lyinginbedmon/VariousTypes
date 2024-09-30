@@ -39,7 +39,7 @@ public abstract class TypeCondition extends ConfigurableCondition
 	protected JsonObject write(JsonObject data, RegistryWrapper.WrapperLookup manager)
 	{
 		JsonArray list = new JsonArray();
-		types.forEach(type -> list.add(type.writeToJson(manager)));
+		types.forEach(type -> list.add(type.writeToJson()));
 		data.add("Types", list);
 		return data;
 	}

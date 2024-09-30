@@ -9,9 +9,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.reference.Reference;
 import com.lying.utility.LoreDisplay;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -23,11 +21,7 @@ import net.minecraft.util.Identifier;
 
 public class DummyType extends Type
 {
-	private static final Identifier REG_NAME = Reference.ModInfo.prefix("dummy");
-	public static final Codec<DummyType> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Identifier.CODEC.fieldOf("ID").forGetter(DummyType::listID), 
-			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(DummyType::display))
-				.apply(instance, (a, b)-> create(a, b)));
+	public static final Identifier REG_NAME = Reference.ModInfo.prefix("dummy");
 	
 	protected NbtCompound data = new NbtCompound();
 	protected Identifier listID;
@@ -42,6 +36,7 @@ public class DummyType extends Type
 	
 	public static DummyType create(Identifier listID, Optional<LoreDisplay> displayIn)
 	{
+		System.out.println("Created dummy subtype: "+listID.toString());
 		return new DummyType(REG_NAME, listID, displayIn);
 	}
 	
@@ -59,12 +54,12 @@ public class DummyType extends Type
 	
 	public NbtElement toNbt()
 	{
-		return CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
+		return CODEC_OBJ.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
 	}
 	
 	public static DummyType fromNbt(NbtElement compound)
 	{
-		return CODEC.parse(NbtOps.INSTANCE, compound).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+		return CODEC_OBJ.parse(NbtOps.INSTANCE, compound).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
 	}
 	
 	public Text displayName() { return customDisplay.isPresent() ? customDisplay.get().title() : Text.literal(listID.getPath()); }
@@ -76,12 +71,12 @@ public class DummyType extends Type
 	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
 	{
 		RegistryOps<JsonElement> registryops = manager.getOps(JsonOps.INSTANCE);
-		return CODEC.encodeStart(registryops, this).getOrThrow();
+		return CODEC_OBJ.encodeStart(registryops, this).getOrThrow();
 	}
 	
 	public static DummyType fromJson(JsonObject obj)
 	{
-		return CODEC.parse(JsonOps.INSTANCE, obj).getOrThrow();
+		return CODEC_OBJ.parse(JsonOps.INSTANCE, obj).getOrThrow();
 	}
 	
 	public static class Builder extends Type.Builder

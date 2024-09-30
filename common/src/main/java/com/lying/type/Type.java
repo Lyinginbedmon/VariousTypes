@@ -21,9 +21,9 @@ import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -33,14 +33,24 @@ import net.minecraft.util.Identifier;
  */
 public class Type
 {
-	public static final Codec<Type> CODEC = Identifier.CODEC.comapFlatMap(id -> 
+	public static final Codec<Type> CODEC_ID = Identifier.CODEC.comapFlatMap(id -> 
 			{
-				Type ability = VTTypes.get(id);
-				if(ability != null)
-					return DataResult.success(ability);
+				Type type = VTTypes.get(id);
+				if(type == VTTypes.DUMMY.get())
+					return DataResult.error(() -> "Dummy type");
+				else if(type != null)
+					return DataResult.success(type);
 				else
 					return DataResult.error(() -> "Not a recognised type: '"+String.valueOf(id) + "'");
-			}, Type::registryName).stable();
+			}, Type::registryName);
+	
+	public static final Codec<DummyType> CODEC_OBJ = RecordCodecBuilder.create(instance -> instance.group(
+			Identifier.CODEC.fieldOf("ID").forGetter(DummyType::listID), 
+			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(DummyType::display))
+				.apply(instance, DummyType::create));
+	
+	// FIXME Ensure Type object is stored and retrieved fully
+	public static final Codec<Type> CODEC = Codec.withAlternative(CODEC_ID, CODEC_OBJ);
 	
 	/** Comparator for sorting types alphabetically by their display name */
 	public static final Comparator<Type> SORT_FUNC = (a, b) -> 
@@ -113,7 +123,7 @@ public class Type
 	
 	public void read(NbtCompound data) { }
 	
-	public JsonElement writeToJson(RegistryWrapper.WrapperLookup manager)
+	public JsonElement writeToJson()
 	{
 		return CODEC.encodeStart(JsonOps.INSTANCE, this).getOrThrow();
 	}
@@ -122,11 +132,11 @@ public class Type
 	public static Type readFromJson(JsonElement entry)
 	{
 		// Only Dummy types are stored as JsonObjects, due to their memory requirements
-		if(entry.isJsonObject())
-			return DummyType.fromJson(entry.getAsJsonObject());
-		else if(entry.isJsonPrimitive())
-			return VTTypes.get(new Identifier(entry.getAsString()));
-		return null;
+//		if(entry.isJsonObject())
+//			return DummyType.fromJson(entry.getAsJsonObject());
+//		else if(entry.isJsonPrimitive())
+//			return VTTypes.get(new Identifier(entry.getAsString()));
+		return CODEC.parse(JsonOps.INSTANCE, entry).getOrThrow();
 	}
 	
 	public static enum Tier
