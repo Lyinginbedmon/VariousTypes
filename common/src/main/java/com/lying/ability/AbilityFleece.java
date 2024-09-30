@@ -6,16 +6,17 @@ import java.util.Optional;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityFleece.ConfigFleece;
+import com.lying.utility.LootBag;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.block.Blocks;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -29,10 +30,7 @@ public class AbilityFleece extends ActivatedAbility implements IComplexAbility<C
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigFleece values = ConfigFleece.fromNbt(instance.memory());
-		Text productName = values.product.getName();
-		if(values.product.getCount() > 1)
-			productName = productName.copy().append(Text.literal(" x")).append(Text.literal(String.valueOf(values.product.getCount())));
-		return Optional.of(translate("ability", registryName().getPath()+".desc", values.foodCost, productName));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", values.foodCost, values.product.description()));
 	}
 	
 	public boolean remappable() { return true; }
@@ -46,7 +44,7 @@ public class AbilityFleece extends ActivatedAbility implements IComplexAbility<C
 		PlayerEntity player = (PlayerEntity)owner;
 		ConfigFleece config = instanceToValues(instance);
 		player.getHungerManager().add(-config.foodCost, 0);
-		player.giveItemStack(config.product.copy());
+		config.product.giveTo((ServerPlayerEntity)player);
 	}
 	
 	public ConfigFleece memoryToValues(NbtCompound data) { return ConfigFleece.fromNbt(data); }
@@ -55,16 +53,16 @@ public class AbilityFleece extends ActivatedAbility implements IComplexAbility<C
 	{
 		protected static final Codec<ConfigFleece> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 				Codec.INT.optionalFieldOf("Cost").forGetter(v -> Optional.of(v.foodCost)), 
-				ItemStack.CODEC.optionalFieldOf("Product").forGetter(v -> Optional.of(v.product)))
+				LootBag.CODEC.optionalFieldOf("Product").forGetter(v -> Optional.of(v.product)))
 					.apply(instance, ConfigFleece::new));
 		
 		protected int foodCost;
-		protected ItemStack product;
+		protected LootBag product;
 		
-		public ConfigFleece(Optional<Integer> rateIn, Optional<ItemStack> amountIn)
+		public ConfigFleece(Optional<Integer> costIn, Optional<LootBag> productIn)
 		{
-			rateIn.ifPresentOrElse(val -> foodCost = val, () -> foodCost = 6);
-			amountIn.ifPresentOrElse(val -> product = val.copy(), () -> product = new ItemStack(Blocks.WHITE_WOOL));
+			foodCost = costIn.orElse(6);
+			product = productIn.orElse(LootBag.ofItems(Items.WHITE_WOOL));
 		}
 		
 		public static ConfigFleece fromNbt(NbtCompound nbt)

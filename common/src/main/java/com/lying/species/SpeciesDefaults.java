@@ -19,7 +19,14 @@ import com.lying.utility.LoreDisplay;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.item.Items;
+import net.minecraft.loot.LootPool;
+import net.minecraft.loot.LootTable;
 import net.minecraft.loot.LootTables;
+import net.minecraft.loot.entry.ItemEntry;
+import net.minecraft.loot.entry.LeafEntry;
+import net.minecraft.loot.entry.LootPoolEntry;
+import net.minecraft.loot.function.SetCountLootFunction;
+import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
@@ -51,6 +58,7 @@ public class SpeciesDefaults
 				nbt.put("Entities", list);
 			}).build());
 	
+	@SuppressWarnings("rawtypes")
 	public static final Supplier<Species> ORKIN	= register(prefix("orkin"), () -> Species.Builder.of(prefix("orkin"))
 			.texture(Species.BACKING_BASTION)
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".orkin.desc"))
@@ -58,7 +66,7 @@ public class SpeciesDefaults
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
 			.addAbility(SingleAttributeAbility.Health.of(-4))
 			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get())
-			.startingLoot(LootBag.ofItems(Items.CROSSBOW, Items.GOLDEN_SWORD).withSystemTable(LootTables.JUNGLE_TEMPLE_DISPENSER_CHEST)).build());
+			.startingLoot(LootBag.ofItems(Items.CROSSBOW, Items.GOLDEN_SWORD).withCustomTable(LootTable.builder().pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0f, 2.0f)).with((LootPoolEntry.Builder<?>)((Object)((LeafEntry.Builder)ItemEntry.builder(Items.ARROW).weight(30)).apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0f, 7.0f)))))).build())).build());
 	
 	public static final Supplier<Species> MERROW	= register(prefix("merrow"), () -> Species.Builder.of(prefix("merrow"))
 			.texture(Species.BACKING_SHIPWRECK)

@@ -3,6 +3,7 @@ package com.lying.utility;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,6 +45,8 @@ import net.minecraft.world.World;
 
 public class VTUtils
 {
+	public static final Comparator<Text> TEXT_ALPHABETICAL = (a, b) -> stringComparator(a.getString(), b.getString());
+	
 	/** Generates a character sheet for the given entity with a random species and templates up to the given power level */
 	public static CharacterSheet makeRandomSheet(LivingEntity ent, int power)
 	{
