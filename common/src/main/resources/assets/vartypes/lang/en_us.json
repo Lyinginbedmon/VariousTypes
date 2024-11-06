@@ -5,6 +5,7 @@
 	"effect.vartypes.fatigue": "Fatigue",
 	"effect.vartypes.dazzled": "Dazzled",
 	"effect.vartypes.anchored": "Anchored",
+	"effect.vartypes.stealth": "Stealth",
 	// Item tags
 	"tag.item.vartypes.silver": "silver",
 	"tag.item.vartypes.vegetarian": "vegetarian",
@@ -244,6 +245,8 @@
 	"ability.vartypes.sunblind.desc": "Your physiology is best suited to dim or indoor environments. You suffer from [%s] whilst in direct sunlight.",
 	"ability.vartypes.drops": "Drops",
 	"ability.vartypes.drops.desc": "Your body contains harvestable goods that others may find useful. On death, you additionally drop [%s].",
+	"ability.vartypes.stealth": "Stealth",
+	"ability.vartypes.stealth.desc": "You can become temporarily imperceptible, until the moment you strike",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

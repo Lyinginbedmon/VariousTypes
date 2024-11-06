@@ -52,6 +52,7 @@ import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
+import com.lying.client.event.RenderEvents;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
 import com.lying.event.LivingEvents;
@@ -62,11 +63,14 @@ import com.lying.type.Action;
 import com.lying.utility.LootBag;
 import com.lying.utility.VTUtils;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -79,6 +83,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -91,8 +96,6 @@ public class VTAbilities
 {
 	private static final Map<Identifier, Supplier<Ability>> ABILITIES = new HashMap<>();
 	
-	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", (id) -> new AbilityBreathing.Allow(id));
-	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", (id) -> new AbilityBreathing.Deny(id));
 	public static final Supplier<Ability> AMPHIBIOUS		= register("amphibious", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -105,36 +108,11 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> NIGHT_VISION		= register("night_vision", (id) -> new AbilityNightVision(id, Category.UTILITY));
-	public static final Supplier<Ability> SCULK_SIGHT		= register("sculk_sight", (id) -> new AbilitySculksight(id, Category.UTILITY));
-	public static final Supplier<Ability> INVISIBILITY		= register("invisibility", (id) -> new AbilityInvisibility(id, Category.DEFENSE));
-	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
-	{
-		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
-		
-		public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return owner.isSwimming(); }
-	});
-	public static final Supplier<Ability> CLIMB				= register("climb", (id) -> new ToggledAbility(id, Category.UTILITY));
-	public static final Supplier<Ability> FLY				= register("fly", (id) -> new AbilityFly(id, Category.UTILITY));
-	public static final Supplier<Ability> BURROW			= register("burrow", (id) -> new AbilityBurrow(id, Category.UTILITY));
-	public static final Supplier<Ability> TELEPORT			= register("teleport", (id) -> new AbilityLoSTeleport(id, Category.UTILITY));
-	public static final Supplier<Ability> GHOSTLY			= register("ghostly", (id) -> new ToggledAbility(id, Category.UTILITY)
-	{
-		protected void onActivation(LivingEntity owner, AbilityInstance instance)
-		{
-			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
-		}
-		
-		protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
-		{
-			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
-		}
-		
-		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
-	});
-	public static final Supplier<Ability> INTANGIBLE		= register("intangible", (id) -> new AbilityIntangible(id, Category.UTILITY));
+	public static final Supplier<Ability> BAD_BREATH		= register("bad_breath", (id) -> new AbilityBadBreath(id, Category.OFFENSE));
+	public static final Supplier<Ability> BERSERK			= register("berserk", (id) -> new AbilityBerserk(id, Category.OFFENSE));
+	public static final Supplier<Ability> BONUS_DMG			= register("bonus_damage", (id) -> new SingleAttributeAbility.Damage(id, Category.OFFENSE));
+	public static final Supplier<Ability> BONUS_HEALTH		= register("bonus_health", (id) -> new SingleAttributeAbility.Health(id, Category.DEFENSE));
+	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", (id) -> new AbilityBreathing.Allow(id));
 	public static final Supplier<Ability> BURN_IN_SUN		= register("burn_in_sun", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -172,13 +150,12 @@ public class VTAbilities
 			return false;
 		}
 	});
-	public static final Supplier<Ability> MITHRIDATIC		= register("mithridatic", (id) -> new AbilityStatusTagImmune(id, Category.DEFENSE));
-	public static final Supplier<Ability> FAST_HEALING		= register("fast_healing", (id) -> new AbilityFastHeal(id, Category.DEFENSE));
-	public static final Supplier<Ability> REGENERATION		= register("regeneration", (id) -> new AbilityRegeneration(id, Category.DEFENSE));
-	public static final Supplier<Ability> BONUS_DMG			= register("bonus_damage", (id) -> new SingleAttributeAbility.Damage(id, Category.OFFENSE));
-	public static final Supplier<Ability> NAT_ARMOUR		= register("natural_armour", (id) -> new SingleAttributeAbility.Armour(id, Category.DEFENSE));
-	public static final Supplier<Ability> BONUS_HEALTH		= register("bonus_health", (id) -> new SingleAttributeAbility.Health(id, Category.DEFENSE));
-	public static final Supplier<Ability> SCALE				= register("scale", (id) -> new SingleAttributeAbility.Scale(id, Category.UTILITY));
+	public static final Supplier<Ability> BURROW			= register("burrow", (id) -> new AbilityBurrow(id, Category.UTILITY));
+	public static final Supplier<Ability> CLIMB				= register("climb", (id) -> new ToggledAbility(id, Category.UTILITY));
+	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", (id) -> new Ability(id, Category.UTILITY)
+	{
+		public boolean isHidden(AbilityInstance instance) { return true; }
+	});
 	public static final Supplier<Ability> DEEP_BREATH		= register("deep_breath", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -186,106 +163,6 @@ public class VTAbilities
 			LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(id) ? air * 2 : air);
 		}
 	});
-	public static final Supplier<Ability> MENDING			= register("mending", (id) -> new Ability(id, Category.DEFENSE)
-	{
-		public void registerEventHandlers()
-		{
-			SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
-			{
-				// Adds the ability to regenerate health after it may have been denied
-				if(!handler.can(Action.REGEN.get()) && abilities.hasAbility(registryName()))
-					handler.activate(Action.REGEN.get());
-			});
-		}
-	});
-	public static final Supplier<Ability> RUN_CMD			= register("run_command", (id) -> new ActivatedAbility(id, Category.UTILITY)
-	{
-		protected boolean remappable() { return true; }
-		
-		protected void activate(LivingEntity owner, AbilityInstance instance)
-		{
-			try
-			{
-				String command = instance.memory().contains("Command", NbtElement.STRING_TYPE) ? instance.memory().getString("Command") : "playsound minecraft:entity.zombie_villager.cure ambient @s ~ ~ ~ 1 1";
-				owner.getServer().getCommandManager().executeWithPrefix(owner.getCommandSource(), command);
-			}
-			catch(Exception e) { }
-		}
-	});
-	public static final Supplier<Ability> PARIAH			= register("pariah", (id) -> new AbilityPariah(id, Category.UTILITY));
-	public static final Supplier<Ability> GOLDHEARTED		= register("goldheart", (id) -> new Ability(id, Category.DEFENSE));
-	public static final Supplier<Ability> INDOMITABLE		= register("indomitable", (id) -> new Ability(id, Category.OFFENSE));
-	public static final Supplier<Ability> WATER_WALKING		= register("water_walking", (id) -> new AbilityWaterWalking(id, Category.UTILITY));
-	public static final Supplier<Ability> RIBSHOT			= register("ribshot", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
-	{
-		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
-		{
-			ItemStack bone = Items.BONE.getDefaultStack().copy();
-			bone.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
-			PersistentProjectileEntity abstractarrow = ProjectileUtil.createArrowProjectile(owner, bone, 1F);	// TODO Replace with non-pickup bone projectile
-			abstractarrow.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
-			abstractarrow.setVelocity(direction.x, direction.y, direction.z, 1.6f, 6);
-			VTUtils.playSound(owner, SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
-			owner.getWorld().spawnEntity(abstractarrow);
-		}
-	});
-	public static final Supplier<Ability> FIREBALL			= register("fireball", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
-	{
-		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
-		{
-			Entity projectile;
-			if(instance.memory().getBoolean("Explosive"))
-			{
-				// Create ghast fireball
-				projectile = new FireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D, 1);
-				projectile.setPosition(owner.getEyePos().add(direction));
-			}
-			else
-			{
-				// Create blaze fireball
-				projectile = new SmallFireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D);
-				projectile.setPosition(owner.getEyePos().add(direction));
-			}
-			VTUtils.playSound(owner, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
-			owner.getWorld().spawnEntity(projectile);
-		}
-	});
-	public static final Supplier<Ability> BERSERK			= register("berserk", (id) -> new AbilityBerserk(id, Category.OFFENSE));
-	public static final Supplier<Ability> MINDLESS			= register("mindless", (id) -> new PassiveNoXP.Mindless(id, Category.UTILITY));
-	public static final Supplier<Ability> OMNISCIENT		= register("omniscient", (id) -> new PassiveNoXP.Omniscient(id, Category.UTILITY));
-	public static final Supplier<Ability> FORGETFUL			= register("forgetful", (id) -> new PassiveNoXP.Forgetful(id, Category.UTILITY));
-	public static final Supplier<Ability> QUAKE				= register("quake", (id) -> new AbilityQuake(id, Category.OFFENSE));
-	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new Ability(id, Category.UTILITY)
-	{
-		public void registerEventHandlers()
-		{
-			PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
-			{
-				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
-					if(damage.isIn(VTTags.PHYSICAL))
-						return amount * 0.85F;
-				
-				return amount;
-			});
-		}
-	});
-	public static final Supplier<Ability> THUNDERSTEP		= register("thunderstep", (id) -> new AbilityThunderstep(id, Category.OFFENSE));
-	public static final Supplier<Ability> BAD_BREATH		= register("bad_breath", (id) -> new AbilityBadBreath(id, Category.OFFENSE));
-	public static final Supplier<Ability> WEBWALKER			= register("webwalker", (id) -> new AbilityIgnoreSlowdown(id, Category.UTILITY));
-	public static final Supplier<Ability> HERBIVORE			= register("herbivore", (id) -> new AbilityDietRestriction(id, Category.UTILITY));
-	public static final Supplier<Ability> FLAMEPROOF		= register("flameproof", (id) -> new AbilityDamageResist(id, Category.DEFENSE));
-	public static final Supplier<Ability> FLEECE			= register("fleece", (id) -> new AbilityFleece(id, Category.UTILITY));
-	public static final Supplier<Ability> ORESIGHT			= register("oresight", (id) -> new AbilityOresight(id, Category.UTILITY));
-	public static final Supplier<Ability> HOME_TURF			= register("home_turf", (id) -> new AbilityFavouredTerrain(id, Category.DEFENSE));
-	public static final Supplier<Ability> PHOTOSYNTH		= register("photosynth", (id) -> new AbilityPhotosynth(id, Category.UTILITY));
-	public static final Supplier<Ability> FAESKIN			= register("faeskin", (id) -> new AbilityFaeskin(id, Category.UTILITY));
-	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", (id) -> new Ability(id, Category.UTILITY)
-	{
-		public boolean isHidden(AbilityInstance instance) { return true; }
-	});
-	public static final Supplier<Ability> FLEXIBLE			= register("flexible", (id) -> new AbilityFlexible(id, Category.UTILITY));
-	public static final Supplier<Ability> SUNBLIND			= register("sunblind", (id) -> new AbilitySunblind(id, Category.UTILITY));
 	public static final Supplier<Ability> DROPS				= register("drops", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public Optional<Text> description(AbilityInstance instance)
@@ -313,6 +190,154 @@ public class VTAbilities
 			return nbt.contains("Loot", NbtElement.COMPOUND_TYPE) ? LootBag.fromNbt(nbt.getCompound("Loot")) : LootBag.ofTable(EntityType.ZOMBIE.getLootTableId());
 		}
 	});
+	public static final Supplier<Ability> FAESKIN			= register("faeskin", (id) -> new AbilityFaeskin(id, Category.UTILITY));
+	public static final Supplier<Ability> FAST_HEALING		= register("fast_healing", (id) -> new AbilityFastHeal(id, Category.DEFENSE));
+	public static final Supplier<Ability> FIREBALL			= register("fireball", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
+	{
+		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
+		{
+			Entity projectile;
+			if(instance.memory().getBoolean("Explosive"))
+			{
+				// Create ghast fireball
+				projectile = new FireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D, 1);
+				projectile.setPosition(owner.getEyePos().add(direction));
+			}
+			else
+			{
+				// Create blaze fireball
+				projectile = new SmallFireballEntity(owner.getWorld(), owner, direction.x * 4D, direction.y * 4D, direction.z * 4D);
+				projectile.setPosition(owner.getEyePos().add(direction));
+			}
+			VTUtils.playSound(owner, SoundEvents.ENTITY_BLAZE_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
+			owner.getWorld().spawnEntity(projectile);
+		}
+	});
+	public static final Supplier<Ability> FLAMEPROOF		= register("flameproof", (id) -> new AbilityDamageResist(id, Category.DEFENSE));
+	public static final Supplier<Ability> FLEECE			= register("fleece", (id) -> new AbilityFleece(id, Category.UTILITY));
+	public static final Supplier<Ability> FLEXIBLE			= register("flexible", (id) -> new AbilityFlexible(id, Category.UTILITY));
+	public static final Supplier<Ability> FLY				= register("fly", (id) -> new AbilityFly(id, Category.UTILITY));
+	public static final Supplier<Ability> FORGETFUL			= register("forgetful", (id) -> new PassiveNoXP.Forgetful(id, Category.UTILITY));
+	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new Ability(id, Category.UTILITY)
+	{
+		public void registerEventHandlers()
+		{
+			PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
+			{
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
+					if(damage.isIn(VTTags.PHYSICAL))
+						return amount * 0.85F;
+				
+				return amount;
+			});
+		}
+	});
+	public static final Supplier<Ability> GHOSTLY			= register("ghostly", (id) -> new ToggledAbility(id, Category.UTILITY)
+	{
+		protected void onActivation(LivingEntity owner, AbilityInstance instance)
+		{
+			if(owner.getType() == EntityType.PLAYER)
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
+		}
+		
+		protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
+		{
+			if(owner.getType() == EntityType.PLAYER)
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
+		}
+		
+		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
+	});
+	public static final Supplier<Ability> GOLDHEARTED		= register("goldheart", (id) -> new Ability(id, Category.DEFENSE));
+	public static final Supplier<Ability> HERBIVORE			= register("herbivore", (id) -> new AbilityDietRestriction(id, Category.UTILITY));
+	public static final Supplier<Ability> HOME_TURF			= register("home_turf", (id) -> new AbilityFavouredTerrain(id, Category.DEFENSE));
+	public static final Supplier<Ability> INDOMITABLE		= register("indomitable", (id) -> new Ability(id, Category.OFFENSE));
+	public static final Supplier<Ability> INTANGIBLE		= register("intangible", (id) -> new AbilityIntangible(id, Category.UTILITY));
+	public static final Supplier<Ability> INVISIBILITY		= register("invisibility", (id) -> new AbilityInvisibility(id, Category.DEFENSE));
+	public static final Supplier<Ability> MENDING			= register("mending", (id) -> new Ability(id, Category.DEFENSE)
+	{
+		public void registerEventHandlers()
+		{
+			SheetEvents.AFTER_REBUILD_ACTIONS_EVENT.register((handler,abilities,owner) -> 
+			{
+				// Adds the ability to regenerate health after it may have been denied
+				if(!handler.can(Action.REGEN.get()) && abilities.hasAbility(registryName()))
+					handler.activate(Action.REGEN.get());
+			});
+		}
+	});
+	public static final Supplier<Ability> MINDLESS			= register("mindless", (id) -> new PassiveNoXP.Mindless(id, Category.UTILITY));
+	public static final Supplier<Ability> MITHRIDATIC		= register("mithridatic", (id) -> new AbilityStatusTagImmune(id, Category.DEFENSE));
+	public static final Supplier<Ability> NAT_ARMOUR		= register("natural_armour", (id) -> new SingleAttributeAbility.Armour(id, Category.DEFENSE));
+	public static final Supplier<Ability> NIGHT_VISION		= register("night_vision", (id) -> new AbilityNightVision(id, Category.UTILITY));
+	public static final Supplier<Ability> OMNISCIENT		= register("omniscient", (id) -> new PassiveNoXP.Omniscient(id, Category.UTILITY));
+	public static final Supplier<Ability> ORESIGHT			= register("oresight", (id) -> new AbilityOresight(id, Category.UTILITY));
+	public static final Supplier<Ability> PARIAH			= register("pariah", (id) -> new AbilityPariah(id, Category.UTILITY));
+	public static final Supplier<Ability> PHOTOSYNTH		= register("photosynth", (id) -> new AbilityPhotosynth(id, Category.UTILITY));
+	public static final Supplier<Ability> QUAKE				= register("quake", (id) -> new AbilityQuake(id, Category.OFFENSE));
+	public static final Supplier<Ability> REGENERATION		= register("regeneration", (id) -> new AbilityRegeneration(id, Category.DEFENSE));
+	public static final Supplier<Ability> RIBSHOT			= register("ribshot", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
+	{
+		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
+		{
+			ItemStack bone = Items.BONE.getDefaultStack().copy();
+			bone.set(DataComponentTypes.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
+			PersistentProjectileEntity abstractarrow = ProjectileUtil.createArrowProjectile(owner, bone, 1F);	// TODO Replace with non-pickup bone projectile
+			abstractarrow.pickupType = PersistentProjectileEntity.PickupPermission.DISALLOWED;
+			abstractarrow.setVelocity(direction.x, direction.y, direction.z, 1.6f, 6);
+			VTUtils.playSound(owner, SoundEvents.ENTITY_SKELETON_SHOOT, SoundCategory.PLAYERS, 1F, 1F / owner.getRandom().nextFloat() * 0.4F + 0.8F);
+			owner.getWorld().spawnEntity(abstractarrow);
+		}
+	});
+	public static final Supplier<Ability> RUN_CMD			= register("run_command", (id) -> new ActivatedAbility(id, Category.UTILITY)
+	{
+		protected boolean remappable() { return true; }
+		
+		protected void activate(LivingEntity owner, AbilityInstance instance)
+		{
+			try
+			{
+				String command = instance.memory().contains("Command", NbtElement.STRING_TYPE) ? instance.memory().getString("Command") : "playsound minecraft:entity.zombie_villager.cure ambient @s ~ ~ ~ 1 1";
+				owner.getServer().getCommandManager().executeWithPrefix(owner.getCommandSource(), command);
+			}
+			catch(Exception e) { }
+		}
+	});
+	public static final Supplier<Ability> SCALE				= register("scale", (id) -> new SingleAttributeAbility.Scale(id, Category.UTILITY));
+	public static final Supplier<Ability> SCULK_SIGHT		= register("sculk_sight", (id) -> new AbilitySculksight(id, Category.UTILITY));
+	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", (id) -> new AbilityBreathing.Deny(id));
+	public static final Supplier<Ability> SUNBLIND			= register("sunblind", (id) -> new AbilitySunblind(id, Category.UTILITY));
+	public static final Supplier<Ability> STEALTH			= register("stealth", (id) -> new AbilityStatusEffectOnDemand(id, Category.DEFENSE, new StatusEffectInstance(VTStatusEffects.getEntry(VTStatusEffects.STEALTH), Reference.Values.TICKS_PER_SECOND * 30, 0, false, false))
+	{
+		// FIXME Ensure Stealth status effect also counts as being Invisible
+		
+		public int cooldownDefault() { return Reference.Values.TICKS_PER_MINUTE * 5; }
+		
+		public void registerEventHandlers()
+		{
+			RenderEvents.PLAYER_RENDER_PERMISSION.register((player) -> player.hasStatusEffect(VTStatusEffects.getEntry(VTStatusEffects.STEALTH)) ? EventResult.interruptFalse() : EventResult.pass());
+			EntityEvent.LIVING_HURT.register((entity, source, amount) -> 
+			{
+				RegistryEntry<StatusEffect> stealth = VTStatusEffects.getEntry(VTStatusEffects.STEALTH);
+				for(Entity ent : new Entity[] {entity, source.getSource()})
+					if(ent != null && ent.isAlive() && ent instanceof LivingEntity && ((LivingEntity)ent).hasStatusEffect(stealth))
+						((LivingEntity)ent).removeStatusEffect(stealth);
+				
+				return EventResult.pass();
+			});
+		}
+	});
+	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
+	{
+		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
+		
+		public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return owner.isSwimming(); }
+	});
+	public static final Supplier<Ability> TELEPORT			= register("teleport", (id) -> new AbilityLoSTeleport(id, Category.UTILITY));
+	public static final Supplier<Ability> THUNDERSTEP		= register("thunderstep", (id) -> new AbilityThunderstep(id, Category.OFFENSE));
+	public static final Supplier<Ability> WATER_WALKING		= register("water_walking", (id) -> new AbilityWaterWalking(id, Category.UTILITY));
+	public static final Supplier<Ability> WEBWALKER			= register("webwalker", (id) -> new AbilityIgnoreSlowdown(id, Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", (id) -> new Ability(id, Category.UTILITY)
 	{
@@ -325,7 +350,6 @@ public class VTAbilities
 	 	 * 
 	 	 * Analgesic - No hurt sound or animation, health display in HUD is inaccurate
 		 * Arrowsnatcher - Projectile attacks fail on impact, instead add their item to your inventory. Ability then goes on cooldown.
-		 * Blink - Very temporary (read: single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Camouflage - Perfect Invisibility with unlimited duration whilst within certain conditions or until attack/ed
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
@@ -334,7 +358,7 @@ public class VTAbilities
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
 		 * Flaming Fist - Applies Fire Aspect to all melee attacks
-		 * Flitting - Creative-style flight
+		 * Flit - Very temporary (read: single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Fury - Temporary mild damage buff and resistance, ends after configured duration OR if owner deals no damage after 5 seconds
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
@@ -348,7 +372,7 @@ public class VTAbilities
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Roar - AoE damage effect
 		 * Smokescreen - Spawn an AoE particle cloud obscuring vision
-		 * Stealth - Temporary perfect Invisibility (ie. turns off rendering entirely) and mild Speed & Strength effect, long cooldown and ends immediately if you attack
+		 * Untethered - Creative-style flight
 		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */
@@ -356,7 +380,11 @@ public class VTAbilities
 	public static Supplier<Ability> register(String name, Function<Identifier, Ability> ability)
 	{
 		final Identifier regName = prefix(name);
-		final Supplier<Ability> supplier = () -> ability.apply(regName);
+		return register(regName, () -> ability.apply(regName));
+	}
+	
+	public static Supplier<Ability> register(Identifier regName, Supplier<Ability> supplier)
+	{
 		ABILITIES.put(regName, supplier);
 		return supplier;
 	}
