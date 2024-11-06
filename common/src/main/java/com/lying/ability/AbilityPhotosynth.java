@@ -107,9 +107,9 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 	public static class ConfigPhotosynth
 	{
 		protected static final Codec<ConfigPhotosynth> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("Food").forGetter(v -> Optional.of(v.food)),
-				Codec.INT.optionalFieldOf("Saturation").forGetter(v -> Optional.of(v.food)),
-				Codec.INT.optionalFieldOf("Rate").forGetter(v -> Optional.of(v.rate)),
+				Codec.INT.optionalFieldOf("Food").forGetter(v -> v.food == 0 ? Optional.empty() : Optional.of(v.food)),
+				Codec.INT.optionalFieldOf("Saturation").forGetter(v -> v.saturation == 0 ? Optional.empty() : Optional.of(v.saturation)),
+				Codec.INT.optionalFieldOf("Rate").forGetter(v -> v.rate == 0 ? Optional.empty() : Optional.of(v.rate)),
 				Codec.LONG.optionalFieldOf("Start").forGetter(v -> v.startTime),
 				BlockPos.CODEC.optionalFieldOf("Pos").forGetter(v -> v.position))
 					.apply(instance, ConfigPhotosynth::new));

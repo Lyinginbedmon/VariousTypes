@@ -1,6 +1,7 @@
 package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
+import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -57,6 +59,7 @@ import com.lying.event.PlayerEvents;
 import com.lying.event.SheetEvents;
 import com.lying.reference.Reference;
 import com.lying.type.Action;
+import com.lying.utility.LootBag;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.component.DataComponentTypes;
@@ -74,9 +77,11 @@ import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
@@ -86,9 +91,9 @@ public class VTAbilities
 {
 	private static final Map<Identifier, Supplier<Ability>> ABILITIES = new HashMap<>();
 	
-	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", () -> new AbilityBreathing.Allow(prefix("breathe_in_fluid")));
-	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", () -> new AbilityBreathing.Deny(prefix("suffocate_in_fluid")));
-	public static final Supplier<Ability> AMPHIBIOUS		= register("amphibious", () -> new Ability(prefix("amphibious"), Category.UTILITY)
+	public static final Supplier<Ability> BREATHE_FLUID		= register("breathe_in_fluid", (id) -> new AbilityBreathing.Allow(id));
+	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", (id) -> new AbilityBreathing.Deny(id));
+	public static final Supplier<Ability> AMPHIBIOUS		= register("amphibious", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
 		{
@@ -100,20 +105,20 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> NIGHT_VISION		= register("night_vision", () -> new AbilityNightVision(prefix("night_vision"), Category.UTILITY));
-	public static final Supplier<Ability> SCULK_SIGHT		= register("sculk_sight", () -> new AbilitySculksight(prefix("sculk_sight"), Category.UTILITY));
-	public static final Supplier<Ability> INVISIBILITY		= register("invisibility", () -> new AbilityInvisibility(prefix("invisibility"), Category.DEFENSE));
-	public static final Supplier<Ability> SWIM				= register("swim", () -> new AbilityStatusEffectOnDemand(prefix("swim"), Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
+	public static final Supplier<Ability> NIGHT_VISION		= register("night_vision", (id) -> new AbilityNightVision(id, Category.UTILITY));
+	public static final Supplier<Ability> SCULK_SIGHT		= register("sculk_sight", (id) -> new AbilitySculksight(id, Category.UTILITY));
+	public static final Supplier<Ability> INVISIBILITY		= register("invisibility", (id) -> new AbilityInvisibility(id, Category.DEFENSE));
+	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
 		
 		public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return owner.isSwimming(); }
 	});
-	public static final Supplier<Ability> CLIMB				= register("climb", () -> new ToggledAbility(prefix("climb"), Category.UTILITY));
-	public static final Supplier<Ability> FLY				= register("fly", () -> new AbilityFly(prefix("fly"), Category.UTILITY));
-	public static final Supplier<Ability> BURROW			= register("burrow", () -> new AbilityBurrow(prefix("burrow"), Category.UTILITY));
-	public static final Supplier<Ability> TELEPORT			= register("teleport", () -> new AbilityLoSTeleport(prefix("teleport"), Category.UTILITY));
-	public static final Supplier<Ability> GHOSTLY			= register("ghostly", () -> new ToggledAbility(prefix("ghostly"), Category.UTILITY)
+	public static final Supplier<Ability> CLIMB				= register("climb", (id) -> new ToggledAbility(id, Category.UTILITY));
+	public static final Supplier<Ability> FLY				= register("fly", (id) -> new AbilityFly(id, Category.UTILITY));
+	public static final Supplier<Ability> BURROW			= register("burrow", (id) -> new AbilityBurrow(id, Category.UTILITY));
+	public static final Supplier<Ability> TELEPORT			= register("teleport", (id) -> new AbilityLoSTeleport(id, Category.UTILITY));
+	public static final Supplier<Ability> GHOSTLY			= register("ghostly", (id) -> new ToggledAbility(id, Category.UTILITY)
 	{
 		protected void onActivation(LivingEntity owner, AbilityInstance instance)
 		{
@@ -129,8 +134,8 @@ public class VTAbilities
 		
 		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
 	});
-	public static final Supplier<Ability> INTANGIBLE		= register("intangible", () -> new AbilityIntangible(prefix("intangible"), Category.UTILITY));
-	public static final Supplier<Ability> BURN_IN_SUN		= register("burn_in_sun", () -> new Ability(prefix("burn_in_sun"), Category.UTILITY)
+	public static final Supplier<Ability> INTANGIBLE		= register("intangible", (id) -> new AbilityIntangible(id, Category.UTILITY));
+	public static final Supplier<Ability> BURN_IN_SUN		= register("burn_in_sun", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
 		{
@@ -167,21 +172,21 @@ public class VTAbilities
 			return false;
 		}
 	});
-	public static final Supplier<Ability> MITHRIDATIC		= register("mithridatic", () -> new AbilityStatusTagImmune(prefix("mithridatic"), Category.DEFENSE));
-	public static final Supplier<Ability> FAST_HEALING		= register("fast_healing", () -> new AbilityFastHeal(prefix("fast_healing"), Category.DEFENSE));
-	public static final Supplier<Ability> REGENERATION		= register("regeneration", () -> new AbilityRegeneration(prefix("regeneration"), Category.DEFENSE));
-	public static final Supplier<Ability> BONUS_DMG			= register("bonus_damage", () -> new SingleAttributeAbility.Damage(prefix("bonus_damage"), Category.OFFENSE));
-	public static final Supplier<Ability> NAT_ARMOUR		= register("natural_armour", () -> new SingleAttributeAbility.Armour(prefix("natural_armour"), Category.DEFENSE));
-	public static final Supplier<Ability> BONUS_HEALTH		= register("bonus_health", () -> new SingleAttributeAbility.Health(prefix("bonus_health"), Category.DEFENSE));
-	public static final Supplier<Ability> SCALE				= register("scale", () -> new SingleAttributeAbility.Scale(prefix("scale"), Category.UTILITY));
-	public static final Supplier<Ability> DEEP_BREATH		= register("deep_breath", () -> new Ability(prefix("deep_breath"), Category.UTILITY)
+	public static final Supplier<Ability> MITHRIDATIC		= register("mithridatic", (id) -> new AbilityStatusTagImmune(id, Category.DEFENSE));
+	public static final Supplier<Ability> FAST_HEALING		= register("fast_healing", (id) -> new AbilityFastHeal(id, Category.DEFENSE));
+	public static final Supplier<Ability> REGENERATION		= register("regeneration", (id) -> new AbilityRegeneration(id, Category.DEFENSE));
+	public static final Supplier<Ability> BONUS_DMG			= register("bonus_damage", (id) -> new SingleAttributeAbility.Damage(id, Category.OFFENSE));
+	public static final Supplier<Ability> NAT_ARMOUR		= register("natural_armour", (id) -> new SingleAttributeAbility.Armour(id, Category.DEFENSE));
+	public static final Supplier<Ability> BONUS_HEALTH		= register("bonus_health", (id) -> new SingleAttributeAbility.Health(id, Category.DEFENSE));
+	public static final Supplier<Ability> SCALE				= register("scale", (id) -> new SingleAttributeAbility.Scale(id, Category.UTILITY));
+	public static final Supplier<Ability> DEEP_BREATH		= register("deep_breath", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
 		{
-			LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(prefix("deep_breath")) ? air * 2 : air);
+			LivingEvents.GET_MAX_AIR_EVENT.register((abilities,air) -> abilities.hasAbility(id) ? air * 2 : air);
 		}
 	});
-	public static final Supplier<Ability> MENDING			= register("mending", () -> new Ability(prefix("mending"), Category.DEFENSE)
+	public static final Supplier<Ability> MENDING			= register("mending", (id) -> new Ability(id, Category.DEFENSE)
 	{
 		public void registerEventHandlers()
 		{
@@ -193,7 +198,7 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> RUN_CMD			= register("run_command", () -> new ActivatedAbility(prefix("run_command"), Category.UTILITY)
+	public static final Supplier<Ability> RUN_CMD			= register("run_command", (id) -> new ActivatedAbility(id, Category.UTILITY)
 	{
 		protected boolean remappable() { return true; }
 		
@@ -207,11 +212,11 @@ public class VTAbilities
 			catch(Exception e) { }
 		}
 	});
-	public static final Supplier<Ability> PARIAH			= register("pariah", () -> new AbilityPariah(prefix("pariah"), Category.UTILITY));
-	public static final Supplier<Ability> GOLDHEARTED		= register("goldheart", () -> new Ability(prefix("goldheart"), Category.DEFENSE));
-	public static final Supplier<Ability> INDOMITABLE		= register("indomitable", () -> new Ability(prefix("indomitable"), Category.OFFENSE));
-	public static final Supplier<Ability> WATER_WALKING		= register("water_walking", () -> new AbilityWaterWalking(prefix("water_walking"), Category.UTILITY));
-	public static final Supplier<Ability> RIBSHOT			= register("ribshot", () -> new SpawnProjectileAbility(prefix("ribshot"), Category.OFFENSE)
+	public static final Supplier<Ability> PARIAH			= register("pariah", (id) -> new AbilityPariah(id, Category.UTILITY));
+	public static final Supplier<Ability> GOLDHEARTED		= register("goldheart", (id) -> new Ability(id, Category.DEFENSE));
+	public static final Supplier<Ability> INDOMITABLE		= register("indomitable", (id) -> new Ability(id, Category.OFFENSE));
+	public static final Supplier<Ability> WATER_WALKING		= register("water_walking", (id) -> new AbilityWaterWalking(id, Category.UTILITY));
+	public static final Supplier<Ability> RIBSHOT			= register("ribshot", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
 	{
 		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
 		{
@@ -224,7 +229,7 @@ public class VTAbilities
 			owner.getWorld().spawnEntity(abstractarrow);
 		}
 	});
-	public static final Supplier<Ability> FIREBALL			= register("fireball", () -> new SpawnProjectileAbility(prefix("fireball"), Category.OFFENSE)
+	public static final Supplier<Ability> FIREBALL			= register("fireball", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
 	{
 		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
 		{
@@ -245,12 +250,12 @@ public class VTAbilities
 			owner.getWorld().spawnEntity(projectile);
 		}
 	});
-	public static final Supplier<Ability> BERSERK			= register("berserk", () -> new AbilityBerserk(prefix("berserk"), Category.OFFENSE));
-	public static final Supplier<Ability> MINDLESS			= register("mindless", () -> new PassiveNoXP.Mindless(prefix("mindless"), Category.UTILITY));
-	public static final Supplier<Ability> OMNISCIENT		= register("omniscient", () -> new PassiveNoXP.Omniscient(prefix("omniscient"), Category.UTILITY));
-	public static final Supplier<Ability> FORGETFUL			= register("forgetful", () -> new PassiveNoXP.Forgetful(prefix("forgetful"), Category.UTILITY));
-	public static final Supplier<Ability> QUAKE				= register("quake", () -> new AbilityQuake(prefix("quake"), Category.OFFENSE));
-	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", () -> new Ability(prefix("gelatinous"), Category.UTILITY)
+	public static final Supplier<Ability> BERSERK			= register("berserk", (id) -> new AbilityBerserk(id, Category.OFFENSE));
+	public static final Supplier<Ability> MINDLESS			= register("mindless", (id) -> new PassiveNoXP.Mindless(id, Category.UTILITY));
+	public static final Supplier<Ability> OMNISCIENT		= register("omniscient", (id) -> new PassiveNoXP.Omniscient(id, Category.UTILITY));
+	public static final Supplier<Ability> FORGETFUL			= register("forgetful", (id) -> new PassiveNoXP.Forgetful(id, Category.UTILITY));
+	public static final Supplier<Ability> QUAKE				= register("quake", (id) -> new AbilityQuake(id, Category.OFFENSE));
+	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
 		{
@@ -265,24 +270,51 @@ public class VTAbilities
 			});
 		}
 	});
-	public static final Supplier<Ability> THUNDERSTEP		= register("thunderstep", () -> new AbilityThunderstep(prefix("thunderstep"), Category.OFFENSE));
-	public static final Supplier<Ability> BAD_BREATH		= register("bad_breath", () -> new AbilityBadBreath(prefix("bad_breath"), Category.OFFENSE));
-	public static final Supplier<Ability> WEBWALKER			= register("webwalker", () -> new AbilityIgnoreSlowdown(prefix("webwalker"), Category.UTILITY));
-	public static final Supplier<Ability> HERBIVORE			= register("herbivore", () -> new AbilityDietRestriction(prefix("herbivore"), Category.UTILITY));
-	public static final Supplier<Ability> FLAMEPROOF		= register("flameproof", () -> new AbilityDamageResist(prefix("flameproof"), Category.DEFENSE));
-	public static final Supplier<Ability> FLEECE			= register("fleece", () -> new AbilityFleece(prefix("fleece"), Category.UTILITY));
-	public static final Supplier<Ability> ORESIGHT			= register("oresight", () -> new AbilityOresight(prefix("oresight"), Category.UTILITY));
-	public static final Supplier<Ability> HOME_TURF			= register("home_turf", () -> new AbilityFavouredTerrain(prefix("home_turf"), Category.DEFENSE));
-	public static final Supplier<Ability> PHOTOSYNTH		= register("photosynth", () -> new AbilityPhotosynth(prefix("photosynth"), Category.UTILITY));
-	public static final Supplier<Ability> FAESKIN			= register("faeskin", () -> new AbilityFaeskin(prefix("faeskin"), Category.UTILITY));
-	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", () -> new Ability(prefix("cosmetic_wings"), Category.UTILITY)
+	public static final Supplier<Ability> THUNDERSTEP		= register("thunderstep", (id) -> new AbilityThunderstep(id, Category.OFFENSE));
+	public static final Supplier<Ability> BAD_BREATH		= register("bad_breath", (id) -> new AbilityBadBreath(id, Category.OFFENSE));
+	public static final Supplier<Ability> WEBWALKER			= register("webwalker", (id) -> new AbilityIgnoreSlowdown(id, Category.UTILITY));
+	public static final Supplier<Ability> HERBIVORE			= register("herbivore", (id) -> new AbilityDietRestriction(id, Category.UTILITY));
+	public static final Supplier<Ability> FLAMEPROOF		= register("flameproof", (id) -> new AbilityDamageResist(id, Category.DEFENSE));
+	public static final Supplier<Ability> FLEECE			= register("fleece", (id) -> new AbilityFleece(id, Category.UTILITY));
+	public static final Supplier<Ability> ORESIGHT			= register("oresight", (id) -> new AbilityOresight(id, Category.UTILITY));
+	public static final Supplier<Ability> HOME_TURF			= register("home_turf", (id) -> new AbilityFavouredTerrain(id, Category.DEFENSE));
+	public static final Supplier<Ability> PHOTOSYNTH		= register("photosynth", (id) -> new AbilityPhotosynth(id, Category.UTILITY));
+	public static final Supplier<Ability> FAESKIN			= register("faeskin", (id) -> new AbilityFaeskin(id, Category.UTILITY));
+	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public boolean isHidden(AbilityInstance instance) { return true; }
 	});
-	public static final Supplier<Ability> FLEXIBLE			= register("flexible", () -> new AbilityFlexible(prefix("flexible"), Category.UTILITY));
-	public static final Supplier<Ability> SUNBLIND			= register("sunblind", () -> new AbilitySunblind(prefix("sunblind"), Category.UTILITY));
+	public static final Supplier<Ability> FLEXIBLE			= register("flexible", (id) -> new AbilityFlexible(id, Category.UTILITY));
+	public static final Supplier<Ability> SUNBLIND			= register("sunblind", (id) -> new AbilitySunblind(id, Category.UTILITY));
+	public static final Supplier<Ability> DROPS				= register("drops", (id) -> new Ability(id, Category.UTILITY)
+	{
+		public Optional<Text> description(AbilityInstance instance)
+		{
+			return Optional.of(translate("ability", id.getPath()+".desc", getBag(instance.memory()).description()));
+		}
+		
+		public void registerEventHandlers()
+		{
+			PlayerEvents.PLAYER_DROPS_EVENT.register((living, source) -> VariousTypes.getSheet(living).ifPresent(sheet -> 
+			{
+				AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+				if(!abilities.hasAbility(id))
+					return;
+				
+				AbilityInstance inst = abilities.get(id);
+				LootBag loot = getBag(inst.memory());
+				if(loot != null)
+					loot.dropFrom(living, source);
+			}));
+		}
+		
+		private static LootBag getBag(NbtCompound nbt)
+		{
+			return nbt.contains("Loot", NbtElement.COMPOUND_TYPE) ? LootBag.fromNbt(nbt.getCompound("Loot")) : LootBag.ofTable(EntityType.ZOMBIE.getLootTableId());
+		}
+	});
 	
-	public static final Supplier<Ability> DUMMY = register("dummy", () -> new Ability(prefix("dummy"), Category.UTILITY)
+	public static final Supplier<Ability> DUMMY = register("dummy", (id) -> new Ability(id, Category.UTILITY)
 	{
 		protected boolean remappable() { return true; }
 	});
@@ -321,10 +353,12 @@ public class VTAbilities
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */
 	
-	public static Supplier<Ability> register(String name, Supplier<Ability> ability)
+	public static Supplier<Ability> register(String name, Function<Identifier, Ability> ability)
 	{
-		ABILITIES.put(prefix(name), ability);
-		return ability;
+		final Identifier regName = prefix(name);
+		final Supplier<Ability> supplier = () -> ability.apply(regName);
+		ABILITIES.put(regName, supplier);
+		return supplier;
 	}
 	
 	public static void init()

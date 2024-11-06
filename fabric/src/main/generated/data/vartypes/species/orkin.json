@@ -57,6 +57,16 @@
   },
   "Types": [
     "vartypes:human",
-    "vartypes:dummy"
+    {
+      "Display": {
+        "Description": {
+          "translate": "subtype.vartypes.orkin.desc"
+        },
+        "Title": {
+          "translate": "subtype.vartypes.orkin"
+        }
+      },
+      "ID": "vartypes:orkin"
+    }
   ]
 }

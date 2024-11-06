@@ -21,6 +21,13 @@
   },
   "Types": [
     "vartypes:human",
-    "vartypes:dummy"
+    {
+      "Display": {
+        "Title": {
+          "translate": "subtype.vartypes.verdine"
+        }
+      },
+      "ID": "vartypes:verdine"
+    }
   ]
 }

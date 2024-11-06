@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -35,64 +36,65 @@ public class VTTypes
 	
 	private static final Predicate<TypeSet> IS_OTHALL = types -> types.contains(VTTypes.OTHALL.get());
 	
-	public static final Supplier<Type> ADUAIN			= register("aduain", () -> Type.Builder.of(prefix("aduain"), Tier.SUPERTYPE).colour(0x0029292)
+	public static final Supplier<Type> ADUAIN			= register("aduain", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x0029292)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> ANIMAL			= register("animal", () -> Type.Builder.of(prefix("animal"), Tier.SUPERTYPE).colour(0xFFFF6D).build());
-	public static final Supplier<Type> ARTHROPOD		= register("arthropod", () -> Type.Builder.of(prefix("arthropod"), Tier.SUPERTYPE).colour(0x924900)
+	public static final Supplier<Type> ANIMAL			= register("animal", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xFFFF6D).build());
+	public static final Supplier<Type> ARTHROPOD		= register("arthropod", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x924900)
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> CONSTRUCT		= register("construct", () -> Type.Builder.of(prefix("construct"), Tier.SUPERTYPE).colour(0xDB6D00)
+	public static final Supplier<Type> CONSTRUCT		= register("construct", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xDB6D00)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
 			.addAbility(VTAbilities.NIGHT_VISION.get(), VTAbilities.MITHRIDATIC.get()).build());
-	public static final Supplier<Type> DRAGON			= register("dragon", () -> Type.Builder.of(prefix("dragon"), Tier.SUPERTYPE).colour(0x920000)
+	public static final Supplier<Type> DRAGON			= register("dragon", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x920000)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> ELEMENT			= register("element", () -> Type.Builder.of(prefix("element"), Tier.SUPERTYPE).colour(0xFF6DB6)
+	public static final Supplier<Type> ELEMENT			= register("element", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xFF6DB6)
 			.setActions(ActionHandler.REGEN_ONLY)
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
-	public static final Supplier<Type> FAE				= register("fae", () -> Type.Builder.of(prefix("fae"), Tier.SUPERTYPE).colour(0xDDB6DB)
+	public static final Supplier<Type> FAE				= register("fae", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xDDB6DB)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, -5))
 			.addAbility(VTAbilities.FAESKIN.get()).build());
-	public static final Supplier<Type> HUMAN			= register("human", () -> Type.Builder.of(prefix("human"), Tier.SUPERTYPE).colour(0x006DDB).build());
-	public static final Supplier<Type> OOZE				= register("ooze", () -> Type.Builder.of(prefix("ooze"), Tier.SUPERTYPE).colour(0xB6DBFF)
+	public static final Supplier<Type> HUMAN			= register("human", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x006DDB).build());
+	public static final Supplier<Type> OOZE				= register("ooze", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xB6DBFF)
 			.setActions(ActionHandler.of(Action.EAT.get(), Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 5))
 			.addAbility(VTAbilities.MITHRIDATIC.get(), VTAbilities.GELATINOUS.get(), VTAbilities.SCULK_SIGHT.get()).build());
-	public static final Supplier<Type> OTHALL			= register("othall", () -> Type.Builder.of(prefix("othall"), Tier.SUPERTYPE).colour(0xB66DFF)
+	public static final Supplier<Type> OTHALL			= register("othall", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0xB66DFF)
 			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
 			.addAbility(VTAbilities.NIGHT_VISION.get()).build());
-	public static final Supplier<Type> PLANT			= register("plant", () -> Type.Builder.of(prefix("plant"), Tier.SUPERTYPE).colour(0x24FF24)
+	public static final Supplier<Type> PLANT			= register("plant", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x24FF24)
 			.setActions(ActionHandler.of(Action.BREATHE.get(), Action.SLEEP.get(), Action.REGEN.get()).allowBreathe(VTTags.AIR))
 			.addAbility(VTAbilities.MITHRIDATIC.get()).build());
-	public static final Supplier<Type> UNDEAD			= register("undead", () -> Type.Builder.of(prefix("undead"), Tier.SUPERTYPE).colour(0x1F1F1F)
+	public static final Supplier<Type> UNDEAD			= register("undead", (id) -> Type.Builder.of(id, Tier.SUPERTYPE).colour(0x1F1F1F)
 			.setActions(ActionHandler.NONE)
 			.addAbility(VTAbilities.BONUS_HEALTH.get(), nbt -> nbt.putInt(SingleAttributeAbility.AMOUNT, 10))
 			.addAbility(VTAbilities.NIGHT_VISION.get(), VTAbilities.MITHRIDATIC.get()).build());
 	
-	public static final Supplier<Type> NATIVE			= register("native", () -> Type.Builder.of(prefix("native"), Tier.SUBTYPE).description(ModInfo.translate("type", "native.desc"))
+	public static final Supplier<Type> NATIVE			= register("native", (id) -> Type.Builder.of(id, Tier.SUBTYPE).description(ModInfo.translate("type", "native.desc"))
 			.setActions(ActionHandler.of()
 				.add(Operation.add(IS_OTHALL, Action.EAT.get()))
 				.add(Operation.add(IS_OTHALL, Action.SLEEP.get()))).build());
-	public static final Supplier<Type> OTHAKIN			= register("othakin", () -> Type.Builder.of(prefix("othakin"), Tier.SUBTYPE).description(ModInfo.translate("type", "othakin.desc")).build());
-	public static final Supplier<Type> ALTERED			= register("altered", () -> Type.Builder.of(prefix("altered"), Tier.SUBTYPE).description(ModInfo.translate("type", "altered.desc")).build());
-	public static final Supplier<Type> AIR				= register("air", () -> Type.Builder.of(prefix("air"), Tier.SUBTYPE)
+	public static final Supplier<Type> OTHAKIN			= register("othakin", (id) -> Type.Builder.of(id, Tier.SUBTYPE).description(ModInfo.translate("type", "othakin.desc")).build());
+	public static final Supplier<Type> ALTERED			= register("altered", (id) -> Type.Builder.of(id, Tier.SUBTYPE).description(ModInfo.translate("type", "altered.desc")).build());
+	public static final Supplier<Type> AIR				= register("air", (id) -> Type.Builder.of(id, Tier.SUBTYPE)
 			.addAbility(VTAbilities.FLY.get()).build());
-	public static final Supplier<Type> EARTH			= register("earth", () -> Type.Builder.of(prefix("earth"), Tier.SUBTYPE)
+	public static final Supplier<Type> EARTH			= register("earth", (id) -> Type.Builder.of(id, Tier.SUBTYPE)
 			.addAbility(AbilityBurrow.of(BlockTags.DIRT, BlockTags.BASE_STONE_OVERWORLD, BlockTags.BASE_STONE_NETHER)).build());
-	public static final Supplier<Type> FIRE				= register("fire", () -> Type.Builder.of(prefix("fire"), Tier.SUBTYPE).build());
-	public static final Supplier<Type> WATER			= register("water", () -> Type.Builder.of(prefix("water"), Tier.SUBTYPE)
+	public static final Supplier<Type> FIRE				= register("fire", (id) -> Type.Builder.of(id, Tier.SUBTYPE).build());
+	public static final Supplier<Type> WATER			= register("water", (id) -> Type.Builder.of(id, Tier.SUBTYPE)
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.SWIM.get()).build());
-	public static final Supplier<Type> AQUATIC			= register("aquatic", () -> Type.Builder.of(prefix("aquatic"), Tier.SUBTYPE).description(ModInfo.translate("type", "aquatic.desc"))
+	public static final Supplier<Type> AQUATIC			= register("aquatic", (id) -> Type.Builder.of(id, Tier.SUBTYPE).description(ModInfo.translate("type", "aquatic.desc"))
 			.addAbility(VTAbilities.BREATHE_FLUID.get(), AbilityBreathing.water())
 			.addAbility(VTAbilities.SUFFOCATE_FLUID.get(), AbilityBreathing.air())
 			.addAbility(VTAbilities.SWIM.get()).build());
-	public static final Supplier<Type> SPECTRAL			= register("spectral", () -> Type.Builder.of(prefix("spectral"), Tier.SUBTYPE)
+	public static final Supplier<Type> SPECTRAL			= register("spectral", (id) -> Type.Builder.of(id, Tier.SUBTYPE)
 			.addAbility(VTAbilities.INTANGIBLE.get()).build());
 	
 	/** A do-nothing subtype that can be given a customised ID and display name, primarily for flavour purposes */
-	public static final Supplier<Type> DUMMY	= register("dummy", () -> DummyType.Builder.of(prefix("dummy")).build());
+	public static final Supplier<Type> DUMMY	= register("dummy", (id) -> DummyType.Builder.of(id).build());
+	public static final Identifier DUMMY_ID	= DUMMY.get().registryName();
 	
 	public static final Supplier<Type> GOBLINOID	= dummyType("goblinoid");
 	public static final Supplier<Type> LINN			= dummyTypeWithDesc("linn");
@@ -110,10 +112,12 @@ public class VTTypes
 	
 	private static Identifier prefix(String nameIn) { return ModInfo.prefix(nameIn); }
 	
-	public static Supplier<Type> register(String name, Supplier<Type> ability)
+	public static Supplier<Type> register(String name, Function<Identifier, Type> ability)
 	{
-		TYPES.put(prefix(name), ability);
-		return ability;
+		Identifier regName = prefix(name);
+		Supplier<Type> sup = () -> ability.apply(regName);
+		TYPES.put(regName, sup);
+		return sup;
 	}
 	
 	public static void init()

@@ -293,4 +293,10 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 		if(amount <= 0)
 			ci.cancel();
 	}
+	
+	@Inject(method = "onDeath(Lnet/minecraft/entity/damage/DamageSource;)V", at = @At("TAIL"))
+	public void vt$onDeath(DamageSource damageSource, final CallbackInfo ci)
+	{
+		PlayerEvents.PLAYER_DROPS_EVENT.invoker().onLivingDrops((PlayerEntity)(Object)this, damageSource);
+	}
 }

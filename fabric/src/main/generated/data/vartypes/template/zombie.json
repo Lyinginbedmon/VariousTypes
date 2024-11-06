@@ -25,7 +25,8 @@
     {
       "Ability": [
         "vartypes:burn_in_sun",
-        "vartypes:mindless"
+        "vartypes:mindless",
+        "vartypes:drops"
       ],
       "Name": "vartypes:add_ability"
     },

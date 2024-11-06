@@ -10,6 +10,7 @@ import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
 import dev.architectury.event.EventResult;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -82,5 +83,12 @@ public class PlayerEvents
 	public interface PlayerTakeDamageEvent
 	{
 		float getModifiedDamage(PlayerEntity living, DamageSource source, float amount);
+	}
+	
+	public static final Event<LivingDropsEvent> PLAYER_DROPS_EVENT = EventFactory.createLoop(LivingDropsEvent.class);
+	
+	public interface LivingDropsEvent
+	{
+		void onLivingDrops(LivingEntity living, DamageSource source);
 	}
 }

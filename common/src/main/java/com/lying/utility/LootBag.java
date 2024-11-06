@@ -12,17 +12,24 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
+import com.lying.VariousTypes;
+import com.lying.reference.Reference;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootTable;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.loot.context.LootContextTypes;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -133,7 +140,7 @@ public class LootBag
 	{
 		if(isEmpty())
 		{
-			description = Text.literal("Nothing");
+			description = Reference.ModInfo.translate("loot", "empty");
 			return;
 		}
 		
@@ -164,7 +171,7 @@ public class LootBag
 		}
 		
 		if(systemTable.isPresent() || customTable.isPresent())
-			entries.add(Text.literal("Random Loot"));
+			entries.add(Reference.ModInfo.translate("loot", "table"));
 		
 		description = VTUtils.listToString(entries, v -> v, ", ");
 	}
@@ -193,17 +200,28 @@ public class LootBag
 	
 	public void giveTo(ServerPlayerEntity player)
 	{
-		if(!isEmpty())
-			getTotalLoot(player, player.getWorld().getRandom().nextLong()).forEach(stack -> player.giveItemStack(stack.copy()));
+		if(isEmpty()) return;
+		LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder(player.getServerWorld())
+				.add(LootContextParameters.THIS_ENTITY, player)
+				.add(LootContextParameters.ORIGIN, player.getPos());
+		getTotalLoot(player, builder.build(LootContextTypes.GIFT), player.getWorld().getRandom().nextLong()).forEach(stack -> player.giveItemStack(stack.copy()));
 	}
 	
-	public void dropFrom(LivingEntity living)
+	public void dropFrom(LivingEntity living, DamageSource source)
 	{
-		if(!isEmpty())
-			getTotalLoot(living, living.getWorld().getRandom().nextLong()).forEach(stack -> living.dropStack(stack.copy()));
+		if(isEmpty()) return;
+		LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder((ServerWorld)living.getWorld())
+				.add(LootContextParameters.THIS_ENTITY, living)
+				.add(LootContextParameters.ORIGIN, living.getPos())
+				.add(LootContextParameters.DAMAGE_SOURCE, source)
+				.addOptional(LootContextParameters.KILLER_ENTITY, source.getAttacker())
+				.addOptional(LootContextParameters.DIRECT_KILLER_ENTITY, source.getSource());
+		if(living.getLastAttacker() != null && living.getLastAttacker().getType() == EntityType.PLAYER)
+			builder.add(LootContextParameters.LAST_DAMAGE_PLAYER, (PlayerEntity)living.getLastAttacker()).luck(((PlayerEntity)living.getLastAttacker()).getLuck());
+		getTotalLoot(living, builder.build(LootContextTypes.ENTITY), living.getWorld().getRandom().nextLong()).forEach(stack -> living.dropStack(stack.copy()));
 	}
 	
-	private List<ItemStack> getTotalLoot(LivingEntity spawner, long seed)
+	private List<ItemStack> getTotalLoot(LivingEntity spawner, LootContextParameterSet lootContext, long seed)
 	{
 		List<ItemStack> loot = Lists.newArrayList();
 		items.ifPresent(set -> set.forEach(item -> loot.add(new ItemStack(item))));
@@ -212,24 +230,23 @@ public class LootBag
 		{
 			LootTable table = spawner.getWorld().getServer().getReloadableRegistries().getLootTable(id);
 			if(table != null)
-				getGeneratedLoot(table, spawner, spawner.getWorld().getRandom().nextLong());
+				getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong());
 		});
-		customTable.ifPresent(table -> getGeneratedLoot(table, spawner, spawner.getWorld().getRandom().nextLong()));
+		customTable.ifPresent(table -> getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong()));
 		return loot;
 	}
 	
-	private static List<ItemStack> getGeneratedLoot(LootTable table, LivingEntity recipient, long seed)
+	private static List<ItemStack> getGeneratedLoot(LootTable table, LootContextParameterSet lootContext, long seed)
 	{
-		if(recipient.getWorld().isClient())
-			return Lists.newArrayList();
-		LootContextParameterSet.Builder builder = new LootContextParameterSet.Builder((ServerWorld)recipient.getWorld())
-				.add(LootContextParameters.THIS_ENTITY, recipient)
-				.add(LootContextParameters.ORIGIN, recipient.getPos());
 		List<ItemStack> loot = Lists.newArrayList();
-		table.generateLoot(builder.build(LootContextTypes.GIFT), seed, s -> loot.add(s.copy()));
+		table.generateLoot(lootContext, seed, s -> loot.add(s.copy()));
 		return loot;
 	}
 	
+	public static LootBag fromNbt(NbtCompound nbt)
+	{
+		return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);
+	}
 	
 	public static LootBag fromJson(JsonElement obj)
 	{

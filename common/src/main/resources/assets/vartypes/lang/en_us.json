@@ -242,6 +242,8 @@
 	"ability.vartypes.sculk_sight.desc": "You are able to precisely pinpoint the origin of vibrations within [%s] blocks.",
 	"ability.vartypes.sunblind": "Sunblind",
 	"ability.vartypes.sunblind.desc": "Your physiology is best suited to dim or indoor environments. You suffer from [%s] whilst in direct sunlight.",
+	"ability.vartypes.drops": "Drops",
+	"ability.vartypes.drops.desc": "Your body contains harvestable goods that others may find useful. On death, you additionally drop [%s].",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",
@@ -339,5 +341,8 @@
 	"key.vartypes.use_fav_ability_1": "Activate favourited ability 1",
 	"key.vartypes.use_fav_ability_2": "Activate favourited ability 2",
 	"key.vartypes.use_fav_ability_3": "Activate favourited ability 3",
-	"key.vartypes.use_fav_ability_4": "Activate favourited ability 4"
+	"key.vartypes.use_fav_ability_4": "Activate favourited ability 4",
+	// Loot bags
+	"loot.vartypes.table": "Random Loot",
+	"loot.vartypes.empty": "Nothing"
 }

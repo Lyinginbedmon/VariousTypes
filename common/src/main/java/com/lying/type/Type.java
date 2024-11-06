@@ -20,7 +20,9 @@ import com.lying.utility.LoreDisplay;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
+import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.nbt.NbtCompound;
@@ -33,24 +35,59 @@ import net.minecraft.util.Identifier;
  */
 public class Type
 {
-	public static final Codec<Type> CODEC_ID = Identifier.CODEC.comapFlatMap(id -> 
+	// Main codec used by standard types, which only need to store their registry name
+	protected static final Codec<Type> CODEC_ID = Identifier.CODEC.comapFlatMap(id -> 
 			{
 				Type type = VTTypes.get(id);
-				if(type == VTTypes.DUMMY.get())
-					return DataResult.error(() -> "Dummy type");
-				else if(type != null)
+				if(type != null)
 					return DataResult.success(type);
 				else
 					return DataResult.error(() -> "Not a recognised type: '"+String.valueOf(id) + "'");
 			}, Type::registryName);
 	
-	public static final Codec<DummyType> CODEC_OBJ = RecordCodecBuilder.create(instance -> instance.group(
+	// Bulkier codec used by dummy types, which need to store custom data
+	protected static final Codec<DummyType> CODEC_OBJ = RecordCodecBuilder.create(instance -> instance.group(
 			Identifier.CODEC.fieldOf("ID").forGetter(DummyType::listID), 
 			LoreDisplay.CODEC.optionalFieldOf("Display").forGetter(DummyType::display))
 				.apply(instance, DummyType::create));
 	
-	// FIXME Ensure Type object is stored and retrieved fully
-	public static final Codec<Type> CODEC = Codec.withAlternative(CODEC_ID, CODEC_OBJ);
+	public static final PrimitiveCodec<Type> CODEC = new PrimitiveCodec<Type>() 
+	{
+		public <T> DataResult<Type> read(final DynamicOps<T> ops, final T input)
+		{
+			// First try to rebuild assuming a standard type ID
+			try
+			{
+				DataResult<Type> std = CODEC_ID.parse(ops, input);
+				if(std.isSuccess() && !std.getOrThrow().registryName().equals(VTTypes.DUMMY_ID))
+					return std;
+				else
+					throw new Exception();
+			}
+			catch(Exception e) { }
+			
+			// If that fails, attempt to build a dummy type
+			try
+			{
+				DataResult<DummyType> dmy = CODEC_OBJ.parse(ops, input);
+				if(dmy.isSuccess())
+					return DataResult.success((Type)dmy.getOrThrow());
+				else
+					throw new Exception();
+			}
+			catch(Exception e) { }
+			
+			return DataResult.error(() -> "Unrecognised type");
+		}
+		
+		public <T> T write(DynamicOps<T> ops, Type value)
+		{
+			if(value instanceof DummyType)
+				return CODEC_OBJ.encodeStart(ops, (DummyType)value).getOrThrow();
+			else
+				return CODEC_ID.encodeStart(ops, value).getOrThrow();
+		}
+	};
 	
 	/** Comparator for sorting types alphabetically by their display name */
 	public static final Comparator<Type> SORT_FUNC = (a, b) -> 
@@ -131,11 +168,6 @@ public class Type
 	@Nullable
 	public static Type readFromJson(JsonElement entry)
 	{
-		// Only Dummy types are stored as JsonObjects, due to their memory requirements
-//		if(entry.isJsonObject())
-//			return DummyType.fromJson(entry.getAsJsonObject());
-//		else if(entry.isJsonPrimitive())
-//			return VTTypes.get(new Identifier(entry.getAsString()));
 		return CODEC.parse(JsonOps.INSTANCE, entry).getOrThrow();
 	}
 	

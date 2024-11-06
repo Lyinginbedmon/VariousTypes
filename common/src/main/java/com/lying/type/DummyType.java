@@ -36,7 +36,6 @@ public class DummyType extends Type
 	
 	public static DummyType create(Identifier listID, Optional<LoreDisplay> displayIn)
 	{
-		System.out.println("Created dummy subtype: "+listID.toString());
 		return new DummyType(REG_NAME, listID, displayIn);
 	}
 	
