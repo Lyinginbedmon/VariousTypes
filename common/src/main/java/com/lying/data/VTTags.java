@@ -13,6 +13,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.biome.Biome;
 
 public class VTTags
 {
@@ -40,6 +41,11 @@ public class VTTags
 	public static final TagKey<Block> SILVER_BLOCK	= TagKey.of(RegistryKeys.BLOCK, prefix("silver"));
 	public static final TagKey<Block> WEBS			= TagKey.of(RegistryKeys.BLOCK, prefix("webs"));
 	public static final TagKey<Block> ORES			= TagKey.of(RegistryKeys.BLOCK, new Identifier("c","ores"));
+	
+	/** Vanilla biomes that have a temperature score of 0.15 or less */
+	public static final TagKey<Biome> COLD_BIOMES	= TagKey.of(RegistryKeys.BIOME, prefix("cold"));
+	/** Vanilla biomes that have a temperature score of 0.85 or higher */
+	public static final TagKey<Biome> HOT_BIOMES	= TagKey.of(RegistryKeys.BIOME, prefix("hot"));
 	
 	public static final TagKey<ScreenHandlerType<?>> CRAFTING_MENU = TagKey.of(RegistryKeys.SCREEN_HANDLER, prefix("crafting"));
 	public static final TagKey<ScreenHandlerType<?>> COOKING_MENU = TagKey.of(RegistryKeys.SCREEN_HANDLER, prefix("cooking"));

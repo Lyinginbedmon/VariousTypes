@@ -22,12 +22,26 @@
       ]
     },
     {
-      "Ability": {
-        "Ability": "vartypes:natural_armour",
-        "Memory": {
-          "Amount": 5
+      "Ability": [
+        {
+          "Ability": "vartypes:natural_armour",
+          "Memory": {
+            "Amount": 5
+          }
+        },
+        {
+          "Ability": "vartypes:poison",
+          "Memory": {
+            "Effects": [
+              {
+                "duration": 300,
+                "id": "minecraft:slowness",
+                "show_icon": 1
+              }
+            ]
+          }
         }
-      },
+      ],
       "Name": "vartypes:add_ability"
     }
   ],

@@ -21,6 +21,7 @@ import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
+import com.lying.ability.AbilityColdBlood;
 import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFaeskin;
@@ -35,9 +36,11 @@ import com.lying.ability.AbilityIntangible;
 import com.lying.ability.AbilityInvisibility;
 import com.lying.ability.AbilityLoSTeleport;
 import com.lying.ability.AbilityNightVision;
+import com.lying.ability.AbilityOnMeleeHit;
 import com.lying.ability.AbilityOresight;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityPhotosynth;
+import com.lying.ability.AbilityPoison;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilitySculksight;
@@ -147,6 +150,7 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> BURROW			= register("burrow", (id) -> new AbilityBurrow(id, Category.UTILITY));
 	public static final Supplier<Ability> CLIMB				= register("climb", (id) -> new ToggledAbility(id, Category.UTILITY));
+	public static final Supplier<Ability> COLD_BLOODED		= register("cold_blooded", (id) -> new AbilityColdBlood(id, Category.UTILITY));
 	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public boolean isHidden(AbilityInstance instance) { return true; }
@@ -209,6 +213,7 @@ public class VTAbilities
 		}
 	});
 	public static final Supplier<Ability> FLAMEPROOF		= register("flameproof", (id) -> new AbilityDamageResist(id, Category.DEFENSE));
+	public static final Supplier<Ability> FLAMING_FIST		= register("flaming_fist", (id) -> new AbilityOnMeleeHit.SetFire(id, Category.OFFENSE));
 	public static final Supplier<Ability> FLEECE			= register("fleece", (id) -> new AbilityFleece(id, Category.UTILITY));
 	public static final Supplier<Ability> FLEXIBLE			= register("flexible", (id) -> new AbilityFlexible(id, Category.UTILITY));
 	public static final Supplier<Ability> FLY				= register("fly", (id) -> new AbilityFly(id, Category.UTILITY));
@@ -270,6 +275,7 @@ public class VTAbilities
 	public static final Supplier<Ability> ORESIGHT			= register("oresight", (id) -> new AbilityOresight(id, Category.UTILITY));
 	public static final Supplier<Ability> PARIAH			= register("pariah", (id) -> new AbilityPariah(id, Category.UTILITY));
 	public static final Supplier<Ability> PHOTOSYNTH		= register("photosynth", (id) -> new AbilityPhotosynth(id, Category.UTILITY));
+	public static final Supplier<Ability> POISON			= register("poison", (id) -> new AbilityPoison(id, Category.OFFENSE));
 	public static final Supplier<Ability> QUAKE				= register("quake", (id) -> new AbilityQuake(id, Category.OFFENSE));
 	public static final Supplier<Ability> REGENERATION		= register("regeneration", (id) -> new AbilityRegeneration(id, Category.DEFENSE));
 	public static final Supplier<Ability> RIBSHOT			= register("ribshot", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
@@ -332,11 +338,10 @@ public class VTAbilities
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Camouflage - Perfect Invisibility with unlimited duration whilst within certain conditions or until attack/ed
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
-		 * Cold-Blooded - Weak and slow in warm environments (configurable)
+		 * Cold-Blooded - Weak and slow in cold environments (configurable)
 		 * Enchain - Locks a target in place with a set of magical chains
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
-		 * Flaming Fist - Applies Fire Aspect to all melee attacks
 		 * Flit - Very temporary (read: single digit seconds) Spectator mode with no menu access, moderate cooldown
 		 * Fury - Temporary mild damage buff and resistance, ends after configured duration OR if owner deals no damage after 5 seconds
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
@@ -347,7 +352,6 @@ public class VTAbilities
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Poison - Applies configurable status effects to target on melee hit
 		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Roar - AoE damage effect
 		 * Smokescreen - Spawn an AoE particle cloud obscuring vision

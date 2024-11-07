@@ -5,18 +5,23 @@ import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.lying.ability.AbilityPoison;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTTypes;
+import com.lying.reference.Reference;
 import com.lying.template.operation.AbilityOperation;
 import com.lying.template.operation.Operation;
 import com.lying.template.operation.TypesOperation;
 import com.lying.template.precondition.Precondition;
 import com.lying.template.precondition.TypeCondition;
 
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.util.Identifier;
 
 public class TemplateDefaults
@@ -49,7 +54,9 @@ public class TemplateDefaults
 			.power(4)
 			.condition(TypeCondition.Any.of(VTTypes.HUMAN.get(), VTTypes.OTHALL.get(), VTTypes.DRAGON.get()))
 			.operation(TypesOperation.Set.of(VTTypes.UNDEAD.get()))
-			.operation(AbilityOperation.Add.of(SingleAttributeAbility.Armour.of(5))).build());
+			.operation(AbilityOperation.Add.of(
+				SingleAttributeAbility.Armour.of(5), 
+				AbilityPoison.withEffects(List.of(new StatusEffectInstance(StatusEffects.SLOWNESS, 15 * Reference.Values.TICKS_PER_SECOND))))).build());
 	public static final Supplier<Template> REPTILIAN	= register(prefix("reptilian"), () -> Template.Builder.of(prefix("reptilian")).description(translate("template","reptilian.desc"))
 			.power(2)
 			.condition(Precondition.IS_LIVING.get())
