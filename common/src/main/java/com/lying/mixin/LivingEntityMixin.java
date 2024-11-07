@@ -25,6 +25,7 @@ import com.lying.event.LivingEvents;
 import com.lying.event.Result;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTStatusEffects;
 import com.lying.init.VTTypes;
 import com.lying.type.TypeSet;
 import com.lying.utility.InedibleFoodHelper;
@@ -354,5 +355,12 @@ public class LivingEntityMixin extends EntityMixin
 			emitGameEvent(GameEvent.EAT);
 			ci.setReturnValue(stack);
 		}
+	}
+	
+	@Inject(method = "updatePotionVisibility()V", at = @At("TAIL"))
+	private void vt$updatePotionVisibility(final CallbackInfo ci)
+	{
+		if(hasStatusEffect(VTStatusEffects.getEntry(VTStatusEffects.STEALTH)))
+			setInvisible(true);
 	}
 }

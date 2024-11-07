@@ -52,7 +52,6 @@ import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
-import com.lying.client.event.RenderEvents;
 import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
 import com.lying.event.LivingEvents;
@@ -63,14 +62,11 @@ import com.lying.type.Action;
 import com.lying.utility.LootBag;
 import com.lying.utility.VTUtils;
 
-import dev.architectury.event.EventResult;
-import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
@@ -83,7 +79,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -310,23 +305,7 @@ public class VTAbilities
 	public static final Supplier<Ability> SUNBLIND			= register("sunblind", (id) -> new AbilitySunblind(id, Category.UTILITY));
 	public static final Supplier<Ability> STEALTH			= register("stealth", (id) -> new AbilityStatusEffectOnDemand(id, Category.DEFENSE, new StatusEffectInstance(VTStatusEffects.getEntry(VTStatusEffects.STEALTH), Reference.Values.TICKS_PER_SECOND * 30, 0, false, false))
 	{
-		// FIXME Ensure Stealth status effect also counts as being Invisible
-		
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_MINUTE * 5; }
-		
-		public void registerEventHandlers()
-		{
-			RenderEvents.PLAYER_RENDER_PERMISSION.register((player) -> player.hasStatusEffect(VTStatusEffects.getEntry(VTStatusEffects.STEALTH)) ? EventResult.interruptFalse() : EventResult.pass());
-			EntityEvent.LIVING_HURT.register((entity, source, amount) -> 
-			{
-				RegistryEntry<StatusEffect> stealth = VTStatusEffects.getEntry(VTStatusEffects.STEALTH);
-				for(Entity ent : new Entity[] {entity, source.getSource()})
-					if(ent != null && ent.isAlive() && ent instanceof LivingEntity && ((LivingEntity)ent).hasStatusEffect(stealth))
-						((LivingEntity)ent).removeStatusEffect(stealth);
-				
-				return EventResult.pass();
-			});
-		}
 	});
 	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{

@@ -141,6 +141,7 @@ public class ServerBus
 		SheetEvents.AFTER_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().applyAttributeModifiers(living, inst)));
 	}
 	
+	/** Handles the down/up-grading of fatigue intensity */
 	private static void handleFatigue(int amplifier, LivingEntity player)
 	{
 		if(!VariousTypes.config.fatigueEnabled() || player.age%Reference.Values.TICKS_PER_SECOND > 0 || amplifier < 0)

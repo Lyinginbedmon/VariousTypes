@@ -130,6 +130,9 @@ public class EntityMixin
 	@Shadow
 	public void emitGameEvent(RegistryEntry<GameEvent> event) { }
 	
+	@Shadow
+	public void setInvisible(boolean bool) { }
+	
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
 	{
