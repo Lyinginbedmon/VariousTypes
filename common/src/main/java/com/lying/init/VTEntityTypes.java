@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.entity.ShakenBlockEntity;
+import com.lying.entity.ThrownBlockEntity;
 import com.lying.reference.Reference;
 
 import dev.architectury.registry.registries.DeferredRegister;
@@ -27,6 +28,12 @@ public class VTEntityTypes
 	{
 		EntityType.Builder<ShakenBlockEntity> builder = EntityType.Builder.<ShakenBlockEntity>create(ShakenBlockEntity::new, SpawnGroup.MISC).dimensions(1F, 1F);
 		return builder.build("shaken_block");
+	});
+	
+	public static final RegistrySupplier<EntityType<ThrownBlockEntity>> THROWN_BLOCK	= register("thrown_block", () -> 
+	{
+		EntityType.Builder<ThrownBlockEntity> builder = EntityType.Builder.<ThrownBlockEntity>create(ThrownBlockEntity::new, SpawnGroup.MISC).dimensions(1F, 1F);
+		return builder.build("thrown_block");
 	});
 	
 	private static <T extends Entity> RegistrySupplier<EntityType<T>> register(String name, Supplier<EntityType<T>> entry)

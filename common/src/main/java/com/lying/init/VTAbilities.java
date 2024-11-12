@@ -48,10 +48,12 @@ import com.lying.ability.AbilitySet;
 import com.lying.ability.AbilityStatusEffectOnDemand;
 import com.lying.ability.AbilityStatusTagImmune;
 import com.lying.ability.AbilitySunblind;
+import com.lying.ability.AbilityThrowBlock;
 import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.PassiveNoXP;
+import com.lying.ability.AbilityDamageGear;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
@@ -255,6 +257,7 @@ public class VTAbilities
 	public static final Supplier<Ability> INDOMITABLE		= register("indomitable", (id) -> new Ability(id, Category.OFFENSE));
 	public static final Supplier<Ability> INTANGIBLE		= register("intangible", (id) -> new AbilityIntangible(id, Category.UTILITY));
 	public static final Supplier<Ability> INVISIBILITY		= register("invisibility", (id) -> new AbilityInvisibility(id, Category.DEFENSE));
+	public static final Supplier<Ability> LUDDITE			= register("luddite", (id) -> new AbilityDamageGear(id, Category.OFFENSE, EquipmentSlot.MAINHAND, EquipmentSlot.OFFHAND));
 	public static final Supplier<Ability> MENDING			= register("mending", (id) -> new Ability(id, Category.DEFENSE)
 	{
 		public void registerEventHandlers()
@@ -278,6 +281,7 @@ public class VTAbilities
 	public static final Supplier<Ability> POISON			= register("poison", (id) -> new AbilityPoison(id, Category.OFFENSE));
 	public static final Supplier<Ability> QUAKE				= register("quake", (id) -> new AbilityQuake(id, Category.OFFENSE));
 	public static final Supplier<Ability> REGENERATION		= register("regeneration", (id) -> new AbilityRegeneration(id, Category.DEFENSE));
+	public static final Supplier<Ability> REND				= register("rend", (id) -> new AbilityDamageGear(id, Category.OFFENSE, EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET));
 	public static final Supplier<Ability> RIBSHOT			= register("ribshot", (id) -> new SpawnProjectileAbility(id, Category.OFFENSE)
 	{
 		protected void shootFrom(LivingEntity owner, Vec3d direction, AbilityInstance instance)
@@ -322,6 +326,7 @@ public class VTAbilities
 	public static final Supplier<Ability> TELEPORT			= register("teleport", (id) -> new AbilityLoSTeleport(id, Category.UTILITY));
 	public static final Supplier<Ability> THUNDERSTEP		= register("thunderstep", (id) -> new AbilityThunderstep(id, Category.OFFENSE));
 	public static final Supplier<Ability> WATER_WALKING		= register("water_walking", (id) -> new AbilityWaterWalking(id, Category.UTILITY));
+	public static final Supplier<Ability> WEBSPINNER		= register("webspinner", (id) -> new AbilityThrowBlock(id, Category.OFFENSE));
 	public static final Supplier<Ability> WEBWALKER			= register("webwalker", (id) -> new AbilityIgnoreSlowdown(id, Category.UTILITY));
 	
 	public static final Supplier<Ability> DUMMY = register("dummy", (id) -> new Ability(id, Category.UTILITY)
@@ -338,7 +343,6 @@ public class VTAbilities
 		 * Blood Draw - Melee-range attack that self heals, deals unblockable damage, Nausea, and Weakness effects, but moderate cooldown and only works on physical living targets
 		 * Camouflage - Perfect Invisibility with unlimited duration whilst within certain conditions or until attack/ed
 		 * Charge - Brief large boost to forward movement, damage and knockback entities collided with en route
-		 * Cold-Blooded - Weak and slow in cold environments (configurable)
 		 * Enchain - Locks a target in place with a set of magical chains
 		 * Eye Ray - Shoots a beam of energy that can damage and/or deal status effects to those struck, highly configurable, does not affect invisible entities
 		 * Fertile Aura - Bonemeal surrounding area (periodically? or activated)
@@ -346,17 +350,14 @@ public class VTAbilities
 		 * Fury - Temporary mild damage buff and resistance, ends after configured duration OR if owner deals no damage after 5 seconds
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
-		 * Luddite - Melee hits damage the attacker's held item (if any), or causes it to drop if unbreakable
 		 * Flexible - Toggled, applies a configured scale modifier (up or down)
 		 * Mindeater - Melee-range attack on players that drains XP levels or kills outright
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off
 		 * Omenpath - Create a stationary temporary portal to your home dimension, usable by any entity in either direction
-		 * Rend - Melee attacks deal extra damage to target's held items and equipment (if any), or causes it to drop if unbreakable
 		 * Roar - AoE damage effect
 		 * Smokescreen - Spawn an AoE particle cloud obscuring vision
 		 * Untethered - Creative-style flight
-		 * Webspinner - Throw a falling block entity of cobweb in the direction you are looking
 		 * Worldbridge - Create a pair of linked portals between two points, you can only have two at once and the eldest despawns if another is made
 	 */
 	

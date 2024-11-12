@@ -43,8 +43,9 @@ public class AbilityPoison extends AbilityOnMeleeHit implements IComplexAbility<
 				VTUtils.getEffectNames(values.effects)));
 	}
 	
-	public void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst)
+	public void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst, boolean isClient)
 	{
+		if(isClient) return;
 		ConfigPoison.fromNbt(inst.memory()).effects.stream().filter(e -> victim.canHaveStatusEffect(e)).forEach(e -> 
 			victim.addStatusEffect(new StatusEffectInstance(e.getEffectType(), e.getDuration(), e.getAmplifier(), e.isAmbient(), e.shouldShowParticles()), attacker));
 	}

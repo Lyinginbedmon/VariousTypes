@@ -8,7 +8,7 @@ import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.particle.ShockwaveParticle;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
-import com.lying.client.renderer.ShakenBlockEntityRenderer;
+import com.lying.client.renderer.ThrownBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
 import com.lying.client.screen.CharacterSheetScreen;
@@ -130,7 +130,8 @@ public class VariousTypesClient
 	private static void registerEntityRenderers()
 	{
 		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
-		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ShakenBlockEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ThrownBlockEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.THROWN_BLOCK, ThrownBlockEntityRenderer::new);
 	}
 	
 	private static void registerParticleFactories()

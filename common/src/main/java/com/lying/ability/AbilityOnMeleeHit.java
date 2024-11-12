@@ -33,15 +33,15 @@ public abstract class AbilityOnMeleeHit extends Ability
 			{
 				LivingEntity attacker = (LivingEntity)sourceEntity;
 				VariousTypes.getSheet(attacker).ifPresent(sheet -> 
-					sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfClass(AbilityOnMeleeHit.class).forEach(inst -> 
-						((AbilityOnMeleeHit)inst.ability()).onMeleeHit(entity, attacker, inst)));
+					sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfType(registryName()).forEach(inst -> 
+						((AbilityOnMeleeHit)inst.ability()).onMeleeHit(entity, attacker, inst, entity.getWorld().isClient())));
 			}
 			
 			return EventResult.pass();
 		});
 	}
 	
-	public abstract void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst);
+	public abstract void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst, boolean isClient);
 	
 	public static class SetFire extends AbilityOnMeleeHit
 	{
@@ -55,8 +55,9 @@ public abstract class AbilityOnMeleeHit extends Ability
 			return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToTime(getFireTicks(instance))));
 		}
 		
-		public void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst)
+		public void onMeleeHit(LivingEntity victim, LivingEntity attacker, AbilityInstance inst, boolean isClient)
 		{
+			if(isClient) return;
 			if(victim.isOnFire() || victim.isFireImmune())
 				return;
 			victim.setFireTicks(getFireTicks(inst));
