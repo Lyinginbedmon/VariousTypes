@@ -1,10 +1,13 @@
 package com.lying.mixin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -14,6 +17,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
+import com.lying.entity.PlayerEntityInterface;
 import com.lying.entity.PlayerXPInterface;
 import com.lying.event.LivingEvents;
 import com.lying.event.PlayerEvents;
@@ -22,11 +26,13 @@ import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
 import com.lying.type.Action;
 import com.lying.type.TypeSet;
+import com.lying.utility.PlayerPose;
 import com.mojang.datafixers.util.Either;
 
 import dev.architectury.event.EventResult;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -45,8 +51,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(PlayerEntity.class)
-public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInterface
+public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInterface, PlayerEntityInterface
 {
+	@Unique
+	private final Map<PlayerPose, AnimationState> ANIM_STATES = new HashMap<>();
+	
 	@Shadow
 	public int totalExperience;
 	
@@ -298,5 +307,31 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	public void vt$onDeath(DamageSource damageSource, final CallbackInfo ci)
 	{
 		PlayerEvents.PLAYER_DROPS_EVENT.invoker().onLivingDrops((PlayerEntity)(Object)this, damageSource);
+	}
+	
+	@Override
+	public AnimationState getAnimation(PlayerPose poseIn)
+	{
+		if(!ANIM_STATES.containsKey(poseIn))
+			ANIM_STATES.put(poseIn, new AnimationState());
+		return ANIM_STATES.get(poseIn);
+	}
+	
+	@Override
+	public void startAnimation(PlayerPose pose)
+	{
+		for(PlayerPose anim : PlayerPose.values())
+		{
+			AnimationState state = getAnimation(anim);
+			if(anim == pose)
+			{
+				if(state.isRunning())
+					continue;
+				VariousTypes.LOGGER.info("# Started playing {} animation", pose.name());
+				state.startIfNotRunning(age);
+			}
+			else if(state.isRunning())
+				state.stop();
+		}
 	}
 }

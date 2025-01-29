@@ -16,11 +16,13 @@ import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionables;
+import com.lying.entity.PlayerEntityInterface;
 import com.lying.event.LivingEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.type.Action;
 import com.lying.type.ActionHandler;
+import com.lying.utility.PlayerPose;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
@@ -30,6 +32,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageSources;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
@@ -45,6 +48,9 @@ public class EntityMixin
 {
 	/** Set to true if calls to setAir should be ignored */
 	protected boolean shouldSkipAir = false;
+	
+	@Shadow
+	public int age;
 	
 	@Shadow
 	public Random random;
@@ -233,14 +239,14 @@ public class EntityMixin
 	@Inject(method = "fall(DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V", at = @At("HEAD"))
 	private void vt$fall(double heightDifference, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition, final CallbackInfo ci)
 	{
-		if(this.fallDistance > 0F && (Entity)(Object) this instanceof LivingEntity && !getWorld().isClient())
+		if(this.fallDistance > 0F && (Entity)(Object)this instanceof LivingEntity && !getWorld().isClient())
 			LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
 	}
 	
 	@Inject(method = "slowMovement(Lnet/minecraft/block/BlockState;Lnet/minecraft/util/math/Vec3d;)V", at = @At("HEAD"), cancellable = true)
 	private void vt$ignoresSlowdown(BlockState state, Vec3d slow, final CallbackInfo ci)
 	{
-		if((Entity)(Object) this instanceof LivingEntity)
+		if((Entity)(Object)this instanceof LivingEntity)
 			if(LivingEvents.IGNORE_SLOW_EVENT.invoker().shouldIgnoreSlowingFrom((LivingEntity)(Object)this, state).isTrue())
 				ci.cancel();
 	}
@@ -248,10 +254,21 @@ public class EntityMixin
 	@Inject(method = "move(Lnet/minecraft/entity/MovementType;Lnet/minecraft/util/math/Vec3d;)V", at = @At("TAIL"))
 	private void vt$move(MovementType type, Vec3d move, final CallbackInfo ci)
 	{
-		if((Entity)(Object) this instanceof LivingEntity)
+		if((Entity)(Object)this instanceof LivingEntity)
 		{
 			LivingEntity living = (LivingEntity)(Object)this;
 			LivingEvents.LIVING_MOVE_EVENT.invoker().onLivingMove(living, type, move, VariousTypes.getSheet(living));
+		}
+	}
+	
+	@Inject(method = "setPose(Lnet/minecraft/entity/EntityPose;)V", at = @At("TAIL"))
+	private void vt$setPose(EntityPose poseIn, final CallbackInfo ci)
+	{
+		if(getType() == EntityType.PLAYER && getWorld().isClient())
+		{
+			PlayerEntity player = (PlayerEntity)(Object)this;
+			PlayerPose pose = PlayerPose.getPoseFromPlayer(player, poseIn);
+			((PlayerEntityInterface)player).startAnimation(pose);
 		}
 	}
 }
