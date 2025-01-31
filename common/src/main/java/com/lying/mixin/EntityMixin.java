@@ -1,6 +1,7 @@
 package com.lying.mixin;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -16,7 +17,7 @@ import com.lying.ability.ToggledAbility;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementAbilitySet;
 import com.lying.component.element.ElementActionables;
-import com.lying.entity.PlayerEntityInterface;
+import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.event.LivingEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
@@ -36,6 +37,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
@@ -63,6 +65,9 @@ public class EntityMixin
 	
 	@Shadow
 	public int timeUntilRegen;
+	
+	@Shadow
+	public UUID getUuid() { return null; }
 	
 	@Shadow
 	public boolean isSpectator() { return false; }
@@ -138,6 +143,9 @@ public class EntityMixin
 	
 	@Shadow
 	public void setInvisible(boolean bool) { }
+	
+	@Shadow
+	public Text getName() { return Text.empty(); }
 	
 	@Inject(method = "isInvulnerableTo(Lnet/minecraft/entity/damage/DamageSource;)Z", at = @At("TAIL"), cancellable = true)
 	private void vt$isInvulnerableTo(DamageSource source, final CallbackInfoReturnable<Boolean> ci)
@@ -268,7 +276,7 @@ public class EntityMixin
 		{
 			PlayerEntity player = (PlayerEntity)(Object)this;
 			PlayerPose pose = PlayerPose.getPoseFromPlayer(player, poseIn);
-			((PlayerEntityInterface)player).startAnimation(pose);
+			((AccessoryAnimationInterface)player).startAnimation(pose);
 		}
 	}
 }

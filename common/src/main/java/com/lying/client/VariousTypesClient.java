@@ -19,11 +19,13 @@ import com.lying.client.utility.highlights.HighlightManager;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.component.element.ElementSpecialPose;
+import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.network.HighlightPacket;
+import com.lying.network.PoweredFlightPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
 import com.lying.network.SyncPosePacket;
@@ -36,6 +38,7 @@ import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 
 public class VariousTypesClient
@@ -115,6 +118,12 @@ public class VariousTypesClient
     			if(ENTITY_HIGHLIGHTS.canAccept(highlight))
 					ENTITY_HIGHLIGHTS.add((Highlight.Entity)highlight);
     		});
+    	});
+    	NetworkManager.registerReceiver(NetworkManager.s2c(), PoweredFlightPacket.PACKET_TYPE, PoweredFlightPacket.PACKET_CODEC, (value, context) -> 
+    	{
+    		PlayerEntity player = value.playerID().equals(mc.player.getUuid()) ? mc.player : mc.player.getWorld().getPlayerByUuid(value.playerID());
+    		if(player != null)
+    			((AccessoryAnimationInterface)player).setPoweredFlight(value.powered());
     	});
 	}
 	

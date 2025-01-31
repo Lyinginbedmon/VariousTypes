@@ -17,13 +17,14 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilitySet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionHandler;
-import com.lying.entity.PlayerEntityInterface;
+import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.entity.PlayerXPInterface;
 import com.lying.event.LivingEvents;
 import com.lying.event.PlayerEvents;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTTypes;
+import com.lying.network.PoweredFlightPacket;
 import com.lying.type.Action;
 import com.lying.type.TypeSet;
 import com.lying.utility.PlayerPose;
@@ -46,15 +47,20 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.packet.s2c.play.ExperienceBarUpdateS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Unit;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
 @Mixin(PlayerEntity.class)
-public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInterface, PlayerEntityInterface
+public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInterface, AccessoryAnimationInterface
 {
 	@Unique
-	private final Map<PlayerPose, AnimationState> ANIM_STATES = new HashMap<>();
+	private final Map<PlayerPose, AnimationState> accessoryAnimations = new HashMap<>();
+	@Unique
+	private final AnimationState accessoryIdleAnimation = new AnimationState();
+	@Unique
+	private boolean isFlightPowered = false;
 	
 	@Shadow
 	public int totalExperience;
@@ -312,14 +318,19 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	@Override
 	public AnimationState getAnimation(PlayerPose poseIn)
 	{
-		if(!ANIM_STATES.containsKey(poseIn))
-			ANIM_STATES.put(poseIn, new AnimationState());
-		return ANIM_STATES.get(poseIn);
+		if(!accessoryAnimations.containsKey(poseIn))
+			accessoryAnimations.put(poseIn, new AnimationState());
+		return accessoryAnimations.get(poseIn);
 	}
+	
+	@Override
+	public AnimationState getIdleAnimation() { return accessoryIdleAnimation; }
 	
 	@Override
 	public void startAnimation(PlayerPose pose)
 	{
+		accessoryIdleAnimation.startIfNotRunning(age);
+		
 		for(PlayerPose anim : PlayerPose.values())
 		{
 			AnimationState state = getAnimation(anim);
@@ -327,11 +338,37 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 			{
 				if(state.isRunning())
 					continue;
-				VariousTypes.LOGGER.info("# Started playing {} animation", pose.name());
+				VariousTypes.LOGGER.info("# Started playing {} animation on {}", pose.name(), getName().getString());
 				state.startIfNotRunning(age);
 			}
 			else if(state.isRunning())
 				state.stop();
 		}
 	}
+	
+	public void setPoweredFlight(boolean bool)
+	{
+		if(isFlightPowered == bool) return;
+		
+		isFlightPowered = bool;
+		
+		if(!getWorld().isClient())
+			PoweredFlightPacket.send(((ServerWorld)getWorld()).getPlayers(), getUuid(), bool);
+		else
+			switch(currentlyRunning())
+			{
+				case PlayerPose.FLYING_IDLE:
+					if(bool)
+						startAnimation(PlayerPose.FLYING_POWERED);
+					break;
+				case PlayerPose.FLYING_POWERED:
+					if(!bool)
+						startAnimation(PlayerPose.FLYING_IDLE);
+					break;
+				default:
+					break;
+			}
+	}
+	
+	public boolean isPoweredFlying() { return isFlightPowered; }
 }

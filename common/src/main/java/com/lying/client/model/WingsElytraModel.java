@@ -1,5 +1,7 @@
 package com.lying.client.model;
 
+import com.lying.entity.AccessoryAnimationInterface;
+
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;
 import net.minecraft.client.model.ModelPart;
@@ -77,4 +79,6 @@ public class WingsElytraModel<E extends LivingEntity> extends AbstractWingsModel
 		this.wingRight.pitch = this.wingLeft.pitch;
 		this.wingRight.roll = -this.wingLeft.roll;
 	}
+	
+	protected void animateWings(AccessoryAnimationInterface anims, float age) { }
 }

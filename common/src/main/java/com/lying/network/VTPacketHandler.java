@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.module.ModuleTemplates;
+import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.event.PlayerEvents;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
@@ -32,6 +33,7 @@ public class VTPacketHandler
 	public static final Identifier SYNC_ACTIONABLES_ID	= prefix("s2c_sync_actionables");
 	public static final Identifier SYNC_FATIGUE_ID		= prefix("s2c_sync_fatigue");
 	public static final Identifier SYNC_POSE_ID			= prefix("s2c_sync_pose");
+	public static final Identifier POWERED_FLIGHT_ID	= prefix("s2c_powered_flight");
 	public static final Identifier HIGHLIGHT_ID			= prefix("s2c_highlight");
 	
 	public static void initServer()
@@ -84,7 +86,10 @@ public class VTPacketHandler
     	{
     		ServerPlayerEntity player = (ServerPlayerEntity)context.getPlayer();
     		if(player.isFallFlying())
+    		{
     			PlayerEvents.PLAYER_FLIGHT_INPUT_EVENT.invoker().onPlayerInput((ServerPlayerEntity)context.getPlayer(), value.forward(), value.strafing(), value.jumping(), value.sneaking());
+    			((AccessoryAnimationInterface)player).setPoweredFlight(value.forward() > 0F);
+    		}
     	});
 	}
 }

@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+import com.lying.entity.AccessoryAnimationInterface;
 
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.effect.StatusEffects;
@@ -20,7 +21,7 @@ public enum PlayerPose
 	SWIMMING_IDLE(1, EntityPose.SWIMMING),
 	SWIMMING_POWERED(0, EntityPose.SWIMMING, p -> p.hasStatusEffect(StatusEffects.DOLPHINS_GRACE)),
 	FLYING_IDLE(1, EntityPose.FALL_FLYING),
-	FLYING_POWERED(0, EntityPose.FALL_FLYING, Predicates.alwaysFalse()),	// TODO Detect when under powered flight
+	FLYING_POWERED(0, EntityPose.FALL_FLYING, p -> ((AccessoryAnimationInterface)p).isPoweredFlying()),
 	SLEEPING(EntityPose.SLEEPING),
 	DYING(EntityPose.DYING);
 	

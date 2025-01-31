@@ -1,13 +1,17 @@
 package com.lying.entity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import com.lying.init.VTEntityTypes;
+import com.lying.utility.PlayerPose;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Pair;
 
+import net.minecraft.entity.AnimationState;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -16,7 +20,7 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
-public class AnimatedPlayerEntity extends LivingEntity
+public class AnimatedPlayerEntity extends LivingEntity implements AccessoryAnimationInterface
 {
 	private GameProfile gameProfile;
 
@@ -57,6 +61,9 @@ public class AnimatedPlayerEntity extends LivingEntity
 			ANIM_SIT_MAIN, List.of(ANIM_SIT_MAIN, ANIM_SIT_MAIN, ANIM_SIT_END)
 			));
 	
+	private final Map<PlayerPose, AnimationState> accessoryAnims = new HashMap<>();
+	private final AnimationState accessoryIdle = new AnimationState();
+	
 	public AnimatedPlayerEntity(EntityType<? extends AnimatedPlayerEntity> typeIn, World worldIn)
 	{
 		super(typeIn, worldIn);
@@ -87,11 +94,89 @@ public class AnimatedPlayerEntity extends LivingEntity
 	{
 		super.tick();
 		this.animations.tick(this);
+		this.accessoryIdle.startIfNotRunning(age);
 		
 		if(animations.currentAnim() == -1)
 		{
 			List<Integer> candidates = stateEngine.getTransitions(animations.lastAnim());
 			animations.start(candidates.get(random.nextInt(candidates.size())), age);
+			
+			switch(animations.currentAnim())
+			{
+				case ANIM_SNEAK:
+					startAnimation(PlayerPose.CROUCHING);
+					break;
+				case ANIM_TPOSE:
+					startAnimation(PlayerPose.FLYING_IDLE);
+					break;
+				case ANIM_SIT_START:
+				case ANIM_SIT_MAIN:
+					startAnimation(PlayerPose.SITTING);
+					break;
+				default:
+					setPose(getPose());
+					break;
+			}
 		}
 	}
+	
+	public void setPose(EntityPose poseIn)
+	{
+		super.setPose(poseIn);
+		switch(poseIn)
+		{
+			case CROUCHING:
+				startAnimation(PlayerPose.CROUCHING);
+				break;
+			case DYING:
+				startAnimation(PlayerPose.DYING);
+				break;
+			case FALL_FLYING:
+				startAnimation(PlayerPose.FLYING_IDLE);
+				break;
+			case SITTING:
+				startAnimation(PlayerPose.SITTING);
+				break;
+			case SLEEPING:
+				startAnimation(PlayerPose.SLEEPING);
+				break;
+			case STANDING:
+				startAnimation(PlayerPose.STANDING);
+				break;
+			case SWIMMING:
+				startAnimation(PlayerPose.SWIMMING_IDLE);
+				break;
+			default:
+				startAnimation(null);
+				break;
+		}
+	}
+	
+	@Override
+	public AnimationState getAnimation(PlayerPose poseIn)
+	{
+		if(!accessoryAnims.containsKey(poseIn))
+			accessoryAnims.put(poseIn, new AnimationState());
+		return accessoryAnims.get(poseIn);
+	}
+	
+	@Override
+	public AnimationState getIdleAnimation() { return accessoryIdle; }
+	
+	@Override
+	public void startAnimation(PlayerPose pose)
+	{
+		for(PlayerPose anim : PlayerPose.values())
+		{
+			AnimationState state = getAnimation(anim);
+			if(anim == pose)
+				state.startIfNotRunning(age);
+			else if(state.isRunning())
+				state.stop();
+		}
+	}
+	
+	public void setPoweredFlight(boolean bool) { }
+	
+	public boolean isPoweredFlying() { return false; }
 }
