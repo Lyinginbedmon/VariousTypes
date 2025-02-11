@@ -59,17 +59,17 @@ public class WingsBatModel<E extends LivingEntity> extends AbstractWingsModel<E>
 			{
 				case PlayerPose.FLYING_IDLE:
 				case PlayerPose.FLYING_POWERED:
-					updateAnimation(currentState, VTAnimations.WINGS_BAT_FLYING_POWERED, age);
+					updateAnimation(currentState, VTAnimations.BatWings.WINGS_BAT_FLYING_POWERED, age);
 					break;
 				case PlayerPose.CROUCHING:
-					updateAnimation(currentState, VTAnimations.WINGS_BAT_FLYING_IDLE, age);
+					updateAnimation(currentState, VTAnimations.BatWings.WINGS_BAT_FLYING_IDLE, age);
 					break;
 				default:
-					updateAnimation(anims.getIdleAnimation(), VTAnimations.WINGS_BAT_IDLE, age);
+					updateAnimation(anims.getIdleAnimation(), VTAnimations.BatWings.WINGS_BAT_IDLE, age);
 					break;
 			}
 		}
 		else
-			updateAnimation(anims.getIdleAnimation(), VTAnimations.WINGS_BAT_IDLE, age);
+			updateAnimation(anims.getIdleAnimation(), VTAnimations.BatWings.WINGS_BAT_IDLE, age);
 	}
 }

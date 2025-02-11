@@ -11,11 +11,17 @@ public abstract class AbstractWingsModel<E extends LivingEntity> extends Animate
 	public static final String LEFT_WING = EntityModelPartNames.LEFT_WING;
 	public static final String RIGHT_WING = EntityModelPartNames.RIGHT_WING;
 	
+	public static final String LEFT_HUMERUS = "left_humerus";
+	public static final String RIGHT_HUMERUS = "right_humerus";
+	
 	public static final String LEFT_RADIUS = "left_radius";
 	public static final String RIGHT_RADIUS = "right_radius";
 	
 	public static final String LEFT_PHALANGES = "left_phalanges";
 	public static final String RIGHT_PHALANGES = "right_phalanges";
+	
+	public static final String LEFT_METATARSAL = "left_metatarsal";	
+	public static final String RIGHT_METATARSAL = "right_metatarsal";
 	
 	protected final ModelPart wingLeft;
 	protected final ModelPart wingRight;

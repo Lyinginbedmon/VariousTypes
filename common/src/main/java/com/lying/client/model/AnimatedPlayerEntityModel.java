@@ -22,20 +22,20 @@ public class AnimatedPlayerEntityModel<E extends AnimatedPlayerEntity> extends A
 	
 	static
 	{
-			ANIMS.put(AnimatedPlayerEntity.ANIM_IDLE, VTAnimations.PLAYER_IDLE);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_TPOSE, VTAnimations.PLAYER_TPOSE);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_LOOK_AROUND, VTAnimations.PLAYER_LOOK_AROUND);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_START, VTAnimations.PLAYER_FGAME_START);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_MAIN, VTAnimations.PLAYER_FGAME_MAIN);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_END, VTAnimations.PLAYER_FGAME_END);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_START, VTAnimations.PLAYER_SIT_START);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_MAIN, VTAnimations.PLAYER_SIT_MAIN);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_END, VTAnimations.PLAYER_SIT_END);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_WOLOLO, VTAnimations.PLAYER_WOLOLO);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_PDANCE, VTAnimations.PLAYER_PDANCE);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SNEAK, VTAnimations.PLAYER_SNEAK);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_SWAY, VTAnimations.PLAYER_SWAY);
-			ANIMS.put(AnimatedPlayerEntity.ANIM_WAVE, VTAnimations.PLAYER_WAVE);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_IDLE, VTAnimations.PlayerAnimations.PLAYER_IDLE);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_TPOSE, VTAnimations.PlayerAnimations.PLAYER_TPOSE);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_LOOK_AROUND, VTAnimations.PlayerAnimations.PLAYER_LOOK_AROUND);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_START, VTAnimations.PlayerAnimations.PLAYER_FGAME_START);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_MAIN, VTAnimations.PlayerAnimations.PLAYER_FGAME_MAIN);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_FGAME_END, VTAnimations.PlayerAnimations.PLAYER_FGAME_END);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_START, VTAnimations.PlayerAnimations.PLAYER_SIT_START);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_MAIN, VTAnimations.PlayerAnimations.PLAYER_SIT_MAIN);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SIT_END, VTAnimations.PlayerAnimations.PLAYER_SIT_END);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_WOLOLO, VTAnimations.PlayerAnimations.PLAYER_WOLOLO);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_PDANCE, VTAnimations.PlayerAnimations.PLAYER_PDANCE);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SNEAK, VTAnimations.PlayerAnimations.PLAYER_SNEAK);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_SWAY, VTAnimations.PlayerAnimations.PLAYER_SWAY);
+			ANIMS.put(AnimatedPlayerEntity.ANIM_WAVE, VTAnimations.PlayerAnimations.PLAYER_WAVE);
 	}
 	
 	public final ModelPart jacket;

@@ -28,33 +28,27 @@ public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E
 		ModelPartData modelPartData = modelData.getRoot();
 		ModelPartData body = modelPartData.getChild(EntityModelPartNames.BODY);
 		
-		ModelPartData rightWing = body.addChild(RIGHT_WING, ModelPartBuilder.create(), ModelTransform.pivot(-2.0F, 1.0F, 2.0F));
-			rightWing.addChild("cube_r1", ModelPartBuilder.create().uv(0, 0).cuboid(4.0F, -2.0F, 0.0F, 1.0F, 5.0F, 6.0F, new Dilation(0.0F)), ModelTransform.of(-4.5F, 2.0F, 0.0F, -0.086F, 0.0145F, -0.0045F));
-			rightWing.addChild("cube_r2", ModelPartBuilder.create().uv(14, 0).cuboid(4.0F, -2.0F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.1F)), ModelTransform.of(-4.5F, 1.0F, 0.0F, -0.086F, 0.0145F, -0.0045F));
+		ModelPartData rightWing = body.addChild(RIGHT_WING, ModelPartBuilder.create(), ModelTransform.pivot(-2.0F, 0.5F, 2.0F));
+		ModelPartData rightHumerus = rightWing.addChild(RIGHT_HUMERUS, ModelPartBuilder.create().uv(0, 11).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.09F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData rightRadius = rightHumerus.addChild(RIGHT_RADIUS, ModelPartBuilder.create().uv(9, 13).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 6.0F));
+		ModelPartData rightPhalanges = rightRadius.addChild(RIGHT_PHALANGES, ModelPartBuilder.create().uv(16, 14).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.2F)).mirrored(false)
+		.uv(28, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.05F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
 		
-		ModelPartData rightRadius = rightWing.addChild(RIGHT_RADIUS, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, -0.5F, 6.5F));
-			ModelPartData r2 = rightRadius.addChild("r2", ModelPartBuilder.create(), ModelTransform.of(0.0F, 0.0F, -0.25F, 0.0F, 0.0F, -0.0175F));
-			r2.addChild("cube_r3", ModelPartBuilder.create().uv(0, 11).cuboid(7.0F, -1.0F, -1.0F, 1.0F, 6.0F, 8.0F, new Dilation(0.0F)), ModelTransform.of(-7.5F, 1.5F, 0.75F, -0.0704F, 0.016F, 0.0485F));
-			r2.addChild("cube_r4", ModelPartBuilder.create().uv(18, 11).cuboid(7.0F, -1.0F, -1.0F, 1.0F, 1.0F, 8.0F, new Dilation(0.1F)), ModelTransform.of(-7.5F, 0.5F, 0.75F, -0.0704F, 0.016F, 0.0485F));
+		rightPhalanges.addChild(RIGHT_METATARSAL, ModelPartBuilder.create().uv(40, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 6.0F, new Dilation(-0.05F)).mirrored(false)
+				.uv(21, 13).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
+		rightRadius.addChild("right_secondaries", ModelPartBuilder.create().uv(16, 0).mirrored().cuboid(-0.5F, 0.5F, 6.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, -6.0F));
+		rightHumerus.addChild("right_tertials", ModelPartBuilder.create().uv(0, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 7.0F, new Dilation(-0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		
-		ModelPartData rightPhalanges = rightRadius.addChild(RIGHT_PHALANGES, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 8.0F));
-			ModelPartData p2 = rightPhalanges.addChild("p2", ModelPartBuilder.create(), ModelTransform.of(-0.25F, 0.0F, -0.5F, 0.0F, 0.0F, -0.0349F));
-			p2.addChild("cube_r5", ModelPartBuilder.create().uv(0, 25).cuboid(8.0F, -1.0F, -1.0F, 1.0F, 5.0F, 9.0F, new Dilation(0.0F)), ModelTransform.of(-8.25F, 1.5F, 1.0F, -0.0302F, -0.006F, 0.0817F));
-			p2.addChild("cube_r6", ModelPartBuilder.create().uv(20, 25).cuboid(8.0F, -1.0F, -1.0F, 1.0F, 1.0F, 9.0F, new Dilation(0.1F)), ModelTransform.of(-8.25F, 0.5F, 1.0F, -0.0302F, -0.006F, 0.0817F));
+		ModelPartData leftWing = body.addChild(LEFT_WING, ModelPartBuilder.create(), ModelTransform.pivot(2.0F, 0.5F, 2.0F));
+		ModelPartData leftHumerus = leftWing.addChild(LEFT_HUMERUS, ModelPartBuilder.create().uv(0, 11).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.09F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		ModelPartData leftRadius = leftHumerus.addChild(LEFT_RADIUS, ModelPartBuilder.create().uv(9, 13).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.1F)), ModelTransform.pivot(0.0F, 0.0F, 6.0F));
+		ModelPartData leftPhalanges = leftRadius.addChild(LEFT_PHALANGES, ModelPartBuilder.create().uv(16, 14).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.2F))
+		.uv(28, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.05F)), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
 		
-		ModelPartData leftWing = body.addChild(LEFT_WING, ModelPartBuilder.create(), ModelTransform.pivot(2.0F, 1.0F, 2.0F));
-			leftWing.addChild("cube_r7", ModelPartBuilder.create().uv(0, 0).mirrored().cuboid(-5.0F, -2.0F, 0.0F, 1.0F, 5.0F, 6.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.of(4.5F, 2.0F, 0.0F, -0.086F, -0.0145F, 0.0045F));
-			leftWing.addChild("cube_r8", ModelPartBuilder.create().uv(14, 0).mirrored().cuboid(-5.0F, -2.0F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.of(4.5F, 1.0F, 0.0F, -0.086F, -0.0145F, 0.0045F));
-		
-		ModelPartData leftRadius = leftWing.addChild(LEFT_RADIUS, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, -0.5F, 6.5F));
-			ModelPartData r3 = leftRadius.addChild("r3", ModelPartBuilder.create(), ModelTransform.of(0.0F, 0.0F, -0.25F, 0.0F, 0.0F, 0.0175F));
-			r3.addChild("cube_r9", ModelPartBuilder.create().uv(0, 11).mirrored().cuboid(-8.0F, -1.0F, -1.0F, 1.0F, 6.0F, 8.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.of(7.5F, 1.5F, 0.75F, -0.0704F, -0.016F, -0.0485F));
-			r3.addChild("cube_r10", ModelPartBuilder.create().uv(18, 11).mirrored().cuboid(-8.0F, -1.0F, -1.0F, 1.0F, 1.0F, 8.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.of(7.5F, 0.5F, 0.75F, -0.0704F, -0.016F, -0.0485F));
-		
-		ModelPartData leftPhalanges = leftRadius.addChild(LEFT_PHALANGES, ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 8.0F));
-			ModelPartData p3 = leftPhalanges.addChild("p3", ModelPartBuilder.create(), ModelTransform.of(0.25F, 0.0F, -0.5F, 0.0F, 0.0F, 0.0349F));
-			p3.addChild("cube_r11", ModelPartBuilder.create().uv(0, 25).mirrored().cuboid(-9.0F, -1.0F, -1.0F, 1.0F, 5.0F, 9.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.of(8.25F, 1.5F, 1.0F, -0.0302F, 0.006F, -0.0817F));
-			p3.addChild("cube_r12", ModelPartBuilder.create().uv(20, 25).mirrored().cuboid(-9.0F, -1.0F, -1.0F, 1.0F, 1.0F, 9.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.of(8.25F, 0.5F, 1.0F, -0.0302F, 0.006F, -0.0817F));
+		leftPhalanges.addChild(LEFT_METATARSAL, ModelPartBuilder.create().uv(40, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 6.0F, new Dilation(-0.05F))
+				.uv(21, 13).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.1F)), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
+		leftRadius.addChild("left_secondaries", ModelPartBuilder.create().uv(16, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+		leftHumerus.addChild("left_tertials", ModelPartBuilder.create().uv(0, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 7.0F, new Dilation(-0.1F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		
 		return TexturedModelData.of(modelData, 64, 64);
 	}
@@ -68,20 +62,20 @@ public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E
 			switch(currentPose)
 			{
 				case PlayerPose.FLYING_IDLE:
-					updateAnimation(currentState, VTAnimations.WINGS_BIRD_FLYING_IDLE, age);
+					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_FLYING_IDLE, age);
 					break;
 				case PlayerPose.FLYING_POWERED:
-					updateAnimation(currentState, VTAnimations.WINGS_BIRD_FLYING_POWERED, age);
+					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_FLYING_POWERED, age);
 					break;
 				case PlayerPose.CROUCHING:
-					// TODO Add crouching animation for bird wings
+					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_CROUCH, age);
 					break;
 				default:
-					updateAnimation(anims.getIdleAnimation(), VTAnimations.WINGS_BIRD_IDLE, age);
+					updateAnimation(anims.getIdleAnimation(), VTAnimations.BirdWings.WINGS_BIRD_IDLE, age);
 					break;
 			}
 		}
 		else
-			updateAnimation(anims.getIdleAnimation(), VTAnimations.WINGS_BIRD_IDLE, age);
+			updateAnimation(anims.getIdleAnimation(), VTAnimations.BirdWings.WINGS_BIRD_IDLE, age);
 	}
 }
