@@ -15,16 +15,16 @@ import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.entity.AnimationState;
 import net.minecraft.entity.LivingEntity;
 
-public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E>
+public class WingsAngelModel<E extends LivingEntity> extends WingsBirdModel<E>
 {
-	public static final String RIGHT_SECONDARIES = "right_secondaries";
-	public static final String LEFT_SECONDARIES = "left_secondaries";
-	public static final String RIGHT_TERTIALS = "right_tertials";
-	public static final String LEFT_TERTIALS = "left_tertials";
+	public static final String HALO = "halo";
 	
-	public WingsBirdModel(ModelPart root)
+	protected final ModelPart halo;
+	
+	public WingsAngelModel(ModelPart root)
 	{
 		super(root);
+		this.halo = body.getChild(HALO);
 	}
 	
 	public static TexturedModelData createBodyLayer()
@@ -33,7 +33,13 @@ public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E
 		ModelPartData modelPartData = modelData.getRoot();
 		ModelPartData body = modelPartData.getChild(EntityModelPartNames.BODY);
 		
-		ModelPartData rightWing = body.addChild(RIGHT_WING, ModelPartBuilder.create(), ModelTransform.pivot(-2.0F, 0.5F, 2.0F));
+		ModelPartData halo = body.addChild(HALO, ModelPartBuilder.create().uv(48, 10).cuboid(-3.0F, -3.0F, -1.0F, 6.0F, 2.0F, 2.0F, new Dilation(-0.5F))
+			.uv(44, 18).cuboid(-5.0F, -5.0F, 0.0F, 10.0F, 10.0F, 0.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, 3.0F, 4.0F, 0.0F, 0.0F, 0.7854F));
+			halo.addChild("cube_r1", ModelPartBuilder.create().uv(52, 14).cuboid(-2.0F, -3.0F, -1.0F, 4.0F, 2.0F, 2.0F, new Dilation(-0.5F)), ModelTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -1.5708F));
+			halo.addChild("cube_r2", ModelPartBuilder.create().uv(48, 10).cuboid(-3.0F, -3.0F, -1.0F, 6.0F, 2.0F, 2.0F, new Dilation(-0.5F)), ModelTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -3.1416F));
+			halo.addChild("cube_r3", ModelPartBuilder.create().uv(52, 14).cuboid(-2.0F, -3.0F, -1.0F, 4.0F, 2.0F, 2.0F, new Dilation(-0.5F)), ModelTransform.of(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 1.5708F));
+		
+		ModelPartData rightWing = body.addChild(RIGHT_WING, ModelPartBuilder.create(), ModelTransform.pivot(-5.0F, 0.5F, 4.0F));
 		ModelPartData rightHumerus = rightWing.addChild(RIGHT_HUMERUS, ModelPartBuilder.create().uv(0, 11).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.09F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		ModelPartData rightRadius = rightHumerus.addChild(RIGHT_RADIUS, ModelPartBuilder.create().uv(9, 13).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 6.0F));
 		ModelPartData rightPhalanges = rightRadius.addChild(RIGHT_PHALANGES, ModelPartBuilder.create().uv(16, 14).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.2F)).mirrored(false)
@@ -41,10 +47,10 @@ public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E
 		
 		rightPhalanges.addChild(RIGHT_METATARSAL, ModelPartBuilder.create().uv(40, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 6.0F, new Dilation(-0.05F)).mirrored(false)
 				.uv(21, 13).mirrored().cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
-		rightRadius.addChild(RIGHT_SECONDARIES, ModelPartBuilder.create().uv(16, 0).mirrored().cuboid(-0.5F, 0.5F, 6.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, -6.0F));
+		rightRadius.addChild(RIGHT_SECONDARIES, ModelPartBuilder.create().uv(16, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.0F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		rightHumerus.addChild(RIGHT_TERTIALS, ModelPartBuilder.create().uv(0, 0).mirrored().cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 7.0F, new Dilation(-0.1F)).mirrored(false), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		
-		ModelPartData leftWing = body.addChild(LEFT_WING, ModelPartBuilder.create(), ModelTransform.pivot(2.0F, 0.5F, 2.0F));
+		ModelPartData leftWing = body.addChild(LEFT_WING, ModelPartBuilder.create(), ModelTransform.pivot(5.0F, 0.5F, 4.0F));
 		ModelPartData leftHumerus = leftWing.addChild(LEFT_HUMERUS, ModelPartBuilder.create().uv(0, 11).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 6.0F, new Dilation(0.09F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		ModelPartData leftRadius = leftHumerus.addChild(LEFT_RADIUS, ModelPartBuilder.create().uv(9, 13).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.1F)), ModelTransform.pivot(0.0F, 0.0F, 6.0F));
 		ModelPartData leftPhalanges = leftRadius.addChild(LEFT_PHALANGES, ModelPartBuilder.create().uv(16, 14).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 5.0F, new Dilation(0.2F))
@@ -54,33 +60,40 @@ public class WingsBirdModel<E extends LivingEntity> extends AbstractWingsModel<E
 				.uv(21, 13).cuboid(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 7.0F, new Dilation(0.1F)), ModelTransform.pivot(0.0F, 0.0F, 5.0F));
 		leftRadius.addChild(LEFT_SECONDARIES, ModelPartBuilder.create().uv(16, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 5.0F, 5.0F, new Dilation(0.0F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 		leftHumerus.addChild(LEFT_TERTIALS, ModelPartBuilder.create().uv(0, 0).cuboid(-0.5F, 0.5F, 0.0F, 1.0F, 4.0F, 7.0F, new Dilation(-0.1F)), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
-		
 		return TexturedModelData.of(modelData, 64, 64);
 	}
 	
 	protected void animateWings(AccessoryAnimationInterface anims, float age)
 	{
+		halo.traverse().forEach(part -> part.resetTransform());
+		updateAnimation(anims.getIdleAnimation(), VTAnimations.AngelWings.WINGS_ANGEL_HALO, age);
+		
 		PlayerPose currentPose = anims.currentlyRunning();
-		if(currentPose != null)
+		
+		boolean wingsVisible = 
+				currentPose == PlayerPose.CROUCHING || 
+				currentPose == PlayerPose.FLYING_IDLE || 
+				currentPose == PlayerPose.FLYING_POWERED;
+		wingRight.visible = wingsVisible;
+		wingLeft.visible = wingsVisible;
+		
+		if(currentPose != null && wingsVisible)
 		{
 			AnimationState currentState = anims.getAnimation(currentPose);
 			switch(currentPose)
 			{
 				case PlayerPose.FLYING_IDLE:
-					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_FLYING_IDLE, age);
+					updateAnimation(currentState, VTAnimations.AngelWings.WINGS_ANGEL_FLYING_IDLE, age);
 					break;
 				case PlayerPose.FLYING_POWERED:
-					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_FLYING_POWERED, age);
+					updateAnimation(currentState, VTAnimations.AngelWings.WINGS_ANGEL_FLYING_POWERED, age);
 					break;
 				case PlayerPose.CROUCHING:
-					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_CROUCH, age);
+					updateAnimation(currentState, VTAnimations.AngelWings.WINGS_ANGEL_CROUCH, age);
 					break;
 				default:
-					updateAnimation(anims.getIdleAnimation(), VTAnimations.BirdWings.WINGS_BIRD_IDLE, age);
 					break;
 			}
 		}
-		else
-			updateAnimation(anims.getIdleAnimation(), VTAnimations.BirdWings.WINGS_BIRD_IDLE, age);
 	}
 }
