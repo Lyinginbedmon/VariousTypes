@@ -26,7 +26,7 @@ public class GlowWingData<E extends LivingEntity, T extends EntityModel<E>> exte
 	
 	public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
 	{
-		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getEyes(glowTexture));
+		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getEntityTranslucentEmissive(glowTexture));
 		model.render(matrixStack, vertexConsumer, 0xF00000, OverlayTexture.DEFAULT_UV, r, g, b, 1F);
 	}
 }

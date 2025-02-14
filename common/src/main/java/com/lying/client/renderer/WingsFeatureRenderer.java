@@ -120,6 +120,9 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 	
 	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, E entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch)
 	{
+		if(entity.isInvisible())
+			return;
+		
 		ItemStack chestplate = entity.getEquippedStack(EquipmentSlot.BODY);
 		if(!chestplate.isEmpty() && chestplate.isOf(Items.ELYTRA))
 			return;
