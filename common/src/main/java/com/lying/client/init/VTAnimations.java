@@ -3,6 +3,7 @@ package com.lying.client.init;
 import com.lying.client.model.AbstractWingsModel;
 import com.lying.client.model.WingsAngelModel;
 import com.lying.client.model.WingsBirdModel;
+import com.lying.client.model.WingsDragonModel;
 
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.animation.AnimationHelper;
@@ -1596,6 +1597,575 @@ public class VTAnimations
 				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-32.2904F, -21.3345F, 0.6535F), Transformation.Interpolations.LINEAR),
 				new Keyframe(0.1667F, AnimationHelper.createRotationalVector(-11.8087F, 31.9472F, -6.3127F), Transformation.Interpolations.CUBIC),
 				new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-32.2904F, -21.3345F, 0.6535F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+	}
+	
+	public static class DragonWings extends WingAnimations
+	{
+		protected static final String RIGHT_CLAW = WingsDragonModel.RIGHT_CLAW;
+		protected static final String RIGHT_TERTIAL = WingsDragonModel.RIGHT_TERTIAL;
+		protected static final String RIGHT_HAND = WingsDragonModel.RIGHT_HAND;
+		protected static final String RIGHT_DIGIT_1 = WingsDragonModel.RIGHT_DIGIT_1;
+		protected static final String RIGHT_DIGIT_2 = WingsDragonModel.RIGHT_DIGIT_2;
+		protected static final String RIGHT_DIGIT_3 = WingsDragonModel.RIGHT_DIGIT_3;
+		protected static final String RIGHT_DIGIT_4 = WingsDragonModel.RIGHT_DIGIT_4;
+		protected static final String RIGHT_DIGIT_1_SMALL = WingsDragonModel.RIGHT_DIGIT_1_SMALL;
+		protected static final String RIGHT_DIGIT_1_LARGE = WingsDragonModel.RIGHT_DIGIT_1_LARGE;
+		protected static final String RIGHT_DIGIT_2_SMALL = WingsDragonModel.RIGHT_DIGIT_2_SMALL;
+		protected static final String RIGHT_DIGIT_2_LARGE = WingsDragonModel.RIGHT_DIGIT_2_LARGE;
+		protected static final String RIGHT_DIGIT_3_SMALL = WingsDragonModel.RIGHT_DIGIT_3_SMALL;
+		protected static final String RIGHT_DIGIT_3_LARGE = WingsDragonModel.RIGHT_DIGIT_3_LARGE;
+		protected static final String RIGHT_DIGIT_4_SMALL = WingsDragonModel.RIGHT_DIGIT_4_SMALL;
+		protected static final String RIGHT_DIGIT_4_LARGE = WingsDragonModel.RIGHT_DIGIT_4_LARGE;
+		
+		protected static final String LEFT_CLAW = WingsDragonModel.LEFT_CLAW;
+		protected static final String LEFT_TERTIAL = WingsDragonModel.LEFT_TERTIAL;
+		protected static final String LEFT_HAND = WingsDragonModel.LEFT_HAND;
+		protected static final String LEFT_DIGIT_1 = WingsDragonModel.LEFT_DIGIT_1;
+		protected static final String LEFT_DIGIT_2 = WingsDragonModel.LEFT_DIGIT_2;
+		protected static final String LEFT_DIGIT_3 = WingsDragonModel.LEFT_DIGIT_3;
+		protected static final String LEFT_DIGIT_4 = WingsDragonModel.LEFT_DIGIT_4;
+		protected static final String LEFT_DIGIT_1_SMALL = WingsDragonModel.LEFT_DIGIT_1_SMALL;
+		protected static final String LEFT_DIGIT_1_LARGE = WingsDragonModel.LEFT_DIGIT_1_LARGE;
+		protected static final String LEFT_DIGIT_2_SMALL = WingsDragonModel.LEFT_DIGIT_2_SMALL;
+		protected static final String LEFT_DIGIT_2_LARGE = WingsDragonModel.LEFT_DIGIT_2_LARGE;
+		protected static final String LEFT_DIGIT_3_SMALL = WingsDragonModel.LEFT_DIGIT_3_SMALL;
+		protected static final String LEFT_DIGIT_3_LARGE = WingsDragonModel.LEFT_DIGIT_3_LARGE;
+		protected static final String LEFT_DIGIT_4_SMALL = WingsDragonModel.LEFT_DIGIT_4_SMALL;
+		protected static final String LEFT_DIGIT_4_LARGE = WingsDragonModel.LEFT_DIGIT_4_LARGE;
+		
+		public static final Animation WINGS_DRAGON_IDLE = Animation.Builder.create(3.0F).looping()
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.0417F, AnimationHelper.createRotationalVector(135.1092F, -3.5333F, -3.54F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.875F, AnimationHelper.createRotationalVector(135.0273F, 1.7675F, 1.7683F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-73.1676F, -20.5581F, -1.1832F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.0833F, AnimationHelper.createRotationalVector(-69.5246F, -27.6116F, -3.9783F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.0F, AnimationHelper.createRotationalVector(-71.8654F, -19.5715F, -0.966F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-73.1676F, -20.5581F, -1.1832F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.0F, AnimationHelper.createRotationalVector(-147.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6667F, AnimationHelper.createRotationalVector(-125.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.9583F, AnimationHelper.createRotationalVector(-107.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-97.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.8333F, AnimationHelper.createRotationalVector(-85.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-97.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 10.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2083F, AnimationHelper.createRotationalVector(0.0F, -5.0F, 15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 10.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.7917F, AnimationHelper.createRotationalVector(-115.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.125F, AnimationHelper.createRotationalVector(-105.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 2.25F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-73.1676F, 20.5581F, 1.1832F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.875F, AnimationHelper.createRotationalVector(-69.5246F, 27.6116F, 3.9783F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.7917F, AnimationHelper.createRotationalVector(-70.9566F, 18.197F, 0.3122F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-73.1676F, 20.5581F, 1.1832F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 2.25F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.9167F, AnimationHelper.createRotationalVector(135.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.9583F, AnimationHelper.createRotationalVector(-115.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.7917F, AnimationHelper.createRotationalVector(-115.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.5F, AnimationHelper.createRotationalVector(-147.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -10.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.375F, AnimationHelper.createRotationalVector(0.0F, 5.0F, -15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -10.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6667F, AnimationHelper.createRotationalVector(-125.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2083F, AnimationHelper.createRotationalVector(-107.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-97.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.7083F, AnimationHelper.createRotationalVector(-85.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-97.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+
+		public static final Animation WINGS_DRAGON_CROUCH = Animation.Builder.create(10.0F)
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.375F, AnimationHelper.createRotationalVector(135.1092F, -3.5333F, -3.54F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.125F, AnimationHelper.createRotationalVector(127.6092F, -3.5333F, -3.54F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.6667F, AnimationHelper.createRotationalVector(135.1092F, -3.5333F, -3.54F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-73.1676F, -20.5581F, -1.1832F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-69.5246F, -27.6116F, -3.9783F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.4167F, AnimationHelper.createRotationalVector(-65.992F, -32.2804F, -6.0449F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.9583F, AnimationHelper.createRotationalVector(-70.3349F, -22.9148F, -2.0815F), Transformation.Interpolations.CUBIC),
+				new Keyframe(9.75F, AnimationHelper.createRotationalVector(-69.5246F, -27.6116F, -3.9783F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(-147.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.9167F, AnimationHelper.createRotationalVector(-146.6F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.9167F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.75F, AnimationHelper.createRotationalVector(-145.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.4167F, AnimationHelper.createRotationalVector(-125.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.4583F, AnimationHelper.createRotationalVector(-129.66F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.3333F, AnimationHelper.createRotationalVector(-127.61F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.7917F, AnimationHelper.createRotationalVector(-130.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-107.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.625F, AnimationHelper.createRotationalVector(-105.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(5.3333F, AnimationHelper.createRotationalVector(-102.25F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.2083F, AnimationHelper.createRotationalVector(-110.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-54.12F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.8333F, AnimationHelper.createRotationalVector(-54.04F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.5833F, AnimationHelper.createRotationalVector(-45.75F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.125F, AnimationHelper.createRotationalVector(-57.84F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-59.12F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 10.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.2917F, AnimationHelper.createRotationalVector(2.5F, -5.0F, 15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.7083F, AnimationHelper.createRotationalVector(5.3324F, -1.6034F, 5.0442F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.9583F, AnimationHelper.createRotationalVector(0.8637F, -4.9274F, 5.072F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.2917F, AnimationHelper.createRotationalVector(2.9944F, -5.1283F, 6.5168F), Transformation.Interpolations.CUBIC),
+				new Keyframe(9.1667F, AnimationHelper.createRotationalVector(0.6475F, -4.9604F, 7.5811F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-90.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.5833F, AnimationHelper.createRotationalVector(-110.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.625F, AnimationHelper.createRotationalVector(-105.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(9.875F, AnimationHelper.createRotationalVector(-110.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 2.25F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-73.1676F, 20.5581F, 1.1832F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-69.5246F, 27.6116F, 3.9783F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.5417F, AnimationHelper.createRotationalVector(-68.492F, 32.2804F, 6.0449F), Transformation.Interpolations.CUBIC),
+				new Keyframe(5.875F, AnimationHelper.createRotationalVector(-64.5246F, 27.6116F, 3.9783F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-69.0387F, 29.95F, 4.9873F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 2.25F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(135.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.1667F, AnimationHelper.createRotationalVector(127.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.5417F, AnimationHelper.createRotationalVector(132.03F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(124.53F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-102.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.3333F, AnimationHelper.createRotationalVector(-95.47F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.9583F, AnimationHelper.createRotationalVector(-107.97F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.1667F, AnimationHelper.createRotationalVector(-102.97F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.7083F, AnimationHelper.createRotationalVector(-97.97F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5417F, AnimationHelper.createRotationalVector(-147.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.4583F, AnimationHelper.createRotationalVector(-148.28F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.6667F, AnimationHelper.createRotationalVector(-146.67F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-150.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -10.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.375F, AnimationHelper.createRotationalVector(2.5F, 5.0F, -15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0833F, AnimationHelper.createRotationalVector(5.0F, 5.0F, -15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(5.7083F, AnimationHelper.createRotationalVector(-0.2187F, 4.9952F, -17.5095F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.5833F, AnimationHelper.createRotationalVector(0.6475F, 4.9604F, -7.5811F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-132.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(-125.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.1667F, AnimationHelper.createRotationalVector(-129.22F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.5417F, AnimationHelper.createRotationalVector(-130.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.2917F, AnimationHelper.createRotationalVector(-107.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.7917F, AnimationHelper.createRotationalVector(-107.25F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(5.4583F, AnimationHelper.createRotationalVector(-103.59F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(9.2917F, AnimationHelper.createRotationalVector(-110.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3_LARGE, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.0833F, AnimationHelper.createRotationalVector(-60.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(5.875F, AnimationHelper.createRotationalVector(-50.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(8.875F, AnimationHelper.createRotationalVector(-50.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+
+		public static final Animation WINGS_DRAGON_FLYING_IDLE = Animation.Builder.create(3.0F).looping()
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(35.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(2.0623F, -77.7286F, -22.1635F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(-2.9377F, -77.7286F, -22.1635F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(2.0623F, -77.7286F, -22.1635F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(27.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.7917F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(27.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-67.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.125F, AnimationHelper.createRotationalVector(-62.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-67.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2917F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(0.0F, 5.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.6667F, AnimationHelper.createRotationalVector(-8.67F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.625F, AnimationHelper.createRotationalVector(-12.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.1F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.1F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(2.0623F, 77.7286F, 22.1635F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(-2.9377F, 77.7286F, 22.1635F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(2.0623F, 77.7286F, 22.1635F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.1F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.1F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(35.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.6667F, AnimationHelper.createRotationalVector(-8.67F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.625F, AnimationHelper.createRotationalVector(-12.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4583F, AnimationHelper.createRotationalVector(0.0F, -5.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-67.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.125F, AnimationHelper.createRotationalVector(-62.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-67.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2917F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(27.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.7917F, AnimationHelper.createRotationalVector(30.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.0F, AnimationHelper.createRotationalVector(27.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+
+		public static final Animation WINGS_DRAGON_FLYING_POWERED = Animation.Builder.create(0.7083F).looping()
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(26.2886F, 31.0422F, -0.076F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(31.2266F, -20.6653F, -9.4352F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(26.2886F, 31.0422F, -0.076F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(19.7287F, -68.694F, -21.053F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-135.1092F, -82.9334F, 134.8908F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(19.7287F, -68.694F, -21.053F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-120.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-120.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_1_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-62.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-82.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_2_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_3_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(55.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-1.1499F, 19.9502F, -5.2745F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-3.1166F, -34.8025F, 8.8324F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.5833F, AnimationHelper.createRotationalVector(-1.1499F, 19.9502F, -5.2745F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(-1.1499F, 19.9502F, -5.2745F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(7.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_TERTIAL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createScalingVector(1.0F, 1.6F, 1.1F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.7083F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(19.7287F, 68.694F, 21.053F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-135.1092F, 82.9334F, -134.8908F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(19.7287F, 68.694F, 21.053F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_TERTIAL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createScalingVector(1.0F, 1.6F, 1.1F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.7083F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(26.2886F, -31.0422F, 0.076F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(31.2266F, 20.6653F, 9.4352F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(26.2886F, -31.0422F, 0.076F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_CLAW, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(7.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(-57.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-120.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-115.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-120.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_1_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HAND, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-1.1499F, -19.9502F, 5.2745F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-3.1166F, 34.8025F, -8.8324F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.5833F, AnimationHelper.createRotationalVector(-1.1499F, -19.9502F, 5.2745F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7083F, AnimationHelper.createRotationalVector(-1.1499F, -19.9502F, 5.2745F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-62.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-82.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_2_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(-2.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_3_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(55.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.4583F, AnimationHelper.createRotationalVector(-10.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_DIGIT_4_SMALL, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
 			))
 			.build();
 	}

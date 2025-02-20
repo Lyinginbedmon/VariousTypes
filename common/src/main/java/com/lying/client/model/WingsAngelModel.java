@@ -70,10 +70,7 @@ public class WingsAngelModel<E extends LivingEntity> extends WingsBirdModel<E>
 		
 		PlayerPose currentPose = anims.currentlyRunning();
 		
-		boolean wingsVisible = 
-				currentPose == PlayerPose.CROUCHING || 
-				currentPose == PlayerPose.FLYING_IDLE || 
-				currentPose == PlayerPose.FLYING_POWERED;
+		boolean wingsVisible = currentPose == PlayerPose.CROUCHING || currentPose.isFlying();
 		wingRight.visible = wingsVisible;
 		wingLeft.visible = wingsVisible;
 		

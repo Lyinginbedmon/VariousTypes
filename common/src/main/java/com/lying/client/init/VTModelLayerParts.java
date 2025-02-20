@@ -12,6 +12,7 @@ import com.lying.client.model.WingsBatModel;
 import com.lying.client.model.WingsBeetleModel;
 import com.lying.client.model.WingsBirdModel;
 import com.lying.client.model.WingsButterflyModel;
+import com.lying.client.model.WingsDragonModel;
 import com.lying.client.model.WingsDragonflyModel;
 import com.lying.client.model.WingsElytraModel;
 import com.lying.reference.Reference;
@@ -36,6 +37,7 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_BIRD				= make("player", "wings_bird", WingsBirdModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_ANGEL			= make("player", "wings_angel", WingsAngelModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_BEETLE			= make("player", "wings_beetle", WingsBeetleModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_DRAGON			= make("player", "wings_dragon", WingsDragonModel::createBodyLayer);
 	
 	/** Creates a new model layer and registers its supplier for generation */
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)

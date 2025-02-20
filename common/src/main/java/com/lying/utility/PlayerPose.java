@@ -14,20 +14,21 @@ import net.minecraft.entity.player.PlayerEntity;
 
 public enum PlayerPose
 {
-	STANDING(1, EntityPose.STANDING),
-	CROUCHING(EntityPose.CROUCHING),
-	RUNNING(0, EntityPose.STANDING, p -> p.shouldSpawnSprintingParticles()),
-	SITTING(EntityPose.SITTING),
-	SWIMMING_IDLE(1, EntityPose.SWIMMING),
-	SWIMMING_POWERED(0, EntityPose.SWIMMING, p -> p.hasStatusEffect(StatusEffects.DOLPHINS_GRACE)),
-	FLYING_IDLE(1, EntityPose.FALL_FLYING),
-	FLYING_POWERED(0, EntityPose.FALL_FLYING, p -> ((AccessoryAnimationInterface)p).isPoweredFlying()),
-	SLEEPING(EntityPose.SLEEPING),
-	DYING(EntityPose.DYING);
+	STANDING(1, EntityPose.STANDING, false),
+	CROUCHING(EntityPose.CROUCHING, false),
+	RUNNING(0, EntityPose.STANDING, p -> p.shouldSpawnSprintingParticles(), false),
+	SITTING(EntityPose.SITTING, false),
+	SWIMMING_IDLE(1, EntityPose.SWIMMING, false),
+	SWIMMING_POWERED(0, EntityPose.SWIMMING, p -> p.hasStatusEffect(StatusEffects.DOLPHINS_GRACE), false),
+	FLYING_IDLE(1, EntityPose.FALL_FLYING, true),
+	FLYING_POWERED(0, EntityPose.FALL_FLYING, p -> ((AccessoryAnimationInterface)p).isPoweredFlying(), true),
+	SLEEPING(EntityPose.SLEEPING, false),
+	DYING(EntityPose.DYING, false);
 	
 	private final int index;
 	private final Optional<EntityPose> parentPose;
 	private final Predicate<PlayerEntity> conditions;
+	private final boolean isFlyingPose;
 	
 	private static int compare(PlayerPose a, PlayerPose b)
 	{
@@ -36,16 +37,19 @@ public enum PlayerPose
 		return a.ordinal() < b.ordinal() ? -1 : a.ordinal() > b.ordinal() ? 1 : 0;
 	}
 	
-	private PlayerPose(EntityPose parent) { this(0, parent, Predicates.alwaysTrue()); }
+	private PlayerPose(EntityPose parent, boolean isFlying) { this(0, parent, Predicates.alwaysTrue(), isFlying); }
 	
-	private PlayerPose(int indexIn, EntityPose parent) { this(indexIn, parent, Predicates.alwaysTrue()); }
+	private PlayerPose(int indexIn, EntityPose parent, boolean isFlying) { this(indexIn, parent, Predicates.alwaysTrue(), isFlying); }
 	
-	private PlayerPose(int indexIn, EntityPose parent, Predicate<PlayerEntity> conditionIn)
+	private PlayerPose(int indexIn, EntityPose parent, Predicate<PlayerEntity> conditionIn, boolean isFlying)
 	{
 		index = indexIn;
 		parentPose = parent == null ? Optional.empty() : Optional.of(parent);
 		conditions = conditionIn;
+		isFlyingPose = isFlying;
 	}
+	
+	public boolean isFlying() { return isFlyingPose; }
 	
 	public static PlayerPose getPoseFromPlayer(PlayerEntity player, EntityPose poseIn)
 	{

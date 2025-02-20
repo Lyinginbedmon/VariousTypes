@@ -25,9 +25,14 @@ public class WingData<E extends LivingEntity, T extends EntityModel<E>> implemen
 	protected Function<Boolean, Identifier> textureProvider;
 	protected boolean tintable = true;
 	
+	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex)
+	{
+		return create(modelIn, colourTex, colourTex);
+	}
+	
 	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex)
 	{
-		return new WingData<E,T>(modelIn, colourTex, tintedTex);
+		return create(modelIn, colourTex, tintedTex, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
 	}
 	
 	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)

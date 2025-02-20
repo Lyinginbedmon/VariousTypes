@@ -21,6 +21,7 @@ import com.lying.client.model.WingsBatModel;
 import com.lying.client.model.WingsBeetleModel;
 import com.lying.client.model.WingsBirdModel;
 import com.lying.client.model.WingsButterflyModel;
+import com.lying.client.model.WingsDragonModel;
 import com.lying.client.model.WingsDragonflyModel;
 import com.lying.client.model.WingsElytraModel;
 import com.lying.client.renderer.wings.CompoundWingData;
@@ -60,18 +61,22 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 	private void populateWingsMap()
 	{
 		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
-		addWingModel(
-				WingStyle.BUTTERFLY, 
-				WingData.create(
-					new WingsButterflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BUTTERFLY)), 
-					prefix("textures/entity/wings/butterfly.png"), 
-					prefix("textures/entity/wings/butterfly_tinted.png")));
+		
+		WingsBeetleModel<E> beetleModel = new WingsBeetleModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
+		WingsAngelModel<E> angelModel = new WingsAngelModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL));
+		
 		addWingModel(
 				WingStyle.ELYTRA, 
 				WingData.create(
 					new WingsElytraModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ELYTRA)),
 					prefix("textures/entity/wings/elytra.png"),
 					prefix("textures/entity/wings/elytra_tinted.png")));
+		addWingModel(
+				WingStyle.BUTTERFLY, 
+				WingData.create(
+					new WingsButterflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BUTTERFLY)), 
+					prefix("textures/entity/wings/butterfly.png"), 
+					prefix("textures/entity/wings/butterfly_tinted.png")));
 		addWingModel(
 				WingStyle.DRAGONFLY, 
 				TranslucentWingData.create(
@@ -94,22 +99,31 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 				WingStyle.BEETLE,
 				CompoundWingData.create(
 					TranslucentWingData.create(
-							new WingsBeetleModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE)),
-							prefix("textures/entity/wings/beetle.png")).untinted(),
+						beetleModel,
+						prefix("textures/entity/wings/beetle.png")).untinted(),
 					WingData.create(
-						new WingsBeetleModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE)),
+						beetleModel,
 						prefix("textures/entity/wings/beetle_overlay.png"),
 						prefix("textures/entity/wings/beetle_overlay_tinted.png"))));
 		addWingModel(
 				WingStyle.ANGEL, 
 				CompoundWingData.create(
 					WingData.create(
-						new WingsAngelModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL)), 
+						angelModel, 
 						prefix("textures/entity/wings/angel.png"), 
 						prefix("textures/entity/wings/angel_tinted.png")),
+					WingData.create(
+						angelModel, 
+						prefix("textures/entity/wings/angel_halo.png")).untinted(),
 					GlowWingData.create(
-						new WingsAngelModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL)),
+						angelModel,
 						prefix("textures/entity/wings/angel_glow.png")).untinted()));
+		addWingModel(
+				WingStyle.DRAGON,
+				WingData.create(
+					new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON)),
+					prefix("textures/entity/wings/dragon.png"),
+					prefix("textures/entity/wings/dragon_tinted.png")));
 	}
 	
 	@SuppressWarnings("unchecked")
