@@ -84,7 +84,7 @@ public class WingData<E extends LivingEntity, T extends EntityModel<E>> implemen
 		}
 	}
 	
-	public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
+	public final void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
 	{
 		tinted = tinted & tintable;
 		if(!tintable)
@@ -93,7 +93,11 @@ public class WingData<E extends LivingEntity, T extends EntityModel<E>> implemen
 			g = 1F;
 			b = 1F;
 		}
-		
+		doRender(matrixStack, vertexConsumerProvider, light, entity, tinted, r, g, b);
+	}
+	
+	protected void doRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
+	{
 		Identifier texture = textureProvider.apply(tinted);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layerProvider.apply(texture));
 		model.render(matrixStack, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0f), r, g, b, alpha);

@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.AbilityFaeskin;
+import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.VariousTypesClient;
@@ -31,6 +32,7 @@ import com.lying.init.VTStatusEffects;
 import com.lying.mixin.AccessorEntityRenderDispatcher;
 import com.lying.mixin.AccessorLivingEntityRenderer;
 import com.lying.reference.Reference;
+import com.lying.utility.Cosmetic;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -184,6 +186,20 @@ public class ClientBus
 		RenderEvents.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
 				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+		
+		RenderEvents.GET_LIVING_COSMETICS_EVENT.register((living, type, set) -> 
+		{
+			if(type == null || type == Cosmetic.Type.WINGS)
+				VariousTypes.getSheet(living).ifPresent(sheet -> 
+				{
+					AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+					Identifier flyReg, wingsReg;
+					if(abilities.hasAbility(flyReg = VTAbilities.FLY.get().registryName()))
+						set.add(((AbilityFly)VTAbilities.FLY.get()).instanceToValues(abilities.get(flyReg)).toCosmetic());
+					if(abilities.hasAbility(wingsReg = VTAbilities.COS_WINGS.get().registryName()))
+						set.add(((AbilityFly)VTAbilities.FLY.get()).instanceToValues(abilities.get(wingsReg)).toCosmetic());
+				});
+		});
 	}
 	
 	private static void registerHighlights()

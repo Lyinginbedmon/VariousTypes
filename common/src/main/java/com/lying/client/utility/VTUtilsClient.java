@@ -11,11 +11,13 @@ import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
 import com.lying.ability.AbilityInstance;
+import com.lying.client.event.RenderEvents;
 import com.lying.client.screen.DetailObject;
 import com.lying.client.screen.DetailObject.Batch;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
+import com.lying.utility.Cosmetic;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.client.MinecraftClient;
@@ -31,6 +33,20 @@ public class VTUtilsClient
 {
 	public static final MinecraftClient client = MinecraftClient.getInstance();
 	public static final PlayerEntity player = client.player;
+	
+	public static CosmeticSet getEntityCosmetics(LivingEntity player)
+	{
+		CosmeticSet set = new CosmeticSet();
+		RenderEvents.GET_LIVING_COSMETICS_EVENT.invoker().getCosmeticsFor(player, null, set);
+		return set;
+	}
+	
+	public static List<Cosmetic> getEntityCosmetics(LivingEntity player, Cosmetic.Type type)
+	{
+		CosmeticSet set = new CosmeticSet();
+		RenderEvents.GET_LIVING_COSMETICS_EVENT.invoker().getCosmeticsFor(player, type, set);
+		return set.ofType(type);
+	}
 	
 	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float pitch, float yaw)
 	{

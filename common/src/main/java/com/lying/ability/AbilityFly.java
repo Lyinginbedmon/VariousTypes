@@ -3,15 +3,21 @@ package com.lying.ability;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityFly.ConfigFly;
 import com.lying.component.CharacterSheet;
 import com.lying.event.LivingEvents;
 import com.lying.event.PlayerEvents;
+import com.lying.init.VTCosmetics;
 import com.lying.init.VTSheetElements;
+import com.lying.utility.Cosmetic;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -107,8 +113,10 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		BEETLE,
 		BIRD,	// FIXME Dyed texture
 		ANGEL,
+		WITCH,
 		BAT,
-		DRAGON,	// FIXME Finalised textures
+		DRAGON,
+		SKELETON,
 		ELYTRA,
 		NONE;
 		
@@ -136,6 +144,18 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 				Codec.INT.optionalFieldOf("Color").forGetter(v -> v.color))
 					.apply(instance, ConfigFly::new));
 		
+		private static final Map<WingStyle, Supplier<Cosmetic>> COS_MAP = Map.of(
+				WingStyle.ANGEL, VTCosmetics.WINGS_ANGEL,
+				WingStyle.BAT, VTCosmetics.WINGS_BAT,
+				WingStyle.BEETLE, VTCosmetics.WINGS_BEETLE,
+				WingStyle.BIRD, VTCosmetics.WINGS_BIRD,
+				WingStyle.BUTTERFLY, VTCosmetics.WINGS_BUTTERFLY,
+				WingStyle.DRAGON, VTCosmetics.WINGS_DRAGON,
+				WingStyle.DRAGONFLY, VTCosmetics.WINGS_DRAGONFLY,
+				WingStyle.ELYTRA, VTCosmetics.WINGS_ELYTRA,
+				WingStyle.SKELETON, VTCosmetics.WINGS_SKELETON,
+				WingStyle.WITCH, VTCosmetics.WINGS_WITCH);
+		
 		protected double speed;
 		protected float food;
 		
@@ -153,6 +173,17 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		
 		public WingStyle type() { return this.style; }
 		public Optional<Integer> colour() { return color; }
+		
+		@Nullable
+		public Cosmetic toCosmetic()
+		{
+			if(style == WingStyle.NONE || !COS_MAP.containsKey(style))
+				return null;
+			
+			Cosmetic cos = COS_MAP.get(style).get();
+			color.ifPresent(i -> cos.tint(i));
+			return cos;
+		}
 		
 		public static ConfigFly fromNbt(NbtCompound nbt)
 		{

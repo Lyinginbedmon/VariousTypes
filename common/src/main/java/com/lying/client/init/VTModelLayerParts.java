@@ -15,6 +15,8 @@ import com.lying.client.model.WingsButterflyModel;
 import com.lying.client.model.WingsDragonModel;
 import com.lying.client.model.WingsDragonflyModel;
 import com.lying.client.model.WingsElytraModel;
+import com.lying.client.model.WingsSkeletonModel;
+import com.lying.client.model.WingsWitchModel;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.model.Dilation;
@@ -38,6 +40,8 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_ANGEL			= make("player", "wings_angel", WingsAngelModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_BEETLE			= make("player", "wings_beetle", WingsBeetleModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_DRAGON			= make("player", "wings_dragon", WingsDragonModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_WITCH			= make("player", "wings_witch", WingsWitchModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_SKELETON			= make("player", "wings_skeleton", WingsSkeletonModel::createBodyLayer);
 	
 	/** Creates a new model layer and registers its supplier for generation */
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)

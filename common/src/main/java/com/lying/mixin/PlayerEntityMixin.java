@@ -86,6 +86,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	@Shadow
 	public PlayerInventory getInventory() { return null; }
 	
+	/** Returns true if there's a separate record of XP total, indicating the displayed value isn't accurate */
 	public boolean xpIsManipulated() { return originalXP.isPresent(); }
 	
 	public void addStoredXP(int xpIn)
