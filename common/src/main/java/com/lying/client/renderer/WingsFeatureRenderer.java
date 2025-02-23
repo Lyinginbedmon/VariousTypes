@@ -155,24 +155,6 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		
 		VTUtilsClient.getEntityCosmetics(entity, Cosmetic.Type.WINGS)
 			.forEach(cosmetic -> handleWingRendering(entity, cosmetic, limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light));
-		
-//		if(WING_ABILITIES == null)
-//			WING_ABILITIES = new Identifier[] {
-//				VTAbilities.FLY.get().registryName(),
-//				VTAbilities.COS_WINGS.get().registryName() };
-//		
-//		VariousTypes.getSheet(entity).ifPresent(sheet -> 
-//		{
-//			AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
-//			for(Identifier regName : WING_ABILITIES)
-//			{
-//				if(!abilities.hasAbility(regName))
-//					continue;
-//				
-//				ConfigFly config = configGetter.apply(abilities.get(regName));
-//				handleWingRendering(entity, config.type(), config.colour(), limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light);
-//			}
-//		});
 	}
 	
 	protected void handleWingRendering(E entity, final Cosmetic cosmetic, float limbAngle, float limbDistance, float headYaw, float headPitch, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light)

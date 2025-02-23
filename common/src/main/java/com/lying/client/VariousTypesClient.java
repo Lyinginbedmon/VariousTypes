@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
+import com.lying.client.init.VTAbilitiesClient;
 import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.particle.ShockwaveParticle;
@@ -56,6 +57,7 @@ public class VariousTypesClient
 		config.read();
 		
 		ClientBus.init();
+		VTAbilitiesClient.init();
 		VTAbilityRenderingRegistry.init();
 		registerMenus();
 		registerS2CPacketReceivers();

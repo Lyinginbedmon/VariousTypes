@@ -10,7 +10,6 @@ import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.AbilityFaeskin;
-import com.lying.ability.AbilityFly;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.VariousTypesClient;
@@ -26,13 +25,13 @@ import com.lying.component.element.ElementActionables;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTCosmetics;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
 import com.lying.mixin.AccessorEntityRenderDispatcher;
 import com.lying.mixin.AccessorLivingEntityRenderer;
 import com.lying.reference.Reference;
-import com.lying.utility.Cosmetic;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -50,6 +49,7 @@ import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
@@ -189,16 +189,8 @@ public class ClientBus
 		
 		RenderEvents.GET_LIVING_COSMETICS_EVENT.register((living, type, set) -> 
 		{
-			if(type == null || type == Cosmetic.Type.WINGS)
-				VariousTypes.getSheet(living).ifPresent(sheet -> 
-				{
-					AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
-					Identifier flyReg, wingsReg;
-					if(abilities.hasAbility(flyReg = VTAbilities.FLY.get().registryName()))
-						set.add(((AbilityFly)VTAbilities.FLY.get()).instanceToValues(abilities.get(flyReg)).toCosmetic());
-					if(abilities.hasAbility(wingsReg = VTAbilities.COS_WINGS.get().registryName()))
-						set.add(((AbilityFly)VTAbilities.FLY.get()).instanceToValues(abilities.get(wingsReg)).toCosmetic());
-				});
+			if(living.getType() == EntityType.PLAYER && ((PlayerEntity)living).getName().getString().equalsIgnoreCase("_Lying"))
+				set.add(VTCosmetics.WINGS_WITCH.get());
 		});
 	}
 	

@@ -14,6 +14,19 @@ public class CosmeticSet
 {
 	private final Map<Type, List<Cosmetic>> set = new HashMap<>();
 	
+	public boolean isEmpty() { return set.isEmpty(); }
+	
+	public void clear() { set.clear(); }
+	
+	public void clone(CosmeticSet setIn)
+	{
+		clear();
+		if(setIn.isEmpty())
+			return;
+		
+		set.putAll(setIn.set);
+	}
+	
 	public void add(@Nullable Cosmetic cosmetic)
 	{
 		if(cosmetic == null)

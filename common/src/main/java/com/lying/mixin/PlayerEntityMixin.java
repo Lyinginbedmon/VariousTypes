@@ -339,7 +339,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 			{
 				if(state.isRunning())
 					continue;
-				VariousTypes.LOGGER.info("# Started playing {} animation on {}", pose.name(), getName().getString());
+				// VariousTypes.LOGGER.info("# Started playing {} animation on {}", pose.name(), getName().getString());
 				state.startIfNotRunning(age);
 			}
 			else if(state.isRunning())

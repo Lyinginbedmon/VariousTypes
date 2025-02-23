@@ -1,7 +1,5 @@
 package com.lying.entity;
 
-import org.jetbrains.annotations.Nullable;
-
 import com.lying.utility.PlayerPose;
 
 import net.minecraft.entity.AnimationState;
@@ -17,13 +15,14 @@ public interface AccessoryAnimationInterface
 	/** Returns true if the given animation is currently running */
 	default boolean isRunning(PlayerPose pose) { return getAnimation(pose).isRunning(); }
 	
-	@Nullable
 	default PlayerPose currentlyRunning()
 	{
 		for(PlayerPose pose : PlayerPose.values())
 			if(isRunning(pose))
 				return pose;
-		return null;
+		
+		startAnimation(PlayerPose.STANDING);
+		return PlayerPose.STANDING;
 	}
 	
 	/** Returns true if any PlayerPose animation is currently running */

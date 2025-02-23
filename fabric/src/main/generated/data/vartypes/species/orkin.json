@@ -7,6 +7,16 @@
         "Amount": -4
       }
     },
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:orkin_appearance",
+        "Values": [
+          "vartypes:piglin_ears",
+          "vartypes:piglin_nose"
+        ]
+      }
+    },
     "vartypes:goldheart"
   ],
   "Background": "vartypes:textures/gui/sheet/creator_bastion.png",

@@ -3,7 +3,6 @@ package com.lying.ability;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +31,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.Vec3d;
 
-public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
+public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>, ICosmeticSupplier
 {
 	public static final double DEFAULT_SPEED = 1D;
 	public static final float DEFAULT_EXHAUSTION = 0.15F;
@@ -102,25 +101,38 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		});
 	}
 	
+	public List<Cosmetic> getCosmetics(AbilityInstance inst)
+	{
+		ConfigFly config = instanceToValues(inst);
+		Cosmetic cos = config.toCosmetic();
+		return cos == null ? List.of() : List.of(cos); 
+	}
+	
 	public ConfigFly memoryToValues(NbtCompound data) { return ConfigFly.fromNbt(data); }
 	
 	public static enum WingStyle implements StringIdentifiable
 	{
-		BUTTERFLY,
-		DRAGONFLY,
-		FAIRY,	//
-		ENERGY,	//
-		BEETLE,
-		BIRD,	// FIXME Dyed texture
-		ANGEL,
-		WITCH,
-		BAT,
-		DRAGON,
-		SKELETON,
-		ELYTRA,
-		NONE;
+		BUTTERFLY(VTCosmetics.WINGS_BUTTERFLY),
+		DRAGONFLY(VTCosmetics.WINGS_DRAGONFLY),
+		FAIRY(null),	//
+		ENERGY(null),	//
+		BEETLE(VTCosmetics.WINGS_BEETLE),
+		BIRD(VTCosmetics.WINGS_BIRD),	// FIXME Dyed texture
+		ANGEL(VTCosmetics.WINGS_ANGEL),
+		WITCH(VTCosmetics.WINGS_WITCH),
+		BAT(VTCosmetics.WINGS_BAT),
+		DRAGON(VTCosmetics.WINGS_DRAGON),
+		SKELETON(VTCosmetics.WINGS_SKELETON),
+		ELYTRA(VTCosmetics.WINGS_ELYTRA),
+		NONE(null);
 		
 		public static Codec<WingStyle> CODEC = StringIdentifiable.createBasicCodec(WingStyle::values);
+		private final Supplier<Cosmetic> registryObj;
+		
+		private WingStyle(Supplier<Cosmetic> supplierIn)
+		{
+			registryObj = supplierIn;
+		}
 		
 		public String asString() { return name().toLowerCase(); }
 		
@@ -144,18 +156,6 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 				Codec.INT.optionalFieldOf("Color").forGetter(v -> v.color))
 					.apply(instance, ConfigFly::new));
 		
-		private static final Map<WingStyle, Supplier<Cosmetic>> COS_MAP = Map.of(
-				WingStyle.ANGEL, VTCosmetics.WINGS_ANGEL,
-				WingStyle.BAT, VTCosmetics.WINGS_BAT,
-				WingStyle.BEETLE, VTCosmetics.WINGS_BEETLE,
-				WingStyle.BIRD, VTCosmetics.WINGS_BIRD,
-				WingStyle.BUTTERFLY, VTCosmetics.WINGS_BUTTERFLY,
-				WingStyle.DRAGON, VTCosmetics.WINGS_DRAGON,
-				WingStyle.DRAGONFLY, VTCosmetics.WINGS_DRAGONFLY,
-				WingStyle.ELYTRA, VTCosmetics.WINGS_ELYTRA,
-				WingStyle.SKELETON, VTCosmetics.WINGS_SKELETON,
-				WingStyle.WITCH, VTCosmetics.WINGS_WITCH);
-		
 		protected double speed;
 		protected float food;
 		
@@ -177,10 +177,10 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>
 		@Nullable
 		public Cosmetic toCosmetic()
 		{
-			if(style == WingStyle.NONE || !COS_MAP.containsKey(style))
+			if(style == WingStyle.NONE || style.registryObj == null)
 				return null;
 			
-			Cosmetic cos = COS_MAP.get(style).get();
+			Cosmetic cos = style.registryObj.get();
 			color.ifPresent(i -> cos.tint(i));
 			return cos;
 		}

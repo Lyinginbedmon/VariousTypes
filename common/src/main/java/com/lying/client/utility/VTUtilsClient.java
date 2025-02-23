@@ -3,6 +3,7 @@ package com.lying.client.utility;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
@@ -10,10 +11,14 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
+import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
 import com.lying.client.event.RenderEvents;
 import com.lying.client.screen.DetailObject;
 import com.lying.client.screen.DetailObject.Batch;
+import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementCosmetics;
+import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
@@ -36,16 +41,25 @@ public class VTUtilsClient
 	
 	public static CosmeticSet getEntityCosmetics(LivingEntity player)
 	{
+		Optional<CharacterSheet> sheet = VariousTypes.getSheet(player);
+		if(sheet.isEmpty())
+			return new CosmeticSet();
+		
+		ElementCosmetics cosmetics = sheet.get().element(VTSheetElements.COSMETICS);
+		
+		if(cosmetics.hasBeenCached())
+			return cosmetics.value();
+		
 		CosmeticSet set = new CosmeticSet();
 		RenderEvents.GET_LIVING_COSMETICS_EVENT.invoker().getCosmeticsFor(player, null, set);
+		cosmetics.set(set);
+		
 		return set;
 	}
 	
 	public static List<Cosmetic> getEntityCosmetics(LivingEntity player, Cosmetic.Type type)
 	{
-		CosmeticSet set = new CosmeticSet();
-		RenderEvents.GET_LIVING_COSMETICS_EVENT.invoker().getCosmeticsFor(player, type, set);
-		return set.ofType(type);
+		return getEntityCosmetics(player).ofType(type);
 	}
 	
 	public static void renderDisplayEntity(@Nullable LivingEntity entity, DrawContext context, int renderX, int renderY, float pitch, float yaw)

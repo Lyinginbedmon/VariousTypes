@@ -28,6 +28,9 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
 	
+	public static final Supplier<Cosmetic> NOSE_PIGLIN		= register(prefix("piglin_nose"), Type.NOSE);
+	public static final Supplier<Cosmetic> EARS_PIGLIN		= register(prefix("piglin_ears"), Type.EARS);
+	
 	private static Supplier<Cosmetic> wings(String nameIn)
 	{
 		return register(prefix(nameIn), Type.WINGS);

@@ -22,6 +22,8 @@ import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
 import com.lying.ability.AbilityBurrow;
 import com.lying.ability.AbilityColdBlood;
+import com.lying.ability.AbilityCosmetics;
+import com.lying.ability.AbilityDamageGear;
 import com.lying.ability.AbilityDamageResist;
 import com.lying.ability.AbilityDietRestriction;
 import com.lying.ability.AbilityFaeskin;
@@ -53,7 +55,6 @@ import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
 import com.lying.ability.PassiveNoXP;
-import com.lying.ability.AbilityDamageGear;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
@@ -153,10 +154,7 @@ public class VTAbilities
 	public static final Supplier<Ability> BURROW			= register("burrow", (id) -> new AbilityBurrow(id, Category.UTILITY));
 	public static final Supplier<Ability> CLIMB				= register("climb", (id) -> new ToggledAbility(id, Category.UTILITY));
 	public static final Supplier<Ability> COLD_BLOODED		= register("cold_blooded", (id) -> new AbilityColdBlood(id, Category.UTILITY));
-	public static final Supplier<Ability> COS_WINGS			= register("cosmetic_wings", (id) -> new Ability(id, Category.UTILITY)
-	{
-		public boolean isHidden(AbilityInstance instance) { return true; }
-	});
+	public static final Supplier<Ability> COSMETICS			= register("cosmetics", (id) -> new AbilityCosmetics(id, Category.UTILITY));
 	public static final Supplier<Ability> DEEP_BREATH		= register("deep_breath", (id) -> new Ability(id, Category.UTILITY)
 	{
 		public void registerEventHandlers()
@@ -375,7 +373,7 @@ public class VTAbilities
 	
 	public static void init()
 	{
-		ABILITIES.values().forEach(entry -> entry.get().registerEventHandlers());
+		abilities().forEach(entry -> entry.get().registerEventHandlers());
 		VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities");
 	}
 	
@@ -388,4 +386,6 @@ public class VTAbilities
 	public static boolean exists(Identifier registryName) { return ABILITIES.containsKey(registryName); }
 	
 	public static Collection<Identifier> abilityIds() { return ABILITIES.keySet(); }
+	
+	public static Collection<Supplier<Ability>> abilities() { return ABILITIES.values(); }
 }

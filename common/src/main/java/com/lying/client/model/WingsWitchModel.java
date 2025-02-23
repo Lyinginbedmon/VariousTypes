@@ -61,12 +61,13 @@ public class WingsWitchModel<E extends LivingEntity> extends WingsBirdModel<E>
 	protected void animateWings(AccessoryAnimationInterface anims, float age)
 	{
 		PlayerPose currentPose = anims.currentlyRunning();
+		if(currentPose == null)
+			return;
 		
 		boolean wingsVisible = currentPose == PlayerPose.CROUCHING || currentPose.isFlying();
 		wingRight.visible = wingsVisible;
 		wingLeft.visible = wingsVisible;
-		
-		if(currentPose != null && wingsVisible)
+		if(wingsVisible)
 		{
 			AnimationState currentState = anims.getAnimation(currentPose);
 			switch(currentPose)
