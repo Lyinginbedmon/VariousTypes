@@ -1,9 +1,9 @@
 package com.lying.client.init;
 
-import com.lying.client.model.AbstractWingsModel;
-import com.lying.client.model.WingsAngelModel;
-import com.lying.client.model.WingsBirdModel;
-import com.lying.client.model.WingsDragonModel;
+import com.lying.client.model.wings.AbstractWingsModel;
+import com.lying.client.model.wings.WingsAngelModel;
+import com.lying.client.model.wings.WingsBirdModel;
+import com.lying.client.model.wings.WingsDragonModel;
 
 import net.minecraft.client.render.entity.animation.Animation;
 import net.minecraft.client.render.entity.animation.AnimationHelper;

@@ -117,7 +117,7 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>, I
 		FAIRY(null),	//
 		ENERGY(null),	//
 		BEETLE(VTCosmetics.WINGS_BEETLE),
-		BIRD(VTCosmetics.WINGS_BIRD),	// FIXME Dyed texture
+		BIRD(VTCosmetics.WINGS_BIRD),
 		ANGEL(VTCosmetics.WINGS_ANGEL),
 		WITCH(VTCosmetics.WINGS_WITCH),
 		BAT(VTCosmetics.WINGS_BAT),

@@ -17,6 +17,8 @@ import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
+import com.lying.client.renderer.EarsFeatureRenderer;
+import com.lying.client.renderer.NoseFeatureRenderer;
 import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.client.utility.highlights.HighlightManager;
@@ -149,14 +151,19 @@ public class ClientBus
 		RenderEvents.ADD_FEATURE_RENDERERS_EVENT.register((dispatcher) -> 
 		{
 			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;
-			PlayerEntityRenderer wide = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.WIDE);
-			((AccessorLivingEntityRenderer)wide).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)wide));
-			
-			PlayerEntityRenderer slim = (PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.SLIM);
-			((AccessorLivingEntityRenderer)slim).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)slim));
+			for(PlayerEntityRenderer mode : new PlayerEntityRenderer[] {
+					(PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.WIDE), 
+					(PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.SLIM)})
+			{
+				((AccessorLivingEntityRenderer)mode).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
+				((AccessorLivingEntityRenderer)mode).appendFeature(new NoseFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
+				((AccessorLivingEntityRenderer)mode).appendFeature(new EarsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
+			}
 			
 			AnimatedPlayerEntityRenderer animPlayer = (AnimatedPlayerEntityRenderer) accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get());
 			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
+			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new NoseFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
+			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new EarsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
 		});
 	}
 	

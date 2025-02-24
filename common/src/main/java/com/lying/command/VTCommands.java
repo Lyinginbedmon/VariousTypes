@@ -87,6 +87,8 @@ public class VTCommands
 	private static final String TYPE = "type";
 	private static final String ABILITY = "ability";
 	
+	// TODO Implement variants for detecting types/species/templates/abilities
+	
 	private static SimpleCommandExceptionType make(String name)
 	{
 		return new SimpleCommandExceptionType(translate("command", "failed_"+name.toLowerCase()));

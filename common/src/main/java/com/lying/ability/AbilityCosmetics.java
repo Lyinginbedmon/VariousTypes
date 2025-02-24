@@ -2,6 +2,7 @@ package com.lying.ability;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -23,26 +24,9 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 		super(regName, catIn);
 	}
 	
-	public static AbilityInstance of(Identifier mapName, Cosmetic... values)
+	public static AbilityInstance of(boolean reset, Cosmetic... values)
 	{
-		ConfigCosmetics config = new ConfigCosmetics(List.of());
-		for(Cosmetic cos : values)
-			config.add(cos);
-		
-		NbtCompound nbt = (NbtCompound)ConfigCosmetics.CODEC.encodeStart(NbtOps.INSTANCE, config).getOrThrow();
-		nbt.putString("MapName", mapName.toString());
-		
-		AbilityInstance inst = VTAbilities.COSMETICS.get().instance();
-		inst.setMemory(nbt);
-		return inst;
-	}
-	
-	public static AbilityInstance of(Cosmetic... values)
-	{
-		ConfigCosmetics config = new ConfigCosmetics(List.of());
-		for(Cosmetic cos : values)
-			config.add(cos);
-		
+		ConfigCosmetics config = new ConfigCosmetics(reset, values);
 		AbilityInstance inst = VTAbilities.COSMETICS.get().instance();
 		inst.setMemory((NbtCompound)ConfigCosmetics.CODEC.encodeStart(NbtOps.INSTANCE, config).getOrThrow());
 		return inst;
@@ -66,10 +50,18 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 					.apply(instance, ConfigCosmetics::new));
 		
 		private Map<Identifier, Cosmetic> values = Maps.newHashMap();
+		private Optional<Boolean> clearPrevious = Optional.empty();
 		
 		public ConfigCosmetics(List<Cosmetic> valuesIn)
 		{
 			valuesIn.forEach(cos -> add(cos));
+		}
+		
+		public ConfigCosmetics(boolean reset, Cosmetic... valuesIn)
+		{
+			setClear(reset);
+			for(Cosmetic cos : valuesIn)
+				add(cos);
 		}
 		
 		protected void add(Cosmetic cos) { values.put(cos.registryName(), cos); }
@@ -80,6 +72,10 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 			list.addAll(values.values());
 			return list;
 		}
+		
+		public void setClear(boolean val) { clearPrevious = Optional.of(val); }
+		
+		public boolean shouldRemovePreceding() { return clearPrevious.orElse(false); }
 		
 		public static ConfigCosmetics fromNbt(NbtCompound nbt)
 		{

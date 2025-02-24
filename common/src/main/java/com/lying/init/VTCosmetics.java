@@ -28,13 +28,16 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
 	
-	public static final Supplier<Cosmetic> NOSE_PIGLIN		= register(prefix("piglin_nose"), Type.NOSE);
-	public static final Supplier<Cosmetic> EARS_PIGLIN		= register(prefix("piglin_ears"), Type.EARS);
+	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
+	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
+	public static final Supplier<Cosmetic> NOSE_PIGZOMBIE	= nose("zombified_piglin_nose");
 	
-	private static Supplier<Cosmetic> wings(String nameIn)
-	{
-		return register(prefix(nameIn), Type.WINGS);
-	}
+	public static final Supplier<Cosmetic> EARS_PIGLIN		= ears("piglin_ears");
+	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
+	
+	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), Type.WINGS); }
+	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), Type.NOSE); }
+	private static Supplier<Cosmetic> ears(String nameIn) { return register(prefix(nameIn), Type.EARS); }
 	
 	public static Supplier<Cosmetic> register(Identifier regName, Type type)
 	{

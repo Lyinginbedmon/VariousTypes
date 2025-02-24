@@ -1,4 +1,4 @@
-package com.lying.client.renderer.wings;
+package com.lying.client.renderer.accessory;
 
 import java.util.List;
 
@@ -9,21 +9,21 @@ import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 
-public class CompoundWingData<E extends LivingEntity, T extends EntityModel<E>> implements WingRenderer<E, T>
+public class AccessoryCompound<E extends LivingEntity, T extends EntityModel<E>> implements IAccessoryRenderer<E, T>
 {
-	private final List<WingRenderer<E, T>> data = Lists.newArrayList();
+	private final List<IAccessoryRenderer<E, T>> data = Lists.newArrayList();
 	
 	@SuppressWarnings("unchecked")
-	protected CompoundWingData(WingRenderer<E, T>... dataIn)
+	protected AccessoryCompound(IAccessoryRenderer<E, T>... dataIn)
 	{
 		for(int i=0; i<dataIn.length; i++)
 			data.add(dataIn[i]);
 	}
 	
 	@SafeVarargs
-	public static <E extends LivingEntity, T extends EntityModel<E>> CompoundWingData<E,T> create(WingRenderer<E, T>... dataIn)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryCompound<E,T> create(IAccessoryRenderer<E, T>... dataIn)
 	{
-		return new CompoundWingData<E,T>(dataIn);
+		return new AccessoryCompound<E,T>(dataIn);
 	}
 	
 	public void prepareModel(E entity, T contextModel, float limbAngle, float limbDistance, float tickDelta, float headYaw, float headPitch)

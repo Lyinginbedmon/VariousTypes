@@ -1,11 +1,11 @@
-package com.lying.client.renderer.wings;
+package com.lying.client.renderer.accessory;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 
-public interface WingRenderer<E extends LivingEntity, T extends EntityModel<E>>
+public interface IAccessoryRenderer<E extends LivingEntity, T extends EntityModel<E>>
 {
 	public void prepareModel(E entity, T contextModel, float limbAngle, float limbDistance, float tickDelta, float headYaw, float headPitch);
 	

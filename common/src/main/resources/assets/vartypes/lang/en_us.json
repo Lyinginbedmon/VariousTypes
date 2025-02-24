@@ -261,6 +261,8 @@
 	"ability.vartypes.rend.desc": "Your vicious claws have a chance to deal an extra [%s] damage to the victim's armour.",
 	"ability.vartypes.luddite": "Luddite",
 	"ability.vartypes.luddite.desc": "Your strikes wear away at your opponents weaponry, randomly dealing [%s] damage.",
+	"ability.vartypes.cosmetics": "Cosmetics",
+	"ability.vartypes.cosmetics.desc": "Provides one or more visible cosmetics.",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",

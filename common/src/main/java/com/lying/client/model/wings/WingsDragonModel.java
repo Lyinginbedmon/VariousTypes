@@ -1,4 +1,4 @@
-package com.lying.client.model;
+package com.lying.client.model.wings;
 
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;

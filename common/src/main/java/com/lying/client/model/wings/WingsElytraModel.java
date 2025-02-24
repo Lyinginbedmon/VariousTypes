@@ -1,4 +1,4 @@
-package com.lying.client.model;
+package com.lying.client.model.wings;
 
 import com.lying.entity.AccessoryAnimationInterface;
 

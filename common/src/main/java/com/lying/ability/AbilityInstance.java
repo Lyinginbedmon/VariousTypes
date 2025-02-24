@@ -110,6 +110,13 @@ public class AbilityInstance
 	
 	public AbilityInstance setCooldown(int cooldown) { this.cooldown = Optional.of(cooldown); return this; }
 	
+	public AbilityInstance withMapName(Identifier mapName)
+	{
+		if(!isReadOnly())
+			memory.putString("MapName", mapName.toString());
+		return this;
+	}
+	
 	public Text displayName()
 	{
 		if(display.isPresent())

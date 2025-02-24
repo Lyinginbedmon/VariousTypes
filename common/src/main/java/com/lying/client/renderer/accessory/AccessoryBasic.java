@@ -1,4 +1,4 @@
-package com.lying.client.renderer.wings;
+package com.lying.client.renderer.accessory;
 
 import java.util.function.Function;
 
@@ -17,7 +17,7 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 
-public class WingData<E extends LivingEntity, T extends EntityModel<E>> implements WingRenderer<E, T>
+public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> implements IAccessoryRenderer<E, T>
 {
 	protected final Function<Identifier, RenderLayer> layerProvider;
 	protected final T model;
@@ -25,27 +25,27 @@ public class WingData<E extends LivingEntity, T extends EntityModel<E>> implemen
 	protected Function<Boolean, Identifier> textureProvider;
 	protected boolean tintable = true;
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex)
 	{
 		return create(modelIn, colourTex, colourTex);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex)
 	{
 		return create(modelIn, colourTex, tintedTex, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> WingData<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
 	{
-		return new WingData<E,T>(modelIn, colourTex, tintedTex, layerProviderIn, alphaIn);
+		return new AccessoryBasic<E,T>(modelIn, colourTex, tintedTex, layerProviderIn, alphaIn);
 	}
 	
-	protected WingData(T modelIn, Identifier colourTex, Identifier tintedTex)
+	protected AccessoryBasic(T modelIn, Identifier colourTex, Identifier tintedTex)
 	{
 		this(modelIn, colourTex, tintedTex, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
 	}
 	
-	protected WingData(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
+	protected AccessoryBasic(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
 	{
 		layerProvider = layerProviderIn;
 		textureProvider = bool -> bool ? tintedTex : colourTex;
@@ -54,7 +54,7 @@ public class WingData<E extends LivingEntity, T extends EntityModel<E>> implemen
 	}
 	
 	/** Sets this renderer to never be tinted */
-	public WingData<E,T> untinted()
+	public AccessoryBasic<E,T> untinted()
 	{
 		tintable = false;
 		return this;

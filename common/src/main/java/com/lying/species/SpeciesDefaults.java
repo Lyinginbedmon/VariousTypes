@@ -65,7 +65,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".orkin.desc"))
 			.from(World.NETHER)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.ORKIN.get())
-			.addAbility(AbilityCosmetics.of(prefix("orkin_appearance"), VTCosmetics.EARS_PIGLIN.get(), VTCosmetics.NOSE_PIGLIN.get()))
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_PIGLIN.get(), VTCosmetics.NOSE_PIGLIN.get()).withMapName(prefix("orkin_appearance")))
 			.addAbility(SingleAttributeAbility.Health.of(-4))
 			.addAbility(VTAbilities.GOLDHEARTED.get(), VTAbilities.BERSERK.get())
 			.startingLoot(LootBag.ofItems(Items.CROSSBOW, Items.GOLDEN_SWORD).withCustomTable(LootTable.builder().pool(LootPool.builder().rolls(UniformLootNumberProvider.create(1.0f, 2.0f)).with((LootPoolEntry.Builder<?>)((Object)((LeafEntry.Builder)ItemEntry.builder(Items.ARROW).weight(30)).apply(SetCountLootFunction.builder(UniformLootNumberProvider.create(2.0f, 7.0f)))))).build())).build());

@@ -6,17 +6,19 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.client.model.EarsPiglinModel;
 import com.lying.client.model.GelatinousBipedEntityModel;
-import com.lying.client.model.WingsAngelModel;
-import com.lying.client.model.WingsBatModel;
-import com.lying.client.model.WingsBeetleModel;
-import com.lying.client.model.WingsBirdModel;
-import com.lying.client.model.WingsButterflyModel;
-import com.lying.client.model.WingsDragonModel;
-import com.lying.client.model.WingsDragonflyModel;
-import com.lying.client.model.WingsElytraModel;
-import com.lying.client.model.WingsSkeletonModel;
-import com.lying.client.model.WingsWitchModel;
+import com.lying.client.model.NosePiglinModel;
+import com.lying.client.model.wings.WingsAngelModel;
+import com.lying.client.model.wings.WingsBatModel;
+import com.lying.client.model.wings.WingsBeetleModel;
+import com.lying.client.model.wings.WingsBirdModel;
+import com.lying.client.model.wings.WingsButterflyModel;
+import com.lying.client.model.wings.WingsDragonModel;
+import com.lying.client.model.wings.WingsDragonflyModel;
+import com.lying.client.model.wings.WingsElytraModel;
+import com.lying.client.model.wings.WingsSkeletonModel;
+import com.lying.client.model.wings.WingsWitchModel;
 import com.lying.reference.Reference;
 
 import net.minecraft.client.model.Dilation;
@@ -42,6 +44,11 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_DRAGON			= make("player", "wings_dragon", WingsDragonModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_WITCH			= make("player", "wings_witch", WingsWitchModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_SKELETON			= make("player", "wings_skeleton", WingsSkeletonModel::createBodyLayer);
+	
+	public static final EntityModelLayer NOSE_PIG				= make("player", "nose_pig", NosePiglinModel::createPigNose);
+	public static final EntityModelLayer NOSE_PIGLIN			= make("player", "nose_piglin", NosePiglinModel::createPiglinNose);
+	
+	public static final EntityModelLayer EARS_PIGLIN			= make("player", "ears_piglin", EarsPiglinModel::createBodyLayer);
 	
 	/** Creates a new model layer and registers its supplier for generation */
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)

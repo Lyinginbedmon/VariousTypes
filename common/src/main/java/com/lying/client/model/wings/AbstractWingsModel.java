@@ -1,12 +1,13 @@
-package com.lying.client.model;
+package com.lying.client.model.wings;
 
+import com.lying.client.model.AbstractAccessoryModel;
 import com.lying.entity.AccessoryAnimationInterface;
 
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.entity.LivingEntity;
 
-public abstract class AbstractWingsModel<E extends LivingEntity> extends AnimatedBipedEntityModel<E> implements IModelWithRoot, IBipedLikeModel<E>
+public abstract class AbstractWingsModel<E extends LivingEntity> extends AbstractAccessoryModel<E>
 {
 	public static final String LEFT_WING = EntityModelPartNames.LEFT_WING;
 	public static final String RIGHT_WING = EntityModelPartNames.RIGHT_WING;
@@ -26,18 +27,11 @@ public abstract class AbstractWingsModel<E extends LivingEntity> extends Animate
 	protected final ModelPart wingLeft;
 	protected final ModelPart wingRight;
 	
-	public AbstractWingsModel(ModelPart root)
+	protected AbstractWingsModel(ModelPart root)
 	{
 		super(root);
 		this.wingLeft = body.getChild(LEFT_WING);
 		this.wingRight = body.getChild(RIGHT_WING);
-	}
-	
-	protected static void copyRotation(ModelPart from, ModelPart to)
-	{
-		to.pitch = from.pitch;
-		to.yaw = from.yaw;
-		to.roll = from.roll;
 	}
 	
 	public void setAngles(E livingEntity, float limbAngle, float limbDistance, float age, float headYaw, float headPitch)
