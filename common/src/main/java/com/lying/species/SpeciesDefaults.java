@@ -75,6 +75,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".merrow.desc"))
 			.power(1)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.AQUATIC.get())
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_AXOLOTL.get()).withMapName(prefix("merfolk_appearance")))
 			.addAbility(VTAbilities.DEEP_BREATH.get(), VTAbilities.SWIM.get()).build());
 	
 	public static final Supplier<Species> DRAGAN	= register(prefix("dragan"), () -> Species.Builder.of(prefix("dragan"))
@@ -82,6 +83,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".dragan.desc"))
 			.power(3)
 			.setTypes(VTTypes.DRAGON.get())
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.HORNS_HARTEBEEST.get(), VTCosmetics.TAIL_DRAGON.get()).withMapName(prefix("draconic_appearance")))
 			.addAbility(SingleAttributeAbility.Scale.of(0.1F))
 			.addAbility(SingleAttributeAbility.Damage.of(2))
 			.addAbility(AbilityDietRestriction.ofTags(List.of(ItemTags.MEAT), List.of()).setDisplay(new LoreDisplay(Reference.ModInfo.translate("ability", "carnivore")))).build());
@@ -90,6 +92,7 @@ public class SpeciesDefaults
 			.texture(Species.BACKING_DEFAULT)
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".verdine.desc"))
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.VERDINE.get())
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_ELF.get(), VTCosmetics.MISC_GLOW_SPOTS.get()).withMapName(prefix("fae_appearance")))
 			.addAbility(AbilityDietRestriction.ofTags(List.of(VTTags.VEGETARIAN), List.of()))
 			.addAbility(VTAbilities.PHOTOSYNTH.get()).build());
 	

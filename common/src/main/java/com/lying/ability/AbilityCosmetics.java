@@ -1,13 +1,11 @@
 package com.lying.ability;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityCosmetics.ConfigCosmetics;
+import com.lying.client.utility.CosmeticSet;
 import com.lying.init.VTAbilities;
 import com.lying.utility.Cosmetic;
 import com.mojang.serialization.Codec;
@@ -38,7 +36,7 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 	
 	public List<Cosmetic> getCosmetics(AbilityInstance inst)
 	{
-		return instanceToValues(inst).values();
+		return instanceToValues(inst).set().values();
 	}
 	
 	public ConfigCosmetics memoryToValues(NbtCompound nbt) { return ConfigCosmetics.fromNbt(nbt); }
@@ -46,10 +44,10 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 	public static class ConfigCosmetics
 	{
 		protected static final Codec<ConfigCosmetics> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Cosmetic.CODEC.listOf().fieldOf("Values").forGetter(ConfigCosmetics::values))
-					.apply(instance, ConfigCosmetics::new));
+				Cosmetic.CODEC.listOf().fieldOf("Values").forGetter(c -> c.set().values()))
+					.apply(instance, a -> new ConfigCosmetics((List<Cosmetic>)a)));
 		
-		private Map<Identifier, Cosmetic> values = Maps.newHashMap();
+		private CosmeticSet values = CosmeticSet.of(List.of());
 		private Optional<Boolean> clearPrevious = Optional.empty();
 		
 		public ConfigCosmetics(List<Cosmetic> valuesIn)
@@ -64,14 +62,9 @@ public class AbilityCosmetics extends Ability implements IComplexAbility<ConfigC
 				add(cos);
 		}
 		
-		protected void add(Cosmetic cos) { values.put(cos.registryName(), cos); }
+		protected void add(Cosmetic cos) { values.add(cos); }
 		
-		public List<Cosmetic> values()
-		{
-			List<Cosmetic> list = Lists.newArrayList();
-			list.addAll(values.values());
-			return list;
-		}
+		public CosmeticSet set() { return values; }
 		
 		public void setClear(boolean val) { clearPrevious = Optional.of(val); }
 		

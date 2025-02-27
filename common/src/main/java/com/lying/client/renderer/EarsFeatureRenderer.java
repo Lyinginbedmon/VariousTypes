@@ -3,7 +3,9 @@ package com.lying.client.renderer;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import com.lying.client.init.VTModelLayerParts;
+import com.lying.client.model.EarsElfModel;
 import com.lying.client.model.EarsPiglinModel;
+import com.lying.client.model.GillsAxolotlModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.init.VTCosmetics;
 import com.lying.utility.Cosmetic;
@@ -21,6 +23,7 @@ public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 	public EarsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(Cosmetic.Type.EARS, context);
+		populateRendererMap();
 	}
 	
 	protected void populateRendererMap()
@@ -41,7 +44,19 @@ public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 					piglinModel,
 					prefix("textures/entity/ears/zombified_piglin.png"),
 					prefix("textures/entity/ears/zombified_piglin_tinted.png")));
+		addRendererMap(
+				VTCosmetics.EARS_AXOLOTL,
+				AccessoryBasic.create(
+					new GillsAxolotlModel<>(loader.getModelPart(VTModelLayerParts.GILLS_AXOLOTL)),
+					prefix("textures/entity/ears/axolotl.png"),
+					prefix("textures/entity/ears/axolotl_tinted.png")));
+		addRendererMap(
+				VTCosmetics.EARS_ELF,
+				AccessoryBasic.create(
+					new EarsElfModel<>(loader.getModelPart(VTModelLayerParts.EARS_ELF)),
+					prefix("textures/entity/ears/elf.png"),
+					prefix("textures/entity/ears/elf_tinted.png")));
 	}
 	
-	public boolean shouldRender(E entity) { return !entity.getEquippedStack(EquipmentSlot.HEAD).isIn(ItemTags.SKULLS); }
+	public boolean shouldRender(E entity) { return super.shouldRender(entity) && !entity.getEquippedStack(EquipmentSlot.HEAD).isIn(ItemTags.SKULLS); }
 }

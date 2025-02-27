@@ -22,6 +22,7 @@ public class NoseFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 	public NoseFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(Cosmetic.Type.NOSE, context);
+		populateRendererMap();
 	}
 	
 	protected void populateRendererMap()

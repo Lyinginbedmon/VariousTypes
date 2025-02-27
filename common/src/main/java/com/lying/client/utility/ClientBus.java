@@ -18,7 +18,10 @@ import com.lying.client.init.VTAbilityRenderingRegistry;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.EarsFeatureRenderer;
+import com.lying.client.renderer.HornsFeatureRenderer;
+import com.lying.client.renderer.MiscFeatureRenderer;
 import com.lying.client.renderer.NoseFeatureRenderer;
+import com.lying.client.renderer.TailFeatureRenderer;
 import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.client.utility.highlights.HighlightManager;
@@ -50,6 +53,7 @@ import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.SkinTextures;
+import net.minecraft.client.util.SkinTextures.Model;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -151,19 +155,29 @@ public class ClientBus
 		RenderEvents.ADD_FEATURE_RENDERERS_EVENT.register((dispatcher) -> 
 		{
 			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;
-			for(PlayerEntityRenderer mode : new PlayerEntityRenderer[] {
-					(PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.WIDE), 
-					(PlayerEntityRenderer)accessor.getModelRenderers().get(SkinTextures.Model.SLIM)})
+			
+			for(Model model : SkinTextures.Model.values())
 			{
-				((AccessorLivingEntityRenderer)mode).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
-				((AccessorLivingEntityRenderer)mode).appendFeature(new NoseFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
-				((AccessorLivingEntityRenderer)mode).appendFeature(new EarsFeatureRenderer<>((FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)mode));
+				PlayerEntityRenderer renderer = (PlayerEntityRenderer)accessor.getModelRenderers().get(model);
+				AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)renderer;
+				FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> featureContext = (FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)renderer;
+				renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
+				renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext, model == SkinTextures.Model.SLIM));
+				renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
+				renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
+				renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));
+				renderAccessor.appendFeature(new TailFeatureRenderer<>(featureContext));
 			}
 			
 			AnimatedPlayerEntityRenderer animPlayer = (AnimatedPlayerEntityRenderer) accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get());
-			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new WingsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
-			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new NoseFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
-			((AccessorLivingEntityRenderer)animPlayer).appendFeature(new EarsFeatureRenderer<>((FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer));
+			AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)animPlayer;
+			FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>> featureContext = (FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer;
+			renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
+			renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext, true));	// FIXME Ensure model arm width matches renderer's
+			renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
+			renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
+			renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));
+			renderAccessor.appendFeature(new TailFeatureRenderer<>(featureContext));
 		});
 	}
 	

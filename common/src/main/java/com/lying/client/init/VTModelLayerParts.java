@@ -6,9 +6,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import com.lying.client.model.AnimatedPlayerEntityModel;
+import com.lying.client.model.EarsElfModel;
 import com.lying.client.model.EarsPiglinModel;
 import com.lying.client.model.GelatinousBipedEntityModel;
+import com.lying.client.model.GillsAxolotlModel;
+import com.lying.client.model.HornsHartebeestModel;
+import com.lying.client.model.ModelFullbody;
 import com.lying.client.model.NosePiglinModel;
+import com.lying.client.model.TailDragonModel;
+import com.lying.client.model.TailKirinModel;
 import com.lying.client.model.wings.WingsAngelModel;
 import com.lying.client.model.wings.WingsBatModel;
 import com.lying.client.model.wings.WingsBeetleModel;
@@ -49,6 +55,16 @@ public class VTModelLayerParts
 	public static final EntityModelLayer NOSE_PIGLIN			= make("player", "nose_piglin", NosePiglinModel::createPiglinNose);
 	
 	public static final EntityModelLayer EARS_PIGLIN			= make("player", "ears_piglin", EarsPiglinModel::createBodyLayer);
+	public static final EntityModelLayer GILLS_AXOLOTL			= make("player", "gills_axolotl", GillsAxolotlModel::createBodyLayer);
+	public static final EntityModelLayer EARS_ELF				= make("player", "ears_elf", EarsElfModel::createBodyLayer);
+	
+	public static final EntityModelLayer HORNS_HARTEBEEST		= make("player", "horns_hartebeest", HornsHartebeestModel::createBodyLayer);
+	
+	public static final EntityModelLayer TAIL_DRAGON			= make("player", "tail_dragon", TailDragonModel::createBodyLayer);
+	public static final EntityModelLayer TAIL_KIRIN				= make("player", "tail_kirin", TailKirinModel::createBodyLayer);
+	
+	public static final EntityModelLayer FULLBODY_SLIM			= make("player", "fullbody_slim", () -> ModelFullbody.createBodyLayer(true));
+	public static final EntityModelLayer FULLBODY_WIDE			= make("player", "fullbody_wide", () -> ModelFullbody.createBodyLayer(false));
 	
 	/** Creates a new model layer and registers its supplier for generation */
 	private static EntityModelLayer make(String id, String name, Supplier<TexturedModelData> supplier)

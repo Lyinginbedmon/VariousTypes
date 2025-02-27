@@ -34,6 +34,7 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(Cosmetic.Type.WINGS, context);
+		populateRendererMap();
 	}
 	
 	protected void populateRendererMap()

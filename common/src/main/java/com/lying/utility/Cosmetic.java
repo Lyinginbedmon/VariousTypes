@@ -13,6 +13,7 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class Cosmetic
@@ -89,6 +90,19 @@ public class Cosmetic
 	{
 		this(regName, typeIn);
 		colour = colourIn;
+	}
+	
+	public Text describe()
+	{
+		if(tinted())
+			return Text.literal(registryName.toString()).append(" (").append(String.valueOf(colour)).append(")");
+		else
+			return Text.literal(registryName.toString());
+	}
+	
+	public boolean matches(Cosmetic cosmetic, boolean matchColour)
+	{
+		return registryName().equals(cosmetic.registryName()) && (!matchColour || colour == cosmetic.colour);
 	}
 	
 	public JsonElement toJson()

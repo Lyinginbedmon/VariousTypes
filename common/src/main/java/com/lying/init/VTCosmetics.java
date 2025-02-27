@@ -2,6 +2,7 @@ package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,10 +35,22 @@ public class VTCosmetics
 	
 	public static final Supplier<Cosmetic> EARS_PIGLIN		= ears("piglin_ears");
 	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
+	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
+	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
+	
+	public static final Supplier<Cosmetic> HORNS_HARTEBEEST	= horns("hartebeest_horns");
+	
+	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
+	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
+	
+	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
 	
 	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), Type.WINGS); }
 	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), Type.NOSE); }
 	private static Supplier<Cosmetic> ears(String nameIn) { return register(prefix(nameIn), Type.EARS); }
+	private static Supplier<Cosmetic> horns(String nameIn) { return register(prefix(nameIn), Type.HORNS); }
+	private static Supplier<Cosmetic> tail(String nameIn) { return register(prefix(nameIn), Type.TAIL); }
+	private static Supplier<Cosmetic> misc(String nameIn) { return register(prefix(nameIn), Type.MISC); }
 	
 	public static Supplier<Cosmetic> register(Identifier regName, Type type)
 	{
@@ -49,6 +62,8 @@ public class VTCosmetics
 		COSMETICS_REGISTRY.put(regName, supplierIn);
 		return supplierIn;
 	}
+	
+	public static Collection<Identifier> cosmeticIds() { return COSMETICS_REGISTRY.keySet(); }
 	
 	public static Optional<Cosmetic> get(Identifier registryName)
 	{

@@ -14,6 +14,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.component.module.AbstractSheetModule;
 import com.lying.component.module.ModuleCustomAbilities;
+import com.lying.component.module.ModuleCustomCosmetics;
 import com.lying.component.module.ModuleCustomHome;
 import com.lying.component.module.ModuleCustomTypes;
 import com.lying.component.module.ModuleSpecies;
@@ -29,6 +30,7 @@ public class VTSheetModules
 	public static final Supplier<ModuleSpecies> SPECIES	= register("species", ModuleSpecies::new);
 	public static final Supplier<ModuleTemplates> TEMPLATES	= register("templates", ModuleTemplates::new);
 	
+	public static final Supplier<ModuleCustomCosmetics> COSMETICS = register("custom_cosmetics", ModuleCustomCosmetics::new);
 	public static final Supplier<ModuleCustomHome> HOME	= register("custom_home", ModuleCustomHome::new);
 	public static final Supplier<ModuleCustomTypes> TYPES	= register("custom_types", ModuleCustomTypes::new);
 	public static final Supplier<ModuleCustomAbilities> ABILITIES	= register("custom_abilities", ModuleCustomAbilities::new);

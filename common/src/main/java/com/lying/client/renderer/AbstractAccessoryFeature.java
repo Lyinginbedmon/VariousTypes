@@ -28,7 +28,6 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 	{
 		super(context);
 		type = typeIn;
-		populateRendererMap();
 	}
 	
 	protected abstract void populateRendererMap();

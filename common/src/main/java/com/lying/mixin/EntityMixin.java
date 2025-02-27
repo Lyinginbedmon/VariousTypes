@@ -269,14 +269,41 @@ public class EntityMixin
 		}
 	}
 	
+	private boolean isClientPlayer() { return getType() == EntityType.PLAYER && getWorld().isClient(); }
+	
 	@Inject(method = "setPose(Lnet/minecraft/entity/EntityPose;)V", at = @At("TAIL"))
 	private void vt$setPose(EntityPose poseIn, final CallbackInfo ci)
 	{
-		if(getType() == EntityType.PLAYER && getWorld().isClient())
+		if(isClientPlayer())
 		{
 			PlayerEntity player = (PlayerEntity)(Object)this;
 			PlayerPose pose = PlayerPose.getPoseFromPlayer(player, poseIn);
 			((AccessoryAnimationInterface)player).startAnimation(pose);
+		}
+	}
+	
+	@Inject(method = "startRiding(Lnet/minecraft/entity/Entity;Z)Z", at = @At("TAIL"))
+	private void vt$startRiding(Entity entity, boolean force, final CallbackInfoReturnable<Boolean> ci)
+	{
+		if(isClientPlayer() && ci.getReturnValueZ())
+		{
+			PlayerEntity player = (PlayerEntity)(Object)this;
+			AccessoryAnimationInterface animator = (AccessoryAnimationInterface)player;
+			if(animator.currentlyRunning() != PlayerPose.SITTING)
+				animator.startAnimation(PlayerPose.SITTING);
+		}
+	}
+	
+	@Inject(method = "dismountVehicle()V", at = @At("TAIL"))
+	private void vt$dismountVehicle(final CallbackInfo ci)
+	{
+		if(isClientPlayer())
+		{
+			PlayerEntity player = (PlayerEntity)(Object)this;
+			AccessoryAnimationInterface animator = (AccessoryAnimationInterface)player;
+			PlayerPose pose = animator.currentlyRunning();
+			if(pose == PlayerPose.SITTING && !hasVehicle())
+				animator.startAnimation(PlayerPose.STANDING);
 		}
 	}
 }
