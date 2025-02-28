@@ -10,6 +10,7 @@ import com.google.common.base.Supplier;
 import com.lying.client.renderer.accessory.IAccessoryRenderer;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.utility.Cosmetic;
+import com.lying.utility.CosmeticType;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
@@ -22,9 +23,9 @@ import net.minecraft.util.Identifier;
 public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends EntityModel<E>> extends FeatureRenderer<E, M>
 {
 	private final Map<Identifier, IAccessoryRenderer<E,M>> rendererMap = new HashMap<>();
-	private final Cosmetic.Type type;
+	private final Supplier<CosmeticType> type;
 	
-	public AbstractAccessoryFeature(Cosmetic.Type typeIn, FeatureRendererContext<E, M> context)
+	public AbstractAccessoryFeature(Supplier<CosmeticType> typeIn, FeatureRendererContext<E, M> context)
 	{
 		super(context);
 		type = typeIn;
@@ -38,14 +39,14 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 		rendererMap.put(style.get().registryName(), (IAccessoryRenderer<E,M>)renderer);
 	}
 	
-	protected boolean shouldRender(E entity) { return !entity.isInvisible(); }
+	protected boolean shouldRender(E entity) { return !entity.isInvisible() && !type.get().shouldBeHidden(entity); }
 	
 	public void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, E entity, float limbAngle, float limbDistance, float tickDelta, float animationProgress, float headYaw, float headPitch)
 	{
 		if(!shouldRender(entity))
 			return;
 		
-		VTUtilsClient.getEntityCosmetics(entity, type)
+		VTUtilsClient.getEntityCosmetics(entity, type.get())
 			.forEach(cosmetic -> handleAccessoryRendering(entity, cosmetic, limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light));
 	}
 	

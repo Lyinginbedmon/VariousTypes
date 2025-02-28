@@ -51,6 +51,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".crioch.desc"))
 			.from(World.END)
 			.setTypes(VTTypes.OTHALL.get())
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_GOBLIN.get(), VTCosmetics.TAIL_RAT.get()).withMapName(prefix("goblin_appearance")))
 			.addAbility(VTAbilities.TELEPORT.get())
 			.addAbility(VTAbilities.PARIAH.get(), nbt -> 
 			{

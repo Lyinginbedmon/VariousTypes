@@ -7,22 +7,20 @@ import com.lying.client.model.EarsElfModel;
 import com.lying.client.model.EarsPiglinModel;
 import com.lying.client.model.GillsAxolotlModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
+import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
-import com.lying.utility.Cosmetic;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.registry.tag.ItemTags;
 
 public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
 	public EarsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
-		super(Cosmetic.Type.EARS, context);
+		super(VTCosmeticTypes.EARS, context);
 		populateRendererMap();
 	}
 	
@@ -57,6 +55,4 @@ public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 					prefix("textures/entity/ears/elf.png"),
 					prefix("textures/entity/ears/elf_tinted.png")));
 	}
-	
-	public boolean shouldRender(E entity) { return super.shouldRender(entity) && !entity.getEquippedStack(EquipmentSlot.HEAD).isIn(ItemTags.SKULLS); }
 }

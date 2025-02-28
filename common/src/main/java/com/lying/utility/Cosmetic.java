@@ -1,6 +1,7 @@
 package com.lying.utility;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -71,22 +72,22 @@ public class Cosmetic
 	};
 	
 	private final Identifier registryName;
-	private final Type type;
+	private final Supplier<CosmeticType> type;
 	private int colour = -1;
 	
-	protected Cosmetic(Identifier regName, Type typeIn, Optional<Integer> colourIn)
+	protected Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn, Optional<Integer> colourIn)
 	{
 		registryName = regName;
 		type = typeIn;
 		colourIn.ifPresent(c -> colour = c);
 	}
 	
-	public Cosmetic(Identifier regName, Type typeIn)
+	public Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn)
 	{
 		this(regName, typeIn, Optional.empty());
 	}
 	
-	public Cosmetic(Identifier regName, Type typeIn, int colourIn)
+	public Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn, int colourIn)
 	{
 		this(regName, typeIn);
 		colour = colourIn;
@@ -128,7 +129,7 @@ public class Cosmetic
 	
 	public Identifier registryName() { return registryName; }
 	
-	public Type type() { return type; }
+	public CosmeticType type() { return type.get(); }
 	
 	public Cosmetic tint(int colour)
 	{
@@ -139,25 +140,4 @@ public class Cosmetic
 	public boolean tinted() { return colour >= 0; }
 	
 	public Optional<Integer> color() { return tinted() ? Optional.of(colour) : Optional.empty(); }
-	
-	public static enum Type
-	{
-		EARS(1),
-		TAIL(1),
-		WINGS(1),
-		HORNS(3),
-		NOSE(1),
-		MISC(-1);
-		
-		private final int capacity;
-		
-		private Type(int limitIn)
-		{
-			capacity = limitIn;
-		}
-		
-		public int capacity() { return capacity; }
-		
-		public boolean uncapped() { return capacity < 1; }
-	}
 }

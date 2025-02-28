@@ -6,8 +6,8 @@ import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.TailDragonModel;
 import com.lying.client.model.TailKirinModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
+import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
-import com.lying.utility.Cosmetic;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
@@ -19,7 +19,7 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 {
 	public TailFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
-		super(Cosmetic.Type.TAIL, context);
+		super(VTCosmeticTypes.TAIL, context);
 		populateRendererMap();
 	}
 	

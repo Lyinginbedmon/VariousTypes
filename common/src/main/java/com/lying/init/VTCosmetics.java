@@ -10,7 +10,7 @@ import java.util.Optional;
 import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.utility.Cosmetic;
-import com.lying.utility.Cosmetic.Type;
+import com.lying.utility.CosmeticType;
 
 import net.minecraft.util.Identifier;
 
@@ -28,38 +28,57 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_BAT		= wings("bat_wings");
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY		= wings("fairy_wings");	//
+	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	//
 	
 	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGZOMBIE	= nose("zombified_piglin_nose");
+	public static final Supplier<Cosmetic> NOSE_VILLAGER	= nose("villager_nose");	//
+	public static final Supplier<Cosmetic> NOSE_WITCH		= nose("witch_nose");	//
 	
 	public static final Supplier<Cosmetic> EARS_PIGLIN		= ears("piglin_ears");
 	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
 	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
 	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
+	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");	//
+	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");	//
+	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");	//
+	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");	//
+	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");	//
 	
 	public static final Supplier<Cosmetic> HORNS_HARTEBEEST	= horns("hartebeest_horns");
+	public static final Supplier<Cosmetic> HORNS_RAM		= horns("ram_horns");	//
+	public static final Supplier<Cosmetic> HORNS_STAG		= horns("stag_antlers");	//
+	public static final Supplier<Cosmetic> HORNS_KIRIN		= horns("kirin_horns");	//
+	public static final Supplier<Cosmetic> HORNS_LIGHTNING	= horns("lightning_horns");	//
 	
 	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
 	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
+	public static final Supplier<Cosmetic> TAIL_FOX			= tail("fox_tail");	//
+	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");	//
+	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");	//
+	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");	//
+	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");	//
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
+	public static final Supplier<Cosmetic> MISC_THIRD_EYE	= misc("third_eye");	//
 	
-	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), Type.WINGS); }
-	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), Type.NOSE); }
-	private static Supplier<Cosmetic> ears(String nameIn) { return register(prefix(nameIn), Type.EARS); }
-	private static Supplier<Cosmetic> horns(String nameIn) { return register(prefix(nameIn), Type.HORNS); }
-	private static Supplier<Cosmetic> tail(String nameIn) { return register(prefix(nameIn), Type.TAIL); }
-	private static Supplier<Cosmetic> misc(String nameIn) { return register(prefix(nameIn), Type.MISC); }
+	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.WINGS); }
+	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.NOSE); }
+	private static Supplier<Cosmetic> ears(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.EARS); }
+	private static Supplier<Cosmetic> horns(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.HORNS); }
+	private static Supplier<Cosmetic> tail(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.TAIL); }
+	private static Supplier<Cosmetic> misc(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.MISC); }
 	
-	public static Supplier<Cosmetic> register(Identifier regName, Type type)
+	public static Supplier<Cosmetic> register(Identifier regName, Supplier<CosmeticType> type)
 	{
-		return register(regName, () -> new Cosmetic(regName, type));
+		return register(() -> new Cosmetic(regName, type));
 	}
 	
-	public static Supplier<Cosmetic> register(Identifier regName, Supplier<Cosmetic> supplierIn)
+	public static Supplier<Cosmetic> register(Supplier<Cosmetic> supplierIn)
 	{
-		COSMETICS_REGISTRY.put(regName, supplierIn);
+		COSMETICS_REGISTRY.put(supplierIn.get().registryName(), supplierIn);
 		return supplierIn;
 	}
 	

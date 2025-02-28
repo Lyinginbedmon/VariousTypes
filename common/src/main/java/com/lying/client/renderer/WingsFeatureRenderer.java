@@ -18,22 +18,20 @@ import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.client.renderer.accessory.AccessoryEndPortal;
 import com.lying.client.renderer.accessory.AccessoryGlowing;
 import com.lying.client.renderer.accessory.AccessoryTranslucent;
+import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
-import com.lying.utility.Cosmetic;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.Items;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
-		super(Cosmetic.Type.WINGS, context);
+		super(VTCosmeticTypes.WINGS, context);
 		populateRendererMap();
 	}
 	
@@ -119,6 +117,4 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 						dragonModel,
 						prefix("textures/entity/wings/dragon_overlay.png")).untinted()));
 	}
-	
-	public boolean shouldRender(E entity) { return super.shouldRender(entity) && !entity.getEquippedStack(EquipmentSlot.BODY).isOf(Items.ELYTRA); }
 }

@@ -23,6 +23,7 @@ import com.lying.reference.Reference;
 import com.lying.species.Species;
 import com.lying.template.Template;
 import com.lying.utility.Cosmetic;
+import com.lying.utility.CosmeticType;
 import com.lying.utility.VTUtils;
 
 import net.minecraft.client.MinecraftClient;
@@ -57,7 +58,7 @@ public class VTUtilsClient
 		return set;
 	}
 	
-	public static List<Cosmetic> getEntityCosmetics(LivingEntity player, Cosmetic.Type type)
+	public static List<Cosmetic> getEntityCosmetics(LivingEntity player, CosmeticType type)
 	{
 		return getEntityCosmetics(player).ofType(type);
 	}

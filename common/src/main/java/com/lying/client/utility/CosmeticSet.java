@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.collect.Lists;
 import com.lying.init.VTCosmetics;
 import com.lying.utility.Cosmetic;
-import com.lying.utility.Cosmetic.Type;
+import com.lying.utility.CosmeticType;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -23,7 +23,7 @@ public class CosmeticSet
 			Cosmetic.CODEC.listOf().fieldOf("Values").forGetter(CosmeticSet::values))
 				.apply(instance, CosmeticSet::of));
 	
-	private final Map<Type, List<Cosmetic>> set = new HashMap<>();
+	private final Map<Identifier, List<Cosmetic>> set = new HashMap<>();
 	
 	protected CosmeticSet() { }
 	
@@ -90,7 +90,7 @@ public class CosmeticSet
 		if(cosmetic == null)
 			return;
 		
-		Type type = cosmetic.type();
+		CosmeticType type = cosmetic.type();
 		List<Cosmetic> list = ofType(type);
 		
 		// Ensure unique cosmetics
@@ -102,7 +102,7 @@ public class CosmeticSet
 			while(list.size() > type.capacity())
 				list.remove(0);
 		
-		set.put(type, list);
+		set.put(type.regName(), list);
 	}
 	
 	public boolean remove(Identifier registryId)
@@ -124,14 +124,14 @@ public class CosmeticSet
 	
 	public boolean remove(Cosmetic cosmetic, boolean matchColour)
 	{
-		Cosmetic.Type type = cosmetic.type();
+		CosmeticType type = cosmetic.type();
 		List<Cosmetic> list = ofType(type);
 		if(list.isEmpty())
 			return false;
 		
 		boolean result = list.removeIf(c -> c.matches(cosmetic, matchColour));
 		if(result)
-			set.put(type, list);
+			set.put(type.regName(), list);
 		return result;
 	}
 	
@@ -140,5 +140,5 @@ public class CosmeticSet
 		set.set.values().forEach(list -> list.forEach(cosmetic -> add(cosmetic)));
 	}
 	
-	public List<Cosmetic> ofType(Type type) { return set.getOrDefault(type, Lists.newArrayList()); }
+	public List<Cosmetic> ofType(CosmeticType type) { return set.getOrDefault(type.regName(), Lists.newArrayList()); }
 }

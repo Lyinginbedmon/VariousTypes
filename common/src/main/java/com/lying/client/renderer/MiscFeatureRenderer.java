@@ -5,8 +5,8 @@ import static com.lying.reference.Reference.ModInfo.prefix;
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.ModelFullbody;
 import com.lying.client.renderer.accessory.AccessoryGlowing;
+import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
-import com.lying.utility.Cosmetic;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
@@ -20,7 +20,7 @@ public class MiscFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 	
 	public MiscFeatureRenderer(FeatureRendererContext<E, M> context, boolean slim)
 	{
-		super(Cosmetic.Type.MISC, context);
+		super(VTCosmeticTypes.MISC, context);
 		isSlimModel = slim;
 		populateRendererMap();
 	}

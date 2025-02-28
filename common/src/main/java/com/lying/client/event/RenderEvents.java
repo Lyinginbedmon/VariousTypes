@@ -11,7 +11,7 @@ import org.joml.Vector3f;
 import com.google.common.reflect.AbstractInvocationHandler;
 import com.lying.client.utility.CosmeticSet;
 import com.lying.component.CharacterSheet;
-import com.lying.utility.Cosmetic;
+import com.lying.utility.CosmeticType;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
@@ -132,6 +132,6 @@ public class RenderEvents
 	@FunctionalInterface
 	public interface GetPlayerCosmeticsEvent
 	{
-		void getCosmeticsFor(LivingEntity player, @Nullable Cosmetic.Type type, final CosmeticSet set);
+		void getCosmeticsFor(LivingEntity player, @Nullable CosmeticType type, final CosmeticSet set);
 	}
 }
