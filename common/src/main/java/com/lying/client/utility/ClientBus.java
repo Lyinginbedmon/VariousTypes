@@ -8,13 +8,12 @@ import org.joml.Vector3f;
 
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
-import com.lying.ability.Ability;
 import com.lying.ability.AbilityFaeskin;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 import com.lying.client.VariousTypesClient;
 import com.lying.client.event.RenderEvents;
-import com.lying.client.init.VTAbilityRenderingRegistry;
+import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.EarsFeatureRenderer;
@@ -27,6 +26,7 @@ import com.lying.client.screen.FavouriteAbilityButton;
 import com.lying.client.utility.highlights.HighlightManager;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
+import com.lying.component.element.ElementCosmetics;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTAbilities;
@@ -37,6 +37,7 @@ import com.lying.init.VTStatusEffects;
 import com.lying.mixin.AccessorEntityRenderDispatcher;
 import com.lying.mixin.AccessorLivingEntityRenderer;
 import com.lying.reference.Reference;
+import com.lying.utility.Cosmetic;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
@@ -187,26 +188,31 @@ public class ClientBus
 		RenderEvents.GET_PLAYER_COLOR_EVENT.register((LivingEntity player) -> 
 		{
 			Vector3f color = new Vector3f(1F, 1F, 1F);
-			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
-				color.mul(VTAbilityRenderingRegistry.doColorMods(player, inst));
+			VariousTypes.getSheet(player).ifPresent(sheet -> 
+			{
+				for(Cosmetic inst : ((ElementCosmetics)sheet.element(VTSheetElements.COSMETICS)).value().values())
+					color.mul(VTPlayerSpecialRenderingRegistry.doColorMods(player, inst));
+			});
 			return color;
 		});
 		
 		RenderEvents.GET_PLAYER_ALPHA_EVENT.register((LivingEntity player) -> 
 		{
 			float alpha = 1F;
-			for(AbilityInstance inst : Ability.getAllOf(Ability.class, player))
-				alpha *= VTAbilityRenderingRegistry.doAlphaMods(player, inst);
+			List<Cosmetic> cosmetics = Lists.newArrayList();
+			VariousTypes.getSheet(player).ifPresent(sheet -> cosmetics.addAll(((ElementCosmetics)sheet.element(VTSheetElements.COSMETICS)).value().values()));
+			for(Cosmetic inst : cosmetics)
+				alpha *= VTPlayerSpecialRenderingRegistry.doAlphaMods(player, inst);
 			return alpha;
 		});
 		
 		RenderEvents.BEFORE_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
-				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPreRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+			((ElementCosmetics)sheet.element(VTSheetElements.COSMETICS)).value().values().forEach(inst -> VTPlayerSpecialRenderingRegistry.doPreRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 		
 		RenderEvents.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
-				Ability.getAllOf(Ability.class, player).forEach(inst -> VTAbilityRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
+			((ElementCosmetics)sheet.element(VTSheetElements.COSMETICS)).value().values().forEach(inst -> VTPlayerSpecialRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
 		
 		RenderEvents.GET_LIVING_COSMETICS_EVENT.register((living, type, set) -> 
 		{

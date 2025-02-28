@@ -63,6 +63,8 @@ public class VTCosmetics
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
 	public static final Supplier<Cosmetic> MISC_THIRD_EYE	= misc("third_eye");	//
+	public static final Supplier<Cosmetic> MISC_GELATINOUS	= misc("gelatinous");
+	public static final Supplier<Cosmetic> MISC_GHOSTLY		= misc("ghostly");
 	
 	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.WINGS); }
 	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.NOSE); }

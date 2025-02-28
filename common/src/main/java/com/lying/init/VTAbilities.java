@@ -32,6 +32,7 @@ import com.lying.ability.AbilityFavouredTerrain;
 import com.lying.ability.AbilityFleece;
 import com.lying.ability.AbilityFlexible;
 import com.lying.ability.AbilityFly;
+import com.lying.ability.AbilityGelatinous;
 import com.lying.ability.AbilityIgnoreSlowdown;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityIntangible;
@@ -58,7 +59,6 @@ import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
-import com.lying.component.CharacterSheet;
 import com.lying.data.VTTags;
 import com.lying.event.LivingEvents;
 import com.lying.event.PlayerEvents;
@@ -218,21 +218,7 @@ public class VTAbilities
 	public static final Supplier<Ability> FLEXIBLE			= register("flexible", (id) -> new AbilityFlexible(id, Category.UTILITY));
 	public static final Supplier<Ability> FLY				= register("fly", (id) -> new AbilityFly(id, Category.UTILITY));
 	public static final Supplier<Ability> FORGETFUL			= register("forgetful", (id) -> new PassiveNoXP.Forgetful(id, Category.UTILITY));
-	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new Ability(id, Category.UTILITY)
-	{
-		public void registerEventHandlers()
-		{
-			PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((player, damage, amount) -> 
-			{
-				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-				if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
-					if(damage.isIn(VTTags.PHYSICAL))
-						return amount * 0.85F;
-				
-				return amount;
-			});
-		}
-	});
+	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new AbilityGelatinous(id, Category.UTILITY));
 	public static final Supplier<Ability> GHOSTLY			= register("ghostly", (id) -> new ToggledAbility(id, Category.UTILITY)
 	{
 		protected void onActivation(LivingEntity owner, AbilityInstance instance)

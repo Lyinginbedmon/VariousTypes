@@ -16,6 +16,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 public class Cosmetic
 {
@@ -30,8 +31,15 @@ public class Cosmetic
 	
 	protected static final Codec<Cosmetic> FULL_CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			REG_CODEC.fieldOf("ID").forGetter(cos -> VTCosmetics.get(cos.registryName()).get()),
-			Codec.INT.optionalFieldOf("Color").forGetter(Cosmetic::color))
-				.apply(instance, (reg, col) -> col.isPresent() ? reg.tint(col.get()) : reg));
+			Codec.INT.optionalFieldOf("Color").forGetter(Cosmetic::color),
+			Codec.FLOAT.optionalFieldOf("Alpha").forGetter(Cosmetic::alpha))
+				.apply(instance, (reg, col, alp) -> 
+				{
+					Cosmetic cos = reg;
+					col.ifPresent(c -> cos.tint(c));
+					alp.ifPresent(a -> cos.alpha(a));
+					return cos;
+				}));
 	
 	public static final PrimitiveCodec<Cosmetic> CODEC = new PrimitiveCodec<Cosmetic>() 
 	{
@@ -73,24 +81,13 @@ public class Cosmetic
 	
 	private final Identifier registryName;
 	private final Supplier<CosmeticType> type;
-	private int colour = -1;
-	
-	protected Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn, Optional<Integer> colourIn)
-	{
-		registryName = regName;
-		type = typeIn;
-		colourIn.ifPresent(c -> colour = c);
-	}
+	private Optional<Integer> colour = Optional.empty();
+	private Optional<Float> alpha = Optional.empty();
 	
 	public Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn)
 	{
-		this(regName, typeIn, Optional.empty());
-	}
-	
-	public Cosmetic(Identifier regName, Supplier<CosmeticType> typeIn, int colourIn)
-	{
-		this(regName, typeIn);
-		colour = colourIn;
+		registryName = regName;
+		type = typeIn;
 	}
 	
 	public Text describe()
@@ -103,7 +100,7 @@ public class Cosmetic
 	
 	public boolean matches(Cosmetic cosmetic, boolean matchColour)
 	{
-		return registryName().equals(cosmetic.registryName()) && (!matchColour || colour == cosmetic.colour);
+		return registryName().equals(cosmetic.registryName()) && (!matchColour || colour.get() == cosmetic.colour.get());
 	}
 	
 	public JsonElement toJson()
@@ -133,11 +130,19 @@ public class Cosmetic
 	
 	public Cosmetic tint(int colour)
 	{
-		this.colour = colour;
+		this.colour = Optional.of(colour);
 		return this;
 	}
 	
-	public boolean tinted() { return colour >= 0; }
+	public Cosmetic alpha(float opacity)
+	{
+		this.alpha = Optional.of(MathHelper.clamp(opacity, 0F, 1F));
+		return this;
+	}
 	
-	public Optional<Integer> color() { return tinted() ? Optional.of(colour) : Optional.empty(); }
+	public boolean tinted() { return colour.isPresent() && colour.get() >= 0; }
+	
+	public Optional<Integer> color() { return colour; }
+	
+	public Optional<Float> alpha() { return alpha; }
 }
