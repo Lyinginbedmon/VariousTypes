@@ -8,6 +8,16 @@
         ]
       }
     },
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:fae_appearance",
+        "Values": [
+          "vartypes:elf_ears",
+          "vartypes:verdine_spots"
+        ]
+      }
+    },
     "vartypes:photosynth"
   ],
   "Background": "vartypes:textures/gui/sheet/creator_default.png",

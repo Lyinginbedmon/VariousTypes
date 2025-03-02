@@ -1,4 +1,4 @@
-package com.lying.client.model;
+package com.lying.client.model.tail;
 
 import com.lying.client.init.VTAnimations;
 import com.lying.entity.AccessoryAnimationInterface;

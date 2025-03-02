@@ -1,6 +1,7 @@
-package com.lying.client.model;
+package com.lying.client.model.ears;
 
 import com.lying.client.init.VTAnimations;
+import com.lying.client.model.AbstractAccessoryModel;
 import com.lying.entity.AccessoryAnimationInterface;
 
 import net.minecraft.client.model.Dilation;

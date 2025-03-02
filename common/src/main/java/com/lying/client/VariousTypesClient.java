@@ -5,8 +5,8 @@ import org.lwjgl.glfw.GLFW;
 import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTAbilitiesClient;
-import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
 import com.lying.client.init.VTKeybinds;
+import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
 import com.lying.client.particle.ShockwaveParticle;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.ThrownBlockEntityRenderer;
@@ -88,7 +88,7 @@ public class VariousTypesClient
     		VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
     		{
     			ElementNonLethal nonlethal = sheet.element(VTSheetElements.NONLETHAL);
-    			nonlethal.set(value.fatigue());
+    			nonlethal.set(value.fatigue(), null);
     		});
     	});
     	NetworkManager.registerReceiver(NetworkManager.s2c(), SyncPosePacket.PACKET_TYPE, SyncPosePacket.PACKET_CODEC, (value, context) -> 

@@ -51,7 +51,8 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".crioch.desc"))
 			.from(World.END)
 			.setTypes(VTTypes.OTHALL.get())
-			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_GOBLIN.get(), VTCosmetics.TAIL_RAT.get()).withMapName(prefix("goblin_appearance")))
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_GOBLIN.get().tint(0xE5DAC5), VTCosmetics.TAIL_RAT.get().tint(0xE5DAC5)).withMapName(prefix("goblin_appearance")))
+			.addAbility(SingleAttributeAbility.Scale.of(-0.2F))
 			.addAbility(VTAbilities.TELEPORT.get())
 			.addAbility(VTAbilities.PARIAH.get(), nbt -> 
 			{
@@ -76,7 +77,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".merrow.desc"))
 			.power(1)
 			.setTypes(VTTypes.HUMAN.get(), VTTypes.AQUATIC.get())
-			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_AXOLOTL.get()).withMapName(prefix("merfolk_appearance")))
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.EARS_AXOLOTL.get(), VTCosmetics.TAIL_AXOLOTL.get()).withMapName(prefix("merfolk_appearance")))
 			.addAbility(VTAbilities.DEEP_BREATH.get(), VTAbilities.SWIM.get()).build());
 	
 	public static final Supplier<Species> DRAGAN	= register(prefix("dragan"), () -> Species.Builder.of(prefix("dragan"))

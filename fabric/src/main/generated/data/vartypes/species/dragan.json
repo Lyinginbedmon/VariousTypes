@@ -20,6 +20,16 @@
       }
     },
     {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:draconic_appearance",
+        "Values": [
+          "vartypes:dragon_tail",
+          "vartypes:hartebeest_horns"
+        ]
+      }
+    },
+    {
       "Ability": "vartypes:scale",
       "Memory": {
         "Amount": 0.1

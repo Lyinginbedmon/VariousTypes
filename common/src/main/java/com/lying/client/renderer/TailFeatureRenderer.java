@@ -3,9 +3,11 @@ package com.lying.client.renderer;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import com.lying.client.init.VTModelLayerParts;
-import com.lying.client.model.TailDragonModel;
-import com.lying.client.model.TailKirinModel;
+import com.lying.client.model.tail.TailDragonModel;
+import com.lying.client.model.tail.TailKirinModel;
+import com.lying.client.model.tail.TailRatModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
+import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 
@@ -27,6 +29,8 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 	{
 		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
 		
+		TailRatModel<E> ratModel = new TailRatModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RAT));
+		
 		addRendererMap(
 				VTCosmetics.TAIL_DRAGON,
 				AccessoryBasic.create(
@@ -39,5 +43,15 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 					new TailKirinModel<>(loader.getModelPart(VTModelLayerParts.TAIL_KIRIN)),
 					prefix("textures/entity/tail/kirin.png"),
 					prefix("textures/entity/tail/kirin_tinted.png")));
+		addRendererMap(
+				VTCosmetics.TAIL_RAT,
+				AccessoryCompound.create(
+					AccessoryBasic.create(
+						ratModel,
+						prefix("textures/entity/tail/rat_overlay.png")).untinted(),
+					AccessoryBasic.create(
+						ratModel, 
+						prefix("textures/entity/tail/rat.png"), 
+						prefix("textures/entity/tail/rat_tinted.png"))));
 	}
 }

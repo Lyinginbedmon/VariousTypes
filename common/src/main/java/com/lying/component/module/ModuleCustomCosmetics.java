@@ -11,6 +11,7 @@ import com.lying.component.element.ISheetElement;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 import com.lying.utility.Cosmetic;
+import com.lying.utility.CosmeticType;
 import com.mojang.brigadier.Command;
 
 import net.minecraft.entity.LivingEntity;
@@ -65,6 +66,16 @@ public class ModuleCustomCosmetics extends AbstractSheetModule
 		if(cosmetics.has(registryId, colour))
 		{
 			cosmetics.remove(registryId, colour);
+			updateSheet();
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean removeAll(CosmeticType category)
+	{
+		if(cosmetics.removeAll(category))
+		{
 			updateSheet();
 			return true;
 		}

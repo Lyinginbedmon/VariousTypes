@@ -8,7 +8,29 @@
         ]
       }
     },
-    "vartypes:teleport"
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:goblin_appearance",
+        "Values": [
+          {
+            "Color": 15063749,
+            "ID": "vartypes:rat_tail"
+          },
+          {
+            "Color": 15063749,
+            "ID": "vartypes:goblin_ears"
+          }
+        ]
+      }
+    },
+    "vartypes:teleport",
+    {
+      "Ability": "vartypes:scale",
+      "Memory": {
+        "Amount": -0.2
+      }
+    }
   ],
   "Background": "vartypes:textures/gui/sheet/creator_end_city.png",
   "Display": {

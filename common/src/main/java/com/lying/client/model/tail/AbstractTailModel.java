@@ -1,5 +1,6 @@
-package com.lying.client.model;
+package com.lying.client.model.tail;
 
+import com.lying.client.model.AbstractAccessoryModel;
 import com.lying.entity.AccessoryAnimationInterface;
 
 import net.minecraft.client.model.ModelPart;

@@ -5,17 +5,22 @@ import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
 import com.lying.VariousTypes;
+import com.lying.command.ModeArgumentType;
 import com.lying.component.CharacterSheet;
 import com.lying.fabric.component.VTComponents;
 import com.lying.init.VTEntityTypes;
+import com.lying.reference.Reference;
 import com.lying.utility.XPlatHandler;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.command.argument.serialize.ConstantArgumentSerializer;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 public final class VariousTypesFabric implements ModInitializer
 {
@@ -52,5 +57,7 @@ public final class VariousTypesFabric implements ModInitializer
 						getSheet(entity).ifPresent(sheetB -> sheetB.readSheetFromNbt(sheet.writeSheetToNbt(new NbtCompound())));
 			}
 		});
+		
+		ArgumentTypeRegistry.registerArgumentType(Identifier.of(Reference.ModInfo.MOD_ID, "test_mode"), ModeArgumentType.class, ConstantArgumentSerializer.of(ModeArgumentType::mode));
 	}
 }

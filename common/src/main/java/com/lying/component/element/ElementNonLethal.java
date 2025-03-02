@@ -19,7 +19,12 @@ public class ElementNonLethal implements ISheetElement<Float>
 	
 	public Float value() { return nonlethalDamage; }
 	
-	public void set(float amount) { nonlethalDamage = amount; }
+	public void set(float amount, @Nullable PlayerEntity player)
+	{
+		nonlethalDamage = amount;
+		if(player != null && !player.getWorld().isClient())
+			SyncFatiguePacket.send((ServerPlayerEntity)player, nonlethalDamage);
+	}
 	
 	public void accrue(float amount, float maxHealth, @Nullable PlayerEntity player)
 	{

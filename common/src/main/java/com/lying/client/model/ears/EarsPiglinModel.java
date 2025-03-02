@@ -1,4 +1,6 @@
-package com.lying.client.model;
+package com.lying.client.model.ears;
+
+import com.lying.client.model.AbstractAccessoryModel;
 
 import net.minecraft.client.model.Dilation;
 import net.minecraft.client.model.ModelData;

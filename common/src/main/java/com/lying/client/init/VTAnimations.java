@@ -1,7 +1,7 @@
 package com.lying.client.init;
 
-import com.lying.client.model.AbstractTailModel;
-import com.lying.client.model.GillsAxolotlModel;
+import com.lying.client.model.ears.GillsAxolotlModel;
+import com.lying.client.model.tail.AbstractTailModel;
 import com.lying.client.model.wings.AbstractWingsModel;
 import com.lying.client.model.wings.WingsAngelModel;
 import com.lying.client.model.wings.WingsBirdModel;

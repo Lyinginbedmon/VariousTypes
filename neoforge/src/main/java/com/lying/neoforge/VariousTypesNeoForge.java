@@ -9,7 +9,6 @@ import com.lying.neoforge.component.PlayerSheetHandler;
 import com.lying.reference.Reference;
 import com.lying.utility.XPlatHandler;
 
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.neoforged.bus.api.IEventBus;
@@ -39,15 +38,17 @@ public final class VariousTypesNeoForge
 		{
 			public Optional<CharacterSheet> getSheet(LivingEntity entity)
 			{
-				return entity.getType() != EntityType.PLAYER ? Optional.empty() : Optional.of(entity.getData(HANDLER).setOwner(entity));
+				return !VariousTypes.SHEETED_ENTITIES.get().contains(entity.getType()) ? Optional.empty() : Optional.of(entity.getData(HANDLER).setOwner(entity));
 			}
 			
 			public void setSheet(LivingEntity entity, CharacterSheet sheet)
 			{
-				if(entity.getType() == EntityType.PLAYER)
+				if(VariousTypes.SHEETED_ENTITIES.get().contains(entity.getType()))
 					entity.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(entity));
 			}
 		});
+		
+		// FIXME Register ModeArgumentType
 	}
 	
 	public void registerEntityAttributes(final EntityAttributeCreationEvent event)

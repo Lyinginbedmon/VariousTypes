@@ -2,6 +2,7 @@ package com.lying.init;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -57,4 +58,6 @@ public class VTCosmeticTypes
 	{
 		VariousTypes.LOGGER.info(" # Initialised "+TYPE_REGISTRY.size()+" cosmetic types");
 	}
+	
+	public static Collection<Identifier> typeIds() { return TYPE_REGISTRY.keySet(); }
 }

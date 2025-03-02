@@ -12,8 +12,8 @@
       "Memory": {
         "MapName": "vartypes:orkin_appearance",
         "Values": [
-          "vartypes:piglin_ears",
-          "vartypes:piglin_nose"
+          "vartypes:piglin_nose",
+          "vartypes:piglin_ears"
         ]
       }
     },

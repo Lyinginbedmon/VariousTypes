@@ -41,25 +41,26 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
 	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
 	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
-	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");	//
+	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");		//
 	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");	//
-	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");	//
+	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");		//
 	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");	//
-	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");	//
+	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");
 	
 	public static final Supplier<Cosmetic> HORNS_HARTEBEEST	= horns("hartebeest_horns");
-	public static final Supplier<Cosmetic> HORNS_RAM		= horns("ram_horns");	//
+	public static final Supplier<Cosmetic> HORNS_RAM		= horns("ram_horns");		//
 	public static final Supplier<Cosmetic> HORNS_STAG		= horns("stag_antlers");	//
-	public static final Supplier<Cosmetic> HORNS_KIRIN		= horns("kirin_horns");	//
+	public static final Supplier<Cosmetic> HORNS_KIRIN		= horns("kirin_horns");		//
 	public static final Supplier<Cosmetic> HORNS_LIGHTNING	= horns("lightning_horns");	//
 	
 	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
 	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
-	public static final Supplier<Cosmetic> TAIL_FOX			= tail("fox_tail");	//
+	public static final Supplier<Cosmetic> TAIL_FOX			= tail("fox_tail");		//
 	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");	//
-	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");	//
-	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");	//
+	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");		//
+	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");
 	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");	//
+	public static final Supplier<Cosmetic> TAIL_AXOLOTL		= tail("axolotl_tail");	//
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
 	public static final Supplier<Cosmetic> MISC_THIRD_EYE	= misc("third_eye");	//

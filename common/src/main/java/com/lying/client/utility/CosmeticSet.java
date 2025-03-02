@@ -102,7 +102,7 @@ public class CosmeticSet
 			while(list.size() > type.capacity())
 				list.remove(0);
 		
-		set.put(type.regName(), list);
+		set.put(type.registryName(), list);
 	}
 	
 	public boolean remove(Identifier registryId)
@@ -131,8 +131,13 @@ public class CosmeticSet
 		
 		boolean result = list.removeIf(c -> c.matches(cosmetic, matchColour));
 		if(result)
-			set.put(type.regName(), list);
+			set.put(type.registryName(), list);
 		return result;
+	}
+	
+	public boolean removeAll(CosmeticType category)
+	{
+		return set.remove(category.registryName()) != null;
 	}
 	
 	public void addAll(@NotNull CosmeticSet set)
@@ -140,5 +145,5 @@ public class CosmeticSet
 		set.set.values().forEach(list -> list.forEach(cosmetic -> add(cosmetic)));
 	}
 	
-	public List<Cosmetic> ofType(CosmeticType type) { return set.getOrDefault(type.regName(), Lists.newArrayList()); }
+	public List<Cosmetic> ofType(CosmeticType type) { return set.getOrDefault(type.registryName(), Lists.newArrayList()); }
 }

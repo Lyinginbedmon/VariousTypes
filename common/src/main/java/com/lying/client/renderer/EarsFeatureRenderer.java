@@ -3,9 +3,9 @@ package com.lying.client.renderer;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import com.lying.client.init.VTModelLayerParts;
-import com.lying.client.model.EarsElfModel;
-import com.lying.client.model.EarsPiglinModel;
-import com.lying.client.model.GillsAxolotlModel;
+import com.lying.client.model.ears.SimpleEarsModel;
+import com.lying.client.model.ears.EarsPiglinModel;
+import com.lying.client.model.ears.GillsAxolotlModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
@@ -51,8 +51,14 @@ public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		addRendererMap(
 				VTCosmetics.EARS_ELF,
 				AccessoryBasic.create(
-					new EarsElfModel<>(loader.getModelPart(VTModelLayerParts.EARS_ELF)),
+					new SimpleEarsModel<>(loader.getModelPart(VTModelLayerParts.EARS_ELF)),
 					prefix("textures/entity/ears/elf.png"),
 					prefix("textures/entity/ears/elf_tinted.png")));
+		addRendererMap(
+				VTCosmetics.EARS_GOBLIN,
+				AccessoryBasic.create(
+					new SimpleEarsModel<>(loader.getModelPart(VTModelLayerParts.EARS_GOBLIN)),
+					prefix("textures/entity/ears/goblin.png"),
+					prefix("textures/entity/ears/goblin_tinted.png")));
 	}
 }
