@@ -11,6 +11,7 @@ import com.lying.client.renderer.accessory.IAccessoryRenderer;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.utility.Cosmetic;
 import com.lying.utility.CosmeticType;
+import com.lying.utility.VTUtils;
 
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
@@ -46,7 +47,7 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 		if(!shouldRender(entity))
 			return;
 		
-		VTUtilsClient.getEntityCosmetics(entity, type.get())
+		VTUtils.getEntityCosmetics(entity, type.get())
 			.forEach(cosmetic -> handleAccessoryRendering(entity, cosmetic, limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light));
 	}
 	

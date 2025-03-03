@@ -17,6 +17,7 @@ import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
+import com.lying.component.element.ElementCosmetics;
 import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
@@ -55,6 +56,7 @@ import com.lying.ability.AbilityThrowBlock;
 import com.lying.ability.AbilityThunderstep;
 import com.lying.ability.AbilityWaterWalking;
 import com.lying.ability.ActivatedAbility;
+import com.lying.ability.ICosmeticSupplier;
 import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
@@ -359,7 +361,25 @@ public class VTAbilities
 	
 	public static void init()
 	{
-		abilities().forEach(entry -> entry.get().registerEventHandlers());
+		abilities().forEach(entry -> 
+		{
+			entry.get().registerEventHandlers();
+			Ability ab = entry.get();
+			if(ab instanceof ICosmeticSupplier)
+			{
+				Identifier registry = ab.registryName();
+				ICosmeticSupplier supplier = (ICosmeticSupplier)ab;
+				ElementCosmetics.GET_LIVING_COSMETICS_EVENT.register((living, set) -> 
+				{
+					VariousTypes.getSheet(living).ifPresent(sheet -> 
+					{
+						AbilitySet abilities = sheet.elementValue(VTSheetElements.ABILITIES);
+						if(abilities.hasAbility(registry))
+							abilities.getAbilitiesOfType(registry).forEach(inst -> supplier.getCosmetics(inst).forEach(cos -> set.add(cos)));
+					});
+				});
+			}
+		});
 		VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities");
 	}
 	

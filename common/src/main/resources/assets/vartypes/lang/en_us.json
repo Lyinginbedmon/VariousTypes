@@ -288,6 +288,7 @@
 	"command.vartypes.get.custom_abilities.success": "%s has %s custom abilities:",
 	"command.vartypes.get.custom_cosmetics.success": "%s has %s custom cosmetics applied",
 	"command.vartypes.get.nonlethal.success": "%s currently has %s points of nonlethal damage",
+	"command.vartypes.get.cosmetics.success": "%s currently has active %s cosmetics",
 	"command.vartypes.custom_home.apply.success": "%s is now from %s",
 	"command.vartypes.custom_home.clear.success": "Custom home dimension cleared, %s is now from %s",
 	"command.vartypes.custom_home.remove.success": "Custom home dimension removed, %s is now from %s",

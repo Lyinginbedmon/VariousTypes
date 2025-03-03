@@ -30,7 +30,6 @@ import com.lying.component.element.ElementCosmetics;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTAbilities;
-import com.lying.init.VTCosmetics;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
@@ -56,7 +55,6 @@ import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.SkinTextures.Model;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.player.PlayerEntity;
@@ -213,12 +211,6 @@ public class ClientBus
 		RenderEvents.AFTER_RENDER_PLAYER_EVENT.register((player, yaw, tickDelta, matrices, vertexConsumers, light, renderer) -> 
 			VariousTypes.getSheet(player).ifPresent(sheet -> 
 			((ElementCosmetics)sheet.element(VTSheetElements.COSMETICS)).value().values().forEach(inst -> VTPlayerSpecialRenderingRegistry.doPostRender(player, inst, matrices, vertexConsumers, renderer, yaw, tickDelta, light))));
-		
-		RenderEvents.GET_LIVING_COSMETICS_EVENT.register((living, type, set) -> 
-		{
-			if(living.getType() == EntityType.PLAYER && ((PlayerEntity)living).getName().getString().equalsIgnoreCase("_Lying"))
-				set.add(VTCosmetics.WINGS_WITCH.get());
-		});
 	}
 	
 	private static void registerHighlights()

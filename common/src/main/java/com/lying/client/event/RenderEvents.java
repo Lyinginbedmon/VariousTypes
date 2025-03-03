@@ -4,14 +4,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Optional;
 
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import com.google.common.reflect.AbstractInvocationHandler;
-import com.lying.client.utility.CosmeticSet;
 import com.lying.component.CharacterSheet;
-import com.lying.utility.CosmeticType;
 
 import dev.architectury.event.Event;
 import dev.architectury.event.EventFactory;
@@ -125,13 +122,5 @@ public class RenderEvents
 	public interface HudRenderEvent
 	{
 		void render(MinecraftClient mc, PlayerEntity player, Optional<CharacterSheet> sheetOpt, float tickDelta, DrawContext context);
-	}
-	
-	public static final Event<GetPlayerCosmeticsEvent> GET_LIVING_COSMETICS_EVENT = EventFactory.createLoop(GetPlayerCosmeticsEvent.class);
-	
-	@FunctionalInterface
-	public interface GetPlayerCosmeticsEvent
-	{
-		void getCosmeticsFor(LivingEntity player, @Nullable CosmeticType type, final CosmeticSet set);
 	}
 }

@@ -7,10 +7,12 @@ import com.lying.ability.Ability;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.IStatusEffectSpoofAbility;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementCosmetics;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.event.LivingEvents;
 import com.lying.event.Result;
 import com.lying.event.SheetEvents;
+import com.lying.init.VTCosmetics;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
 import com.lying.init.VTTypes;
@@ -22,11 +24,13 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.EntityEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.event.events.common.TickEvent;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -139,6 +143,12 @@ public class ServerBus
 		// Attribute modifier handling
 		SheetEvents.BEFORE_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().removeAttributeModifiers(living, inst)));
 		SheetEvents.AFTER_REBUILD_EVENT.register((living, abilities) -> abilities.abilities().forEach(inst -> inst.ability().applyAttributeModifiers(living, inst)));
+		
+		ElementCosmetics.GET_LIVING_COSMETICS_EVENT.register((living, set) -> 
+		{
+			if(living.getType() == EntityType.PLAYER && ((PlayerEntity)living).getName().getString().equalsIgnoreCase("_Lying"))
+				set.add(VTCosmetics.WINGS_WITCH.get());
+		});
 	}
 	
 	/** Handles the down/up-grading of fatigue intensity */

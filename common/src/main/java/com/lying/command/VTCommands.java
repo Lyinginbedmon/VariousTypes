@@ -22,6 +22,7 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInstance.AbilityNbt;
 import com.lying.ability.AbilitySet;
+import com.lying.client.utility.CosmeticSet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
 import com.lying.component.element.ElementNonLethal;
@@ -100,6 +101,8 @@ public class VTCommands
 	private static final String ABILITY = "ability";
 	private static final String COSMETIC = "cosmetic";
 	private static final String MODE = "mode";
+	private static final String AMOUNT = "amount";
+	private static final String DIMENSION = "dimension";
 	
 	private static SimpleCommandExceptionType make(String name)
 	{
@@ -148,6 +151,8 @@ public class VTCommands
 								.executes(context -> Edit.Abilities.tryGetAbilities(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))
 							.then(literal("types")
 								.executes(context -> Edit.Types.tryGetTypes(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))
+							.then(literal("cosmetics")
+								.executes(context -> Edit.Cosmetics.tryGetCosmetics(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))
 							.then(argument("module", StringArgumentType.word()).suggests(MODULE_IDS)
 								.executes(context -> 
 								{
@@ -183,12 +188,12 @@ public class VTCommands
 							
 							.then(literal("custom_home")
 								.then(literal("apply")
-									.then(argument("dimension", DimensionArgumentType.dimension())
-										.executes(context -> Edit.Home.tryApplyHome(EntityArgumentType.getPlayer(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, "dimension"), context.getSource()))))
+									.then(argument(DIMENSION, DimensionArgumentType.dimension())
+										.executes(context -> Edit.Home.tryApplyHome(EntityArgumentType.getPlayer(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), context.getSource()))))
 								.then(literal("remove")
 									.executes(context -> Edit.Home.tryClearHome(EntityArgumentType.getPlayer(context, PLAYER), context.getSource()))
-									.then(argument("dimension", DimensionArgumentType.dimension())
-										.executes(context -> Edit.Home.tryRemoveHome(EntityArgumentType.getPlayer(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, "dimension"), context.getSource())))))
+									.then(argument(DIMENSION, DimensionArgumentType.dimension())
+										.executes(context -> Edit.Home.tryRemoveHome(EntityArgumentType.getPlayer(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), context.getSource())))))
 							
 							.then(literal("custom_types")
 								.then(literal("apply")
@@ -218,16 +223,16 @@ public class VTCommands
 							
 							.then(literal("nonlethal")
 								.then(literal("apply")
-									.then(argument("amount", FloatArgumentType.floatArg(0))
-										.executes(context -> Edit.Nonlethal.tryAddNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, "amount"), context.getSource()))))
+									.then(argument(AMOUNT, FloatArgumentType.floatArg(0))
+										.executes(context -> Edit.Nonlethal.tryAddNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, AMOUNT), context.getSource()))))
 								.then(literal("remove")
-									.then(argument("amount", FloatArgumentType.floatArg(0))
-										.executes(context -> Edit.Nonlethal.tryRemoveNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, "amount"), context.getSource()))))
+									.then(argument(AMOUNT, FloatArgumentType.floatArg(0))
+										.executes(context -> Edit.Nonlethal.tryRemoveNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, AMOUNT), context.getSource()))))
 								.then(literal("clear")
 									.executes(context -> Edit.Nonlethal.tryClearNonlethal(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))
 								.then(literal("set"))
-									.then(argument("amount", FloatArgumentType.floatArg(0))
-										.executes(context -> Edit.Nonlethal.trySetNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, "amount"), context.getSource()))))
+									.then(argument(AMOUNT, FloatArgumentType.floatArg(0))
+										.executes(context -> Edit.Nonlethal.trySetNonlethal(EntityArgumentType.getPlayer(context, PLAYER), FloatArgumentType.getFloat(context, AMOUNT), context.getSource()))))
 							
 							.then(literal("species")
 								.then(literal("apply")
@@ -250,7 +255,7 @@ public class VTCommands
 									.then(literal("all")
 										.executes(context -> Edit.Templates.tryClearTemplates(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))))
 							))
-					.then(literal("test")	// TODO Implement variants for detecting types/species/templates/abilities/etc
+					.then(literal("test")
 						.then(argument(MODE, ModeArgumentType.mode())
 							.then(argument(PLAYER, EntityArgumentType.players())
 								.then(literal("species")
@@ -261,13 +266,21 @@ public class VTCommands
 										.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
 											.executes(context -> Test.Species.isOf(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, SPECIES), false, ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								
-								.then(literal("templates"))
+								.then(literal("templates")
+									.then(literal("has")
+										.then(argument(TEMPLATE, IdentifierArgumentType.identifier()).suggests(TEMPLATE_IDS)
+											.executes(context -> Test.Templates.has(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+									.then(literal("lacks")
+										.then(argument(TEMPLATE, IdentifierArgumentType.identifier()).suggests(TEMPLATE_IDS)
+											.executes(context -> Test.Templates.lacks(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								
 								.then(literal("types")
 									.then(literal("is")
-										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)))
+										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
+											.executes(context -> Test.Types.hasType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), ModeArgumentType.getMode(context, MODE), context.getSource()))))
 									.then(literal("is_not")
-										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS))))
+										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
+											.executes(context -> Test.Types.hasNoType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								
 								.then(literal("abilities")
 									.then(literal("has_any")
@@ -285,23 +298,47 @@ public class VTCommands
 											.then(argument(ABILITY, IdentifierArgumentType.identifier()).suggests(ABILITY_IDS)
 												.executes(context -> Test.Abilities.hasNoneById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.ability().registryName().equals(b), ModeArgumentType.getMode(context, MODE), context.getSource()))))))
 								
-								.then(literal("cosmetics"))
+								.then(literal("cosmetics")
+									.then(literal("has")
+										.then(argument(COSMETIC, IdentifierArgumentType.identifier()).suggests(COSMETIC_IDS)
+											.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), ModeArgumentType.getMode(context, MODE), context.getSource()))
+											.then(argument("color", IntegerArgumentType.integer(0))
+												.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+									.then(literal("has_any")
+										.then(argument("category", IdentifierArgumentType.identifier()).suggests(COSMETIC_TYPE_IDS)
+											.executes(context -> Test.Cosmetics.hasAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+									.then(literal("lacks")
+										.then(argument(COSMETIC, IdentifierArgumentType.identifier()).suggests(COSMETIC_IDS)
+											.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), ModeArgumentType.getMode(context, MODE), context.getSource()))
+											.then(argument("color", IntegerArgumentType.integer(0))
+												.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+									.then(literal("lacks_any")
+										.then(argument("category", IdentifierArgumentType.identifier()).suggests(COSMETIC_TYPE_IDS)
+											.executes(context -> Test.Cosmetics.lacksAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								
 								.then(literal("nonlethal")
 									.then(literal("equal_to")
-										.then(argument("amount", IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, "amount"), (a,b) -> a==b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a==b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
 									.then(literal("unequal_to")
-										.then(argument("amount", IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, "amount"), (a,b) -> a!=b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a!=b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
 									.then(literal("greater_than")
-										.then(argument("amount", IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, "amount"), (a,b) -> a>b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a>b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
 									.then(literal("less_than")
-										.then(argument("amount", IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, "amount"), (a,b) -> a<b, ModeArgumentType.getMode(context, MODE), context.getSource())))))
+										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a<b, ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								
-								.then(literal("home"))
+								.then(literal("home")
+									.then(literal("is")
+										.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), ModeArgumentType.getMode(context, MODE), context.getSource()))
+										.then(argument(DIMENSION, DimensionArgumentType.dimension())
+											.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+									.then(literal("is_not")
+										.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), ModeArgumentType.getMode(context, MODE), context.getSource()))
+										.then(argument(DIMENSION, DimensionArgumentType.dimension())
+											.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), ModeArgumentType.getMode(context, MODE), context.getSource())))))
 								)
 							)));
 		});
@@ -314,7 +351,7 @@ public class VTCommands
 			private static int tryCreate(PlayerEntity player, ServerCommandSource source) throws CommandSyntaxException
 			{
 				VariousTypes.getSheet(player).ifPresent(sheet ->
-				player.openHandledScreen(new SimpleNamedScreenHandlerFactory((id, playerInventory, custom) -> new CharacterCreationScreenHandler(id, playerInventory.player), player.getDisplayName())));
+					player.openHandledScreen(new SimpleNamedScreenHandlerFactory((id, playerInventory, custom) -> new CharacterCreationScreenHandler(id, playerInventory.player), player.getName())));
 				return 15;
 			}
 			
@@ -738,6 +775,18 @@ public class VTCommands
 		
 		private static class Cosmetics
 		{
+			private static int tryGetCosmetics(PlayerEntity player, ServerCommandSource source) throws CommandSyntaxException
+			{
+				Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
+				if(sheetOpt.isEmpty())
+					throw FAILED_GENERIC.create();
+				
+				CosmeticSet cosmetics = sheetOpt.get().elementValue(VTSheetElements.COSMETICS);
+				source.sendFeedback(() -> translate("command", "get.cosmetics.success", player.getName(), cosmetics.size()), true);
+				cosmetics.values().forEach(c -> source.sendFeedback(() -> Text.literal(" * ").append(c.describe()), false));
+				return 15;
+			}
+			
 			private static int tryAddCosmetic(PlayerEntity player, Identifier registryId, ServerCommandSource source) throws CommandSyntaxException
 			{
 				return tryAddTintedCosmetic(player, registryId, -1, source);
@@ -942,6 +991,19 @@ public class VTCommands
 			}
 		}
 		
+		private static class Templates
+		{
+			private static int has(Collection<ServerPlayerEntity> players, Identifier registryId, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> sheet.module(VTSheetModules.TEMPLATES).get().stream().anyMatch(t -> t.registryName().equals(registryId)), mode, source);
+			}
+			
+			private static int lacks(Collection<ServerPlayerEntity> players, Identifier registryId, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> sheet.module(VTSheetModules.TEMPLATES).get().stream().noneMatch(t -> t.registryName().equals(registryId)), mode, source);
+			}
+		}
+		
 		private static class Abilities
 		{
 			private static int hasAnyById(Collection<ServerPlayerEntity> players, Identifier abilityId, BiPredicate<AbilityInstance,Identifier> comparator, Mode mode, ServerCommandSource source) throws CommandSyntaxException
@@ -960,6 +1022,67 @@ public class VTCommands
 					AbilitySet abilities = sheet.element(VTSheetElements.ABILITIES);
 					return abilities.abilities().stream().noneMatch(a -> comparator.test(a, abilityId));
 				}, mode, source);
+			}
+		}
+		
+		private static class Home
+		{
+			@SuppressWarnings("unchecked")
+			private static int isFrom(Collection<ServerPlayerEntity> players, ServerWorld dimension, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((RegistryKey<World>)sheet.elementValue(VTSheetElements.HOME_DIM)).equals(dimension.getRegistryKey()), mode, source);
+			}
+			
+			@SuppressWarnings("unchecked")
+			private static int isNotFrom(Collection<ServerPlayerEntity> players, ServerWorld dimension, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> !((RegistryKey<World>)sheet.elementValue(VTSheetElements.HOME_DIM)).equals(dimension.getRegistryKey()), mode, source);
+			}
+		}
+		
+		private static class Cosmetics
+		{
+			private static int hasCosmetic(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).has(id), mode, source);
+			}
+			
+			private static int hasCosmetic(Collection<ServerPlayerEntity> players, Identifier id, int color, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).has(id, color), mode, source);
+			}
+			
+			private static int lacksCosmetic(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> !((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).has(id), mode, source);
+			}
+			
+			private static int lacksCosmetic(Collection<ServerPlayerEntity> players, Identifier id, int color, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> !((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).has(id, color), mode, source);
+			}
+			
+			private static int hasAny(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> !((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).ofType(id).isEmpty(), mode, source);
+			}
+			
+			private static int lacksAny(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((CosmeticSet)sheet.elementValue(VTSheetElements.COSMETICS)).ofType(id).isEmpty(), mode, source);
+			}
+		}
+		
+		private static class Types
+		{
+			private static int hasType(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((TypeSet)sheet.elementValue(VTSheetElements.TYPES)).contents().stream().anyMatch(t -> t.listID().equals(id)), mode, source);
+			}
+			
+			private static int hasNoType(Collection<ServerPlayerEntity> players, Identifier id, Mode mode, ServerCommandSource source) throws CommandSyntaxException
+			{
+				return conductTest(players, sheet -> ((TypeSet)sheet.elementValue(VTSheetElements.TYPES)).contents().stream().noneMatch(t -> t.listID().equals(id)), mode, source);
 			}
 		}
 	}

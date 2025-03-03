@@ -11,9 +11,12 @@ import org.joml.Vector2i;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import com.lying.VariousTypes;
 import com.lying.ability.AbilityInstance;
+import com.lying.client.utility.CosmeticSet;
 import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
+import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
@@ -46,6 +49,17 @@ import net.minecraft.world.World;
 public class VTUtils
 {
 	public static final Comparator<Text> TEXT_ALPHABETICAL = (a, b) -> stringComparator(a.getString(), b.getString());
+	
+	public static CosmeticSet getEntityCosmetics(LivingEntity player)
+	{
+		Optional<CharacterSheet> sheet = VariousTypes.getSheet(player);
+		return sheet.isEmpty() ? CosmeticSet.of(List.of()) : sheet.get().elementValue(VTSheetElements.COSMETICS);
+	}
+	
+	public static List<Cosmetic> getEntityCosmetics(LivingEntity player, CosmeticType type)
+	{
+		return getEntityCosmetics(player).ofType(type);
+	}
 	
 	/** Generates a character sheet for the given entity with a random species and templates up to the given power level */
 	public static CharacterSheet makeRandomSheet(LivingEntity ent, int power)

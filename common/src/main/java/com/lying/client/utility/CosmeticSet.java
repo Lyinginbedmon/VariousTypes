@@ -64,25 +64,12 @@ public class CosmeticSet
 	
 	public boolean has(Identifier registryId)
 	{
-		return has(registryId, -1);
+		return values().stream().anyMatch(c -> c.registryName().equals(registryId));
 	}
 	
 	public boolean has(Identifier registryId, int colour)
 	{
-		Optional<Cosmetic> cos = VTCosmetics.get(registryId);
-		if(cos.isEmpty())
-			return false;
-		
-		Cosmetic cosmetic = cos.get();
-		cosmetic.tint(colour);
-		
-		return has(cosmetic, colour >= 0);
-	}
-	
-	public boolean has(Cosmetic cosmetic, boolean matchColour)
-	{
-		List<Cosmetic> list = ofType(cosmetic.type());
-		return list.isEmpty() ? false : list.stream().anyMatch(c -> c.matches(cosmetic, matchColour));
+		return values().stream().anyMatch(c -> c.registryName().equals(registryId) && c.tinted() && c.color().get() == colour);
 	}
 	
 	public void add(@Nullable Cosmetic cosmetic)
@@ -145,5 +132,7 @@ public class CosmeticSet
 		set.set.values().forEach(list -> list.forEach(cosmetic -> add(cosmetic)));
 	}
 	
-	public List<Cosmetic> ofType(CosmeticType type) { return set.getOrDefault(type.registryName(), Lists.newArrayList()); }
+	public List<Cosmetic> ofType(CosmeticType type) { return ofType(type.registryName()); }
+	
+	public List<Cosmetic> ofType(Identifier registryName) { return set.getOrDefault(registryName, Lists.newArrayList()); }
 }

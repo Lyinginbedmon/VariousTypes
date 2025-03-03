@@ -93,7 +93,7 @@ public class Cosmetic
 	public Text describe()
 	{
 		if(tinted())
-			return Text.literal(registryName.toString()).append(" (").append(String.valueOf(colour)).append(")");
+			return Text.literal(registryName.toString()).append(" (").append(String.valueOf(colour.get())).append(")");
 		else
 			return Text.literal(registryName.toString());
 	}
