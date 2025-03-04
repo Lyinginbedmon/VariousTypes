@@ -30,7 +30,7 @@ public class ElementCosmetics implements ISheetElement<CosmeticSet>
 	public void rebuild(CharacterSheet sheet)
 	{
 		set.clear();
-		sheet.modules().forEach(module -> module.affect(this));
 		sheet.getOwner().ifPresent(owner -> GET_LIVING_COSMETICS_EVENT.invoker().getCosmeticsFor(owner, set));
+		sheet.modules().forEach(module -> module.affect(this));
 	}
 }

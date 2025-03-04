@@ -41,10 +41,10 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
 	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
 	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
-	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");		//
-	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");	//
-	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");		//
-	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");	//
+	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");
+	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");
+	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");
+	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");
 	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");
 	
 	public static final Supplier<Cosmetic> HORNS_HARTEBEEST	= horns("hartebeest_horns");

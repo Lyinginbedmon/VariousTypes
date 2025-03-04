@@ -36,7 +36,7 @@ public class VTSheetElements
 	public static final SheetElement<ElementActionHandler> ACTIONS	= register("actions", listOf(VTSheetElements.ABILITIES, VTSheetElements.TYPES), ElementActionHandler::new);
 	public static final SheetElement<ElementNonLethal> NONLETHAL	= register("nonlethal", List::of, ElementNonLethal::new);
 	public static final SheetElement<ElementSpecialPose> SPECIAL_POSE	= register("special_pose", List::of, ElementSpecialPose::new);
-	public static final SheetElement<ElementCosmetics> COSMETICS	= register("cosmetics", List::of, ElementCosmetics::new);
+	public static final SheetElement<ElementCosmetics> COSMETICS	= register("cosmetics", listOf(VTSheetElements.ABILITIES), ElementCosmetics::new);
 	
 	private static final List<SheetElement<?>> SORTED_LIST = Lists.newArrayList();
 	

@@ -27,7 +27,7 @@ public class ModuleCustomCosmetics extends AbstractSheetModule
 	
 	public ModuleCustomCosmetics()
 	{
-		super(Reference.ModInfo.prefix("custom_cosmetics"), 0);
+		super(Reference.ModInfo.prefix("custom_cosmetics"), 900);
 	}
 	
 	public Command<ServerCommandSource> describeTo(ServerCommandSource source, LivingEntity owner)
@@ -92,10 +92,8 @@ public class ModuleCustomCosmetics extends AbstractSheetModule
 	
 	public void affect(ISheetElement<?> element)
 	{
-		if(cosmetics.isEmpty() || element.registry() != VTSheetElements.COSMETICS)
-			return;
-		
-		((ElementCosmetics)element).value().addAll(cosmetics);
+		if(!cosmetics.isEmpty() && element.registry() == VTSheetElements.COSMETICS)
+			((ElementCosmetics)element).value().addAll(cosmetics);
 	}
 	
 	protected NbtCompound writeToNbt(NbtCompound nbt)
@@ -109,6 +107,7 @@ public class ModuleCustomCosmetics extends AbstractSheetModule
 		cosmetics.clear();
 		if(!nbt.contains("Values"))
 			return;
+		
 		CosmeticSet data = CosmeticSet.CODEC.parse(NbtOps.INSTANCE, nbt.get("Values")).resultOrPartial(VariousTypes.LOGGER::error).orElse(CosmeticSet.of(List.of()));
 		cosmetics.addAll(data);
 	}

@@ -11,6 +11,7 @@ import com.lying.client.model.HornsHartebeestModel;
 import com.lying.client.model.ModelFullbody;
 import com.lying.client.model.NosePiglinModel;
 import com.lying.client.model.ears.EarsPiglinModel;
+import com.lying.client.model.ears.EarsRabbitModel;
 import com.lying.client.model.ears.GillsAxolotlModel;
 import com.lying.client.model.ears.SimpleEarsModel;
 import com.lying.client.model.tail.TailDragonModel;
@@ -59,6 +60,10 @@ public class VTModelLayerParts
 	public static final EntityModelLayer GILLS_AXOLOTL			= make("player", "gills_axolotl", GillsAxolotlModel::createBodyLayer);
 	public static final EntityModelLayer EARS_ELF				= make("player", "ears_elf", SimpleEarsModel::createElfEars);
 	public static final EntityModelLayer EARS_GOBLIN			= make("player", "ears_goblin", SimpleEarsModel::createGoblinEars);
+	public static final EntityModelLayer EARS_CAT				= make("player", "ears_cat", SimpleEarsModel::createCatEars);
+	public static final EntityModelLayer EARS_FOX				= make("player", "ears_fox", SimpleEarsModel::createFoxEars);
+	public static final EntityModelLayer EARS_WOLF				= make("player", "ears_wolf", SimpleEarsModel::createWolfEars);
+	public static final EntityModelLayer EARS_RABBIT			= make("player", "ears_rabbit", EarsRabbitModel::createBodyLayer);
 	
 	public static final EntityModelLayer HORNS_HARTEBEEST		= make("player", "horns_hartebeest", HornsHartebeestModel::createBodyLayer);
 	

@@ -46,4 +46,40 @@ public class SimpleEarsModel<E extends LivingEntity> extends AbstractAccessoryMo
 		
 		return TexturedModelData.of(modelData, 32, 16);
 	}
+	
+	public static TexturedModelData createCatEars()
+	{
+		ModelData modelData = getRig();
+		ModelPartData modelPartData = modelData.getRoot();
+		ModelPartData head = modelPartData.getChild(EntityModelPartNames.HEAD);
+		
+		head.addChild(EntityModelPartNames.RIGHT_EAR, ModelPartBuilder.create().uv(6, 0).cuboid(-0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 2.0F, Dilation.NONE), ModelTransform.pivot(3.0F, -8.0F, 3.0F));
+		head.addChild(EntityModelPartNames.LEFT_EAR, ModelPartBuilder.create().uv(0, 0).cuboid(-0.5F, -1.0F, -1.0F, 1.0F, 1.0F, 2.0F, Dilation.NONE), ModelTransform.pivot(-3.0F, -8.0F, 3.0F));
+		
+		return TexturedModelData.of(modelData, 16, 16);
+	}
+	
+	public static TexturedModelData createWolfEars()
+	{
+		ModelData modelData = getRig();
+		ModelPartData modelPartData = modelData.getRoot();
+		ModelPartData head = modelPartData.getChild(EntityModelPartNames.HEAD);
+		
+		head.addChild(EntityModelPartNames.RIGHT_EAR, ModelPartBuilder.create().uv(6, 0).cuboid(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.pivot(3.0F, -8.0F, 1.5F));
+		head.addChild(EntityModelPartNames.LEFT_EAR, ModelPartBuilder.create().uv(0, 0).cuboid(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.pivot(-3.0F, -8.0F, 1.5F));
+		
+		return TexturedModelData.of(modelData, 16, 16);
+	}
+	
+	public static TexturedModelData createFoxEars()
+	{
+		ModelData modelData = getRig();
+		ModelPartData modelPartData = modelData.getRoot();
+		ModelPartData head = modelPartData.getChild(EntityModelPartNames.HEAD);
+		
+		head.addChild(EntityModelPartNames.RIGHT_EAR, ModelPartBuilder.create().uv(6, 0).cuboid(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.pivot(3.0F, -8.0F, -1.5F));
+		head.addChild(EntityModelPartNames.LEFT_EAR, ModelPartBuilder.create().uv(0, 0).cuboid(-1.0F, -2.0F, -0.5F, 2.0F, 2.0F, 1.0F, Dilation.NONE), ModelTransform.pivot(-3.0F, -8.0F, -1.5F));
+		
+		return TexturedModelData.of(modelData, 16, 16);
+	}
 }

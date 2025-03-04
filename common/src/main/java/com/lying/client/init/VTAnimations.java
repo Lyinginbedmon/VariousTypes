@@ -2422,4 +2422,63 @@ public class VTAnimations
 			))
 			.build();
 	}
+	
+	public static class RabbitEars
+	{
+		protected static final String RIGHT_EAR = EntityModelPartNames.RIGHT_EAR;
+		protected static final String LEFT_EAR = EntityModelPartNames.LEFT_EAR;
+		
+		public static final Animation EARS_RABBIT_IDLE = Animation.Builder.create(0.0F)
+			.addBoneAnimation(RIGHT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 15.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, -15.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation EARS_RABBIT_CROUCHING = Animation.Builder.create(10.0F)
+			.addBoneAnimation(RIGHT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-60.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.5833F, AnimationHelper.createRotationalVector(-59.7864F, 6.4905F, 3.7661F), Transformation.Interpolations.CUBIC),
+				new Keyframe(7.5F, AnimationHelper.createRotationalVector(-64.7864F, -6.4905F, -3.7661F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-60.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_EAR, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-60.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.5417F, AnimationHelper.createRotationalVector(-54.7864F, -6.4905F, -3.7661F), Transformation.Interpolations.CUBIC),
+				new Keyframe(6.75F, AnimationHelper.createRotationalVector(-59.7864F, 6.4905F, 3.7661F), Transformation.Interpolations.CUBIC),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-60.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_EAR, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation EARS_RABBIT_FLYING = Animation.Builder.create(4.0984F).looping()
+			.addBoneAnimation(RIGHT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-77.4885F, -2.4407F, -0.5414F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.875F, AnimationHelper.createRotationalVector(-80.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.9583F, AnimationHelper.createRotationalVector(-72.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.0833F, AnimationHelper.createRotationalVector(-77.4885F, -2.4407F, -0.5414F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_EAR, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(4.0833F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_EAR, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-77.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.375F, AnimationHelper.createRotationalVector(-65.0F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.5833F, AnimationHelper.createRotationalVector(-72.5F, 0.0F, 0.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.0833F, AnimationHelper.createRotationalVector(-77.5F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_EAR, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(4.0833F, AnimationHelper.createTranslationalVector(0.0F, -0.25F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+	}
 }
