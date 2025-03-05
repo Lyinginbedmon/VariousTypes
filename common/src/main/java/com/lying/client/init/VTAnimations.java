@@ -2423,6 +2423,125 @@ public class VTAnimations
 			.build();
 	}
 	
+	public static class FoxTail extends TailAnimations
+	{
+		public static final Animation TAIL_FOX_IDLE = Animation.Builder.create(4.997F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6857F, AnimationHelper.createRotationalVector(-15.1235F, -7.243F, 1.9516F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.7929F, AnimationHelper.createRotationalVector(-15.1235F, 7.243F, -1.9516F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.997F, AnimationHelper.createRotationalVector(-15.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation TAIL_FOX_FLYING = Animation.Builder.create(1.6316F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.4984F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, -5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.2234F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.6312F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation TAIL_FOX_SITTING = Animation.Builder.create(4.2517F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(5.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6168F, AnimationHelper.createRotationalVector(5.019F, 4.9809F, 0.4369F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.2934F, AnimationHelper.createRotationalVector(5.019F, -4.9809F, -0.4369F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.2515F, AnimationHelper.createRotationalVector(5.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+	}
+	
+	public static class AxolotlTail extends TailAnimations
+	{
+		public static final Animation TAIL_AXOLOTL_IDLE = Animation.Builder.create(4.997F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2041F, AnimationHelper.createRotationalVector(-45.1235F, -7.243F, 1.9516F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.3113F, AnimationHelper.createRotationalVector(-45.1235F, 7.243F, -1.9516F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.997F, AnimationHelper.createRotationalVector(-45.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4449F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 4.45F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.5521F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -4.45F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.997F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6857F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 4.45F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.7929F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -4.45F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.997F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation TAIL_AXOLOTL_FLYING = Animation.Builder.create(1.6316F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.3625F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, -5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.9968F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.6312F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5437F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.2234F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.6312F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.6797F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.3593F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.6312F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation TAIL_AXOLOTL_SWIMMING_POWERED = Animation.Builder.create(1.0154F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, -15.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, 15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.0F, AnimationHelper.createRotationalVector(-75.0F, 0.0F, -15.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -7.22F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.125F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.6667F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -7.22F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.51F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(0.7917F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 15.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(1.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.51F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+
+		public static final Animation TAIL_AXOLOTL_SITTING = Animation.Builder.create(4.2517F).looping()
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(5.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.2575F, AnimationHelper.createRotationalVector(5.019F, 4.9809F, 0.4369F), Transformation.Interpolations.CUBIC),
+				new Keyframe(2.9341F, AnimationHelper.createRotationalVector(5.019F, -4.9809F, -0.4369F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.2515F, AnimationHelper.createRotationalVector(5.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(TAIL, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 1.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG1, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.4371F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.1138F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 5.0F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.2515F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(SEG2, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.6168F, AnimationHelper.createRotationalVector(0.0F, 0.0F, -7.22F), Transformation.Interpolations.CUBIC),
+				new Keyframe(3.2934F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 7.22F), Transformation.Interpolations.CUBIC),
+				new Keyframe(4.2515F, AnimationHelper.createRotationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+	}
+	
 	public static class RabbitEars
 	{
 		protected static final String RIGHT_EAR = EntityModelPartNames.RIGHT_EAR;

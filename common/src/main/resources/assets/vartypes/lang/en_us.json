@@ -367,9 +367,15 @@
 	// Enums
 	"wings.vartypes.butterfly": "Butterfly",
 	"wings.vartypes.dragonfly": "Dragonfly",
+	"wings.vartypes.fairy": "Fairy",
+	"wings.vartypes.energy": "Energy",
 	"wings.vartypes.beetle": "Beetle",
-	"wings.vartypes.bat": "Bat",
 	"wings.vartypes.bird": "Bird",
+	"wings.vartypes.angel": "Angel",
+	"wings.vartypes.witch": "Witch",
+	"wings.vartypes.bat": "Bat",
+	"wings.vartypes.dragon": "Dragon",
+	"wings.vartypes.skeleton": "Skeleton",
 	"wings.vartypes.elytra": "Elytra",
 	"wings.vartypes.none": "None",
 	// Keybinds

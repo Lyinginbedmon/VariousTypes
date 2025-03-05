@@ -113,7 +113,7 @@ public abstract class SingleAttributeAbility extends Ability
 		public Optional<Text> description(AbilityInstance instance)
 		{
 			int amount = getAmount(instance.memory());
-			return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".bonus" : ".penalty")+".desc", amount));
+			return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".bonus" : ".penalty")+".desc", (int)MathHelper.abs(amount)));
 		}
 	}
 	

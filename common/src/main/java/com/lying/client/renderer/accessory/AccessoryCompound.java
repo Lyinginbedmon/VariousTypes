@@ -31,8 +31,8 @@ public class AccessoryCompound<E extends LivingEntity, T extends EntityModel<E>>
 		data.forEach(d -> d.prepareModel(entity, contextModel, limbAngle, limbDistance, tickDelta, headYaw, headPitch));
 	}
 	
-	public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
+	public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b)
 	{
-		data.forEach(d -> d.renderFor(matrixStack, vertexConsumerProvider, light, entity, tinted, r, g, b));
+		data.forEach(d -> d.renderFor(matrixStack, vertexConsumerProvider, light, entity, partialTicks, tinted, r, g, b));
 	}
 }

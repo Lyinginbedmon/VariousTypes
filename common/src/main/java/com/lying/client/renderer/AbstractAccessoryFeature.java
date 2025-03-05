@@ -1,5 +1,6 @@
 package com.lying.client.renderer;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +25,12 @@ import net.minecraft.util.Identifier;
 public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends EntityModel<E>> extends FeatureRenderer<E, M>
 {
 	private final Map<Identifier, IAccessoryRenderer<E,M>> rendererMap = new HashMap<>();
+	private final Comparator<Cosmetic> SORTER = (a,b) -> 
+	{
+		int orderA = rendererMap.containsKey(a.registryName()) ? rendererMap.get(a.registryName()).renderOrder() : 0;
+		int orderB = rendererMap.containsKey(b.registryName()) ? rendererMap.get(b.registryName()).renderOrder() : 0;
+		return orderA < orderB ? -1 : orderA > orderB ? 1 : 0;
+	};
 	private final Supplier<CosmeticType> type;
 	
 	public AbstractAccessoryFeature(Supplier<CosmeticType> typeIn, FeatureRendererContext<E, M> context)
@@ -47,7 +54,7 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 		if(!shouldRender(entity))
 			return;
 		
-		VTUtils.getEntityCosmetics(entity, type.get())
+		VTUtils.getEntityCosmetics(entity, type.get()).stream().sorted(SORTER)
 			.forEach(cosmetic -> handleAccessoryRendering(entity, cosmetic, limbAngle, limbDistance, headYaw, headPitch, tickDelta, matrices, vertexConsumers, light));
 	}
 	
@@ -73,6 +80,6 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 			b = vec.z;
 		}
 		
-		renderer.renderFor(matrices, vertexConsumers, light, entity, colour.isPresent(), r, g, b);
+		renderer.renderFor(matrices, vertexConsumers, light, entity, tickDelta, colour.isPresent(), r, g, b);
 	}
 }

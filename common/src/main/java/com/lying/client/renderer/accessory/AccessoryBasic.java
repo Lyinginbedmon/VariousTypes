@@ -84,7 +84,7 @@ public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> im
 		}
 	}
 	
-	public final void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
+	public final void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b)
 	{
 		tinted = tinted & tintable;
 		if(!tintable)
@@ -93,10 +93,10 @@ public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> im
 			g = 1F;
 			b = 1F;
 		}
-		doRender(matrixStack, vertexConsumerProvider, light, entity, tinted, r, g, b);
+		doRender(matrixStack, vertexConsumerProvider, light, entity, partialTicks, tinted, r, g, b);
 	}
 	
-	protected void doRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, boolean tinted, float r, float g, float b)
+	protected void doRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b)
 	{
 		Identifier texture = textureProvider.apply(tinted);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layerProvider.apply(texture));

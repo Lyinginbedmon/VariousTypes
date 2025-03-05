@@ -3,7 +3,9 @@ package com.lying.client.renderer;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import com.lying.client.init.VTModelLayerParts;
+import com.lying.client.model.tail.TailAxolotlModel;
 import com.lying.client.model.tail.TailDragonModel;
+import com.lying.client.model.tail.TailFoxModel;
 import com.lying.client.model.tail.TailKirinModel;
 import com.lying.client.model.tail.TailRatModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
@@ -30,6 +32,7 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
 		
 		TailRatModel<E> ratModel = new TailRatModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RAT));
+		TailFoxModel<E> foxModel = new TailFoxModel<>(loader.getModelPart(VTModelLayerParts.TAIL_FOX));
 		
 		addRendererMap(
 				VTCosmetics.TAIL_DRAGON,
@@ -53,5 +56,21 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 						ratModel, 
 						prefix("textures/entity/tail/rat.png"), 
 						prefix("textures/entity/tail/rat_tinted.png"))));
+		addRendererMap(
+				VTCosmetics.TAIL_FOX,
+				AccessoryCompound.create(
+					AccessoryBasic.create(
+						foxModel,
+						prefix("textures/entity/tail/fox_overlay.png")).untinted(),
+					AccessoryBasic.create(
+						foxModel, 
+						prefix("textures/entity/tail/fox.png"), 
+						prefix("textures/entity/tail/fox_tinted.png"))));
+		addRendererMap(
+				VTCosmetics.TAIL_AXOLOTL,
+				AccessoryBasic.create(
+					new TailAxolotlModel<>(loader.getModelPart(VTModelLayerParts.TAIL_AXOLOTL)),
+					prefix("textures/entity/tail/axolotl.png"),
+					prefix("textures/entity/tail/axolotl_tinted.png")));
 	}
 }

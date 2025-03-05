@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.google.common.base.Predicates;
 import com.google.gson.Gson;
@@ -32,6 +34,7 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	
 	public static final Gson GSON = (new GsonBuilder()).setPrettyPrinting().disableHtmlEscaping().create();
 	public static final String FILE_PATH = "template";
+	public static final Pattern REGEX = Pattern.compile("[ \\w-]+?(?=\\.)");
 	
 	private final Map<Identifier, Template> TEMPLATES = new HashMap<>();
 	
@@ -72,14 +75,14 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 				// The datapack source this species came from
 				String namespace = fileName.getNamespace();
 				
-				// The filename of this species, to be used as registry name
-				// TODO Tidy this up using regex
-				String fullPath = fileName.getPath();
-				fullPath = fullPath.substring(fullPath.lastIndexOf('/') + 1);
-				if(fullPath.endsWith(".json"))
-					fullPath = fullPath.substring(0, fullPath.length() - 5);
-				Identifier registryID = new Identifier(namespace, fullPath);
+				// The filename of this species, to be used as the registry name
+				String name = fileName.getPath();
+				Matcher match = REGEX.matcher(name);
+				if(!match.find())
+					return;
 				
+				name = match.group().replaceAll(" ", "_");
+				Identifier registryID = new Identifier(namespace, name);
 				Resource file = fileSet.getFirst();
 				try
 				{
