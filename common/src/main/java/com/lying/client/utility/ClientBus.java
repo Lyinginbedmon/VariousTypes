@@ -161,7 +161,7 @@ public class ClientBus
 				AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)renderer;
 				FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> featureContext = (FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)renderer;
 				renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext, model == SkinTextures.Model.SLIM));
+				renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext));
 				renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
 				renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
 				renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));
@@ -172,7 +172,7 @@ public class ClientBus
 			AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)animPlayer;
 			FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>> featureContext = (FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer;
 			renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext, true));	// FIXME Ensure model arm width matches renderer's
+			renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext));
 			renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
 			renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
 			renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));

@@ -9,7 +9,6 @@ import com.lying.client.renderer.accessory.AccessoryLightning;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
@@ -17,44 +16,49 @@ import net.minecraft.entity.LivingEntity;
 
 public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
+	private EntityModel<LivingEntity> dragonHorns, ramHorns, stagAntlers, kirinHorns;
+	
 	public HornsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(VTCosmeticTypes.HORNS, context);
-		populateRendererMap();
+	}
+	
+	protected void createEntityModels(EntityModelLoader loader)
+	{
+		dragonHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_HARTEBEEST));
+		ramHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_RAM));
+		stagAntlers = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_STAG));
+		kirinHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_KIRIN));
 	}
 	
 	protected void populateRendererMap()
 	{
-		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
-		
-		SimpleHornsModel<E> kirinModel = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_KIRIN));
-		
 		addRendererMap(
 				VTCosmetics.HORNS_HARTEBEEST,
 				AccessoryBasic.create(
-					new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_HARTEBEEST)),
+					e -> dragonHorns,
 					prefix("textures/entity/horns/hartebeest.png"),
 					prefix("textures/entity/horns/hartebeest_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_RAM,
 				AccessoryBasic.create(
-					new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_RAM)),
+					e -> ramHorns,
 					prefix("textures/entity/horns/ram.png"),
 					prefix("textures/entity/horns/ram_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_STAG,
 				AccessoryBasic.create(
-					new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_STAG)),
+					e -> stagAntlers,
 					prefix("textures/entity/horns/stag.png"),
 					prefix("textures/entity/horns/stag_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_KIRIN,
 				AccessoryBasic.create(
-						kirinModel,
+					e -> kirinHorns,
 					prefix("textures/entity/horns/kirin.png"),
 					prefix("textures/entity/horns/kirin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_LIGHTNING,
-				AccessoryLightning.create(kirinModel));
+				AccessoryLightning.create(e -> kirinHorns));
 	}
 }

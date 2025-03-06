@@ -1,5 +1,7 @@
 package com.lying.client.renderer.accessory;
 
+import java.util.function.Function;
+
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -10,12 +12,12 @@ import net.minecraft.entity.LivingEntity;
 
 public class AccessoryEndPortal<E extends LivingEntity, T extends EntityModel<E>> extends AccessoryBasic<E, T>
 {
-	protected AccessoryEndPortal(T modelIn)
+	protected AccessoryEndPortal(Function<E, EntityModel<E>> modelIn)
 	{
-		super(modelIn, null, null);
+		super(modelIn);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryEndPortal<E,T> create(T modelIn)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryEndPortal<E,T> create(Function<E, EntityModel<E>> modelIn)
 	{
 		return new AccessoryEndPortal<E,T>(modelIn);
 	}

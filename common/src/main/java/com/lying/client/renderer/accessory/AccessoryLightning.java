@@ -1,5 +1,7 @@
 package com.lying.client.renderer.accessory;
 
+import java.util.function.Function;
+
 import com.lying.reference.Reference;
 
 import net.minecraft.client.render.RenderLayer;
@@ -15,12 +17,12 @@ public class AccessoryLightning<E extends LivingEntity, T extends EntityModel<E>
 {
 	public static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/lightning.png");
 	
-	protected AccessoryLightning(T modelIn)
+	protected AccessoryLightning(Function<E, EntityModel<E>> modelIn)
 	{
-		super(modelIn, null, null);
+		super(modelIn, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryLightning<E,T> create(T modelIn)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryLightning<E,T> create(Function<E, EntityModel<E>> modelIn)
 	{
 		return new AccessoryLightning<E,T>(modelIn);
 	}

@@ -13,7 +13,6 @@ import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
@@ -21,55 +20,60 @@ import net.minecraft.entity.LivingEntity;
 
 public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
+	private EntityModel<LivingEntity> dragonTail, kirinTail, ratTail, foxTail, axolotlTail;
+	
 	public TailFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(VTCosmeticTypes.TAIL, context);
-		populateRendererMap();
+	}
+	
+	protected void createEntityModels(EntityModelLoader loader)
+	{
+		dragonTail = new TailDragonModel<>(loader.getModelPart(VTModelLayerParts.TAIL_DRAGON));
+		kirinTail = new TailKirinModel<>(loader.getModelPart(VTModelLayerParts.TAIL_KIRIN));
+		ratTail = new TailRatModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RAT));
+		foxTail = new TailFoxModel<>(loader.getModelPart(VTModelLayerParts.TAIL_FOX));
+		axolotlTail = new TailAxolotlModel<>(loader.getModelPart(VTModelLayerParts.TAIL_AXOLOTL));
 	}
 	
 	protected void populateRendererMap()
 	{
-		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
-		
-		TailRatModel<E> ratModel = new TailRatModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RAT));
-		TailFoxModel<E> foxModel = new TailFoxModel<>(loader.getModelPart(VTModelLayerParts.TAIL_FOX));
-		
 		addRendererMap(
 				VTCosmetics.TAIL_DRAGON,
 				AccessoryBasic.create(
-					new TailDragonModel<>(loader.getModelPart(VTModelLayerParts.TAIL_DRAGON)),
+					e -> dragonTail,
 					prefix("textures/entity/tail/dragon.png"),
 					prefix("textures/entity/tail/dragon_tinted.png")));
 		addRendererMap(
 				VTCosmetics.TAIL_KIRIN,
 				AccessoryBasic.create(
-					new TailKirinModel<>(loader.getModelPart(VTModelLayerParts.TAIL_KIRIN)),
+					e -> kirinTail,
 					prefix("textures/entity/tail/kirin.png"),
 					prefix("textures/entity/tail/kirin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.TAIL_RAT,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
-						ratModel,
+						e -> ratTail,
 						prefix("textures/entity/tail/rat_overlay.png")).untinted(),
 					AccessoryBasic.create(
-						ratModel, 
+						e -> ratTail, 
 						prefix("textures/entity/tail/rat.png"), 
 						prefix("textures/entity/tail/rat_tinted.png"))));
 		addRendererMap(
 				VTCosmetics.TAIL_FOX,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
-						foxModel,
+						e -> foxTail,
 						prefix("textures/entity/tail/fox_overlay.png")).untinted(),
 					AccessoryBasic.create(
-						foxModel, 
+						e -> foxTail, 
 						prefix("textures/entity/tail/fox.png"), 
 						prefix("textures/entity/tail/fox_tinted.png"))));
 		addRendererMap(
 				VTCosmetics.TAIL_AXOLOTL,
 				AccessoryBasic.create(
-					new TailAxolotlModel<>(loader.getModelPart(VTModelLayerParts.TAIL_AXOLOTL)),
+					e -> axolotlTail,
 					prefix("textures/entity/tail/axolotl.png"),
 					prefix("textures/entity/tail/axolotl_tinted.png")));
 	}

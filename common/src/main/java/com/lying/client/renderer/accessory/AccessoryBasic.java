@@ -1,10 +1,12 @@
 package com.lying.client.renderer.accessory;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import com.lying.client.model.AnimatedBipedEntityModel;
 import com.lying.client.model.IBipedLikeModel;
 import com.lying.client.model.IModelWithRoot;
+import com.lying.reference.Reference;
 
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
@@ -19,39 +21,48 @@ import net.minecraft.util.Identifier;
 
 public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> implements IAccessoryRenderer<E, T>
 {
-	protected final Function<Identifier, RenderLayer> layerProvider;
-	protected final T model;
+	private final Function<Identifier, RenderLayer> layerProvider;
+	private final Function<E, EntityModel<E>> modelProvider;
+	private BiFunction<E, Boolean, Identifier> textureProvider = AccessoryBasic::noTexture;
 	protected final float alpha;
-	protected Function<Boolean, Identifier> textureProvider;
 	protected boolean tintable = true;
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex)
+	protected EntityModel<E> model = null;
+	
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E, T> create(Function<E, EntityModel<E>> modelSupplierIn, Identifier colourTex)
 	{
-		return create(modelIn, colourTex, colourTex);
+		return new AccessoryBasic<E, T>(modelSupplierIn, (e,b) -> colourTex);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E, T> create(Function<E, EntityModel<E>> modelSupplierIn, Identifier colourTex, Identifier tintedTex)
 	{
-		return create(modelIn, colourTex, tintedTex, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
+		return new AccessoryBasic<E, T>(modelSupplierIn, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F).texture((e,b) -> b ? tintedTex : colourTex);
 	}
 	
-	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E,T> create(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
+	public static <E extends LivingEntity, T extends EntityModel<E>> AccessoryBasic<E, T> create(Function<E, EntityModel<E>> modelSupplierIn, BiFunction<E, Boolean, Identifier> texSupplierIn)
 	{
-		return new AccessoryBasic<E,T>(modelIn, colourTex, tintedTex, layerProviderIn, alphaIn);
+		return new AccessoryBasic<E, T>(modelSupplierIn, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F).texture(texSupplierIn);
 	}
 	
-	protected AccessoryBasic(T modelIn, Identifier colourTex, Identifier tintedTex)
+	protected AccessoryBasic(Function<E, EntityModel<E>> modelIn, BiFunction<E, Boolean, Identifier> textureProviderIn)
 	{
-		this(modelIn, colourTex, tintedTex, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
+		this(modelIn);
+		texture(textureProviderIn);
 	}
 	
-	protected AccessoryBasic(T modelIn, Identifier colourTex, Identifier tintedTex, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
+	protected AccessoryBasic(Function<E, EntityModel<E>> modelIn)
+	{
+		this(modelIn, tex -> RenderLayer.getEntityCutoutNoCull(tex), 1F);
+	}
+	
+	protected AccessoryBasic(Function<E, EntityModel<E>> modelIn, Function<Identifier, RenderLayer> layerProviderIn, float alphaIn)
 	{
 		layerProvider = layerProviderIn;
-		textureProvider = bool -> bool ? tintedTex : colourTex;
-		model = modelIn;
+		modelProvider = modelIn;
 		alpha = alphaIn;
 	}
+	
+	public static <E extends LivingEntity> Identifier noTexture(E entity, boolean tinted) { return Reference.ModInfo.prefix("no_texture.png"); }
 	
 	/** Sets this renderer to never be tinted */
 	public AccessoryBasic<E,T> untinted()
@@ -60,9 +71,18 @@ public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> im
 		return this;
 	}
 	
+	public AccessoryBasic<E, T> texture(BiFunction<E, Boolean, Identifier> textureProviderIn)
+	{
+		textureProvider = textureProviderIn;
+		return this;
+	}
+	
+	public final Identifier texture(E entity, boolean tinted) { return textureProvider.apply(entity, tinted); }
+	
 	@SuppressWarnings("unchecked")
 	public void prepareModel(E entity, T contextModel, float limbAngle, float limbDistance, float tickDelta, float headYaw, float headPitch)
 	{
+		model = modelProvider.apply(entity);
 		model.animateModel(entity, limbAngle, limbDistance, tickDelta);
 		model.setAngles(entity, limbAngle, limbDistance, (float)entity.age + tickDelta, headYaw, headPitch);
 		
@@ -98,7 +118,7 @@ public class AccessoryBasic<E extends LivingEntity, T extends EntityModel<E>> im
 	
 	protected void doRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b)
 	{
-		Identifier texture = textureProvider.apply(tinted);
+		Identifier texture = texture(entity, tinted);
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layerProvider.apply(texture));
 		model.render(matrixStack, vertexConsumer, light, LivingEntityRenderer.getOverlay(entity, 0f), r, g, b, alpha);
 	}

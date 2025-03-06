@@ -21,7 +21,6 @@ import com.lying.client.renderer.accessory.AccessoryTranslucent;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
@@ -29,92 +28,101 @@ import net.minecraft.entity.LivingEntity;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
+	private EntityModel<LivingEntity> elytraWings, butterflyWings, dragonflyWings, batWings, birdWings, beetleWings, witchWings, angelWings, dragonWings, skeletonWings;
+	
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
 		super(VTCosmeticTypes.WINGS, context);
-		populateRendererMap();
+	}
+	
+	protected void createEntityModels(EntityModelLoader loader)
+	{
+		elytraWings = new WingsElytraModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ELYTRA));
+		butterflyWings = new WingsButterflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BUTTERFLY));
+		dragonflyWings = new WingsDragonflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGONFLY));
+		batWings = new WingsBatModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BAT));
+		birdWings = new WingsBirdModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BIRD));
+		witchWings = new WingsWitchModel<>(loader.getModelPart(VTModelLayerParts.WINGS_WITCH));
+		skeletonWings = new WingsSkeletonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_SKELETON));
+		beetleWings = new WingsBeetleModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
+		angelWings = new WingsAngelModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL));
+		dragonWings = new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON));
 	}
 	
 	protected void populateRendererMap()
 	{
-		EntityModelLoader loader = MinecraftClient.getInstance().getEntityModelLoader();
-		
-		WingsBeetleModel<E> beetleModel = new WingsBeetleModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
-		WingsAngelModel<E> angelModel = new WingsAngelModel<E>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL));
-		WingsDragonModel<E> dragonModel = new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON));
-		
 		addRendererMap(
 				VTCosmetics.WINGS_ELYTRA, 
 				AccessoryBasic.create(
-					new WingsElytraModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ELYTRA)),
+					e -> elytraWings,
 					prefix("textures/entity/wings/elytra.png"),
 					prefix("textures/entity/wings/elytra_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_BUTTERFLY, 
 				AccessoryBasic.create(
-					new WingsButterflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BUTTERFLY)), 
+					e -> butterflyWings, 
 					prefix("textures/entity/wings/butterfly.png"), 
 					prefix("textures/entity/wings/butterfly_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_DRAGONFLY, 
 				AccessoryTranslucent.create(
-					new WingsDragonflyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGONFLY)),
+					e -> dragonflyWings,
 					prefix("textures/entity/wings/dragonfly.png"),
 					prefix("textures/entity/wings/dragonfly_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_BAT, 
 				AccessoryBasic.create(
-					new WingsBatModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BAT)),
+					e -> batWings,
 					prefix("textures/entity/wings/bat.png"),
 					prefix("textures/entity/wings/bat_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_BIRD,
 				AccessoryBasic.create(
-					new WingsBirdModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BIRD)),
+					e -> birdWings,
 					prefix("textures/entity/wings/bird.png"),
 					prefix("textures/entity/wings/bird_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_BEETLE,
 				AccessoryCompound.create(
 					AccessoryTranslucent.create(
-						beetleModel,
+						e -> beetleWings,
 						prefix("textures/entity/wings/beetle.png")).untinted(),
 					AccessoryBasic.create(
-						beetleModel,
+						e -> beetleWings,
 						prefix("textures/entity/wings/beetle_overlay.png"),
 						prefix("textures/entity/wings/beetle_overlay_tinted.png"))));
 		addRendererMap(
 				VTCosmetics.WINGS_WITCH, 
 				AccessoryEndPortal.create(
-					new WingsWitchModel<>(loader.getModelPart(VTModelLayerParts.WINGS_WITCH))).untinted());
+					e -> witchWings).untinted());
 		addRendererMap(
 				VTCosmetics.WINGS_ANGEL, 
 				AccessoryCompound.create(
 					AccessoryBasic.create(
-						angelModel, 
+						e -> angelWings, 
 						prefix("textures/entity/wings/angel.png"), 
 						prefix("textures/entity/wings/angel_tinted.png")),
 					AccessoryBasic.create(
-						angelModel, 
+						e -> angelWings, 
 						prefix("textures/entity/wings/angel_halo.png")).untinted(),
 					AccessoryGlowing.create(
-						angelModel,
+						e -> angelWings,
 						prefix("textures/entity/wings/angel_glow.png")).untinted()));
 		addRendererMap(
 				VTCosmetics.WINGS_SKELETON,
 				AccessoryBasic.create(
-					new WingsSkeletonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_SKELETON)), 
+					e -> skeletonWings, 
 					prefix("textures/entity/wings/skeleton.png"),
 					prefix("textures/entity/wings/skeleton_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_DRAGON,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
-						dragonModel,
+						e -> dragonWings,
 						prefix("textures/entity/wings/dragon.png"),
 						prefix("textures/entity/wings/dragon_tinted.png")),
 					AccessoryBasic.create(
-						dragonModel,
+						e -> dragonWings,
 						prefix("textures/entity/wings/dragon_overlay.png")).untinted()));
 	}
 }

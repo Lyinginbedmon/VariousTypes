@@ -14,16 +14,19 @@ import com.lying.utility.Cosmetic;
 import com.lying.utility.CosmeticType;
 import com.lying.utility.VTUtils;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.feature.FeatureRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 
 public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends EntityModel<E>> extends FeatureRenderer<E, M>
 {
+	protected static final MinecraftClient mc = MinecraftClient.getInstance();
 	private final Map<Identifier, IAccessoryRenderer<E,M>> rendererMap = new HashMap<>();
 	private final Comparator<Cosmetic> SORTER = (a,b) -> 
 	{
@@ -37,7 +40,13 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 	{
 		super(context);
 		type = typeIn;
+		
+		createEntityModels(mc.getEntityModelLoader());
+		populateRendererMap();
 	}
+	
+	/** Instantiate entity models prior to use to reduce computational load */
+	protected abstract void createEntityModels(EntityModelLoader loader);
 	
 	protected abstract void populateRendererMap();
 	
