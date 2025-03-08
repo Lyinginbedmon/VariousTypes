@@ -198,6 +198,7 @@ public class LootBag
 	
 	public Text description() { return description; }
 	
+	// FIXME Ensure loot is properly given
 	public void giveTo(ServerPlayerEntity player)
 	{
 		if(isEmpty()) return;

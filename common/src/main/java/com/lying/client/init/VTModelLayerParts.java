@@ -7,9 +7,9 @@ import java.util.function.Supplier;
 
 import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.model.GelatinousBipedEntityModel;
-import com.lying.client.model.SimpleHornsModel;
 import com.lying.client.model.ModelFullbody;
-import com.lying.client.model.NosePiglinModel;
+import com.lying.client.model.SimpleHornsModel;
+import com.lying.client.model.SimpleNoseModel;
 import com.lying.client.model.ears.EarsPiglinModel;
 import com.lying.client.model.ears.EarsRabbitModel;
 import com.lying.client.model.ears.GillsAxolotlModel;
@@ -18,6 +18,7 @@ import com.lying.client.model.tail.TailAxolotlModel;
 import com.lying.client.model.tail.TailDragonModel;
 import com.lying.client.model.tail.TailFoxModel;
 import com.lying.client.model.tail.TailKirinModel;
+import com.lying.client.model.tail.TailRabbitModel;
 import com.lying.client.model.tail.TailRatModel;
 import com.lying.client.model.wings.WingsAngelModel;
 import com.lying.client.model.wings.WingsBatModel;
@@ -55,8 +56,10 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_WITCH			= make("player", "wings_witch", WingsWitchModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_SKELETON			= make("player", "wings_skeleton", WingsSkeletonModel::createBodyLayer);
 	
-	public static final EntityModelLayer NOSE_PIG				= make("player", "nose_pig", NosePiglinModel::createPigNose);
-	public static final EntityModelLayer NOSE_PIGLIN			= make("player", "nose_piglin", NosePiglinModel::createPiglinNose);
+	public static final EntityModelLayer NOSE_PIG				= make("player", "nose_pig", SimpleNoseModel::createPigNose);
+	public static final EntityModelLayer NOSE_PIGLIN			= make("player", "nose_piglin", SimpleNoseModel::createPiglinNose);
+	public static final EntityModelLayer NOSE_VILLAGER			= make("player", "nose_villager", SimpleNoseModel::createVillagerNose);
+	public static final EntityModelLayer NOSE_WITCH				= make("player", "nose_witch", SimpleNoseModel::createWitchNose);
 	
 	public static final EntityModelLayer EARS_PIGLIN			= make("player", "ears_piglin", EarsPiglinModel::createBodyLayer);
 	public static final EntityModelLayer GILLS_AXOLOTL			= make("player", "gills_axolotl", GillsAxolotlModel::createBodyLayer);
@@ -67,16 +70,19 @@ public class VTModelLayerParts
 	public static final EntityModelLayer EARS_WOLF				= make("player", "ears_wolf", SimpleEarsModel::createWolfEars);
 	public static final EntityModelLayer EARS_RABBIT			= make("player", "ears_rabbit", EarsRabbitModel::createBodyLayer);
 	
-	public static final EntityModelLayer HORNS_HARTEBEEST		= make("player", "horns_hartebeest", SimpleHornsModel::createHartebeestHorns);
+	public static final EntityModelLayer HORNS_HARTEBEEST		= make("player", "horns_hartebeest", SimpleHornsModel::createSaigaHorns);
 	public static final EntityModelLayer HORNS_RAM				= make("player", "horns_ram", SimpleHornsModel::createRamHorns);
 	public static final EntityModelLayer HORNS_STAG				= make("player", "horns_stag", SimpleHornsModel::createStagHorns);
 	public static final EntityModelLayer HORNS_KIRIN			= make("player", "horns_kirin", SimpleHornsModel::createKirinHorns);
+	public static final EntityModelLayer HORN_UNICORN			= make("player", "horn_unicorn", SimpleHornsModel::createUnicornHorn);
+	public static final EntityModelLayer HORNS_DEVIL			= make("player", "horns_devil", SimpleHornsModel::createDevilHorns);
 	
 	public static final EntityModelLayer TAIL_DRAGON			= make("player", "tail_dragon", TailDragonModel::createBodyLayer);
 	public static final EntityModelLayer TAIL_KIRIN				= make("player", "tail_kirin", TailKirinModel::createBodyLayer);
 	public static final EntityModelLayer TAIL_RAT				= make("player", "tail_rat", TailRatModel::createBodyLayer);
 	public static final EntityModelLayer TAIL_FOX				= make("player", "tail_fox", TailFoxModel::createBodyLayer);
 	public static final EntityModelLayer TAIL_AXOLOTL			= make("player", "tail_axolotl", TailAxolotlModel::createBodyLayer);
+	public static final EntityModelLayer TAIL_RABBIT			= make("player", "tail_rabbit", TailRabbitModel::createBodyLayer);
 	
 	public static final EntityModelLayer FULLBODY_SLIM			= make("player", "fullbody_slim", () -> ModelFullbody.createBodyLayer(true));
 	public static final EntityModelLayer FULLBODY_WIDE			= make("player", "fullbody_wide", () -> ModelFullbody.createBodyLayer(false));

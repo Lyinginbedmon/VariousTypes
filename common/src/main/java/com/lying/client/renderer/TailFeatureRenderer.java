@@ -7,6 +7,7 @@ import com.lying.client.model.tail.TailAxolotlModel;
 import com.lying.client.model.tail.TailDragonModel;
 import com.lying.client.model.tail.TailFoxModel;
 import com.lying.client.model.tail.TailKirinModel;
+import com.lying.client.model.tail.TailRabbitModel;
 import com.lying.client.model.tail.TailRatModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.client.renderer.accessory.AccessoryCompound;
@@ -20,7 +21,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
-	private EntityModel<LivingEntity> dragonTail, kirinTail, ratTail, foxTail, axolotlTail;
+	private EntityModel<LivingEntity> dragonTail, kirinTail, ratTail, foxTail, axolotlTail, rabbitTail;
 	
 	public TailFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
@@ -34,6 +35,7 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		ratTail = new TailRatModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RAT));
 		foxTail = new TailFoxModel<>(loader.getModelPart(VTModelLayerParts.TAIL_FOX));
 		axolotlTail = new TailAxolotlModel<>(loader.getModelPart(VTModelLayerParts.TAIL_AXOLOTL));
+		rabbitTail = new TailRabbitModel<>(loader.getModelPart(VTModelLayerParts.TAIL_RABBIT));
 	}
 	
 	protected void populateRendererMap()
@@ -76,5 +78,11 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 					e -> axolotlTail,
 					prefix("textures/entity/tail/axolotl.png"),
 					prefix("textures/entity/tail/axolotl_tinted.png")));
+		addRendererMap(
+				VTCosmetics.TAIL_RABBIT,
+				AccessoryBasic.create(
+					e -> rabbitTail,
+					prefix("textures/entity/tail/rabbit.png"),
+					prefix("textures/entity/tail/rabbit_tinted.png")));
 	}
 }

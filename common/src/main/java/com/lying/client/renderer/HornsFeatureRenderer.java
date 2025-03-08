@@ -16,7 +16,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
-	private EntityModel<LivingEntity> dragonHorns, ramHorns, stagAntlers, kirinHorns;
+	private EntityModel<LivingEntity> dragonHorns, ramHorns, stagAntlers, kirinHorns, unicornHorn, devilHorns;
 	
 	public HornsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
@@ -29,16 +29,18 @@ public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		ramHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_RAM));
 		stagAntlers = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_STAG));
 		kirinHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_KIRIN));
+		unicornHorn = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORN_UNICORN));
+		devilHorns = new SimpleHornsModel<>(loader.getModelPart(VTModelLayerParts.HORNS_DEVIL));
 	}
 	
 	protected void populateRendererMap()
 	{
 		addRendererMap(
-				VTCosmetics.HORNS_HARTEBEEST,
+				VTCosmetics.HORNS_SAIGA,
 				AccessoryBasic.create(
 					e -> dragonHorns,
-					prefix("textures/entity/horns/hartebeest.png"),
-					prefix("textures/entity/horns/hartebeest_tinted.png")));
+					prefix("textures/entity/horns/saiga.png"),
+					prefix("textures/entity/horns/saiga_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_RAM,
 				AccessoryBasic.create(
@@ -60,5 +62,17 @@ public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		addRendererMap(
 				VTCosmetics.HORNS_LIGHTNING,
 				AccessoryLightning.create(e -> kirinHorns));
+		addRendererMap(
+				VTCosmetics.HORN_UNICORN,
+				AccessoryBasic.create(
+					e -> unicornHorn,
+					prefix("textures/entity/horns/unicorn.png"),
+					prefix("textures/entity/horns/unicorn_tinted.png")));
+		addRendererMap(
+				VTCosmetics.HORNS_DEVIL,
+				AccessoryBasic.create(
+					e -> devilHorns,
+					prefix("textures/entity/horns/devil.png"),
+					prefix("textures/entity/horns/devil_tinted.png")));
 	}
 }

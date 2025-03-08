@@ -85,7 +85,7 @@ public class SpeciesDefaults
 			.description(Text.translatable("species."+Reference.ModInfo.MOD_ID+".dragan.desc"))
 			.power(3)
 			.setTypes(VTTypes.DRAGON.get())
-			.addAbility(AbilityCosmetics.of(false, VTCosmetics.HORNS_HARTEBEEST.get(), VTCosmetics.TAIL_DRAGON.get()).withMapName(prefix("draconic_appearance")))
+			.addAbility(AbilityCosmetics.of(false, VTCosmetics.HORNS_SAIGA.get(), VTCosmetics.TAIL_DRAGON.get()).withMapName(prefix("draconic_appearance")))
 			.addAbility(SingleAttributeAbility.Scale.of(0.1F))
 			.addAbility(SingleAttributeAbility.Damage.of(2))
 			.addAbility(AbilityDietRestriction.ofTags(List.of(ItemTags.MEAT), List.of()).setDisplay(new LoreDisplay(Reference.ModInfo.translate("ability", "carnivore")))).build());

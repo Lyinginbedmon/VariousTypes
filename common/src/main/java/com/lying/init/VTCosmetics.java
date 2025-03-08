@@ -34,8 +34,8 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGZOMBIE	= nose("zombified_piglin_nose");
-	public static final Supplier<Cosmetic> NOSE_VILLAGER	= nose("villager_nose");	//*
-	public static final Supplier<Cosmetic> NOSE_WITCH		= nose("witch_nose");	//
+	public static final Supplier<Cosmetic> NOSE_VILLAGER	= nose("villager_nose");
+	public static final Supplier<Cosmetic> NOSE_WITCH		= nose("witch_nose");
 	
 	public static final Supplier<Cosmetic> EARS_PIGLIN		= ears("piglin_ears");
 	public static final Supplier<Cosmetic> EARS_PIGZOMBIE	= ears("zombified_piglin_ear");
@@ -47,11 +47,13 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");
 	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");
 	
-	public static final Supplier<Cosmetic> HORNS_HARTEBEEST	= horns("hartebeest_horns");
+	public static final Supplier<Cosmetic> HORNS_SAIGA		= horns("saiga_horns");
 	public static final Supplier<Cosmetic> HORNS_RAM		= horns("ram_horns");
 	public static final Supplier<Cosmetic> HORNS_STAG		= horns("stag_antlers");
 	public static final Supplier<Cosmetic> HORNS_KIRIN		= horns("kirin_horns");
 	public static final Supplier<Cosmetic> HORNS_LIGHTNING	= horns("lightning_horns");
+	public static final Supplier<Cosmetic> HORN_UNICORN		= horns("unicorn_horn");
+	public static final Supplier<Cosmetic> HORNS_DEVIL		= horns("devil_horns");
 	
 	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
 	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
@@ -59,13 +61,14 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");	//
 	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");		//
 	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");
-	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");	//
+	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");
 	public static final Supplier<Cosmetic> TAIL_AXOLOTL		= tail("axolotl_tail");
 	public static final Supplier<Cosmetic> TAIL_SCORPION	= tail("scorpion_tail");	//
 	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");	//
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
 	public static final Supplier<Cosmetic> MISC_THIRD_EYE	= misc("third_eye");	//
+	public static final Supplier<Cosmetic> MISC_SHARK_FIN	= misc("shark_fin");	//
 	public static final Supplier<Cosmetic> MISC_GELATINOUS	= misc("gelatinous");
 	public static final Supplier<Cosmetic> MISC_GHOSTLY		= misc("ghostly");
 	
