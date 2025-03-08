@@ -94,6 +94,7 @@ public class VTCommands
 	public static final SuggestionProvider<ServerCommandSource> ABILITY_IDS = SuggestionProviders.register(new Identifier("abilities"), (context, builder) -> CommandSource.suggestIdentifiers(VTAbilities.abilityIds(), builder));
 	public static final SuggestionProvider<ServerCommandSource> COSMETIC_IDS = SuggestionProviders.register(new Identifier("cosmetics"), (context, builder) -> CommandSource.suggestIdentifiers(VTCosmetics.cosmeticIds(), builder));
 	public static final SuggestionProvider<ServerCommandSource> COSMETIC_TYPE_IDS = SuggestionProviders.register(new Identifier("cosmetic_types"), (context, builder) -> CommandSource.suggestIdentifiers(VTCosmeticTypes.typeIds(), builder));
+	public static final SuggestionProvider<ServerCommandSource> MODE_NAMES = SuggestionProviders.register(new Identifier("modes"), (context, builder) -> CommandSource.suggestMatching(Mode.names(), builder));
 	private static final String PLAYER = "player";
 	private static final String SPECIES = "species";
 	private static final String TEMPLATE = "template";
@@ -256,89 +257,89 @@ public class VTCommands
 										.executes(context -> Edit.Templates.tryClearTemplates(EntityArgumentType.getPlayer(context, PLAYER), context.getSource())))))
 							))
 					.then(literal("test")
-						.then(argument(MODE, ModeArgumentType.mode())
+						.then(argument(MODE, StringArgumentType.word()).suggests(MODE_NAMES)
 							.then(argument(PLAYER, EntityArgumentType.players())
 								.then(literal("species")
 									.then(literal("is")
 										.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
-											.executes(context -> Test.Species.isOf(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, SPECIES), true, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Species.isOf(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, SPECIES), true, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("is_not")
 										.then(argument(SPECIES, IdentifierArgumentType.identifier()).suggests(SPECIES_IDS)
-											.executes(context -> Test.Species.isOf(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, SPECIES), false, ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Species.isOf(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, SPECIES), false, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								
 								.then(literal("templates")
 									.then(literal("has")
 										.then(argument(TEMPLATE, IdentifierArgumentType.identifier()).suggests(TEMPLATE_IDS)
-											.executes(context -> Test.Templates.has(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Templates.has(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("lacks")
 										.then(argument(TEMPLATE, IdentifierArgumentType.identifier()).suggests(TEMPLATE_IDS)
-											.executes(context -> Test.Templates.lacks(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Templates.lacks(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TEMPLATE), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								
 								.then(literal("types")
 									.then(literal("is")
 										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
-											.executes(context -> Test.Types.hasType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Types.hasType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("is_not")
 										.then(argument(TYPE, IdentifierArgumentType.identifier()).suggests(TYPE_IDS)
-											.executes(context -> Test.Types.hasNoType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Types.hasNoType(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, TYPE), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								
 								.then(literal("abilities")
 									.then(literal("has_any")
 										.then(literal("map_name")
 											.then(argument(ABILITY, IdentifierArgumentType.identifier()).suggests(ABILITY_IDS)
-												.executes(context -> Test.Abilities.hasAnyById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.mapName().equals(b), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+												.executes(context -> Test.Abilities.hasAnyById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.mapName().equals(b), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 										.then(literal("registry_name")
 											.then(argument(ABILITY, IdentifierArgumentType.identifier()).suggests(ABILITY_IDS)
-												.executes(context -> Test.Abilities.hasAnyById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.ability().registryName().equals(b), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+												.executes(context -> Test.Abilities.hasAnyById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.ability().registryName().equals(b), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 									.then(literal("has_none")
 										.then(literal("map_name")
 											.then(argument(ABILITY, IdentifierArgumentType.identifier()).suggests(ABILITY_IDS)
-												.executes(context -> Test.Abilities.hasNoneById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.mapName().equals(b), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+												.executes(context -> Test.Abilities.hasNoneById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.mapName().equals(b), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 										.then(literal("registry_name")
 											.then(argument(ABILITY, IdentifierArgumentType.identifier()).suggests(ABILITY_IDS)
-												.executes(context -> Test.Abilities.hasNoneById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.ability().registryName().equals(b), ModeArgumentType.getMode(context, MODE), context.getSource()))))))
+												.executes(context -> Test.Abilities.hasNoneById(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, ABILITY), (a,b) -> a.ability().registryName().equals(b), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))))
 								
 								.then(literal("cosmetics")
 									.then(literal("has")
 										.then(argument(COSMETIC, IdentifierArgumentType.identifier()).suggests(COSMETIC_IDS)
-											.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), ModeArgumentType.getMode(context, MODE), context.getSource()))
+											.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))
 											.then(argument("color", IntegerArgumentType.integer(0))
-												.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+												.executes(context -> Test.Cosmetics.hasCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 									.then(literal("has_any")
 										.then(argument("category", IdentifierArgumentType.identifier()).suggests(COSMETIC_TYPE_IDS)
-											.executes(context -> Test.Cosmetics.hasAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Cosmetics.hasAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("lacks")
 										.then(argument(COSMETIC, IdentifierArgumentType.identifier()).suggests(COSMETIC_IDS)
-											.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), ModeArgumentType.getMode(context, MODE), context.getSource()))
+											.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))
 											.then(argument("color", IntegerArgumentType.integer(0))
-												.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+												.executes(context -> Test.Cosmetics.lacksCosmetic(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, COSMETIC), IntegerArgumentType.getInteger(context, "color"), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 									.then(literal("lacks_any")
 										.then(argument("category", IdentifierArgumentType.identifier()).suggests(COSMETIC_TYPE_IDS)
-											.executes(context -> Test.Cosmetics.lacksAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Cosmetics.lacksAny(EntityArgumentType.getPlayers(context, PLAYER), IdentifierArgumentType.getIdentifier(context, "category"), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								
 								.then(literal("nonlethal")
 									.then(literal("equal_to")
 										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a==b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a==b, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("unequal_to")
 										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a!=b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a!=b, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("greater_than")
 										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a>b, ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a>b, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("less_than")
 										.then(argument(AMOUNT, IntegerArgumentType.integer(0))
-											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a<b, ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Nonlethal.compare(EntityArgumentType.getPlayers(context, PLAYER), IntegerArgumentType.getInteger(context, AMOUNT), (a,b) -> a<b, Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								
 								.then(literal("home")
 									.then(literal("is")
-										.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), ModeArgumentType.getMode(context, MODE), context.getSource()))
+										.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))
 										.then(argument(DIMENSION, DimensionArgumentType.dimension())
-											.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), ModeArgumentType.getMode(context, MODE), context.getSource()))))
+											.executes(context -> Test.Home.isFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))))
 									.then(literal("is_not")
-										.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), ModeArgumentType.getMode(context, MODE), context.getSource()))
+										.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), context.getSource().getWorld(), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource()))
 										.then(argument(DIMENSION, DimensionArgumentType.dimension())
-											.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), ModeArgumentType.getMode(context, MODE), context.getSource())))))
+											.executes(context -> Test.Home.isNotFrom(EntityArgumentType.getPlayers(context, PLAYER), DimensionArgumentType.getDimensionArgument(context, DIMENSION), Mode.fromString(StringArgumentType.getString(context, MODE)), context.getSource())))))
 								)
 							)));
 		});
@@ -1094,7 +1095,18 @@ public class VTCommands
 		ALL;
 		
 		public static final Codec<Mode> CODEC = StringIdentifiable.createCodec(Mode::values);
+		private static final List<Mode> VALUES = List.of(ANY, NONE, ALL);
 		
 		public String asString() { return name().toLowerCase(); }
+		
+		public static List<String> names()
+		{
+			return VALUES.stream().map(Mode::asString).toList();
+		}
+		
+		public static Mode fromString(String word)
+		{
+			return VALUES.stream().filter(n -> n.asString().equalsIgnoreCase(word)).findFirst().orElse(ANY);
+		}
 	}
 }

@@ -198,7 +198,6 @@ public class LootBag
 	
 	public Text description() { return description; }
 	
-	// FIXME Ensure loot is properly given
 	public void giveTo(ServerPlayerEntity player)
 	{
 		if(isEmpty()) return;
@@ -225,15 +224,15 @@ public class LootBag
 	private List<ItemStack> getTotalLoot(LivingEntity spawner, LootContextParameterSet lootContext, long seed)
 	{
 		List<ItemStack> loot = Lists.newArrayList();
-		items.ifPresent(set -> set.forEach(item -> loot.add(new ItemStack(item))));
-		itemStacks.ifPresent(set -> set.forEach(stack -> loot.add(stack.copy())));
+		items.orElse(List.of()).forEach(item -> loot.add(new ItemStack(item)));
+		itemStacks.orElse(List.of()).forEach(stack -> loot.add(stack.copy()));
 		systemTable.ifPresent(id -> 
 		{
 			LootTable table = spawner.getWorld().getServer().getReloadableRegistries().getLootTable(id);
 			if(table != null)
-				getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong());
+				loot.addAll(getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong()));
 		});
-		customTable.ifPresent(table -> getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong()));
+		customTable.ifPresent(table -> loot.addAll(getGeneratedLoot(table, lootContext, spawner.getWorld().getRandom().nextLong())));
 		return loot;
 	}
 	
