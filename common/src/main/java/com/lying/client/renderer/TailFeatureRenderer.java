@@ -1,7 +1,5 @@
 package com.lying.client.renderer;
 
-import static com.lying.reference.Reference.ModInfo.prefix;
-
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.tail.TailAxolotlModel;
 import com.lying.client.model.tail.TailDragonModel;
@@ -44,45 +42,45 @@ public class TailFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 				VTCosmetics.TAIL_DRAGON,
 				AccessoryBasic.create(
 					e -> dragonTail,
-					prefix("textures/entity/tail/dragon.png"),
-					prefix("textures/entity/tail/dragon_tinted.png")));
+					texture("tail/dragon.png"),
+					texture("tail/dragon_tinted.png")));
 		addRendererMap(
 				VTCosmetics.TAIL_KIRIN,
 				AccessoryBasic.create(
 					e -> kirinTail,
-					prefix("textures/entity/tail/kirin.png"),
-					prefix("textures/entity/tail/kirin_tinted.png")));
+					texture("tail/kirin.png"),
+					texture("tail/kirin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.TAIL_RAT,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
 						e -> ratTail,
-						prefix("textures/entity/tail/rat_overlay.png")).untinted(),
+						texture("tail/rat_overlay.png")).untinted(),
 					AccessoryBasic.create(
 						e -> ratTail, 
-						prefix("textures/entity/tail/rat.png"), 
-						prefix("textures/entity/tail/rat_tinted.png"))));
+						texture("tail/rat.png"), 
+						texture("tail/rat_tinted.png"))));
 		addRendererMap(
 				VTCosmetics.TAIL_FOX,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
 						e -> foxTail,
-						prefix("textures/entity/tail/fox_overlay.png")).untinted(),
+						texture("tail/fox_overlay.png")).untinted(),
 					AccessoryBasic.create(
 						e -> foxTail, 
-						prefix("textures/entity/tail/fox.png"), 
-						prefix("textures/entity/tail/fox_tinted.png"))));
+						texture("tail/fox.png"), 
+						texture("tail/fox_tinted.png"))));
 		addRendererMap(
 				VTCosmetics.TAIL_AXOLOTL,
 				AccessoryBasic.create(
 					e -> axolotlTail,
-					prefix("textures/entity/tail/axolotl.png"),
-					prefix("textures/entity/tail/axolotl_tinted.png")));
+					texture("tail/axolotl.png"),
+					texture("tail/axolotl_tinted.png")));
 		addRendererMap(
 				VTCosmetics.TAIL_RABBIT,
 				AccessoryBasic.create(
 					e -> rabbitTail,
-					prefix("textures/entity/tail/rabbit.png"),
-					prefix("textures/entity/tail/rabbit_tinted.png")));
+					texture("tail/rabbit.png"),
+					texture("tail/rabbit_tinted.png")));
 	}
 }

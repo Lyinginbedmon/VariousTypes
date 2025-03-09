@@ -224,8 +224,8 @@ public class LootBag
 	private List<ItemStack> getTotalLoot(LivingEntity spawner, LootContextParameterSet lootContext, long seed)
 	{
 		List<ItemStack> loot = Lists.newArrayList();
-		items.orElse(List.of()).forEach(item -> loot.add(new ItemStack(item)));
-		itemStacks.orElse(List.of()).forEach(stack -> loot.add(stack.copy()));
+		loot.addAll(items.orElse(List.of()).stream().map(item -> new ItemStack(item)).toList());
+		loot.addAll(itemStacks.orElse(List.of()).stream().map(stack -> stack.copy()).toList());
 		systemTable.ifPresent(id -> 
 		{
 			LootTable table = spawner.getWorld().getServer().getReloadableRegistries().getLootTable(id);

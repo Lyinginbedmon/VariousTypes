@@ -1,7 +1,5 @@
 package com.lying.client.renderer;
 
-import static com.lying.reference.Reference.ModInfo.prefix;
-
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.ears.EarsPiglinModel;
 import com.lying.client.model.ears.EarsRabbitModel;
@@ -43,55 +41,55 @@ public class EarsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 				VTCosmetics.EARS_PIGLIN,
 				AccessoryBasic.create(
 					e -> piglinEars,
-					prefix("textures/entity/ears/piglin.png"),
-					prefix("textures/entity/ears/piglin_tinted.png")));
+					texture("ears/piglin.png"),
+					texture("ears/piglin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_PIGZOMBIE,
 				AccessoryBasic.create(
 					e -> piglinEars,
-					prefix("textures/entity/ears/zombified_piglin.png"),
-					prefix("textures/entity/ears/zombified_piglin_tinted.png")));
+					texture("ears/zombified_piglin.png"),
+					texture("ears/zombified_piglin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_AXOLOTL,
 				AccessoryBasic.create(
 					e -> axolotlGills,
-					prefix("textures/entity/ears/axolotl.png"),
-					prefix("textures/entity/ears/axolotl_tinted.png")));
+					texture("ears/axolotl.png"),
+					texture("ears/axolotl_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_ELF,
 				AccessoryBasic.create(
 					e -> elfEars,
-					prefix("textures/entity/ears/elf.png"),
-					prefix("textures/entity/ears/elf_tinted.png")));
+					texture("ears/elf.png"),
+					texture("ears/elf_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_GOBLIN,
 				AccessoryBasic.create(
 					e -> goblinEars,
-					prefix("textures/entity/ears/goblin.png"),
-					prefix("textures/entity/ears/goblin_tinted.png")));
+					texture("ears/goblin.png"),
+					texture("ears/goblin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_CAT,
 				AccessoryBasic.create(
 					e -> catEars,
-					prefix("textures/entity/ears/cat.png"),
-					prefix("textures/entity/ears/cat_tinted.png")));
+					texture("ears/cat.png"),
+					texture("ears/cat_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_FOX,
 				AccessoryBasic.create(
 					e -> foxEars,
-					prefix("textures/entity/ears/fox.png"),
-					prefix("textures/entity/ears/fox_tinted.png")));
+					texture("ears/fox.png"),
+					texture("ears/fox_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_WOLF,
 				AccessoryBasic.create(
 					e -> wolfEars,
-					prefix("textures/entity/ears/wolf.png"),
-					prefix("textures/entity/ears/wolf_tinted.png")));
+					texture("ears/wolf.png"),
+					texture("ears/wolf_tinted.png")));
 		addRendererMap(
 				VTCosmetics.EARS_RABBIT,
 				AccessoryBasic.create(
 					e -> rabbitEars,
-					prefix("textures/entity/ears/rabbit.png"),
-					prefix("textures/entity/ears/rabbit_tinted.png")));
+					texture("ears/rabbit.png"),
+					texture("ears/rabbit_tinted.png")));
 	}
 }

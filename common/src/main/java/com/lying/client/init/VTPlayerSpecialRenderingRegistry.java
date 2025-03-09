@@ -42,7 +42,7 @@ public class VTPlayerSpecialRenderingRegistry
 		register(VTCosmetics.MISC_GELATINOUS.get().registryName(), new PlayerSpecialRenderFunc() 
 		{
 			private static final MinecraftClient mc = MinecraftClient.getInstance();
-			private static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/gelatinous.png");
+			private static final Identifier TEXTURE = Reference.ModInfo.prefix("textures/entity/misc/gelatinous.png");
 			private static EntityModel<AbstractClientPlayerEntity> MODEL = null;
 			
 			public Vector3f getColor(LivingEntity player, Cosmetic instance) { return VTUtilsClient.decimalToVector(instance.color().orElse(0x7BC35C)); }

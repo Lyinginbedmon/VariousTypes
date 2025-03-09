@@ -11,6 +11,7 @@ import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.ModelFullbody;
 import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.client.renderer.accessory.AccessoryGlowing;
+import com.lying.client.renderer.accessory.OverheadIconRenderer;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
@@ -50,6 +51,11 @@ public class MiscFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		addRendererMap(
 				VTCosmetics.MISC_GLOW_SPOTS,
 				makeVerdineSpots());
+		addRendererMap(
+				VTCosmetics.MISC_THIRD_EYE,
+				new OverheadIconRenderer<>(
+					prefix("third_eye"),
+					prefix("third_eye_tinted")));
 	}
 	
 	@Nullable
@@ -63,8 +69,8 @@ public class MiscFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 	{
 		Function<E, EntityModel<E>> modelFunc = e -> MiscFeatureRenderer.isSlimPlayer(e) ? slimFullbody : wideFullbody;
 		
-		Function<Boolean, Identifier> texSlim = b -> b ? prefix("textures/entity/verdine_spots_tinted_slim.png") : prefix("textures/entity/verdine_spots_slim.png");
-		Function<Boolean, Identifier> texWide = b -> b ? prefix("textures/entity/verdine_spots_tinted_wide.png") : prefix("textures/entity/verdine_spots_wide.png");
+		Function<Boolean, Identifier> texSlim = b -> b ? texture("misc/verdine_spots_tinted_slim.png") : texture("misc/verdine_spots_slim.png");
+		Function<Boolean, Identifier> texWide = b -> b ? texture("misc/verdine_spots_tinted_wide.png") : texture("misc/verdine_spots_wide.png");
 		BiFunction<E, Boolean, Identifier> texFunc = (e,b) -> 
 		{
 			Model model = Model.WIDE;

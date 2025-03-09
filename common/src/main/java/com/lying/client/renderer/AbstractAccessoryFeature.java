@@ -10,6 +10,7 @@ import org.joml.Vector3f;
 import com.google.common.base.Supplier;
 import com.lying.client.renderer.accessory.IAccessoryRenderer;
 import com.lying.client.utility.VTUtilsClient;
+import com.lying.reference.Reference;
 import com.lying.utility.Cosmetic;
 import com.lying.utility.CosmeticType;
 import com.lying.utility.VTUtils;
@@ -90,5 +91,10 @@ public abstract class AbstractAccessoryFeature<E extends LivingEntity, M extends
 		}
 		
 		renderer.renderFor(matrices, vertexConsumers, light, entity, tickDelta, colour.isPresent(), r, g, b);
+	}
+	
+	protected static Identifier texture(String address)
+	{
+		return Reference.ModInfo.prefix("textures/entity/"+address);
 	}
 }

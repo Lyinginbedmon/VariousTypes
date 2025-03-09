@@ -1,7 +1,5 @@
 package com.lying.client.renderer;
 
-import static com.lying.reference.Reference.ModInfo.prefix;
-
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.SimpleHornsModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
@@ -39,26 +37,26 @@ public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 				VTCosmetics.HORNS_SAIGA,
 				AccessoryBasic.create(
 					e -> dragonHorns,
-					prefix("textures/entity/horns/saiga.png"),
-					prefix("textures/entity/horns/saiga_tinted.png")));
+					texture("horns/saiga.png"),
+					texture("horns/saiga_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_RAM,
 				AccessoryBasic.create(
 					e -> ramHorns,
-					prefix("textures/entity/horns/ram.png"),
-					prefix("textures/entity/horns/ram_tinted.png")));
+					texture("horns/ram.png"),
+					texture("horns/ram_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_STAG,
 				AccessoryBasic.create(
 					e -> stagAntlers,
-					prefix("textures/entity/horns/stag.png"),
-					prefix("textures/entity/horns/stag_tinted.png")));
+					texture("horns/stag.png"),
+					texture("horns/stag_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_KIRIN,
 				AccessoryBasic.create(
 					e -> kirinHorns,
-					prefix("textures/entity/horns/kirin.png"),
-					prefix("textures/entity/horns/kirin_tinted.png")));
+					texture("horns/kirin.png"),
+					texture("horns/kirin_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_LIGHTNING,
 				AccessoryLightning.create(e -> kirinHorns));
@@ -66,13 +64,13 @@ public class HornsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 				VTCosmetics.HORN_UNICORN,
 				AccessoryBasic.create(
 					e -> unicornHorn,
-					prefix("textures/entity/horns/unicorn.png"),
-					prefix("textures/entity/horns/unicorn_tinted.png")));
+					texture("horns/unicorn.png"),
+					texture("horns/unicorn_tinted.png")));
 		addRendererMap(
 				VTCosmetics.HORNS_DEVIL,
 				AccessoryBasic.create(
 					e -> devilHorns,
-					prefix("textures/entity/horns/devil.png"),
-					prefix("textures/entity/horns/devil_tinted.png")));
+					texture("horns/devil.png"),
+					texture("horns/devil_tinted.png")));
 	}
 }

@@ -1,7 +1,5 @@
 package com.lying.client.renderer;
 
-import static com.lying.reference.Reference.ModInfo.prefix;
-
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.SimpleNoseModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
@@ -37,39 +35,39 @@ public class NoseFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 				VTCosmetics.NOSE_PIG,
 				AccessoryBasic.create(
 					e -> pigNose,
-					prefix("textures/entity/nose/pig.png"),
-					prefix("textures/entity/nose/pig_tinted.png")));
+					texture("nose/pig.png"),
+					texture("nose/pig_tinted.png")));
 		addRendererMap(
 				VTCosmetics.NOSE_PIGLIN,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
 						e -> piglinNose,
-						prefix("textures/entity/nose/piglin.png"),
-						prefix("textures/entity/nose/piglin_tinted.png")),
+						texture("nose/piglin.png"),
+						texture("nose/piglin_tinted.png")),
 					AccessoryBasic.create(
 						e -> piglinNose, 
-						prefix("textures/entity/nose/piglin_overlay.png")).untinted()));
+						texture("nose/piglin_overlay.png")).untinted()));
 		addRendererMap(
 				VTCosmetics.NOSE_PIGZOMBIE,
 				AccessoryCompound.create(
 					AccessoryBasic.create(
 						e -> piglinNose,
-						prefix("textures/entity/nose/zombified_piglin.png"),
-						prefix("textures/entity/nose/zombified_piglin_tinted.png")),
+						texture("nose/zombified_piglin.png"),
+						texture("nose/zombified_piglin_tinted.png")),
 					AccessoryBasic.create(
 						e -> piglinNose, 
-						prefix("textures/entity/nose/zombified_piglin_overlay.png")).untinted()));
+						texture("nose/zombified_piglin_overlay.png")).untinted()));
 		addRendererMap(
 				VTCosmetics.NOSE_VILLAGER,
 				AccessoryBasic.create(
 					e -> villagerNose,
-					prefix("textures/entity/nose/villager.png"),
-					prefix("textures/entity/nose/villager_tinted.png")));
+					texture("nose/villager.png"),
+					texture("nose/villager_tinted.png")));
 		addRendererMap(
 				VTCosmetics.NOSE_WITCH,
 				AccessoryBasic.create(
 					e -> witchNose,
-					prefix("textures/entity/nose/witch.png"),
-					prefix("textures/entity/nose/witch_tinted.png")));
+					texture("nose/witch.png"),
+					texture("nose/witch_tinted.png")));
 	}
 }
