@@ -14,10 +14,10 @@ import com.lying.ability.AbilitySet;
 import com.lying.client.VariousTypesClient;
 import com.lying.client.event.RenderEvents;
 import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
-import com.lying.client.model.AnimatedPlayerEntityModel;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.EarsFeatureRenderer;
 import com.lying.client.renderer.HornsFeatureRenderer;
+import com.lying.client.renderer.IconFeatureRenderer;
 import com.lying.client.renderer.MiscFeatureRenderer;
 import com.lying.client.renderer.NoseFeatureRenderer;
 import com.lying.client.renderer.TailFeatureRenderer;
@@ -28,7 +28,6 @@ import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementCosmetics;
 import com.lying.effect.DazzledStatusEffect;
-import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
@@ -44,14 +43,14 @@ import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.event.events.client.ClientTooltipEvent;
 import dev.architectury.event.events.common.PlayerEvent;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
-import net.minecraft.client.render.entity.model.PlayerEntityModel;
+import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.SkinTextures.Model;
 import net.minecraft.client.util.math.MatrixStack;
@@ -156,28 +155,26 @@ public class ClientBus
 			AccessorEntityRenderDispatcher accessor = (AccessorEntityRenderDispatcher)dispatcher;
 			
 			for(Model model : SkinTextures.Model.values())
-			{
-				PlayerEntityRenderer renderer = (PlayerEntityRenderer)accessor.getModelRenderers().get(model);
-				AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)renderer;
-				FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>> featureContext = (FeatureRendererContext<AbstractClientPlayerEntity, PlayerEntityModel<AbstractClientPlayerEntity>>)renderer;
-				renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));
-				renderAccessor.appendFeature(new TailFeatureRenderer<>(featureContext));
-			}
+				appendAccessoryFeatures((PlayerEntityRenderer)accessor.getModelRenderers().get(model));
 			
-			AnimatedPlayerEntityRenderer animPlayer = (AnimatedPlayerEntityRenderer) accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get());
-			AccessorLivingEntityRenderer renderAccessor = (AccessorLivingEntityRenderer)animPlayer;
-			FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>> featureContext = (FeatureRendererContext<AnimatedPlayerEntity, AnimatedPlayerEntityModel<AnimatedPlayerEntity>>)animPlayer;
-			renderAccessor.appendFeature(new WingsFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new MiscFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new NoseFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new EarsFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new HornsFeatureRenderer<>(featureContext));
-			renderAccessor.appendFeature(new TailFeatureRenderer<>(featureContext));
+			appendAccessoryFeatures((AnimatedPlayerEntityRenderer)accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get()));
 		});
+	}
+	
+	private static <
+		E extends LivingEntity, 
+		M extends EntityModel<E>,
+		R extends LivingEntityRenderer<E, M>> void appendAccessoryFeatures(R renderer)
+	{
+		FeatureRendererContext<E, M> context = (FeatureRendererContext<E, M>)renderer;
+		AccessorLivingEntityRenderer accessor = (AccessorLivingEntityRenderer)renderer;
+		accessor.appendFeature(new WingsFeatureRenderer<>(context));
+		accessor.appendFeature(new NoseFeatureRenderer<>(context));
+		accessor.appendFeature(new EarsFeatureRenderer<>(context));
+		accessor.appendFeature(new HornsFeatureRenderer<>(context));
+		accessor.appendFeature(new TailFeatureRenderer<>(context));
+		accessor.appendFeature(new IconFeatureRenderer<>(context));
+		accessor.appendFeature(new MiscFeatureRenderer<>(context));
 	}
 	
 	/** Handles rendering effects applied by abilities that aren't already handled by supplementary feature renderers */

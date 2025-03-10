@@ -67,16 +67,20 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");	//
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
-	public static final Supplier<Cosmetic> MISC_THIRD_EYE	= misc("third_eye");	//
 	public static final Supplier<Cosmetic> MISC_SHARK_FIN	= misc("shark_fin");	//
 	public static final Supplier<Cosmetic> MISC_GELATINOUS	= misc("gelatinous");
 	public static final Supplier<Cosmetic> MISC_GHOSTLY		= misc("ghostly");
+	
+	public static final Supplier<Cosmetic> ICON_ASTRAL_EYE		= icon("astral_eye");
+	public static final Supplier<Cosmetic> ICON_DIVINE_CROWN	= icon("divine_crown");
+	public static final Supplier<Cosmetic> ICON_ETERNAL_FLAME	= icon("eternal_flame");	//
 	
 	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.WINGS); }
 	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.NOSE); }
 	private static Supplier<Cosmetic> ears(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.EARS); }
 	private static Supplier<Cosmetic> horns(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.HORNS); }
 	private static Supplier<Cosmetic> tail(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.TAIL); }
+	private static Supplier<Cosmetic> icon(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.ICON); }
 	private static Supplier<Cosmetic> misc(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.MISC); }
 	
 	public static Supplier<Cosmetic> register(Identifier regName, Supplier<CosmeticType> type)

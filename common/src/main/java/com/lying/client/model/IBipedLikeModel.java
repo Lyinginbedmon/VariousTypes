@@ -1,5 +1,6 @@
 package com.lying.client.model;
 
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModel;
@@ -9,6 +10,8 @@ import net.minecraft.util.math.MathHelper;
 /** Utility class specifically for making models that can be mapped on to either BipedEntityModel or AnimatedBipedEntityModel */
 public interface IBipedLikeModel<E extends LivingEntity>
 {
+	public ModelPart getModelHead();
+	
 	public default void copyTransforms(EntityModel<E> parent)
 	{
 		if(parent instanceof BipedEntityModel)

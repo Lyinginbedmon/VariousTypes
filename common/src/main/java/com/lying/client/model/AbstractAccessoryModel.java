@@ -10,6 +10,8 @@ public class AbstractAccessoryModel<E extends LivingEntity> extends AnimatedBipe
 		super(part);
 	}
 	
+	public ModelPart getModelHead() { return head; }
+	
 	protected static void copyRotation(ModelPart from, ModelPart to)
 	{
 		to.pitch = from.pitch;

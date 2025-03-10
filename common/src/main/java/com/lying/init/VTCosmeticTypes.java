@@ -30,6 +30,7 @@ public class VTCosmeticTypes
 	public static final Supplier<CosmeticType> TAIL		= register(prefix("tail"), 1);
 	public static final Supplier<CosmeticType> HORNS	= register(prefix("horns"), 3, WEARING_SKULL);
 	public static final Supplier<CosmeticType> NOSE		= register(prefix("nose"), 1, WEARING_SKULL);
+	public static final Supplier<CosmeticType> ICON		= register(prefix("icon"), 1);
 	public static final Supplier<CosmeticType> MISC		= register(prefix("misc"), -1);
 	
 	public static Supplier<CosmeticType> register(Identifier regName, int slotLimit)

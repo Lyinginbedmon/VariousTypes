@@ -51,11 +51,6 @@ public class MiscFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		addRendererMap(
 				VTCosmetics.MISC_GLOW_SPOTS,
 				makeVerdineSpots());
-		addRendererMap(
-				VTCosmetics.MISC_THIRD_EYE,
-				new OverheadIconRenderer<>(
-					prefix("third_eye"),
-					prefix("third_eye_tinted")));
 	}
 	
 	@Nullable

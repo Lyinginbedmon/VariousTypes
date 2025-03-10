@@ -12,7 +12,7 @@ import net.minecraft.client.render.entity.model.EntityModelPartNames;
 import net.minecraft.client.render.entity.model.SinglePartEntityModel;
 import net.minecraft.entity.LivingEntity;
 
-public abstract class AnimatedBipedEntityModel<E extends LivingEntity> extends SinglePartEntityModel<E> implements IModelWithRoot
+public abstract class AnimatedBipedEntityModel<E extends LivingEntity> extends SinglePartEntityModel<E> implements IModelWithRoot, IBipedLikeModel<E>
 {
 	final ModelPart root;
 	public final ModelPart head, hat;
@@ -26,7 +26,6 @@ public abstract class AnimatedBipedEntityModel<E extends LivingEntity> extends S
 	public AnimatedBipedEntityModel(ModelPart part)
 	{
 		root = part;
-		
 		head = root.getChild(EntityModelPartNames.HEAD);
 		hat = root.getChild(EntityModelPartNames.HAT);
 		body = root.getChild(EntityModelPartNames.BODY);
@@ -76,6 +75,8 @@ public abstract class AnimatedBipedEntityModel<E extends LivingEntity> extends S
 	public ModelPart getPart() { return root; }
 	
 	public ModelPart getRoot() { return root; }
+	
+	public ModelPart getModelHead() { return head; }
 	
 	public void setVisible(boolean visible)
 	{

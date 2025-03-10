@@ -18,6 +18,8 @@ public class GelatinousBipedEntityModel<T extends LivingEntity> extends BipedEnt
 		super(root);
 	}
 	
+	public ModelPart getModelHead() { return head; }
+	
 	public static TexturedModelData getTexturedModelData()
 	{
 		Dilation dilation = Dilation.NONE;

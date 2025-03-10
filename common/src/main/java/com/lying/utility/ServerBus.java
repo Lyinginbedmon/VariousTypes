@@ -147,7 +147,10 @@ public class ServerBus
 		ElementCosmetics.GET_LIVING_COSMETICS_EVENT.register((living, set) -> 
 		{
 			if(living.getType() == EntityType.PLAYER && ((PlayerEntity)living).getName().getString().equalsIgnoreCase(Reference.ModInfo.LEAD_DEV))
+			{
 				set.add(VTCosmetics.WINGS_WITCH.get());
+				set.add(VTCosmetics.ICON_DIVINE_CROWN.get());
+			}
 		});
 	}
 	
