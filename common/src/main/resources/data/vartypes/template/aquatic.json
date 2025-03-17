@@ -1,0 +1,25 @@
+{
+  "Conditions": [
+    "vartypes:is_living",
+    {
+      "Name": "vartypes:has_none_of_types",
+      "Types": [
+        "vartypes:aquatic"
+      ]
+    }
+  ],
+  "Display": {
+    "Title": {
+      "translate": "template.vartypes.aquatic"
+    }
+  },
+  "Operations": [
+    {
+      "Name": "vartypes:add_types",
+      "Types": [
+        "vartypes:aquatic"
+      ]
+    }
+  ],
+  "Power": 1
+}

@@ -36,6 +36,51 @@ public class IconFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 				VTCosmetics.ICON_ETERNAL_FLAME,
 				new OverheadIconRenderer<>(
 					prefix("eternal_flame"),
-					prefix("eternal_flame_tinted")));
+					prefix("eternal_flame_tinted")).withScale(2F));
+		addRendererMap(
+				VTCosmetics.ICON_CRYSTAL,
+				new OverheadIconRenderer<>(
+					prefix("crystal"),
+					prefix("crystal_tinted")).withScale(2F));
+		addRendererMap(
+				VTCosmetics.ICON_GEM,
+				new OverheadIconRenderer<>(
+					prefix("gem"),
+					prefix("gem_tinted")).withScale(2F));
+		addRendererMap(
+				VTCosmetics.ICON_CURRENCY,
+				new OverheadIconRenderer<>(
+					prefix("currency"),
+					prefix("currency_tinted")).withScale(2F));
+		addRendererMap(
+				VTCosmetics.ICON_EXCLAMATION,
+				new OverheadIconRenderer<>(
+					prefix("exclamation"),
+					prefix("exclamation_tinted")).withScale(3F));
+		addRendererMap(
+				VTCosmetics.ICON_QUESTION,
+				new OverheadIconRenderer<>(
+					prefix("question"),
+					prefix("question_tinted")).withScale(2.5F));
+		addRendererMap(
+				VTCosmetics.ICON_SQUARE,
+				new OverheadIconRenderer<>(
+					prefix("square"),
+					prefix("square_tinted")));
+		addRendererMap(
+				VTCosmetics.ICON_CIRCLE,
+				new OverheadIconRenderer<>(
+					prefix("circle"),
+					prefix("circle_tinted")));
+		addRendererMap(
+				VTCosmetics.ICON_TRIANGLE,
+				new OverheadIconRenderer<>(
+					prefix("triangle"),
+					prefix("triangle_tinted")));
+		addRendererMap(
+				VTCosmetics.ICON_HEXAGON,
+				new OverheadIconRenderer<>(
+					prefix("hexagon"),
+					prefix("hexagon_tinted")));
 	}
 }

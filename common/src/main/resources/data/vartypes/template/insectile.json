@@ -1,0 +1,44 @@
+{
+  "Conditions": [
+    "vartypes:is_living",
+    {
+      "Name": "vartypes:has_all_of_types",
+      "Types": [
+        "vartypes:human"
+      ]
+    }
+  ],
+  "Display": {
+    "Description": {
+      "translate": "template.vartypes.insectile.desc"
+    },
+    "Title": {
+      "translate": "template.vartypes.insectile"
+    }
+  },
+  "Operations": [
+    {
+      "Name": "vartypes:set_supertypes",
+      "Types": [
+        "vartypes:arthropod"
+      ]
+    },
+    {
+      "Ability": [
+        "vartypes:climb",
+        "vartypes:sculk_sight"
+      ],
+      "Name": "vartypes:add_ability"
+    },
+    {
+      "Ability": {
+        "Ability": "vartypes:natural_armour",
+        "Memory": {
+          "Amount": 2
+        }
+      },
+      "Name": "vartypes:add_ability"
+    }
+  ],
+  "Power": 2
+}

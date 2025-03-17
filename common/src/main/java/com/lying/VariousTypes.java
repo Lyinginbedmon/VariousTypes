@@ -55,6 +55,7 @@ public class VariousTypes
     	VTSheetElements.init();
     	VTSheetModules.init();
     	
+    	VTStatusEffects.init();
     	VTEntityTypes.init();
     	VTCosmeticTypes.init();
     	VTCosmetics.init();
@@ -64,7 +65,6 @@ public class VariousTypes
     	VTTemplateRegistry.init();
     	VTScreenHandlerTypes.init();
     	VTItems.init();
-    	VTStatusEffects.init();
     	VTCommands.init();
     	VTParticles.init();
     	ServerBus.init();

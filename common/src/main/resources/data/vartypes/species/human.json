@@ -1,0 +1,25 @@
+{
+  "Background": "vartypes:textures/gui/sheet/creator_default.png",
+  "Display": {
+    "Description": {
+      "translate": "species.vartypes.human.desc"
+    },
+    "Title": {
+      "translate": "species.vartypes.human"
+    }
+  },
+  "Types": [
+    "vartypes:human",
+    {
+      "Display": {
+        "Description": {
+          "translate": "subtype.vartypes.linn.desc"
+        },
+        "Title": {
+          "translate": "subtype.vartypes.linn"
+        }
+      },
+      "ID": "vartypes:linn"
+    }
+  ]
+}

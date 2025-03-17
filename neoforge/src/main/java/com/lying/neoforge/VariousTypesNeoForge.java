@@ -47,8 +47,6 @@ public final class VariousTypesNeoForge
 					entity.setData(HANDLER.get(), (PlayerSheetHandler)sheet.setOwner(entity));
 			}
 		});
-		
-		// FIXME Register ModeArgumentType
 	}
 	
 	public void registerEntityAttributes(final EntityAttributeCreationEvent event)

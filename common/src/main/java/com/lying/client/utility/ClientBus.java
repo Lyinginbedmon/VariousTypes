@@ -105,7 +105,7 @@ public class ClientBus
 			if(player == null || mc.options.hudHidden)
 				return;
 			
-			RegistryEntry<StatusEffect> effect = VTStatusEffects.getEntry(VTStatusEffects.DAZZLED);
+			RegistryEntry<StatusEffect> effect = VTStatusEffects.getEntry(player.getRegistryManager(), VTStatusEffects.DAZZLED);
 			if(!player.hasStatusEffect(effect) || player.getStatusEffect(effect).getDuration() <= 0)
 				return;
 			

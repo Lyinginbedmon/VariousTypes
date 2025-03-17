@@ -34,7 +34,10 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 	private static final float ICON_SIZE = 0.3F;
 	private final Function<Boolean, Identifier> spriteId;
 	
+	private static final float baseOffset = 8 + (2F/3F);
 	private Vector3f poseOffset = new Vector3f(0F, 0F, 0F);
+	private float scale = 1F;
+	private float size = 16F * scale;
 	
 	public OverheadIconRenderer(Identifier icon)
 	{
@@ -44,6 +47,20 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 	public OverheadIconRenderer(Identifier icon, Identifier tinted)
 	{
 		spriteId = b -> b ? tinted : icon;
+	}
+	
+	public OverheadIconRenderer<E,T> withSize(int scaleIn)
+	{
+		size = (float)scaleIn;
+		scale = size / 16F;
+		return this;
+	}
+	
+	public OverheadIconRenderer<E,T> withScale(float scaleIn)
+	{
+		scale = scaleIn;
+		size = 16F * scale;
+		return this;
 	}
 	
 	public void prepareModel(E entity, T contextModel, float limbAngle, float limbDistance, float tickDelta, float headYaw, float headPitch) 
@@ -75,7 +92,7 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 		if(root != null)
 			upVec = ModelTransformHelper.rotateBy(upVec, root.getTransform());
 		
-		poseOffset.add(headOffset).add(upVec.normalize().mul(12F));
+		poseOffset.add(headOffset).add(upVec.normalize().mul(baseOffset + (3F * scale)));
 		
 		// Divide by 16 to convert from model coordinates to global
 		poseOffset.mul(1/16F);
@@ -112,20 +129,20 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 				matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(pitch));
 				
 				matrixStack.scale(ICON_SIZE, ICON_SIZE, ICON_SIZE);
-				drawSprite(matrixStack, sprite, 0, 0, 0, 16, 16, r, g, b);
+				drawSprite(matrixStack, sprite, 0, 0, 0, 16, 16, size, r, g, b);
 			matrixStack.pop();
 			RenderSystem.disableCull();
 			RenderSystem.disableDepthTest();
 		matrixStack.pop();
 	}
 	
-	public static void drawSprite(MatrixStack matrixStack, Sprite sprite, int x, int y, int z, int width, int height, float r, float g, float b)
+	public static void drawSprite(MatrixStack matrixStack, Sprite sprite, int x, int y, int z, int width, int height, float scale, float r, float g, float b)
 	{
 		if(width == 0 || height == 0) return;
-		drawTexturedQuad(matrixStack, sprite.getAtlasId(), sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV(), r, g, b);
+		drawTexturedQuad(matrixStack, sprite.getAtlasId(), sprite.getMinU(), sprite.getMaxU(), sprite.getMinV(), sprite.getMaxV(), scale, r, g, b);
 	}
 	
-	public static void drawTexturedQuad(MatrixStack matrixStack, Identifier texture, float u1, float u2, float v1, float v2, float r, float g, float b)
+	public static void drawTexturedQuad(MatrixStack matrixStack, Identifier texture, float u1, float u2, float v1, float v2, float scale, float r, float g, float b)
 	{
 		Vector3f[] vertices = new Vector3f[]{
 				new Vector3f(1F, 1F, 0F), 
@@ -135,7 +152,7 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 		for(int i=0; i<4; ++i)
 		{
 			Vector3f vec = vertices[i];
-			vec.mul(0.5F);
+			vec.mul(0.5F).mul(scale / 16F);
 		}
 		
 		RenderSystem.setShaderTexture(0, texture);

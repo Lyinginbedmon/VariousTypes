@@ -46,8 +46,11 @@ public class AbilitySunblind extends Ability implements IComplexAbility<ConfigSu
 			
 			AbilityInstance inst = sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName());
 			ConfigSunblind config = ((AbilitySunblind)inst.ability()).instanceToValues(inst);
-			config.debuffs.forEach(debuff -> 
-				living.addStatusEffect(new StatusEffectInstance(debuff.getEffectType(), Reference.Values.TICKS_PER_SECOND * 10, debuff.getAmplifier(), true, false)));
+			if(config.isBlank)
+				living.addStatusEffect(new StatusEffectInstance(VTStatusEffects.getEntry(living.getRegistryManager(), VTStatusEffects.DAZZLED), 0, 0, true, false));
+			else
+				config.debuffs.forEach(debuff -> 
+					living.addStatusEffect(new StatusEffectInstance(debuff.getEffectType(), Reference.Values.TICKS_PER_SECOND * 10, debuff.getAmplifier(), true, false)));
 		});
 	}
 	
@@ -72,10 +75,12 @@ public class AbilitySunblind extends Ability implements IComplexAbility<ConfigSu
 					.apply(instance, ConfigSunblind::new));
 		
 		protected List<StatusEffectInstance> debuffs;
+		protected boolean isBlank = false;
 		
 		public ConfigSunblind(Optional<List<StatusEffectInstance>> debuffsIn)
 		{
-			debuffs = debuffsIn.orElse(List.of(new StatusEffectInstance(VTStatusEffects.getEntry(VTStatusEffects.DAZZLED), 0, 0)));
+			debuffs = debuffsIn.orElse(List.of());
+			isBlank = debuffsIn.isEmpty();
 		}
 		
 		public static ConfigSunblind fromNbt(NbtCompound nbt)

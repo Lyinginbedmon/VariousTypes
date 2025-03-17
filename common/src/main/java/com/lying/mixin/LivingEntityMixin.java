@@ -360,7 +360,7 @@ public class LivingEntityMixin extends EntityMixin
 	@Inject(method = "updatePotionVisibility()V", at = @At("TAIL"))
 	private void vt$updatePotionVisibility(final CallbackInfo ci)
 	{
-		if(hasStatusEffect(VTStatusEffects.getEntry(VTStatusEffects.STEALTH)))
+		if(hasStatusEffect(VTStatusEffects.getEntry(getRegistryManager(), VTStatusEffects.STEALTH)))
 			setInvisible(true);
 	}
 }

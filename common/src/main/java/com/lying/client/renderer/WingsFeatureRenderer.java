@@ -1,7 +1,6 @@
 package com.lying.client.renderer;
 
 import com.lying.client.init.VTModelLayerParts;
-import com.lying.client.model.wings.WingsAngelModel;
 import com.lying.client.model.wings.WingsBatModel;
 import com.lying.client.model.wings.WingsBeetleModel;
 import com.lying.client.model.wings.WingsBirdModel;
@@ -14,7 +13,6 @@ import com.lying.client.model.wings.WingsWitchModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.client.renderer.accessory.AccessoryEndPortal;
-import com.lying.client.renderer.accessory.AccessoryGlowing;
 import com.lying.client.renderer.accessory.AccessoryTranslucent;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
@@ -26,7 +24,7 @@ import net.minecraft.entity.LivingEntity;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
-	private EntityModel<LivingEntity> elytraWings, butterflyWings, dragonflyWings, batWings, birdWings, beetleWings, witchWings, angelWings, dragonWings, skeletonWings;
+	private EntityModel<LivingEntity> elytraWings, butterflyWings, dragonflyWings, batWings, birdWings, beetleWings, witchWings, dragonWings, skeletonWings;
 	
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
@@ -43,7 +41,6 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		witchWings = new WingsWitchModel<>(loader.getModelPart(VTModelLayerParts.WINGS_WITCH));
 		skeletonWings = new WingsSkeletonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_SKELETON));
 		beetleWings = new WingsBeetleModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
-		angelWings = new WingsAngelModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ANGEL));
 		dragonWings = new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON));
 	}
 	
@@ -95,17 +92,10 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 					e -> witchWings).untinted());
 		addRendererMap(
 				VTCosmetics.WINGS_ANGEL, 
-				AccessoryCompound.create(
-					AccessoryBasic.create(
-						e -> angelWings, 
-						texture("wings/angel.png"), 
-						texture("wings/angel_tinted.png")),
-					AccessoryBasic.create(
-						e -> angelWings, 
-						texture("wings/angel_halo.png")).untinted(),
-					AccessoryGlowing.create(
-						e -> angelWings,
-						texture("wings/angel_glow.png")).untinted()));
+				AccessoryBasic.create(
+					e -> witchWings, 
+					texture("wings/angel.png"), 
+					texture("wings/angel_tinted.png")));
 		addRendererMap(
 				VTCosmetics.WINGS_SKELETON,
 				AccessoryBasic.create(

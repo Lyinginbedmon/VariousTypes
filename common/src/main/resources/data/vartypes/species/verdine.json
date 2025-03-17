@@ -1,0 +1,43 @@
+{
+  "Abilities": [
+    {
+      "Ability": "vartypes:herbivore",
+      "Memory": {
+        "Allowed": [
+          "#vartypes:vegetarian"
+        ]
+      }
+    },
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:fae_appearance",
+        "Values": [
+          "vartypes:elf_ears",
+          "vartypes:verdine_spots"
+        ]
+      }
+    },
+    "vartypes:photosynth"
+  ],
+  "Background": "vartypes:textures/gui/sheet/creator_default.png",
+  "Display": {
+    "Description": {
+      "translate": "species.vartypes.verdine.desc"
+    },
+    "Title": {
+      "translate": "species.vartypes.verdine"
+    }
+  },
+  "Types": [
+    "vartypes:human",
+    {
+      "Display": {
+        "Title": {
+          "translate": "subtype.vartypes.verdine"
+        }
+      },
+      "ID": "vartypes:verdine"
+    }
+  ]
+}

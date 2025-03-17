@@ -3,7 +3,7 @@ package com.lying.client.init;
 import com.lying.client.model.ears.GillsAxolotlModel;
 import com.lying.client.model.tail.AbstractTailModel;
 import com.lying.client.model.wings.AbstractWingsModel;
-import com.lying.client.model.wings.WingsAngelModel;
+import com.lying.client.model.wings.MiscHaloModel;
 import com.lying.client.model.wings.WingsBirdModel;
 import com.lying.client.model.wings.WingsDragonModel;
 
@@ -1220,9 +1220,9 @@ public class VTAnimations
 	
 	public static class AngelWings extends BirdWings
 	{
-		protected static final String HALO = WingsAngelModel.HALO;
+		protected static final String HALO = MiscHaloModel.HALO;
 		
-		public static final Animation WINGS_ANGEL_HALO = Animation.Builder.create(25.0F).looping()
+		public static final Animation MISC_ANGEL_HALO = Animation.Builder.create(25.0F).looping()
 				.addBoneAnimation(HALO, new Transformation(Transformation.Targets.TRANSLATE, 
 					new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
 					new Keyframe(2.1F, AnimationHelper.createTranslationalVector(0.18F, -0.12F, 0.0F), Transformation.Interpolations.CUBIC),

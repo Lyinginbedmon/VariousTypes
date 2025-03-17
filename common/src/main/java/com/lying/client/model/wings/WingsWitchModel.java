@@ -55,7 +55,7 @@ public class WingsWitchModel<E extends LivingEntity> extends WingsBirdModel<E>
 	
 	public static TexturedModelData createBodyLayer()
 	{
-		return TexturedModelData.of(createWingsModel(), 64, 64);
+		return TexturedModelData.of(createWingsModel(), 64, 32);
 	}
 	
 	protected void animateWings(AccessoryAnimationInterface anims, float age)

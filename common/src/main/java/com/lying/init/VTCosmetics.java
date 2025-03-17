@@ -28,8 +28,8 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_BAT		= wings("bat_wings");
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY		= wings("fairy_wings");	//
-	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	//
+//	public static final Supplier<Cosmetic> WINGS_FAIRY		= wings("fairy_wings");
+//	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");
 	
 	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
@@ -58,22 +58,32 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
 	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
 	public static final Supplier<Cosmetic> TAIL_FOX			= tail("fox_tail");
-	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");	//
-	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");		//
+//	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");
+//	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");
 	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");
 	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");
 	public static final Supplier<Cosmetic> TAIL_AXOLOTL		= tail("axolotl_tail");
-	public static final Supplier<Cosmetic> TAIL_SCORPION	= tail("scorpion_tail");	//
-	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");	//
+//	public static final Supplier<Cosmetic> TAIL_SCORPION	= tail("scorpion_tail");
+//	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
-	public static final Supplier<Cosmetic> MISC_SHARK_FIN	= misc("shark_fin");	//
 	public static final Supplier<Cosmetic> MISC_GELATINOUS	= misc("gelatinous");
 	public static final Supplier<Cosmetic> MISC_GHOSTLY		= misc("ghostly");
+	public static final Supplier<Cosmetic> MISC_HALO		= misc("halo");
+//	public static final Supplier<Cosmetic> MISC_SHARK_FIN	= misc("shark_fin");
 	
 	public static final Supplier<Cosmetic> ICON_ASTRAL_EYE		= icon("astral_eye");
 	public static final Supplier<Cosmetic> ICON_DIVINE_CROWN	= icon("divine_crown");
-	public static final Supplier<Cosmetic> ICON_ETERNAL_FLAME	= icon("eternal_flame");	//
+	public static final Supplier<Cosmetic> ICON_ETERNAL_FLAME	= icon("eternal_flame");
+	public static final Supplier<Cosmetic> ICON_GEM				= icon("gem_icon");
+	public static final Supplier<Cosmetic> ICON_CRYSTAL			= icon("crystal_icon");
+	public static final Supplier<Cosmetic> ICON_CURRENCY		= icon("currency_icon");
+	public static final Supplier<Cosmetic> ICON_EXCLAMATION		= icon("exclamation_icon");
+	public static final Supplier<Cosmetic> ICON_QUESTION		= icon("question_icon");
+	public static final Supplier<Cosmetic> ICON_SQUARE			= icon("square_icon");
+	public static final Supplier<Cosmetic> ICON_CIRCLE			= icon("circle_icon");
+	public static final Supplier<Cosmetic> ICON_TRIANGLE		= icon("triangle_icon");
+	public static final Supplier<Cosmetic> ICON_HEXAGON			= icon("hexagon_icon");
 	
 	private static Supplier<Cosmetic> wings(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.WINGS); }
 	private static Supplier<Cosmetic> nose(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.NOSE); }
@@ -105,5 +115,8 @@ public class VTCosmetics
 	public static void init()
 	{
 		VariousTypes.LOGGER.info(" # Initialised "+COSMETICS_REGISTRY.size()+" cosmetics");
+		Map<CosmeticType, Integer> tallies = new HashMap<>();
+		COSMETICS_REGISTRY.values().forEach(cos -> tallies.put(cos.get().type(), tallies.getOrDefault(cos.get().type(), 0) + 1));
+		tallies.entrySet().stream().sorted((a,b) -> a.getValue() < b.getValue() ? -1 : a.getValue() > b.getValue() ? 1 : 0).forEach(entry -> VariousTypes.LOGGER.info(" # - {} {}", entry.getValue(), entry.getKey().registryName().getPath()));
 	}
 }

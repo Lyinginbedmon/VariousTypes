@@ -1,0 +1,82 @@
+{
+  "Abilities": [
+    "vartypes:berserk",
+    {
+      "Ability": "vartypes:bonus_health",
+      "Memory": {
+        "Amount": -4
+      }
+    },
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:orkin_appearance",
+        "Values": [
+          "vartypes:piglin_nose",
+          "vartypes:piglin_ears"
+        ]
+      }
+    },
+    "vartypes:goldheart"
+  ],
+  "Background": "vartypes:textures/gui/sheet/creator_bastion.png",
+  "Display": {
+    "Description": {
+      "translate": "species.vartypes.orkin.desc"
+    },
+    "Title": {
+      "translate": "species.vartypes.orkin"
+    }
+  },
+  "Home": "minecraft:the_nether",
+  "StartingLoot": {
+    "Items": [
+      "minecraft:crossbow",
+      "minecraft:golden_sword"
+    ],
+    "LootTable": {
+      "pools": [
+        {
+          "bonus_rolls": 0.0,
+          "entries": [
+            {
+              "type": "minecraft:item",
+              "functions": [
+                {
+                  "add": false,
+                  "count": {
+                    "type": "minecraft:uniform",
+                    "max": 7.0,
+                    "min": 2.0
+                  },
+                  "function": "minecraft:set_count"
+                }
+              ],
+              "name": "minecraft:arrow",
+              "weight": 30
+            }
+          ],
+          "rolls": {
+            "type": "minecraft:uniform",
+            "max": 2.0,
+            "min": 1.0
+          }
+        }
+      ]
+    }
+  },
+  "Types": [
+    "vartypes:human",
+    {
+      "Display": {
+        "Description": {
+          "translate": "subtype.vartypes.orkin.desc"
+        },
+        "Title": {
+          "translate": "subtype.vartypes.orkin"
+        }
+      },
+      "ID": "vartypes:orkin"
+    }
+  ]
+}

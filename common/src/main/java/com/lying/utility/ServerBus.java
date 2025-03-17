@@ -163,7 +163,7 @@ public class ServerBus
 		// If the player already has a stronger instance of Fatigue, remove it so the weaker instance (if any) will take effect
 		if(amplifier >= 0)
 		{
-			RegistryEntry<StatusEffect> fatigue = VTStatusEffects.getEntry(VTStatusEffects.FATIGUE);
+			RegistryEntry<StatusEffect> fatigue = VTStatusEffects.getEntry(player.getRegistryManager(), VTStatusEffects.FATIGUE);
 			if(player.hasStatusEffect(fatigue) && player.getStatusEffect(fatigue).getAmplifier() > amplifier)
 				player.removeStatusEffect(fatigue);
 			

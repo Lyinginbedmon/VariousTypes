@@ -1,0 +1,32 @@
+{
+  "Conditions": [
+    "vartypes:is_living",
+    {
+      "Name": "vartypes:has_none_of_types",
+      "Types": [
+        "vartypes:ooze",
+        "vartypes:aduain"
+      ]
+    }
+  ],
+  "Display": {
+    "Description": {
+      "translate": "template.vartypes.gravekin.desc"
+    },
+    "Title": {
+      "translate": "template.vartypes.gravekin"
+    }
+  },
+  "Operations": [
+    {
+      "Name": "vartypes:set_supertypes",
+      "Types": [
+        "vartypes:undead"
+      ]
+    },
+    {
+      "Ability": "vartypes:mending",
+      "Name": "vartypes:add_ability"
+    }
+  ]
+}

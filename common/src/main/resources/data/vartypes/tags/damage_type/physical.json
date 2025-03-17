@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:arrow",
+    "minecraft:cactus",
+    "minecraft:fall",
+    "minecraft:fly_into_wall",
+    "minecraft:mob_attack",
+    "minecraft:player_attack"
+  ]
+}

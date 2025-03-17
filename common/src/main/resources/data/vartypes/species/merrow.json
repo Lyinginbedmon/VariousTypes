@@ -1,0 +1,30 @@
+{
+  "Abilities": [
+    {
+      "Ability": "vartypes:cosmetics",
+      "Memory": {
+        "MapName": "vartypes:merfolk_appearance",
+        "Values": [
+          "vartypes:axolotl_tail",
+          "vartypes:axolotl_gills"
+        ]
+      }
+    },
+    "vartypes:deep_breath",
+    "vartypes:swim"
+  ],
+  "Background": "vartypes:textures/gui/sheet/creator_shipwreck.png",
+  "Display": {
+    "Description": {
+      "translate": "species.vartypes.merrow.desc"
+    },
+    "Title": {
+      "translate": "species.vartypes.merrow"
+    }
+  },
+  "Power": 1,
+  "Types": [
+    "vartypes:human",
+    "vartypes:aquatic"
+  ]
+}

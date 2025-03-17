@@ -17,7 +17,6 @@ import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability;
 import com.lying.ability.Ability.Category;
-import com.lying.component.element.ElementCosmetics;
 import com.lying.ability.AbilityBadBreath;
 import com.lying.ability.AbilityBerserk;
 import com.lying.ability.AbilityBreathing;
@@ -61,6 +60,7 @@ import com.lying.ability.PassiveNoXP;
 import com.lying.ability.SingleAttributeAbility;
 import com.lying.ability.SpawnProjectileAbility;
 import com.lying.ability.ToggledAbility;
+import com.lying.component.element.ElementCosmetics;
 import com.lying.data.VTTags;
 import com.lying.event.LivingEvents;
 import com.lying.event.PlayerEvents;
@@ -299,11 +299,11 @@ public class VTAbilities
 	public static final Supplier<Ability> SCULK_SIGHT		= register("sculk_sight", (id) -> new AbilitySculksight(id, Category.UTILITY));
 	public static final Supplier<Ability> SUFFOCATE_FLUID	= register("suffocate_in_fluid", (id) -> new AbilityBreathing.Deny(id));
 	public static final Supplier<Ability> SUNBLIND			= register("sunblind", (id) -> new AbilitySunblind(id, Category.UTILITY));
-	public static final Supplier<Ability> STEALTH			= register("stealth", (id) -> new AbilityStatusEffectOnDemand(id, Category.DEFENSE, new StatusEffectInstance(VTStatusEffects.getEntry(VTStatusEffects.STEALTH), Reference.Values.TICKS_PER_SECOND * 30, 0, false, false))
+	public static final Supplier<Ability> STEALTH			= register("stealth", (id) -> new AbilityStatusEffectOnDemand(id, Category.DEFENSE, m -> new StatusEffectInstance(VTStatusEffects.getEntry(m, VTStatusEffects.STEALTH), Reference.Values.TICKS_PER_SECOND * 30, 0, false, false))
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_MINUTE * 5; }
 	});
-	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
+	public static final Supplier<Ability> SWIM				= register("swim", (id) -> new AbilityStatusEffectOnDemand(id, Category.UTILITY, m -> new StatusEffectInstance(StatusEffects.DOLPHINS_GRACE, Reference.Values.TICKS_PER_SECOND * 3, 0, true, true)) 
 	{
 		public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 5; }
 		
@@ -381,6 +381,9 @@ public class VTAbilities
 			}
 		});
 		VariousTypes.LOGGER.info(" # Initialised "+ABILITIES.size()+" abilities");
+		Map<Category, Integer> tallies = new HashMap<>();
+		ABILITIES.values().forEach(a -> tallies.put(a.get().category(), tallies.getOrDefault(a.get().category(), 0) + 1));
+		tallies.entrySet().stream().sorted((a,b) -> a.getValue() < b.getValue() ? -1 : a.getValue() > b.getValue() ? 1 : 0).forEach(entry -> VariousTypes.LOGGER.info(" # - {} {}", entry.getValue(), entry.getKey().name().toLowerCase()));
 	}
 	
 	@Nullable
