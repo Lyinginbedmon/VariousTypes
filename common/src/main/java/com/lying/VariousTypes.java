@@ -16,7 +16,7 @@ import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTItems;
-import com.lying.init.VTParticles;
+import com.lying.init.VTParticleTypes;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
@@ -66,7 +66,7 @@ public class VariousTypes
     	VTScreenHandlerTypes.init();
     	VTItems.init();
     	VTCommands.init();
-    	VTParticles.init();
+    	VTParticleTypes.init();
     	ServerBus.init();
     	
     	VTPacketHandler.initServer();

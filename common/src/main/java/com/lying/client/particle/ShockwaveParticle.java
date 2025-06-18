@@ -1,6 +1,8 @@
 package com.lying.client.particle;
 
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 import com.lying.reference.Reference;
 
@@ -13,50 +15,77 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.particle.SimpleParticleType;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 
 public class ShockwaveParticle extends SpriteBillboardParticle
 {
-	private final SpriteProvider spriteProvider;
-	// Values necessary to render the particle with a defined direction rather than facing camera
-	private final Vec3d pos, normal;
+	private final Vec3d rotation;
 	
-	public ShockwaveParticle(ClientWorld world, double x, double y, double z, double velX, double velY, double velZ, SpriteProvider providerIn)
+	public ShockwaveParticle(ClientWorld clientWorld, double x, double y, double z, double angX, double angY, double angZ)
 	{
-		super(world, x, y, z, 0, 0, 0);
-		this.spriteProvider = providerIn;
-		this.pos = new Vec3d(x, y, z);
-		this.normal = new Vec3d(velX, velY, velZ);
+		super(clientWorld, x, y, z, 0F, 0F, 0F);
 		this.velocityX = this.velocityY = this.velocityZ = 0D;
-		this.maxAge = Reference.Values.TICKS_PER_SECOND * 3;
-		this.scale = 1F;
-		this.setSprite(spriteProvider);
-		System.out.println("Shockwave particle generated at "+this.pos.toString());
+		
+		rotation = new Vec3d(angX, angY, angZ).normalize();
+		this.maxAge = 3 * Reference.Values.TICKS_PER_SECOND;
+		this.scale = 0F;
 	}
 	
-	public ParticleTextureSheet getType() { return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE; }
-	
-	public int getBrightness(float tickDelta) { return 240; }
-	
-	public float getSize(float tickDelta)
+	public ParticleTextureSheet getType()
 	{
-		float age = (float)this.age + tickDelta;
-		return this.scale * (age / maxAge);
+		return ParticleTextureSheet.PARTICLE_SHEET_TRANSLUCENT;
 	}
 	
-	protected float getMinU() { return 0F; }
-	
-	protected float getMaxU() { return 1F; }
-	
-	protected float getMinV() { return 0F; }
-	
-	protected float getMaxV() { return 1F; }
+	public void tick()
+	{
+		super.tick();
+		
+		float time = (float)this.age / (float)this.maxAge;
+		this.scale = time * 5F;
+		
+		this.alpha = Math.min(time / 0.2F, 1F - (float)Math.pow(time, 6D));
+	}
 	
 	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta)
 	{
-		super.buildGeometry(vertexConsumer, camera, tickDelta);
-		Vec3d pos = new Vec3d(x, y, z);
-		System.out.println("Building geometry for shockwave particle at "+pos.toString());
+		Quaternionf rotation = vectorToQuaternion(this.rotation);
+		Vec3d camPos = camera.getPos();
+		float f = (float)(MathHelper.lerp((double)tickDelta, this.prevPosX, this.x) - camPos.getX());
+		float g = (float)(MathHelper.lerp((double)tickDelta, this.prevPosY, this.y) - camPos.getY());
+		float h = (float)(MathHelper.lerp((double)tickDelta, this.prevPosZ, this.z) - camPos.getZ());
+		Vector3f[] vector3fs = new Vector3f[]{new Vector3f(-1.0f, -1.0f, 0.0f), new Vector3f(-1.0f, 1.0f, 0.0f), new Vector3f(1.0f, 1.0f, 0.0f), new Vector3f(1.0f, -1.0f, 0.0f)};
+		float i = this.getSize(tickDelta);
+		for(int j = 0; j < 4; ++j)
+		{
+			Vector3f vector3f = vector3fs[j];
+			vector3f.rotate(rotation);
+			vector3f.mul(i);
+			vector3f.add(f, g, h);
+		}
+		float k = this.getMinU();
+		float l = this.getMaxU();
+		float m = this.getMinV();
+		float n = this.getMaxV();
+		int o = 255;
+		// Primary face
+		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).texture(l, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).texture(l, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).texture(k, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).texture(k, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		
+		// Reverse face
+		vertexConsumer.vertex(vector3fs[3].x(), vector3fs[3].y(), vector3fs[3].z()).texture(k, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[2].x(), vector3fs[2].y(), vector3fs[2].z()).texture(k, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[1].x(), vector3fs[1].y(), vector3fs[1].z()).texture(l, m).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+		vertexConsumer.vertex(vector3fs[0].x(), vector3fs[0].y(), vector3fs[0].z()).texture(l, n).color(this.red, this.green, this.blue, this.alpha).light(o).next();
+	}
+	
+	private static Quaternionf vectorToQuaternion(Vec3d rotation)
+	{
+		float pitch = (float)Math.asin(-rotation.y);
+		float yaw = (float)Math.atan2(rotation.x, rotation.z);
+		return new Quaternionf().rotateXYZ(pitch, yaw, 0);
 	}
 	
 	public static class Factory implements ParticleFactory<SimpleParticleType>
@@ -71,8 +100,9 @@ public class ShockwaveParticle extends SpriteBillboardParticle
 		@Nullable
 		public Particle createParticle(SimpleParticleType particleType, ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ)
 		{
-			System.out.println("Creating shockwave particle");
-			return new ShockwaveParticle(clientWorld, x, y, z, velX, velY, velZ, this.spriteProvider);
+			ShockwaveParticle particle = new ShockwaveParticle(clientWorld, x, y, z, velX, velY, velZ);
+			particle.setSprite(spriteProvider);
+			return particle;
 		}
 	}
 }

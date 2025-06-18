@@ -15,6 +15,7 @@ import com.lying.ability.AbilityQuake.ConfigQuake;
 import com.lying.component.CharacterSheet;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.event.LivingEvents;
+import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -34,6 +35,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 public class AbilityQuake extends ActivatedAbility implements ITickingAbility, IComplexAbility<ConfigQuake>
 {
@@ -94,10 +96,10 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 				values.distanceFallen = fallDistance;
 				instance.setMemory(values.toNbt());
 				
-				// TODO Add impact particle & SFX
-//				World world = living.getWorld();
-//				if(!world.isClient())
-//					((ServerWorld)world).spawnParticles(VTParticles.SHOCKWAVE.get(), living.getX(), living.getY(), living.getZ(), 1, 0, 0, 0, 1);
+				// TODO Add impact SFX
+				World world = living.getWorld();
+				if(!world.isClient())
+					world.addParticle(VTParticleTypes.SHOCKWAVE.get(), living.getX(), living.getY() + 0.01D, living.getZ(), 0D, 1D, 0D);
 			}
 		});
 	}

@@ -3,14 +3,17 @@ package com.lying.neoforge.client;
 import com.lying.VariousTypes;
 import com.lying.client.VariousTypesClient;
 import com.lying.client.init.VTModelLayerParts;
+import com.lying.client.particle.ShockwaveParticle;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.init.VTEntityTypes;
+import com.lying.init.VTParticleTypes;
 import com.lying.reference.Reference;
 
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 @EventBusSubscriber(modid = Reference.ModInfo.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class VariousTypesNeoForgeClient
@@ -34,4 +37,10 @@ public class VariousTypesNeoForgeClient
 		VariousTypes.LOGGER.info("Entity layer registration");
 		VTModelLayerParts.init((layer,data) -> event.registerLayerDefinition(layer, data));
 	}
+    
+    @SubscribeEvent
+    private static void registerParticleProviders(RegisterParticleProvidersEvent event)
+    {
+    	event.registerSpriteSet(VTParticleTypes.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
+    }
 }

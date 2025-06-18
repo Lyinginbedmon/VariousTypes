@@ -1,0 +1,8 @@
+{
+	"randomise_sheet": {
+		"subtitle": "sound.vartypes.randomise",
+		"sounds": [
+			"vartypes:sheet_randomise_chime"
+		]
+	}
+}

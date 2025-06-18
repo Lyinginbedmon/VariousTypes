@@ -6,7 +6,6 @@ import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
-import com.lying.client.particle.ShockwaveParticle;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.ThrownBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
@@ -21,7 +20,6 @@ import com.lying.component.element.ElementNonLethal;
 import com.lying.component.element.ElementSpecialPose;
 import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.init.VTEntityTypes;
-import com.lying.init.VTParticles;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.network.HighlightPacket;
@@ -33,7 +31,6 @@ import com.lying.utility.Highlight;
 
 import dev.architectury.networking.NetworkManager;
 import dev.architectury.registry.client.level.entity.EntityRendererRegistry;
-import dev.architectury.registry.client.particle.ParticleProviderRegistry;
 import dev.architectury.registry.menu.MenuRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.InputUtil;
@@ -61,7 +58,6 @@ public class VariousTypesClient
 		registerS2CPacketReceivers();
 		registerEntityRenderers();
 		registerKeyBindings();
-		registerParticleFactories();
 	}
 	
 	private static void registerMenus()
@@ -141,10 +137,5 @@ public class VariousTypesClient
 		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ThrownBlockEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.THROWN_BLOCK, ThrownBlockEntityRenderer::new);
-	}
-	
-	private static void registerParticleFactories()
-	{
-		ParticleProviderRegistry.register(VTParticles.SHOCKWAVE, ShockwaveParticle.Factory::new);
 	}
 }
