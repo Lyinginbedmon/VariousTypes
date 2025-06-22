@@ -33,9 +33,11 @@ import net.minecraft.entity.damage.DamageSources;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
+import net.minecraft.particle.ParticleEffect;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.HoverEvent;
@@ -43,6 +45,7 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -266,5 +269,15 @@ public class VTUtils
 			for(int i=1; i<effects.size(); i++)
 				names.append(Text.literal(", ")).append(getEffectName(effects.get(i)));
 		return names;
+	}
+	
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, Vec3d pos, Vec3d vel)
+	{
+		spawnParticles(world, parameters, true, pos, 0, vel, 1F);
+	}
+	
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, Vec3d pos, int count, Vec3d vel, float speed)
+	{
+		world.getPlayers().stream().forEach(player -> world.spawnParticles(player, parameters, force, pos.x, pos.y, pos.z, count, vel.x, vel.y, vel.z, speed));
 	}
 }

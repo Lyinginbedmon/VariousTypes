@@ -4,11 +4,13 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import com.lying.VariousTypes;
+import com.lying.ability.AbilityInstance;
 import com.lying.client.init.VTKeybinds;
 import com.lying.component.element.ElementActionables;
 import com.lying.init.VTSheetElements;
 import com.lying.network.ActivateAbilityPacket;
 import com.lying.network.OpenAbilityMenuPacket;
+import com.lying.reference.Reference;
 
 import dev.architectury.event.events.client.ClientTickEvent;
 import net.minecraft.client.MinecraftClient;
@@ -33,8 +35,13 @@ public class KeybindHandling
 						mc.player.sendMessage(Text.translatable("gui.vartypes.no_abilities_to_activate"));
 						return;
 					case 1:
-						sendActivationPacket(abilities.getFirstActivated());
-						break;
+						Optional<Identifier> abilityID = abilities.getFirstActivated();
+						AbilityInstance ability = abilities.get(abilityID.get());
+						if(ability.cooldown() <= Reference.Values.TICKS_PER_SECOND && !abilities.coolingDown())
+						{
+							sendActivationPacket(abilityID);
+							break;
+						}
 					case 2:
 					default:
 						OpenAbilityMenuPacket.send();

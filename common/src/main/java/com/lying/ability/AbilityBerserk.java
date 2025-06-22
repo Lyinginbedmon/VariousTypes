@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityBerserk.ConfigBerserk;
 import com.lying.component.CharacterSheet;
+import com.lying.init.VTParticleTypes;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -18,7 +19,6 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
-import net.minecraft.particle.DustParticleEffect;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -69,17 +69,15 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 			case 1:
 			default:
 				Random rand = owner.getRandom();
-				for(int i=0; i<2; i++)
-				{
-					double x = owner.getX() + ((rand.nextDouble() - 0.5) * owner.getWidth());
-					double y = owner.getRandomBodyY() - 0.25;
-					double z = owner.getZ() + ((rand.nextDouble() - 0.5) * owner.getWidth());
-					
-					double velX = (rand.nextDouble() - 0.5) * 2;
-					double velY = -rand.nextDouble();
-					double velZ = (rand.nextDouble() - 0.5) * 2;
-					world.spawnParticles(DustParticleEffect.DEFAULT, x, y, z, 1, velX, velY, velZ, 1);
-				}
+				for(int i=2; i>0; --i)
+					world.addParticle(
+							VTParticleTypes.RAGE.get(), 
+							owner.getX() + owner.getParticleX(0.5D), 
+							owner.getRandomBodyY() - 0.25D, 
+							owner.getZ() + owner.getParticleZ(0.5D), 
+							0, 
+							rand.nextDouble() * 0.03D, 
+							0);
 				break;
 		}
 	}

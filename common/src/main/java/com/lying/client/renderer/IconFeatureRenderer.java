@@ -18,6 +18,8 @@ public class IconFeatureRenderer<E extends LivingEntity, M extends EntityModel<E
 		super(VTCosmeticTypes.ICON, context);
 	}
 	
+//	protected boolean shouldRender(E entity) { return !VTCosmeticTypes.ICON.get().shouldBeHidden(entity); }
+	
 	protected void createEntityModels(EntityModelLoader loader) { }
 	
 	protected void populateRendererMap()

@@ -7,9 +7,11 @@ import net.minecraft.entity.LivingEntity;
 
 public interface IAccessoryRenderer<E extends LivingEntity, T extends EntityModel<E>>
 {
+	/** The position in the render order this accessory should be rendered */
 	public default int renderOrder() { return 0; }
 	
 	public void prepareModel(E entity, T contextModel, float limbAngle, float limbDistance, float tickDelta, float headYaw, float headPitch);
 	
+	/** Actually renders the accessory */
 	public void renderFor(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b);
 }

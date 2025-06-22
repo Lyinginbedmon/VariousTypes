@@ -90,6 +90,7 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 				{
 					HungerManager manager = player.getHungerManager();
 					manager.add(manager.getFoodLevel() < 20 ? config.food : 0, manager.getSaturationLevel() < 20 ? (float)config.saturation : 0F);
+					// FIXME Add plant particles
 				}
 			}
 			else if(player.age%Reference.Values.TICKS_PER_SECOND == 0)

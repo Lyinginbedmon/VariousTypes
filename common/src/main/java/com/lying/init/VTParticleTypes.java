@@ -23,7 +23,10 @@ public class VTParticleTypes
 	public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Reference.ModInfo.MOD_ID, RegistryKeys.PARTICLE_TYPE);
 	private static int tally = 0;
 	
-	public static final RegistrySupplier<SimpleParticleType> SHOCKWAVE = register("shockwave", true);
+	public static final RegistrySupplier<SimpleParticleType> SHOCKWAVE	= register("shockwave", true);
+	public static final RegistrySupplier<SimpleParticleType> RAGE		= register("rage", true);	// FIXME Add rage particle visuals
+	public static final RegistrySupplier<SimpleParticleType> REND		= register("rend", true);	// FIXME Add rend particle visuals
+	public static final RegistrySupplier<SimpleParticleType> LEAF		= register("leaf", true);	// FIXME Add leaf particle visuals
 	
 	private static RegistrySupplier<SimpleParticleType> register(String nameIn, boolean alwaysShow)
 	{

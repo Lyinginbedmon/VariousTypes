@@ -4,9 +4,9 @@ import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.function.Consumers;
-import org.joml.Vector2i;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
@@ -24,6 +24,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.attribute.EntityAttributeModifier;
+import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
@@ -32,13 +35,15 @@ import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 
 public class AbilityQuake extends ActivatedAbility implements ITickingAbility, IComplexAbility<ConfigQuake>
 {
+	private static final UUID GRAVITY_UUID	= UUID.fromString("bb981f2a-17eb-48ac-b4d3-701f38ccd183");
+	
 	/** The rate of expansion of the shockwave */
 	public static final int INTERVAL = Reference.Values.TICKS_PER_SECOND / 10;
 	
@@ -64,7 +69,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public boolean shouldTick(final LivingEntity owner, final AbilityInstance instance)
 	{
-		return ConfigQuake.fromNbt(instance.memory()).phase >= 0;
+		return ConfigQuake.fromNbt(instance.memory()).phase != Phase.INERT;
 	}
 	
 	public void registerEventHandlers()
@@ -86,21 +91,19 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		set.getAbilitiesOfType(registryName()).forEach(instance -> 
 		{
 			ConfigQuake values = memoryToValues(instance.memory());
-			if(values.phase >= 0 && Phase.values()[values.phase] == Phase.FALLING)
-			{
-				// Trigger shockwave on landing proportional to distance fallen
-				// This technically constitutes an "IMPACT" phase inbetween FALLING and SHOCKWAVE
-				values.phase = 1;
-				values.endTime = living.getWorld().getTime() + values.maxShockwaveTime() + 1;
-				values.originPos = living.getBlockPos().down();
-				values.distanceFallen = fallDistance;
-				instance.setMemory(values.toNbt());
-				
-				// TODO Add impact SFX
-				World world = living.getWorld();
-				if(!world.isClient())
-					world.addParticle(VTParticleTypes.SHOCKWAVE.get(), living.getX(), living.getY() + 0.01D, living.getZ(), 0D, 1D, 0D);
-			}
+			if(values.phase != Phase.FALLING)
+				return;
+			
+			// Trigger shockwave on landing proportional to distance fallen
+			// This technically constitutes an "IMPACT" phase inbetween FALLING and SHOCKWAVE
+			values.setPhase(Phase.IMPACT);
+			values.endTime = living.getWorld().getTime() + values.maxShockwaveTime() + 1;
+			values.originPos = living.getBlockPos().down();
+			values.distanceFallen = fallDistance;
+			instance.setMemory(values.toNbt());
+			
+			// TODO Add impact SFX
+			VTUtils.spawnParticles((ServerWorld)living.getWorld(), VTParticleTypes.SHOCKWAVE.get(), living.getPos().add(0, 0.5, 0), new Vec3d(0, 1, 0));
 		});
 	}
 	
@@ -108,8 +111,10 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	{
 		ConfigQuake values = memoryToValues(instance.memory());
 		ServerWorld world = (ServerWorld)owner.getWorld();
-		switch(Phase.values()[values.phase])
+		switch(values.phase)
 		{
+			case INERT:
+				return;
 			case FALLING:
 				if(owner.isOnGround() || owner.isFallFlying() || owner.isSpectator() || owner.getType() == EntityType.PLAYER && owner.isInCreativeMode() && ((PlayerEntity)owner).getAbilities().flying || world.getBlockState(owner.getBlockPos()).getFluidState().isIn(FluidTags.WATER))
 				{
@@ -117,63 +122,92 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 					stopTicking(instance, owner);
 					break;
 				}
-				// TODO Accelerate fall speed?
 				if(owner.age%(Reference.Values.TICKS_PER_SECOND / 4) == 0)
-					world.spawnParticles(ParticleTypes.CRIT, owner.getX(), owner.getY(), owner.getZ(), 1, 0, 0, 0, 0);
+					VTUtils.spawnParticles(world, ParticleTypes.CRIT, owner.getPos(), Vec3d.ZERO);
+				break;
+			case IMPACT:
+				owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).removeModifier(GRAVITY_UUID);
+				values.setPhase(Phase.SHOCKWAVE);
+				instance.setMemory(values.toNbt());
 				break;
 			case SHOCKWAVE:
 				int ticksLeft = getTicksRemaining(instance, world.getTime());
 				int ticksInShockwave = values.maxShockwaveTime() - ticksLeft;
-				int range = Math.floorDiv(ticksInShockwave, INTERVAL);
-				if(ticksLeft <= 0 || range > Math.min((int)(values.distanceFallen / 1.5F), values.maxRange))
+				int radius = Math.floorDiv(ticksInShockwave, INTERVAL);
+				if(ticksLeft <= 0 || radius > Math.min((int)(values.distanceFallen / 1.5F), values.maxRange))
 				{
 					stopTicking(instance, owner);
 					return;
 				}
 				else if(ticksInShockwave%INTERVAL == 0)
 				{
-					// Start 2 blocks away from origin to reduce owner getting caught in their own shockwave
-					range += 2;
+					// Start 1 block away from origin to reduce owner getting caught in their own shockwave
+					radius += 1;
+					
+					// Iteratively calculate one quarter circle and transform that into the full circle with 90 degree rotations
 					List<BlockPos> alreadyChecked = Lists.newArrayList();
-					for(int i=0; i<360; i++)
-					{
-						Vector2i rotate = VTUtils.rotateDegrees2D(new Vector2i(0, range), i);
-						if(rotate.length() < 2D) continue;
-						tryAffectBlock(values.originPos.add(rotate.x, 0, rotate.y), world, alreadyChecked).ifPresent(pos -> alreadyChecked.add(pos));
-					}
+					for(int x=radius; x>=0; x--)
+						for(int z=radius; z>=0; z--)
+						{
+							if((int)Math.floor(Math.sqrt((x * x) + (z * z))) != radius)
+								continue;
+							
+							tryAffectBlock(values.originPos.add(x, 0, z), world, alreadyChecked).ifPresent(pos -> alreadyChecked.add(pos));
+							tryAffectBlock(values.originPos.add(x, 0, -z), world, alreadyChecked).ifPresent(pos -> alreadyChecked.add(pos));
+							tryAffectBlock(values.originPos.add(-x, 0, z), world, alreadyChecked).ifPresent(pos -> alreadyChecked.add(pos));
+							tryAffectBlock(values.originPos.add(-x, 0, -z), world, alreadyChecked).ifPresent(pos -> alreadyChecked.add(pos));
+						}
 				}
 				break;
 		}
 	}
 	
-	private static Optional<BlockPos> tryAffectBlock(BlockPos affected, ServerWorld world, List<BlockPos> ignore)
+	private static boolean canShakeBlock(BlockPos pos, ServerWorld world, List<BlockPos> ignore)
 	{
-		if(world.isAir(affected) || !world.isAir(affected.up()) || world.getBlockEntity(affected) != null || ignore.contains(affected))
+		if(ignore.stream().anyMatch(p -> p.withY(pos.getY()).equals(pos)))
+			return false;
+		else if(pos.getY() < world.getBottomY() || pos.getY() > world.getTopY())
+			return false;
+		else
+			return 
+					!world.isAir(pos) && 
+					world.getBlockState(pos).isSolidBlock(world, pos) && 
+					world.getBlockState(pos.up()).isReplaceable() && 
+					world.getBlockEntity(pos) == null;
+	}
+	
+	private static Optional<BlockPos> tryAffectBlock(BlockPos target, ServerWorld world, List<BlockPos> ignore)
+	{
+		if(!canShakeBlock(target, world, ignore))
 		{
 			for(int off : new int[] {1, -1, 2, -2})
 			{
-				Optional<BlockPos> alt;
-				if((alt = tryAffectBlock(affected.add(0, off, 0), world, ignore)).isPresent())
-					return alt;
+				BlockPos offset = target.add(0, off, 0);
+				if(canShakeBlock(offset, world, ignore))
+					return affectBlock(offset, world);
 			}
-			
 			return Optional.empty();
 		}
 		
-		ShakenBlockEntity tile = ShakenBlockEntity.spawnFromBlock(world, affected, world.getBlockState(affected));
+		return affectBlock(target, world);
+	}
+	
+	private static Optional<BlockPos> affectBlock(BlockPos pos, ServerWorld world)
+	{
+		ShakenBlockEntity tile = ShakenBlockEntity.spawnFromBlock(world, pos, world.getBlockState(pos));
 		tile.setVelocity(new Vec3d(0D, 0.4D, 0D));
 		
 		world.getOtherEntities(tile, tile.getBoundingBox().expand(0, 1, 0), Predicates.alwaysTrue()).forEach(ent -> ent.addVelocity(new Vec3d(0D, 0.4D, 0D)));
 		
-		return Optional.of(affected);
+		return Optional.of(pos);
 	}
 	
 	private void startTicking(AbilityInstance instance, LivingEntity owner)
 	{
 		ConfigQuake values = memoryToValues(instance.memory());
-		values.phase = 0;
+		values.setPhase(Phase.FALLING);
 		instance.setMemory(values.toNbt());
-		
+		owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).addTemporaryModifier(new EntityAttributeModifier(GRAVITY_UUID, "quake_gravity", 0.75D, Operation.ADD_VALUE));
 		ITickingAbility.tryPutOnIndefiniteCooldown(instance.mapName(), owner);
 	}
 	
@@ -198,18 +232,18 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	public static class ConfigQuake
 	{
 		protected static final Codec<ConfigQuake> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("Phase").forGetter(ConfigQuake::phase),
+				Phase.CODEC.optionalFieldOf("Phase").forGetter(q -> Optional.of(q.phase)),
 				Codec.LONG.optionalFieldOf("Time").forGetter(ConfigQuake::time), 
-				BlockPos.CODEC.optionalFieldOf("Origin").forGetter(ConfigQuake::origin),
-				Codec.FLOAT.optionalFieldOf("Distance").forGetter(ConfigQuake::distance),
-				Codec.INT.optionalFieldOf("Range").forGetter(ConfigQuake::range))
+				BlockPos.CODEC.optionalFieldOf("Origin").forGetter(q -> Optional.of(q.originPos)),
+				Codec.FLOAT.optionalFieldOf("Distance").forGetter(q -> Optional.of(q.distanceFallen)),
+				Codec.INT.optionalFieldOf("Range").forGetter(q -> Optional.of(q.maxRange)))
 					.apply(instance, ConfigQuake::new));
 		
 		/** The configured limit on how far the shockwave can spread, between 0 and 32 blocks */
 		protected int maxRange;
 		
 		// Operational values
-		protected int phase;
+		protected Phase phase;
 		protected long endTime;
 		protected BlockPos originPos;
 		protected float distanceFallen;
@@ -219,9 +253,9 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 			this(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(range));
 		}
 		
-		public ConfigQuake(Optional<Integer> phaseIn, Optional<Long> finishIn, Optional<BlockPos> originIn, Optional<Float> distanceIn, Optional<Integer> rangeIn)
+		public ConfigQuake(Optional<Phase> phaseIn, Optional<Long> finishIn, Optional<BlockPos> originIn, Optional<Float> distanceIn, Optional<Integer> rangeIn)
 		{
-			phase = phaseIn.orElse(-1);
+			phase = phaseIn.orElse(Phase.INERT);
 			endTime = finishIn.orElse(0L);
 			originPos = originIn.orElse(BlockPos.ORIGIN);
 			distanceFallen = distanceIn.orElse(0F);
@@ -230,13 +264,14 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		
 		public static ConfigQuake ofRange(int rangeIn) { return new ConfigQuake(rangeIn); }
 		
-		protected Optional<Integer> phase() { return Optional.of(phase); }
 		protected Optional<Long> time() { return Optional.of(endTime); }
-		protected Optional<BlockPos> origin() { return Optional.of(originPos); }
-		protected Optional<Float> distance() { return Optional.of(distanceFallen); }
-		protected Optional<Integer> range() { return Optional.of(maxRange); }
 		
 		public int maxShockwaveTime() { return maxRange * AbilityQuake.INTERVAL; }
+		
+		public void setPhase(Phase phaseIn)
+		{
+			phase = phaseIn;
+		}
 		
 		public NbtCompound toNbt()
 		{
@@ -249,9 +284,16 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		}
 	}
 	
-	private static enum Phase
+	private static enum Phase implements StringIdentifiable
 	{
+		INERT,
 		FALLING,
+		IMPACT,
 		SHOCKWAVE;
+		
+		@SuppressWarnings("deprecation")
+		public static final StringIdentifiable.EnumCodec<Phase> CODEC	= StringIdentifiable.createCodec(Phase::values);
+		
+		public String asString() { return name().toLowerCase(); }
 	}
 }

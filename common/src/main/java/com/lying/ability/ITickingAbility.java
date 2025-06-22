@@ -13,8 +13,10 @@ import net.minecraft.util.Identifier;
 
 public interface ITickingAbility
 {
+	/** Returns true if this ability needs to be ticked */
 	public boolean shouldTick(final LivingEntity owner, final AbilityInstance instance);
 	
+	/** Ticks the ability, only called server-side */
 	public void onTick(AbilityInstance instance, final CharacterSheet sheet, final LivingEntity owner);
 	
 	/** Puts the ability on indefinite cooldown */

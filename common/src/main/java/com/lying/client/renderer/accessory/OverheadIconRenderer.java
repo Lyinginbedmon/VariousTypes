@@ -3,6 +3,7 @@ package com.lying.client.renderer.accessory;
 import java.util.function.Function;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import com.lying.client.renderer.IconSpriteManager;
@@ -24,13 +25,11 @@ import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
 
 public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<E>> implements IAccessoryRenderer<E, T>
 {
 	private static final MinecraftClient mc = MinecraftClient.getInstance();
+	
 	private static final float ICON_SIZE = 0.3F;
 	private final Function<Boolean, Identifier> spriteId;
 	
@@ -116,24 +115,21 @@ public class OverheadIconRenderer<E extends LivingEntity, T extends EntityModel<
 			matrixStack.translate(poseOffset.x(), poseOffset.y(), poseOffset.z());
 			matrixStack.push();
 				// FIXME Reliably face the camera & remain visible in character sheet UI
-				Camera camera = mc.gameRenderer.getCamera();
-				
-				Vec3d camPos = camera.getPos();
-				Vec3d eyePos = entity.getEyePos().add(0D, 0.5D, 0D);
-				Vec3d dir = camPos.subtract(eyePos).normalize();
-				float yaw = (float)Math.atan2(dir.x, dir.z);
-				float pitch = (float)Math.asin(-dir.y);
-				
-				float entityYaw = (float)Math.toRadians(MathHelper.lerp(tickDelta, entity.prevYaw, entity.getYaw()));
-				matrixStack.multiply(RotationAxis.POSITIVE_Y.rotation(-yaw - entityYaw));
-				matrixStack.multiply(RotationAxis.POSITIVE_X.rotation(pitch));
-				
 				matrixStack.scale(ICON_SIZE, ICON_SIZE, ICON_SIZE);
+				matrixStack.push();
+				matrixStack.multiply(getBillboardRotation(entity, new Quaternionf()).invert());
 				drawSprite(matrixStack, sprite, 0, 0, 0, 16, 16, size, r, g, b);
+				matrixStack.pop();
 			matrixStack.pop();
 			RenderSystem.disableCull();
 			RenderSystem.disableDepthTest();
 		matrixStack.pop();
+	}
+	
+	private Quaternionf getBillboardRotation(E entity, Quaternionf rotation)
+	{
+		Camera camera = mc.getEntityRenderDispatcher().camera;
+		return rotation.rotationYXZ((float)(-Math.PI) / 180 * (camera.getYaw() - 180F), (float)Math.PI / 180 * (-camera.getPitch()), 0.0f);
 	}
 	
 	public static void drawSprite(MatrixStack matrixStack, Sprite sprite, int x, int y, int z, int width, int height, float scale, float r, float g, float b)
