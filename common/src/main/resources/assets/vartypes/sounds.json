@@ -4,5 +4,73 @@
 		"sounds": [
 			"vartypes:sheet_randomise_chime"
 		]
+	},
+	"ability_activated": {
+		"subtitle": "sound.vartypes.ability_activated",
+		"sounds": [
+			"vartypes:ability_activated_0",
+			"vartypes:ability_activated_1",
+			"vartypes:ability_activated_2",
+			"vartypes:ability_activated_3"
+		]
+	},
+	"ability_toggle_on": {
+		"subtitle": "sound.vartypes.ability_toggle_on",
+		"sounds": [
+			"vartypes:ability_toggle_on_0",
+			"vartypes:ability_toggle_on_1",
+			"vartypes:ability_toggle_on_2"
+		]
+	},
+	"ability_toggle_off": {
+		"subtitle": "sound.vartypes.ability_toggle_off",
+		"sounds": [
+			"vartypes:ability_toggle_off_0",
+			"vartypes:ability_toggle_off_1",
+			"vartypes:ability_toggle_off_2"
+		]
+	},
+	"berserk_activated": {
+		"subtitle": "sound.vartypes.berserk_activated",
+		"sounds": [
+			"vartypes:berserk_activated_0",
+			"vartypes:berserk_activated_1",
+			"vartypes:berserk_activated_2"
+		]
+	},
+	"fast_heal": {
+		"subtitle": "sound.vartypes.fast_heal",
+		"sounds": [
+			"vartypes:fast_heal_0",
+			"vartypes:fast_heal_1",
+			"vartypes:fast_heal_2",
+			"vartypes:fast_heal_3"
+		]
+	},
+	"photosynth_heal": {
+		"subtitle": "sound.vartypes.photosynth_heal",
+		"sounds": [
+			"vartypes:photosynth_heal_0",
+			"vartypes:photosynth_heal_1",
+			"vartypes:photosynth_heal_2",
+			"vartypes:photosynth_heal_3"
+		]
+	},
+	"quake_activated": {
+		"subtitle": "sound.vartypes.quake_activated",
+		"sounds": [
+			"vartypes:quake_activated_0",
+			"vartypes:quake_activated_1",
+			"vartypes:quake_activated_2"
+		]
+	},
+	"quake_impact": {
+		"subtitle": "sound.vartypes.quake_impact",
+		"sounds": [
+			"vartypes:quake_impact_0",
+			"vartypes:quake_impact_1",
+			"vartypes:quake_impact_2",
+			"vartypes:quake_impact_3"
+		]
 	}
 }

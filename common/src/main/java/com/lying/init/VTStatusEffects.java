@@ -2,6 +2,7 @@ package com.lying.init;
 
 import java.util.function.Supplier;
 
+import com.lying.VariousTypes;
 import com.lying.client.event.RenderEvents;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.effect.FatigueStatusEffect;
@@ -41,6 +42,7 @@ public class VTStatusEffects
 	{
 		STATUS_EFFECTS.register();
 		registerEffectEventHandling();
+		VariousTypes.LOGGER.info(" # Registered {} status effects", REGISTRAR.entrySet().size());
 	}
 	
 	public static RegistryEntry<StatusEffect> getEntry(DynamicRegistryManager manager, Supplier<StatusEffect> effect)

@@ -2,6 +2,7 @@ package com.lying.init;
 
 import java.util.function.Supplier;
 
+import com.lying.VariousTypes;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.entity.ThrownBlockEntity;
@@ -17,6 +18,7 @@ import net.minecraft.registry.RegistryKeys;
 public class VTEntityTypes
 {
 	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Reference.ModInfo.MOD_ID, RegistryKeys.ENTITY_TYPE);
+	private static int tally;
 
 	public static final RegistrySupplier<EntityType<AnimatedPlayerEntity>> ANIMATED_PLAYER	= register("animated_player", () -> 
 	{
@@ -38,11 +40,13 @@ public class VTEntityTypes
 	
 	private static <T extends Entity> RegistrySupplier<EntityType<T>> register(String name, Supplier<EntityType<T>> entry)
 	{
+		tally++;
 		return ENTITY_TYPES.register(Reference.ModInfo.prefix(name), entry);
 	}
 	
 	public static void init()
 	{
 		ENTITY_TYPES.register();
+		VariousTypes.LOGGER.info(" # Registered {} entity types", tally);
 	}
 }

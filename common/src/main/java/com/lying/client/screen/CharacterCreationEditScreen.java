@@ -16,6 +16,7 @@ import com.lying.component.CharacterSheet;
 import com.lying.component.module.ModuleTemplates;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.init.VTSheetModules;
+import com.lying.init.VTSoundEvents;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTTemplateRegistry;
 import com.lying.network.FinishCharacterCreationPacket;
@@ -30,6 +31,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 
@@ -89,7 +91,7 @@ public class CharacterCreationEditScreen extends HandledScreen<CharacterCreation
 		
 		addDrawableChild(randomButton = new IconButton(0, 0, 20, 20, button -> 
 		{
-			// TODO Add dice roll sound effect on randomise
+			mc.getSoundManager().play(PositionedSoundInstance.master(VTSoundEvents.SHEET_RANDOMISE.get(), 1F));
 			getScreenHandler().copySheet(VTUtils.makeRandomSheet(mc.player, getScreenHandler().powerLimit));
 			updateTemplateList();
 		}, Reference.ModInfo.prefix("textures/gui/randomise.png"), Reference.ModInfo.prefix("textures/gui/randomise_hovered.png")));

@@ -8,6 +8,7 @@ import com.lying.VariousTypes;
 import com.lying.ability.AbilityBerserk.ConfigBerserk;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTParticleTypes;
+import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -20,8 +21,10 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
 public class AbilityBerserk extends ActivatedAbility implements ITickingAbility, IComplexAbility<ConfigBerserk>
@@ -31,6 +34,10 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	public AbilityBerserk(Identifier regName, Category catIn)
 	{
 		super(regName, catIn);
+		this.soundSettings = new ActivationSoundSettings(
+				i -> VTSoundEvents.BERSERK_ACTIVATE.get(), 
+				1F, 
+				true);
 	}
 	
 	public Optional<Text> description(AbilityInstance instance)
@@ -70,14 +77,11 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 			default:
 				Random rand = owner.getRandom();
 				for(int i=2; i>0; --i)
-					world.addParticle(
+					VTUtils.spawnParticles(
+							world,
 							VTParticleTypes.RAGE.get(), 
-							owner.getX() + owner.getParticleX(0.5D), 
-							owner.getRandomBodyY() - 0.25D, 
-							owner.getZ() + owner.getParticleZ(0.5D), 
-							0, 
-							rand.nextDouble() * 0.03D, 
-							0);
+							owner.getPos().add(owner.getParticleX(0.5D), rand.nextDouble() * (owner.getHeight() - 0.25D), owner.getParticleZ(0.5D)),
+							Vec3d.ZERO);
 				break;
 		}
 	}

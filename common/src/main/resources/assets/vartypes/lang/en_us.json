@@ -387,5 +387,15 @@
 	"key.vartypes.use_fav_ability_4": "Activate favourited ability 4",
 	// Loot bags
 	"loot.vartypes.table": "Random Loot",
-	"loot.vartypes.empty": "Nothing"
+	"loot.vartypes.empty": "Nothing",
+	// Sounds
+	"sound.vartypes.randomise": "Character sheet randomises",
+	"sound.vartypes.ability_activated": "Ability activated",
+	"sound.vartypes.ability_toggle_on": "Ability toggled on",
+	"sound.vartypes.ability_toggle_off": "Ability toggled off",
+	"sound.vartypes.photosynth_heal": "Photosynth heals",
+	"sound.vartypes.quake_activate": "Quake activated",
+	"sound.vartypes.quake_impact": "Quake impacts",
+	"sound.vartypes.berserk_activate": "Berserk activated",
+	"sound.vartypes.fast_heal": "Health healed"
 }

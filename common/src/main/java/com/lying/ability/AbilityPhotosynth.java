@@ -8,6 +8,7 @@ import java.util.function.BiPredicate;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityPhotosynth.ConfigPhotosynth;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -20,6 +21,7 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -28,9 +30,13 @@ import net.minecraft.world.World;
 public class AbilityPhotosynth extends Ability implements IComplexAbility<ConfigPhotosynth>
 {
 	private static final BiPredicate<World, BlockPos> GOOD_SKY = (world, position) -> 
-		world.isDay() && !world.isRaining() && world.isSkyVisible(position);
+		world.isDay() && 
+		!world.isRaining() && 
+		world.isSkyVisible(position);
 	private static final BiPredicate<PlayerEntity, BlockPos> GOOD_PLAYER = (player, position) -> 
-		player.isOnGround() && (player.getHungerManager().getFoodLevel() < 20 || player.getHungerManager().getSaturationLevel() < 20) && (position == null || position.withY(player.getBlockY()).getSquaredDistance(player.getBlockPos()) == 0D);
+		player.isOnGround() && 
+		(player.getHungerManager().getFoodLevel() < 20 || player.getHungerManager().getSaturationLevel() < 20) && 
+		(position == null || position.withY(player.getBlockY()).getSquaredDistance(player.getBlockPos()) == 0D);
 	
 	public AbilityPhotosynth(Identifier regName, Category catIn)
 	{
@@ -86,11 +92,26 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 				}
 				
 				int time = (int)(world.getTime() - config.startTime.get());
-				if(time > 0 && time%config.rate == 0)
+				HungerManager manager = player.getHungerManager();
+				if(time > 0 && time%config.rate == 0 && (manager.getFoodLevel() < 20 || manager.getSaturationLevel() < 20))
 				{
-					HungerManager manager = player.getHungerManager();
-					manager.add(manager.getFoodLevel() < 20 ? config.food : 0, manager.getSaturationLevel() < 20 ? (float)config.saturation : 0F);
-					// FIXME Add plant particles
+					boolean emit = false;
+					if(manager.getFoodLevel() < 20 && config.food > 0)
+					{
+						manager.add(config.food, 0F);
+						emit = true;
+					}
+					else if(manager.getSaturationLevel() < 20 && config.saturation > 0)
+					{
+						manager.add(0, (float)config.saturation);
+						emit = true;
+					}
+					
+					if(emit)
+					{
+						// FIXME Add plant particles
+						VTUtils.playSound(player, VTSoundEvents.PHOTOSYNTH_HEAL.get(), SoundCategory.PLAYERS, 0.5F + player.getRandom().nextFloat() * 0.5F, 0.3F);
+					}
 				}
 			}
 			else if(player.age%Reference.Values.TICKS_PER_SECOND == 0)
@@ -133,6 +154,9 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 		
 		public ConfigPhotosynth startTracking(BlockPos pos, Long time)
 		{
+			if(food == 0 && saturation == 0)
+				return this;
+			
 			startTime = Optional.of(time);
 			position = Optional.of(pos);
 			return this;

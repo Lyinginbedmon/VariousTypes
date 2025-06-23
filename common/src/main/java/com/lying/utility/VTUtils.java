@@ -97,7 +97,17 @@ public class VTUtils
 	
 	public static void playSound(World world, RegistryEntry<SoundEvent> sound, SoundCategory category, double x, double y, double z, float pitch, float volume, long seed)
 	{
-		world.getPlayers().forEach(player -> ((ServerPlayerEntity)player).networkHandler.send(new PlaySoundS2CPacket(sound, category, x, y, z, pitch, volume, seed), null));
+		world.getPlayers().forEach(player -> ((ServerPlayerEntity)player).networkHandler.send(new PlaySoundS2CPacket(sound, category, x, y, z, volume, pitch, seed), null));
+	}
+	
+	public static void playSoundFor(ServerPlayerEntity owner, SoundEvent sound, SoundCategory category, float pitch, float volume)
+	{
+		playSound(owner.getWorld(), RegistryEntry.of(sound), category, owner.getX(), owner.getEyeY(), owner.getZ(), pitch, volume, owner.getWorld().getRandom().nextLong());
+	}
+	
+	public static void playSoundFor(ServerPlayerEntity player, SoundEvent sound, SoundCategory category, float pitch, float volume, long seed)
+	{
+		player.networkHandler.send(new PlaySoundS2CPacket(RegistryEntry.of(sound), category, player.getX(), player.getEyeY(), player.getZ(), volume, pitch, seed), null);
 	}
 	
 	public static List<Template> getValidTemplatesFor(CharacterSheet sheet, LivingEntity owner, int powerLimit)
@@ -278,6 +288,16 @@ public class VTUtils
 	
 	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, Vec3d pos, int count, Vec3d vel, float speed)
 	{
-		world.getPlayers().stream().forEach(player -> world.spawnParticles(player, parameters, force, pos.x, pos.y, pos.z, count, vel.x, vel.y, vel.z, speed));
+		spawnParticles(world, parameters, force, pos.x, pos.y, pos.z, count, vel, speed);
+	}
+	
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, Vec3d vel, float speed)
+	{
+		spawnParticles(world, parameters, force, posX, posY, posZ, count, vel.x, vel.y, vel.z, speed);
+	}
+	
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, double velX, double velY, double velZ, float speed)
+	{
+		world.getPlayers().stream().forEach(player -> world.spawnParticles(player, parameters, force, posX, posY, posZ, count, velX, velY, velZ, speed));
 	}
 }

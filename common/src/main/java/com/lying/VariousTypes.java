@@ -20,6 +20,7 @@ import com.lying.init.VTParticleTypes;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSheetModules;
+import com.lying.init.VTSoundEvents;
 import com.lying.init.VTSpeciesRegistry;
 import com.lying.init.VTStatusEffects;
 import com.lying.init.VTTemplateRegistry;
@@ -67,6 +68,7 @@ public class VariousTypes
     	VTItems.init();
     	VTCommands.init();
     	VTParticleTypes.init();
+    	VTSoundEvents.init();
     	ServerBus.init();
     	
     	VTPacketHandler.initServer();

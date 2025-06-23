@@ -128,7 +128,7 @@ public class VTTypes
 			Tier tier = val.get().tier();
 			tally.put(tier, tally.getOrDefault(tier, 0) + 1);
 		});
-		VariousTypes.LOGGER.info(" # Initialised "+tally.getOrDefault(Tier.SUPERTYPE, 0)+" supertypes, "+tally.getOrDefault(Tier.SUBTYPE, 0)+" subtypes");
+		VariousTypes.LOGGER.info(" # Initialised {} supertypes, {} subtypes", tally.getOrDefault(Tier.SUPERTYPE, 0), tally.getOrDefault(Tier.SUBTYPE, 0));
 	}
 	
 	@Nullable

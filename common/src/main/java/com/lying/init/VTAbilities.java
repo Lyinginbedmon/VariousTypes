@@ -223,13 +223,13 @@ public class VTAbilities
 	public static final Supplier<Ability> GELATINOUS		= register("gelatinous", (id) -> new AbilityGelatinous(id, Category.UTILITY));
 	public static final Supplier<Ability> GHOSTLY			= register("ghostly", (id) -> new ToggledAbility(id, Category.UTILITY)
 	{
-		protected void onActivation(LivingEntity owner, AbilityInstance instance)
+		protected void onToggledOn(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
 				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
 		}
 		
-		protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
+		protected void onToggledOff(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
 				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));

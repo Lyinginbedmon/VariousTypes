@@ -17,6 +17,7 @@ import com.lying.entity.ShakenBlockEntity;
 import com.lying.event.LivingEvents;
 import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -33,6 +34,8 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -44,7 +47,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 {
 	private static final UUID GRAVITY_UUID	= UUID.fromString("bb981f2a-17eb-48ac-b4d3-701f38ccd183");
 	
-	/** The rate of expansion of the shockwave */
+	/** The rate of expansion of the shockwave, 10 blocks/s */
 	public static final int INTERVAL = Reference.Values.TICKS_PER_SECOND / 10;
 	
 	public AbilityQuake(Identifier regName, Category catIn)
@@ -64,6 +67,8 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	{
 		startTicking(instance, owner);
 	}
+	
+	protected SoundEvent getActivationSound(AbilityInstance instance) { return null; }
 	
 	public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return !shouldTick(owner, instance) && owner.fallDistance >= 1.5F; }
 	
@@ -95,14 +100,14 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 				return;
 			
 			// Trigger shockwave on landing proportional to distance fallen
-			// This technically constitutes an "IMPACT" phase inbetween FALLING and SHOCKWAVE
+			// This technically constitutes the "IMPACT" phase inbetween FALLING and SHOCKWAVE
 			values.setPhase(Phase.IMPACT);
 			values.endTime = living.getWorld().getTime() + values.maxShockwaveTime() + 1;
 			values.originPos = living.getBlockPos().down();
 			values.distanceFallen = fallDistance;
 			instance.setMemory(values.toNbt());
 			
-			// TODO Add impact SFX
+			VTUtils.playSound(living, VTSoundEvents.QUAKE_IMPACT.get(), SoundCategory.PLAYERS, 1F, 1F);
 			VTUtils.spawnParticles((ServerWorld)living.getWorld(), VTParticleTypes.SHOCKWAVE.get(), living.getPos().add(0, 0.5, 0), new Vec3d(0, 1, 0));
 		});
 	}
@@ -208,6 +213,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		values.setPhase(Phase.FALLING);
 		instance.setMemory(values.toNbt());
 		owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).addTemporaryModifier(new EntityAttributeModifier(GRAVITY_UUID, "quake_gravity", 0.75D, Operation.ADD_VALUE));
+		VTUtils.playSound(owner, VTSoundEvents.QUAKE_ACTIVATE.get(), SoundCategory.PLAYERS, 1F, 1F);
 		ITickingAbility.tryPutOnIndefiniteCooldown(instance.mapName(), owner);
 	}
 	

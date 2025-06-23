@@ -46,6 +46,7 @@ public class AbilityLoSTeleport extends ActivatedAbility
 	public AbilityLoSTeleport(Identifier registryName, Category category)
 	{
 		super(registryName, category);
+		this.soundSettings = new ActivationSoundSettings();
 	}
 	
 	public Optional<Text> description(AbilityInstance instance)

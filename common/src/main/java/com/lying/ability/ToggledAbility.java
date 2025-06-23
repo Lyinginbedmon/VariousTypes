@@ -1,6 +1,7 @@
 package com.lying.ability;
 
 import com.lying.VariousTypes;
+import com.lying.init.VTSoundEvents;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
@@ -11,6 +12,7 @@ public class ToggledAbility extends ActivatedAbility
 	public ToggledAbility(Identifier regName, Category catIn)
 	{
 		super(regName, catIn);
+		this.soundSettings = new ActivationSoundSettings(i -> isActive(i) ? VTSoundEvents.ABILITY_TOGGLE_ON.get() : VTSoundEvents.ABILITY_TOGGLE_OFF.get());
 	}
 	
 	public AbilityType type() { return AbilityType.TOGGLED; }
@@ -28,9 +30,9 @@ public class ToggledAbility extends ActivatedAbility
 		instance.setMemory(mem);
 		
 		if(isActive(instance))
-			onActivation(owner, instance);
+			onToggledOn(owner, instance);
 		else
-			onDeactivation(owner, instance);
+			onToggledOff(owner, instance);
 		
 		VariousTypes.getSheet(owner).ifPresent(sheet -> sheet.buildAndSync());
 	}
@@ -40,7 +42,7 @@ public class ToggledAbility extends ActivatedAbility
 		return instance.memory().getBoolean("IsActive");
 	}
 	
-	protected void onActivation(LivingEntity owner, AbilityInstance instance) { }
+	protected void onToggledOn(LivingEntity owner, AbilityInstance instance) { }
 	
-	protected void onDeactivation(LivingEntity owner, AbilityInstance instance) { }
+	protected void onToggledOff(LivingEntity owner, AbilityInstance instance) { }
 }

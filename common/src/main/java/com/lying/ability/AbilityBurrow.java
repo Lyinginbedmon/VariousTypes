@@ -52,7 +52,7 @@ public class AbilityBurrow extends ToggledAbility implements IPhasingAbility
 		return Optional.of(translate("ability",registryName().getPath()+".desc", names));
 	}
 	
-	protected void onActivation(LivingEntity owner, AbilityInstance instance)
+	protected void onToggledOn(LivingEntity owner, AbilityInstance instance)
 	{
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{
@@ -61,7 +61,7 @@ public class AbilityBurrow extends ToggledAbility implements IPhasingAbility
 		});
 	}
 	
-	protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
+	protected void onToggledOff(LivingEntity owner, AbilityInstance instance)
 	{
 		VariousTypes.getSheet(owner).ifPresent(sheet -> 
 		{

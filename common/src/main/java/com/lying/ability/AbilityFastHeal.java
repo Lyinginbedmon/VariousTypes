@@ -8,6 +8,7 @@ import java.util.function.Function;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityFastHeal.ConfigFastHeal;
 import com.lying.init.VTSheetElements;
+import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -17,6 +18,8 @@ import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -40,20 +43,25 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<ConfigFa
 		TickEvent.PLAYER_POST.register(player -> processFastHealing(player, registryName(), this::instanceToValues));
 	}
 	
-	public static void processFastHealing(PlayerEntity player, Identifier registryName, Function<AbilityInstance,ConfigFastHeal> converter)
+	public static void processFastHealing(PlayerEntity owner, Identifier registryName, Function<AbilityInstance,ConfigFastHeal> converter)
 	{
-		if(player.getWorld().isClient()) return;
+		if(owner.getWorld().isClient()) return;
 		
+		ServerPlayerEntity player = (ServerPlayerEntity)owner;
 		VariousTypes.getSheet(player).ifPresent(sheet -> 
 		{
-			if(!(player.getHealth() < player.getMaxHealth() || sheet.<Float>elementValue(VTSheetElements.NONLETHAL) > 0F))
+			if(player.getHealth() >= player.getMaxHealth() && sheet.<Float>elementValue(VTSheetElements.NONLETHAL) <= 0F)
 				return;
 			if(!sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName))
 				return;
 			
 			ConfigFastHeal values = converter.apply(sheet.<AbilitySet>elementValue(VTSheetElements.ABILITIES).get(registryName));
 			if(player.age%values.healRate == 0 && player.getHungerManager().getFoodLevel() >= values.minimumFood)
+			{
 				player.heal(values.healAmount);
+				// FIXME Add heart particle?
+				VTUtils.playSoundFor(player, VTSoundEvents.FAST_HEAL.get(), SoundCategory.PLAYERS, 0.5F + player.getRandom().nextFloat() * 0.5F, 0.5F);
+			}
 		});
 	}
 	

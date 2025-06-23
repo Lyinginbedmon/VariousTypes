@@ -30,7 +30,7 @@ public class AbilityFlexible extends ToggledAbility
 		return new Identifier(regName.getNamespace(), regName.getPath()+"_"+(isBonus ? "bonus" : "penalty"));
 	}
 	
-	protected void onActivation(LivingEntity owner, AbilityInstance instance)
+	protected void onToggledOn(LivingEntity owner, AbilityInstance instance)
 	{
 		float amount = getScale(instance.memory());
 		EntityAttributeInstance attribute = owner.getAttributeInstance(EntityAttributes.GENERIC_SCALE);
@@ -42,7 +42,7 @@ public class AbilityFlexible extends ToggledAbility
 			attribute.addPersistentModifier(modifier);
 	}
 	
-	protected void onDeactivation(LivingEntity owner, AbilityInstance instance)
+	protected void onToggledOff(LivingEntity owner, AbilityInstance instance)
 	{
 		float amount = getScale(instance.memory());
 		EntityAttributeInstance attribute = owner.getAttributeInstance(EntityAttributes.GENERIC_SCALE);
