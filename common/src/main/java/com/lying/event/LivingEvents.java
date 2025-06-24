@@ -87,6 +87,7 @@ public class LivingEvents
 		EventResult passesElytraCheck(LivingEntity entity, boolean ticking);
 	}
 	
+	/** Fired whenever the entity lands from a fall */
 	public static final Event<LivingFallEvent> ON_FALL_EVENT = EventFactory.createLoop(LivingFallEvent.class);
 	
 	@FunctionalInterface

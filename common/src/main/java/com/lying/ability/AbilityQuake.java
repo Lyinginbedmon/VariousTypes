@@ -15,6 +15,7 @@ import com.lying.ability.AbilityQuake.ConfigQuake;
 import com.lying.component.CharacterSheet;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.event.LivingEvents;
+import com.lying.event.PlayerEvents;
 import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSoundEvents;
@@ -23,11 +24,14 @@ import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
@@ -48,7 +52,9 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	private static final UUID GRAVITY_UUID	= UUID.fromString("bb981f2a-17eb-48ac-b4d3-701f38ccd183");
 	
 	/** The rate of expansion of the shockwave, 10 blocks/s */
-	public static final int INTERVAL = Reference.Values.TICKS_PER_SECOND / 10;
+	public static final int INTERVAL			= Reference.Values.TICKS_PER_SECOND / 10;
+	/** Distance fallen in blocks per block of resulting shockwave radius */
+	public static final float FALL_PER_BLOCK	= 1.5F;
 	
 	public AbilityQuake(Identifier regName, Category catIn)
 	{
@@ -74,41 +80,53 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	
 	public boolean shouldTick(final LivingEntity owner, final AbilityInstance instance)
 	{
-		return ConfigQuake.fromNbt(instance.memory()).phase != Phase.INERT;
+		return ConfigQuake.fromNbt(instance.memory()).isTicking();
 	}
 	
 	public void registerEventHandlers()
 	{
-		LivingEvents.ON_FALL_EVENT.register((living, fallDistance, onGround, landedOnState, landedPosition) -> 
+		/** Deactivate if we die before hitting the ground */
+		EntityEvent.LIVING_DEATH.register((living, source) -> 
 		{
-			if(!onGround || living.getWorld().isClient()) return;
-			
+			VariousTypes.getSheet(living).ifPresent(sheet -> ((AbilitySet)sheet.element(VTSheetElements.ACTIONABLES)).getAbilitiesOfType(registryName()).forEach(i -> 
+			{
+				ConfigQuake values = memoryToValues(i.memory());
+				if(values.isTicking())
+					stopTicking(i, living);
+			}));
+			return EventResult.pass();
+		});
+		
+		/** Advance to impact phase on landing */
+		LivingEvents.ON_FALL_EVENT.register((living, fallDistance, onGround, landedOnState, landedPosition) -> 
 			VariousTypes.getSheet(living).ifPresent(sheet -> 
 			{
-				checkAndUpdateAbilities(sheet.element(VTSheetElements.ABILITIES), living, fallDistance);
-				checkAndUpdateAbilities(sheet.element(VTSheetElements.ACTIONABLES), living, fallDistance);
-			});
-		});
-	}
-	
-	private <T extends AbilitySet> void checkAndUpdateAbilities(T set, LivingEntity living, float fallDistance)
-	{
-		set.getAbilitiesOfType(registryName()).forEach(instance -> 
+				((AbilitySet)sheet.element(VTSheetElements.ACTIONABLES)).getAbilitiesOfType(registryName()).forEach(instance -> 
+				{
+					ConfigQuake values = memoryToValues(instance.memory());
+					if(values.phase != Phase.FALLING)
+						return;
+					
+					// Trigger shockwave on landing proportional to distance fallen
+					// This technically constitutes the "IMPACT" phase inbetween FALLING and SHOCKWAVE
+					values.setPhase(Phase.IMPACT);
+					values.endTime = living.getWorld().getTime() + values.maxShockwaveTime() + 1;
+					values.originPos = living.getBlockPos().down();
+					values.distanceFallen = fallDistance;
+					instance.setMemory(values.toNbt());
+				});
+			}));
+		
+		/** Prevent user from dying on impact from their own ability */
+		PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.register((living, source, amount) -> 
 		{
-			ConfigQuake values = memoryToValues(instance.memory());
-			if(values.phase != Phase.FALLING)
-				return;
+			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
+			if(!source.isOf(DamageTypes.FALL) || sheetOpt.isEmpty())
+				return 1F;
 			
-			// Trigger shockwave on landing proportional to distance fallen
-			// This technically constitutes the "IMPACT" phase inbetween FALLING and SHOCKWAVE
-			values.setPhase(Phase.IMPACT);
-			values.endTime = living.getWorld().getTime() + values.maxShockwaveTime() + 1;
-			values.originPos = living.getBlockPos().down();
-			values.distanceFallen = fallDistance;
-			instance.setMemory(values.toNbt());
-			
-			VTUtils.playSound(living, VTSoundEvents.QUAKE_IMPACT.get(), SoundCategory.PLAYERS, 1F, 1F);
-			VTUtils.spawnParticles((ServerWorld)living.getWorld(), VTParticleTypes.SHOCKWAVE.get(), living.getPos().add(0, 0.5, 0), new Vec3d(0, 1, 0));
+			return 
+					((AbilitySet)sheetOpt.get().element(VTSheetElements.ACTIONABLES)).getAbilitiesOfType(registryName()).stream().map(this::instanceToValues)
+						.anyMatch(ConfigQuake::isGuardingAgainstFallDamage) ? 0.1F : 1F;
 		});
 	}
 	
@@ -134,12 +152,15 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 				owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).removeModifier(GRAVITY_UUID);
 				values.setPhase(Phase.SHOCKWAVE);
 				instance.setMemory(values.toNbt());
+				
+				VTUtils.playSound(owner, VTSoundEvents.QUAKE_IMPACT.get(), SoundCategory.PLAYERS, 1F, 1F);
+				VTUtils.spawnParticles((ServerWorld)owner.getWorld(), VTParticleTypes.SHOCKWAVE.get(), owner.getPos().add(0, 0.5, 0), new Vec3d(0, 1, 0).multiply(values.getFinalRadius() + 2));
 				break;
 			case SHOCKWAVE:
 				int ticksLeft = getTicksRemaining(instance, world.getTime());
 				int ticksInShockwave = values.maxShockwaveTime() - ticksLeft;
 				int radius = Math.floorDiv(ticksInShockwave, INTERVAL);
-				if(ticksLeft <= 0 || radius > Math.min((int)(values.distanceFallen / 1.5F), values.maxRange))
+				if(ticksLeft <= 0 || radius > values.getFinalRadius())
 				{
 					stopTicking(instance, owner);
 					return;
@@ -265,10 +286,12 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 			endTime = finishIn.orElse(0L);
 			originPos = originIn.orElse(BlockPos.ORIGIN);
 			distanceFallen = distanceIn.orElse(0F);
-			maxRange = MathHelper.clamp(rangeIn.orElse(4), 0, 32);
+			maxRange = MathHelper.clamp(rangeIn.orElse(6), 0, 32);
 		}
 		
 		public static ConfigQuake ofRange(int rangeIn) { return new ConfigQuake(rangeIn); }
+		
+		public int getFinalRadius() { return Math.min((int)(distanceFallen / FALL_PER_BLOCK), maxRange); }
 		
 		protected Optional<Long> time() { return Optional.of(endTime); }
 		
@@ -278,6 +301,10 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		{
 			phase = phaseIn;
 		}
+		
+		public boolean isTicking() { return phase != Phase.INERT; }
+		
+		public boolean isGuardingAgainstFallDamage() { return phase == Phase.FALLING || phase == Phase.IMPACT; }
 		
 		public NbtCompound toNbt()
 		{

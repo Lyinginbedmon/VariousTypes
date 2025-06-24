@@ -10,6 +10,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -278,12 +279,16 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 		}
 	}
 	
-	@Inject(method = "applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V", at = @At("HEAD"), cancellable = true)
-	private void vt$applyDamage(final DamageSource source, float amount, final CallbackInfo ci)
+	@ModifyVariable(
+			method = "applyDamage(Lnet/minecraft/entity/damage/DamageSource;F)V",
+			at = @At("HEAD"),
+			argsOnly = true,
+			ordinal = 0)
+	private float vt$applyDamageModifiers(float amount, DamageSource source)
 	{
 		final PlayerEntity player = (PlayerEntity)(Object)this;
-		
-		amount = Math.max(0, PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getModifiedDamage(player, source, amount));
+		float modifier = PlayerEvents.MODIFY_DAMAGE_TAKEN_EVENT.invoker().getDamageModifier(player, source, amount);
+		amount *= modifier;
 		
 		/**
 		 * Applies Smite and Bane of Arthropods bonus damage to players with the UNDEAD or ARTHROPOD supertypes<br>
@@ -295,7 +300,8 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 			LivingEntity originator = (LivingEntity)source.getAttacker();
 			ItemStack heldStack = originator.getEquippedStack(EquipmentSlot.MAINHAND);
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
-			if(sheetOpt.isEmpty()) return;
+			if(sheetOpt.isEmpty())
+				return amount;
 			
 			TypeSet types = sheetOpt.get().elementValue(VTSheetElements.TYPES);
 			// XXX Find some approach to check without using hard-coded enchantments?
@@ -306,8 +312,7 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 				amount += 2.5F * EnchantmentHelper.getLevel(Enchantments.BANE_OF_ARTHROPODS, heldStack);
 		}
 		
-		if(amount <= 0)
-			ci.cancel();
+		return amount < 0 ? 0F : amount;
 	}
 	
 	@Inject(method = "onDeath(Lnet/minecraft/entity/damage/DamageSource;)V", at = @At("TAIL"))

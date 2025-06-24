@@ -26,9 +26,9 @@ public class AbilityGelatinous extends Ability implements ICosmeticSupplier
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(player);
 			if(sheetOpt.isPresent() && sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).hasAbility(registryName()))
 				if(damage.isIn(VTTags.PHYSICAL))
-					return amount * 0.85F;
+					return 0.85F;
 			
-			return amount;
+			return 1F;
 		});
 	}
 	

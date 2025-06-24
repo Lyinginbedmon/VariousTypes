@@ -69,12 +69,13 @@ public class PlayerEvents
 		{
 			PlayerEntity player = (PlayerEntity)args[0];
 			DamageSource source = (DamageSource)args[1];
-			float amount = (float)args[2];
-			if(VTUtils.isDamageInviolable(source, player)) return amount;
+			if(VTUtils.isDamageInviolable(source, player))
+				return 1F;
 			
-			float result = amount;
+			float result = 1F;
 			for(PlayerTakeDamageEvent listener : listeners)
-				result = listener.getModifiedDamage(player, source, result);
+				result *= listener.getDamageModifier(player, source, result);
+			
 			return result;
 		}
 	}));
@@ -82,7 +83,8 @@ public class PlayerEvents
 	@FunctionalInterface
 	public interface PlayerTakeDamageEvent
 	{
-		float getModifiedDamage(PlayerEntity living, DamageSource source, float amount);
+		/** Returns a multiplier, usually 0F or higher, or 1F if this source does not modifer the damage */
+		float getDamageModifier(PlayerEntity living, DamageSource source, float amount);
 	}
 	
 	public static final Event<LivingDropsEvent> PLAYER_DROPS_EVENT = EventFactory.createLoop(LivingDropsEvent.class);

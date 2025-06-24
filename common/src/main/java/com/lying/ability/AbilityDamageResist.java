@@ -47,7 +47,7 @@ public class AbilityDamageResist extends Ability implements IComplexAbility<Conf
 		{
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(living);
 			if(sheetOpt.isEmpty())
-				return amount;
+				return 1F;
 			
 			for(AbilityInstance inst : sheetOpt.get().<AbilitySet>elementValue(VTSheetElements.ABILITIES).getAbilitiesOfType(VTAbilities.FLAMEPROOF.get().registryName()))
 			{
@@ -56,10 +56,10 @@ public class AbilityDamageResist extends Ability implements IComplexAbility<Conf
 					continue;
 				
 				if(config.types.stream().anyMatch(tag -> source.isIn(tag)))
-					return config.nullifies() ? 0F : amount * config.amount;
+					return config.nullifies() ? 0F : config.amount;
 			}
 			
-			return amount;
+			return 1F;
 		});
 	}
 	

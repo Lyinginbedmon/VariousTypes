@@ -29,11 +29,17 @@ public class VTSheetElements
 {
 	private static final Map<Identifier, SheetElement<?>> ELEMENTS = new HashMap<>();
 	
+	/** Creature home dimension, which affects their types */
 	public static final SheetElement<ElementHome> HOME_DIM	= register("home", List::of, ElementHome::new);
+	/** Creature types */
 	public static final SheetElement<ElementTypeSet> TYPES	= register("types", listOf(VTSheetElements.HOME_DIM), ElementTypeSet::new);
+	/** All abilities */
 	public static final SheetElement<ElementAbilitySet> ABILITIES	= register("abilities", listOf(VTSheetElements.TYPES), ElementAbilitySet::new);
+	/** Activated abilities, a subset of abilities */
 	public static final SheetElement<ElementActionables> ACTIONABLES	= register("actionables", listOf(VTSheetElements.ABILITIES), ElementActionables::new);
+	/** Common physiological capacities */
 	public static final SheetElement<ElementActionHandler> ACTIONS	= register("actions", listOf(VTSheetElements.ABILITIES, VTSheetElements.TYPES), ElementActionHandler::new);
+	/** Total nonlethal damage */
 	public static final SheetElement<ElementNonLethal> NONLETHAL	= register("nonlethal", List::of, ElementNonLethal::new);
 	public static final SheetElement<ElementSpecialPose> SPECIAL_POSE	= register("special_pose", List::of, ElementSpecialPose::new);
 	public static final SheetElement<ElementCosmetics> COSMETICS	= register("cosmetics", listOf(VTSheetElements.ABILITIES), ElementCosmetics::new);

@@ -4,7 +4,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import com.lying.reference.Reference;
+import com.lying.ability.AbilityQuake;
 
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleFactory;
@@ -21,14 +21,17 @@ import net.minecraft.util.math.Vec3d;
 public class ShockwaveParticle extends SpriteBillboardParticle
 {
 	private final Vec3d rotation;
+	private final float maxRadius;
 	
 	public ShockwaveParticle(ClientWorld clientWorld, double x, double y, double z, double angX, double angY, double angZ)
 	{
 		super(clientWorld, x, y, z, 0F, 0F, 0F);
 		this.velocityX = this.velocityY = this.velocityZ = 0D;
 		
-		rotation = new Vec3d(angX, angY, angZ).normalize();
-		this.maxAge = 3 * Reference.Values.TICKS_PER_SECOND;
+		Vec3d vel = new Vec3d(angX, angY, angZ);
+		rotation = vel.normalize();
+		maxRadius = (float)(int)vel.length();
+		this.maxAge = (int)(maxRadius * AbilityQuake.INTERVAL);
 		this.scale = 0F;
 	}
 	
@@ -42,7 +45,7 @@ public class ShockwaveParticle extends SpriteBillboardParticle
 		super.tick();
 		
 		float time = (float)this.age / (float)this.maxAge;
-		this.scale = time * 5F;
+		this.scale = time * maxRadius;
 		
 		this.alpha = Math.min(time / 0.2F, 1F - (float)Math.pow(time, 6D));
 	}

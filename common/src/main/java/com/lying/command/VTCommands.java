@@ -19,11 +19,13 @@ import java.util.function.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.Ability.AbilitySource;
+import com.lying.ability.Ability.AbilityType;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilityInstance.AbilityNbt;
 import com.lying.ability.AbilitySet;
 import com.lying.client.utility.CosmeticSet;
 import com.lying.component.CharacterSheet;
+import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementHome;
 import com.lying.component.element.ElementNonLethal;
 import com.lying.component.module.AbstractSheetModule;
@@ -754,6 +756,12 @@ public class VTCommands
 				{
 					AbilityInstance inst = custAbilities.get(registryId).copy();
 					custAbilities.remove(registryId);
+					
+					if(inst.ability().type() != AbilityType.PASSIVE)
+					{
+						ElementActionables actionables = sheetOpt.get().element(VTSheetElements.ACTIONABLES);
+						actionables.clearCooldown(registryId);
+					}
 					source.sendFeedback(() -> translate("command", "custom_abilities.remove.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
 				}
 				catch(Exception e) { source.sendFeedback(() -> translate("command", "custom_abilities.remove.failed", registryId.toString(), player.getDisplayName()), true); }

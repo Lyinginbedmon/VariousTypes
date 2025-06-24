@@ -251,7 +251,7 @@ public class EntityMixin
 	@Inject(method = "fall(DZLnet/minecraft/block/BlockState;Lnet/minecraft/util/math/BlockPos;)V", at = @At("HEAD"))
 	private void vt$fall(double heightDifference, boolean onGround, BlockState stateLandedOn, BlockPos landedPosition, final CallbackInfo ci)
 	{
-		if(this.fallDistance > 0F && (Entity)(Object)this instanceof LivingEntity && !getWorld().isClient())
+		if(this.fallDistance > 0F && onGround && (Entity)(Object)this instanceof LivingEntity && !getWorld().isClient())
 			LivingEvents.ON_FALL_EVENT.invoker().onLivingFall((LivingEntity)(Object)this, this.fallDistance, onGround, stateLandedOn, landedPosition);
 	}
 	
