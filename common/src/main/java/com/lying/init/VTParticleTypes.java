@@ -3,7 +3,6 @@ package com.lying.init;
 import static com.lying.reference.Reference.ModInfo.prefix;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import com.lying.VariousTypes;
 import com.lying.reference.Reference;
@@ -24,9 +23,9 @@ public class VTParticleTypes
 	private static int tally = 0;
 	
 	public static final RegistrySupplier<SimpleParticleType> SHOCKWAVE	= register("shockwave", true);
-	public static final RegistrySupplier<SimpleParticleType> RAGE		= register("rage", true);	// FIXME Add rage particle visuals
+	public static final RegistrySupplier<SimpleParticleType> RAGE		= register("rage", true);	// TODO Improve rage particle texture & parenting
 	public static final RegistrySupplier<SimpleParticleType> REND		= register("rend", true);	// FIXME Add rend particle visuals
-	public static final RegistrySupplier<SimpleParticleType> LEAF		= register("leaf", true);	// FIXME Add leaf particle visuals
+	public static final RegistrySupplier<SimpleParticleType> LEAF		= register("leaf", true);
 	
 	private static RegistrySupplier<SimpleParticleType> register(String nameIn, boolean alwaysShow)
 	{
@@ -39,8 +38,7 @@ public class VTParticleTypes
 			String nameIn, 
 			boolean alwaysShow, 
 			Function<ParticleType<T>, MapCodec<T>> codecGetter,
-			Function<ParticleType<T>, PacketCodec<? super RegistryByteBuf, T>> packetCodecGetter,
-			Supplier<T> type)
+			Function<ParticleType<T>, PacketCodec<? super RegistryByteBuf, T>> packetCodecGetter)
 	{
 		tally++;
 		return PARTICLES.register(prefix(nameIn), () -> new ParticleType<T>(alwaysShow) 

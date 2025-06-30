@@ -8,6 +8,8 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityDamageGear.ConfigDamageGear;
+import com.lying.init.VTParticleTypes;
+import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -16,8 +18,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 
 public class AbilityDamageGear extends AbilityOnMeleeHit implements IComplexAbility<ConfigDamageGear>
@@ -58,6 +63,7 @@ public class AbilityDamageGear extends AbilityOnMeleeHit implements IComplexAbil
 		while(stack.isEmpty() && !slots.isEmpty() && attempts > 0);
 		
 		if(!stack.isEmpty())
+		{
 			if(stack.isDamageable())
 				stack.damage(config.damage(rand), victim, slot);
 			else
@@ -65,6 +71,12 @@ public class AbilityDamageGear extends AbilityOnMeleeHit implements IComplexAbil
 				victim.dropStack(stack.copy());
 				victim.equipStack(slot, ItemStack.EMPTY);
 			}
+			
+			// FIXME Add rend sound effect
+			double xOffset = -MathHelper.sin(attacker.getYaw() * ((float)Math.PI / 180));
+			double zOffset = MathHelper.cos(attacker.getYaw() * ((float)Math.PI / 180));
+			VTUtils.spawnParticles((ServerWorld)attacker.getWorld(), VTParticleTypes.REND.get(), attacker.getPos().add(xOffset, attacker.getHeight() * 0.5D, zOffset), new Vec3d(xOffset, 0, zOffset));
+		}
 	}
 	
 	public ConfigDamageGear memoryToValues(NbtCompound nbt) { return ConfigDamageGear.fromNbt(nbt); }

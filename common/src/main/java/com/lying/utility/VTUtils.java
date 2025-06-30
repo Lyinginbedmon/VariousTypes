@@ -281,23 +281,26 @@ public class VTUtils
 		return names;
 	}
 	
-	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, Vec3d pos, Vec3d vel)
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, Vec3d pos, Vec3d vel, ServerPlayerEntity... exclude)
 	{
-		spawnParticles(world, parameters, true, pos, 0, vel, 1F);
+		spawnParticles(world, parameters, true, pos, 0, vel, 1F, exclude);
 	}
 	
-	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, Vec3d pos, int count, Vec3d vel, float speed)
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, Vec3d pos, int count, Vec3d vel, float speed, ServerPlayerEntity... exclude)
 	{
-		spawnParticles(world, parameters, force, pos.x, pos.y, pos.z, count, vel, speed);
+		spawnParticles(world, parameters, force, pos.x, pos.y, pos.z, count, vel, speed, exclude);
 	}
 	
-	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, Vec3d vel, float speed)
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, Vec3d vel, float speed, ServerPlayerEntity... exclude)
 	{
-		spawnParticles(world, parameters, force, posX, posY, posZ, count, vel.x, vel.y, vel.z, speed);
+		spawnParticles(world, parameters, force, posX, posY, posZ, count, vel.x, vel.y, vel.z, speed, exclude);
 	}
 	
-	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, double velX, double velY, double velZ, float speed)
+	public static void spawnParticles(ServerWorld world, ParticleEffect parameters, boolean force, double posX, double posY, double posZ, int count, double velX, double velY, double velZ, float speed, ServerPlayerEntity... exclude)
 	{
-		world.getPlayers().stream().forEach(player -> world.spawnParticles(player, parameters, force, posX, posY, posZ, count, velX, velY, velZ, speed));
+		List<ServerPlayerEntity> players = world.getPlayers();
+		for(ServerPlayerEntity excluded : exclude)
+			players.remove(excluded);
+		players.stream().forEach(player -> world.spawnParticles(player, parameters, force, posX, posY, posZ, count, velX, velY, velZ, speed));
 	}
 }

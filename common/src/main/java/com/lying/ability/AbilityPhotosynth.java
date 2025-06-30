@@ -7,6 +7,7 @@ import java.util.function.BiPredicate;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityPhotosynth.ConfigPhotosynth;
+import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
@@ -21,10 +22,13 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 public class AbilityPhotosynth extends Ability implements IComplexAbility<ConfigPhotosynth>
@@ -109,8 +113,10 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 					
 					if(emit)
 					{
-						// FIXME Add plant particles
-						VTUtils.playSound(player, VTSoundEvents.PHOTOSYNTH_HEAL.get(), SoundCategory.PLAYERS, 0.5F + player.getRandom().nextFloat() * 0.5F, 0.3F);
+						Random rand = player.getRandom();
+						VTUtils.playSound(player, VTSoundEvents.PHOTOSYNTH_HEAL.get(), SoundCategory.PLAYERS, 0.5F + rand.nextFloat() * 0.5F, 0.3F);
+						for(int i=5; i>0; --i)
+							VTUtils.spawnParticles((ServerWorld)world, VTParticleTypes.LEAF.get(), new Vec3d(player.getX(), player.getRandomBodyY() * 0.75D, player.getZ()), Vec3d.ZERO);
 					}
 				}
 			}

@@ -35,6 +35,7 @@ public class VTPacketHandler
 	public static final Identifier SYNC_POSE_ID			= prefix("s2c_sync_pose");
 	public static final Identifier POWERED_FLIGHT_ID	= prefix("s2c_powered_flight");
 	public static final Identifier HIGHLIGHT_ID			= prefix("s2c_highlight");
+	public static final Identifier PARENTED_PARTICLE_ID	= prefix("s2c_parented_particle");
 	
 	public static void initServer()
 	{

@@ -38,6 +38,8 @@ public class VTEntityTypes
 		return builder.build("thrown_block");
 	});
 	
+	// TODO Implement particle & effect emitter entities
+	
 	private static <T extends Entity> RegistrySupplier<EntityType<T>> register(String name, Supplier<EntityType<T>> entry)
 	{
 		tally++;

@@ -1,3 +1,10 @@
 accessWidener v2 named
 
 accessible	method	net/minecraft/particle/SimpleParticleType <init> (Z)V
+
+accessible	field	net/minecraft/client/particle/Particle	x	D
+accessible	field	net/minecraft/client/particle/Particle	y	D
+accessible	field	net/minecraft/client/particle/Particle	z	D
+accessible	field	net/minecraft/client/particle/Particle	prevPosX	D
+accessible	field	net/minecraft/client/particle/Particle	prevPosY	D
+accessible	field	net/minecraft/client/particle/Particle	prevPosZ	D

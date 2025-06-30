@@ -3,17 +3,20 @@ package com.lying.ability;
 import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityBerserk.ConfigBerserk;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSoundEvents;
+import com.lying.network.ParentedParticlePacket;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
@@ -21,7 +24,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -65,7 +67,8 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	{
 		ConfigBerserk values = memoryToValues(instance.memory());
 		ServerWorld world = (ServerWorld)owner.getWorld();
-		switch(getCurrentTick(instance, world.getTime()))
+		int tick;
+		switch(tick = getCurrentTick(instance, world.getTime()))
 		{
 			case 0:
 				ITickingAbility.tryPutOnCooldown(instance, owner);
@@ -75,13 +78,17 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 				break;
 			case 1:
 			default:
+				if(tick%5 > 0 || owner.getType() != EntityType.PLAYER) return;
 				Random rand = owner.getRandom();
-				for(int i=2; i>0; --i)
-					VTUtils.spawnParticles(
-							world,
-							VTParticleTypes.RAGE.get(), 
-							owner.getPos().add(owner.getParticleX(0.5D), rand.nextDouble() * (owner.getHeight() - 0.25D), owner.getParticleZ(0.5D)),
-							Vec3d.ZERO);
+				UUID id = owner.getUuid();
+				world.getPlayers().stream().forEach(p -> ParentedParticlePacket.send(
+						p, id, 
+						VTParticleTypes.RAGE.get(), 
+						new Vec3d(
+								owner.getParticleX(0.5D) - owner.getX(), 
+								owner.getHeight() * (0.5D + rand.nextDouble() * 0.5D), 
+								owner.getParticleZ(0.5D) - owner.getZ()), 
+						Vec3d.ZERO));
 				break;
 		}
 	}

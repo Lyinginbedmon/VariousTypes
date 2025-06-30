@@ -20,6 +20,7 @@ import com.lying.client.renderer.HornsFeatureRenderer;
 import com.lying.client.renderer.IconFeatureRenderer;
 import com.lying.client.renderer.MiscFeatureRenderer;
 import com.lying.client.renderer.NoseFeatureRenderer;
+import com.lying.client.renderer.ParentedParticlesFeatureRenderer;
 import com.lying.client.renderer.TailFeatureRenderer;
 import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
@@ -175,6 +176,8 @@ public class ClientBus
 		accessor.appendFeature(new TailFeatureRenderer<>(context));
 		accessor.appendFeature(new IconFeatureRenderer<>(context));
 		accessor.appendFeature(new MiscFeatureRenderer<>(context));
+		
+		accessor.appendFeature(new ParentedParticlesFeatureRenderer<>(context));
 	}
 	
 	/** Handles rendering effects applied by abilities that aren't already handled by supplementary feature renderers */
@@ -218,6 +221,8 @@ public class ClientBus
 			long currentTime = client.player.getWorld().getTime();
 			for(HighlightManager<?> manager : VariousTypesClient.HIGHLIGHTS)
 				manager.tick(currentTime);
+			
+			VariousTypesClient.PARENTED_PARTICLES.tick(currentTime);
 		});
 		
 		RenderEvents.AFTER_WORLD_RENDER_EVENT.register((float tickDelta, Camera camera, GameRenderer renderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f1, Matrix4f matrix4f2, VertexConsumerProvider vertexConsumerProvider) -> 
@@ -228,18 +233,22 @@ public class ClientBus
 		
 		PlayerEvent.PLAYER_QUIT.register(player -> 
 		{
-			if(player.getUuid() == mc.player.getUuid())
-				for(HighlightManager<?> manager : VariousTypesClient.HIGHLIGHTS)
-					manager.clear();
+			if(player.getUuid() != mc.player.getUuid()) return;
+			
+			for(HighlightManager<?> manager : VariousTypesClient.HIGHLIGHTS)
+				manager.clear();
+			
+			VariousTypesClient.ENTITY_HIGHLIGHTS.clear();
+			VariousTypesClient.PARENTED_PARTICLES.clear();
 		});
 		
 		PlayerEvent.CHANGE_DIMENSION.register((player, w1, w2) -> 
 		{
-			if(player.getUuid() == mc.player.getUuid())
-			{
-				VariousTypesClient.BLOCK_HIGHLIGHTS.clear(w1);
-				VariousTypesClient.ENTITY_HIGHLIGHTS.clear();
-			}
+			if(player.getUuid() != mc.player.getUuid()) return;
+			
+			VariousTypesClient.BLOCK_HIGHLIGHTS.clear(w1);
+			VariousTypesClient.ENTITY_HIGHLIGHTS.clear();
+			VariousTypesClient.PARENTED_PARTICLES.clear();
 		});
 	}
 }

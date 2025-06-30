@@ -39,7 +39,6 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -59,24 +58,41 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 	public AbilityQuake(Identifier regName, Category catIn)
 	{
 		super(regName, catIn);
+		this.soundSettings = new ActivationSoundSettings(i -> VTSoundEvents.QUAKE_ACTIVATE.get(), 1F, true);
 	}
 	
 	public Optional<Text> description(AbilityInstance instance)
 	{
 		ConfigQuake values = instanceToValues(instance);
-		return Optional.of(translate("ability", registryName().getPath()+".desc", values.maxRange + 2));
+		return Optional.of(translate("ability", registryName().getPath()+".desc", values.maxRange + 1));
 	}
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_SECOND * 30; }
+	
+	public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return !shouldTick(owner, instance) && owner.fallDistance >= 1.5F; }
 	
 	protected void activate(LivingEntity owner, AbilityInstance instance)
 	{
 		startTicking(instance, owner);
 	}
 	
-	protected SoundEvent getActivationSound(AbilityInstance instance) { return null; }
+	private void startTicking(AbilityInstance instance, LivingEntity owner)
+	{
+		ConfigQuake values = memoryToValues(instance.memory());
+		values.setPhase(Phase.FALLING);
+		instance.setMemory(values.toNbt());
+		owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).addTemporaryModifier(new EntityAttributeModifier(GRAVITY_UUID, "quake_gravity", 0.75D, Operation.ADD_VALUE));
+		ITickingAbility.tryPutOnIndefiniteCooldown(instance.mapName(), owner);
+	}
 	
-	public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return !shouldTick(owner, instance) && owner.fallDistance >= 1.5F; }
+	private void stopTicking(AbilityInstance instance, LivingEntity owner)
+	{
+		owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).removeModifier(GRAVITY_UUID);
+		
+		ConfigQuake values = memoryToValues(instance.memory());
+		instance.setMemory(ConfigQuake.ofRange(values.maxRange).toNbt());
+		ITickingAbility.tryPutOnCooldown(instance, owner);
+	}
 	
 	public boolean shouldTick(final LivingEntity owner, final AbilityInstance instance)
 	{
@@ -157,6 +173,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 				VTUtils.spawnParticles((ServerWorld)owner.getWorld(), VTParticleTypes.SHOCKWAVE.get(), owner.getPos().add(0, 0.5, 0), new Vec3d(0, 1, 0).multiply(values.getFinalRadius() + 2));
 				break;
 			case SHOCKWAVE:
+				// XXX Revise to spawn an emitter entity?
 				int ticksLeft = getTicksRemaining(instance, world.getTime());
 				int ticksInShockwave = values.maxShockwaveTime() - ticksLeft;
 				int radius = Math.floorDiv(ticksInShockwave, INTERVAL);
@@ -226,23 +243,6 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		world.getOtherEntities(tile, tile.getBoundingBox().expand(0, 1, 0), Predicates.alwaysTrue()).forEach(ent -> ent.addVelocity(new Vec3d(0D, 0.4D, 0D)));
 		
 		return Optional.of(pos);
-	}
-	
-	private void startTicking(AbilityInstance instance, LivingEntity owner)
-	{
-		ConfigQuake values = memoryToValues(instance.memory());
-		values.setPhase(Phase.FALLING);
-		instance.setMemory(values.toNbt());
-		owner.getAttributeInstance(EntityAttributes.GENERIC_GRAVITY).addTemporaryModifier(new EntityAttributeModifier(GRAVITY_UUID, "quake_gravity", 0.75D, Operation.ADD_VALUE));
-		VTUtils.playSound(owner, VTSoundEvents.QUAKE_ACTIVATE.get(), SoundCategory.PLAYERS, 1F, 1F);
-		ITickingAbility.tryPutOnIndefiniteCooldown(instance.mapName(), owner);
-	}
-	
-	private void stopTicking(AbilityInstance instance, LivingEntity owner)
-	{
-		ConfigQuake values = memoryToValues(instance.memory());
-		instance.setMemory(ConfigQuake.ofRange(values.maxRange).toNbt());
-		ITickingAbility.tryPutOnCooldown(instance, owner);
 	}
 	
 	/** Returns how many ticks until this ability finishes its function */

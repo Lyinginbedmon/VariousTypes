@@ -50,7 +50,7 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_DRAGONFLY		= make("player", "wings_dragonfly", WingsDragonflyModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_BAT				= make("player", "wings_bat", WingsBatModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_BIRD				= make("player", "wings_bird", WingsBirdModel::createBodyLayer);
-	public static final EntityModelLayer MISC_HALO			= make("player", "wings_angel", MiscHaloModel::createBodyLayer);
+	public static final EntityModelLayer MISC_HALO				= make("player", "wings_angel", MiscHaloModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_BEETLE			= make("player", "wings_beetle", WingsBeetleModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_DRAGON			= make("player", "wings_dragon", WingsDragonModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_WITCH			= make("player", "wings_witch", WingsWitchModel::createBodyLayer);

@@ -6,6 +6,7 @@ import com.lying.VariousTypes;
 import com.lying.client.config.ClientConfig;
 import com.lying.client.init.VTKeybinds;
 import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
+import com.lying.client.particle.ParentedParticles;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.ThrownBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
@@ -23,6 +24,7 @@ import com.lying.init.VTEntityTypes;
 import com.lying.init.VTScreenHandlerTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.network.HighlightPacket;
+import com.lying.network.ParentedParticlePacket;
 import com.lying.network.PoweredFlightPacket;
 import com.lying.network.SyncActionablesPacket;
 import com.lying.network.SyncFatiguePacket;
@@ -45,6 +47,7 @@ public class VariousTypesClient
 	
 	public static final BlockHighlights BLOCK_HIGHLIGHTS = new BlockHighlights();
 	public static final EntityHighlights ENTITY_HIGHLIGHTS = new EntityHighlights();
+	public static final ParentedParticles PARENTED_PARTICLES = new ParentedParticles();
 	public static final HighlightManager<?>[] HIGHLIGHTS = new HighlightManager[] { BLOCK_HIGHLIGHTS, ENTITY_HIGHLIGHTS };
 	
 	public static void clientInit()
@@ -120,6 +123,10 @@ public class VariousTypesClient
     		PlayerEntity player = value.playerID().equals(mc.player.getUuid()) ? mc.player : mc.player.getWorld().getPlayerByUuid(value.playerID());
     		if(player != null)
     			((AccessoryAnimationInterface)player).setPoweredFlight(value.powered());
+    	});
+    	NetworkManager.registerReceiver(NetworkManager.s2c(), ParentedParticlePacket.PACKET_TYPE, ParentedParticlePacket.PACKET_CODEC, (value, context) -> 
+    	{
+    		PARENTED_PARTICLES.addParticle(value.uuid(), value.params(), value.x(), value.y(), value.z(), value.velX(), value.velY(), value.velZ());
     	});
 	}
 	
