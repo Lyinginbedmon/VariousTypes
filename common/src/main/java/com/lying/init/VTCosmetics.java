@@ -58,13 +58,13 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> TAIL_DRAGON		= tail("dragon_tail");
 	public static final Supplier<Cosmetic> TAIL_KIRIN		= tail("kirin_tail");
 	public static final Supplier<Cosmetic> TAIL_FOX			= tail("fox_tail");
-//	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");
+	public static final Supplier<Cosmetic> TAIL_WOLF		= tail("wolf_tail");
 //	public static final Supplier<Cosmetic> TAIL_CAT			= tail("cat_tail");
 	public static final Supplier<Cosmetic> TAIL_RAT			= tail("rat_tail");
 	public static final Supplier<Cosmetic> TAIL_RABBIT		= tail("rabbit_tail");
 	public static final Supplier<Cosmetic> TAIL_AXOLOTL		= tail("axolotl_tail");
-//	public static final Supplier<Cosmetic> TAIL_SCORPION	= tail("scorpion_tail");
-//	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");
+	public static final Supplier<Cosmetic> TAIL_SCORPION	= tail("scorpion_tail");
+	public static final Supplier<Cosmetic> TAIL_WHALE		= tail("whale_tail");
 	
 	public static final Supplier<Cosmetic> MISC_GLOW_SPOTS	= misc("verdine_spots");
 	public static final Supplier<Cosmetic> MISC_GELATINOUS	= misc("gelatinous");

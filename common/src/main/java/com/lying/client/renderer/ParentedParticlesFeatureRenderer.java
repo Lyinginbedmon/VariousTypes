@@ -52,18 +52,8 @@ public class ParentedParticlesFeatureRenderer<T extends Entity, M extends Entity
 		double posZ = entity.getZ();
 		
 		ParticleSet set = VariousTypesClient.PARENTED_PARTICLES.getParentedParticles(entity.getUuid());
-		set.getAll().forEach(particle -> 
-		{
-        	// Offset particle position by parent's position
-        	particle.prevPosX += prevX;
-        	particle.x += posX;
-        	
-        	particle.prevPosY += prevY;
-        	particle.y += posY;
-        	
-        	particle.prevPosZ += prevZ;
-        	particle.z += posZ;
-		});
+    	// Offset particle position by parent's position
+		set.getAll().forEach(particle -> modifyParticlePosition(particle, prevX, posX, prevY, posY, prevZ, posZ, 1D));
 		
 		LightmapTextureManager lightmap = mc.gameRenderer.getLightmapTextureManager();
 		Camera camera = mc.gameRenderer.getCamera();
@@ -91,19 +81,19 @@ public class ParentedParticlesFeatureRenderer<T extends Entity, M extends Entity
         RenderSystem.disableBlend();
         lightmap.disable();
         
-		set.getAll().forEach(particle -> 
-		{
-            // Revert offset to retain association to parent
-        	particle.prevPosX -= prevX;
-        	particle.x -= posX;
-        	
-        	particle.prevPosY -= prevY;
-        	particle.y -= posY;
-        	
-        	particle.prevPosZ -= prevZ;
-        	particle.z -= posZ;
-        	
-        	particle.tick();
-		});
+        // Revert offset to retain association to parent
+		set.getAll().forEach(particle -> modifyParticlePosition(particle, prevX, posX, prevY, posY, prevZ, posZ, -1D));
+	}
+	
+	private static void modifyParticlePosition(Particle particle, double prevX, double x, double prevY, double y, double prevZ, double z, double mul)
+	{
+    	particle.prevPosX += prevX * mul;
+    	particle.x += x * mul;
+    	
+    	particle.prevPosY += prevY * mul;
+    	particle.y += y * mul;
+    	
+    	particle.prevPosZ += prevZ * mul;
+    	particle.z += z * mul;
 	}
 }
