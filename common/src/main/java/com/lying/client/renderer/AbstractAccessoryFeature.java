@@ -4,10 +4,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.joml.Vector3f;
 
-import com.google.common.base.Supplier;
 import com.lying.client.renderer.accessory.IAccessoryRenderer;
 import com.lying.client.utility.VTUtilsClient;
 import com.lying.reference.Reference;

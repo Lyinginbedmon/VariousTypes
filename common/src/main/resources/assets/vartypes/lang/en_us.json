@@ -3,6 +3,7 @@
 	"item.vartypes.character_sheet": "Character Sheet",
 	// Entities
 	"entity.vartypes.thrown_block_type": "%s",
+	"entity.vartypes.emitter": "Emitter",
 	// Status effects
 	"effect.vartypes.fatigue": "Fatigue",
 	"effect.vartypes.dazzled": "Dazzled",
@@ -367,7 +368,14 @@
 	// Enums
 	"wings.vartypes.butterfly": "Butterfly",
 	"wings.vartypes.dragonfly": "Dragonfly",
-	"wings.vartypes.fairy": "Fairy",
+	"wings.vartypes.fairy_oak": "Oak Fairy",
+	"wings.vartypes.fairy_spruce": "Spruce Fairy",
+	"wings.vartypes.fairy_birch": "Birch Fairy",
+	"wings.vartypes.fairy_jungle": "Jungle Fairy",
+	"wings.vartypes.fairy_acacia": "Acacia Fairy",
+	"wings.vartypes.fairy_cherry": "Cherry Fairy",
+	"wings.vartypes.fairy_dark_oak": "Dark Oak Fairy",
+	"wings.vartypes.fairy_mangrove": "Mangrove Fairy",
 	"wings.vartypes.energy": "Energy",
 	"wings.vartypes.beetle": "Beetle",
 	"wings.vartypes.bird": "Bird",

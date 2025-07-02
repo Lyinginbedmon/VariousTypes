@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
-import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.utility.Cosmetic;
 import com.lying.utility.CosmeticType;
@@ -28,8 +28,15 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_BAT		= wings("bat_wings");
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
-//	public static final Supplier<Cosmetic> WINGS_FAIRY		= wings("fairy_wings");
-//	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");
+	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	// Detached warp nacelles? Ultrakill? Compatible with halo!
+	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= wings("oak_fairy_wings");	// TODO Finalise model, leaf particles when flapping?
+	public static final Supplier<Cosmetic> WINGS_FAIRY_SPRUCE		= wings("spruce_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_BIRCH		= wings("birch_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_JUNGLE		= wings("jungle_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_ACACIA		= wings("acacia_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_CHERRY		= wings("cherry_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_DARK_OAK		= wings("dark_oak_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_MANGROVE		= wings("mangrove_fairy_wings");
 	
 	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
@@ -42,7 +49,7 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
 	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
 	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");
-	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");
+	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");	// TODO Fix modelling
 	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");
 	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");
 	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");

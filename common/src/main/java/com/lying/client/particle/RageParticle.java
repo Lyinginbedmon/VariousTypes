@@ -1,8 +1,5 @@
 package com.lying.client.particle;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -17,7 +14,6 @@ import net.minecraft.client.particle.SpriteProvider;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.SimpleParticleType;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -26,8 +22,6 @@ import net.minecraft.util.math.random.Random;
 public class RageParticle extends SpriteBillboardParticle
 {
 	private final SpriteProvider spriteProvider;
-	
-	private Optional<UUID> parentId = Optional.empty();
 	
 	public RageParticle(ClientWorld clientWorld, double posX, double posY, double posZ, double velX, double velY, double velZ, SpriteProvider spriteProviderIn)
 	{
@@ -53,16 +47,6 @@ public class RageParticle extends SpriteBillboardParticle
 		float time = (float)this.age / (float)this.maxAge;
 		this.alpha = Math.min(time / 0.2F, 1F - (float)Math.pow(time, 6D));
 		setSpriteForAge(this.spriteProvider);
-		
-		// XXX Implement particle parenting, stay fixed to parent
-		parentId.ifPresent(id -> 
-		{
-			PlayerEntity parent = this.world.getPlayerByUuid(id);
-			
-			this.x += parent.getX() - parent.prevX;
-			this.y += parent.getY() - parent.prevY;
-			this.z += parent.getZ() - parent.prevZ;
-		});
 	}
 	
 	public void buildGeometry(VertexConsumer vertexConsumer, Camera camera, float tickDelta)

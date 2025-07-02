@@ -1,5 +1,7 @@
 package com.lying.client.renderer;
 
+import java.util.function.Supplier;
+
 import com.lying.client.init.VTModelLayerParts;
 import com.lying.client.model.wings.WingsBatModel;
 import com.lying.client.model.wings.WingsBeetleModel;
@@ -8,15 +10,23 @@ import com.lying.client.model.wings.WingsButterflyModel;
 import com.lying.client.model.wings.WingsDragonModel;
 import com.lying.client.model.wings.WingsDragonflyModel;
 import com.lying.client.model.wings.WingsElytraModel;
+import com.lying.client.model.wings.WingsFairyModel;
 import com.lying.client.model.wings.WingsSkeletonModel;
 import com.lying.client.model.wings.WingsWitchModel;
 import com.lying.client.renderer.accessory.AccessoryBasic;
+import com.lying.client.renderer.accessory.AccessoryBlockTexture;
 import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.client.renderer.accessory.AccessoryEndPortal;
 import com.lying.client.renderer.accessory.AccessoryTranslucent;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
+import com.lying.utility.Cosmetic;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.color.block.BlockColorProvider;
+import net.minecraft.client.color.world.BiomeColors;
+import net.minecraft.client.color.world.FoliageColors;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLoader;
@@ -24,7 +34,17 @@ import net.minecraft.entity.LivingEntity;
 
 public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<E>> extends AbstractAccessoryFeature<E, M>
 {
-	private EntityModel<LivingEntity> elytraWings, butterflyWings, dragonflyWings, batWings, birdWings, beetleWings, witchWings, dragonWings, skeletonWings;
+	private EntityModel<LivingEntity> 
+		elytraWings, 
+		butterflyWings, 
+		dragonflyWings, 
+		batWings, 
+		birdWings, 
+		beetleWings, 
+		witchWings, 
+		dragonWings, 
+		skeletonWings,
+		fairyWingsLog, fairyWingsLeaf;
 	
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
 	{
@@ -42,6 +62,8 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		skeletonWings = new WingsSkeletonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_SKELETON));
 		beetleWings = new WingsBeetleModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
 		dragonWings = new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON));
+		fairyWingsLog = new WingsFairyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_FAIRY_LOG));
+		fairyWingsLeaf = new WingsFairyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_FAIRY_LEAF));
 	}
 	
 	protected void populateRendererMap()
@@ -112,5 +134,43 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 					AccessoryBasic.create(
 						e -> dragonWings,
 						texture("wings/dragon_overlay.png")).untinted()));
+		
+		BlockColorProvider leafColor = (state, world, pos, tintIndex) -> world != null && pos != null ? BiomeColors.getFoliageColor(world, pos) : FoliageColors.getDefaultColor();
+		BlockColorProvider spruceColor = (state, world, pos, tintIndex) -> FoliageColors.getSpruceColor();
+		BlockColorProvider birchColor = (state, world, pos, tintIndex) -> FoliageColors.getBirchColor();
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_OAK, Blocks.OAK_LOG, Blocks.OAK_LEAVES, leafColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_BIRCH, Blocks.BIRCH_LOG, Blocks.BIRCH_LEAVES, birchColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_SPRUCE, Blocks.SPRUCE_LOG, Blocks.SPRUCE_LEAVES, spruceColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_JUNGLE, Blocks.JUNGLE_LOG, Blocks.JUNGLE_LEAVES, leafColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_ACACIA, Blocks.ACACIA_LOG, Blocks.ACACIA_LEAVES, leafColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_CHERRY, Blocks.CHERRY_LOG, Blocks.CHERRY_LEAVES);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_DARK_OAK, Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_LEAVES, leafColor);
+		registerFairyWing(VTCosmetics.WINGS_FAIRY_MANGROVE, Blocks.MANGROVE_LOG, Blocks.MANGROVE_LEAVES, leafColor);
+	}
+	
+	private void registerFairyWing(Supplier<Cosmetic> cosmetic, Block log, Block leaf)
+	{
+		addRendererMap(
+				cosmetic,
+				AccessoryCompound.create(
+					AccessoryBlockTexture.create(
+						e -> fairyWingsLog,
+						() -> log).untinted(),
+					AccessoryBlockTexture.create(
+						e -> fairyWingsLeaf, 
+						() -> leaf).untinted()));
+	}
+	
+	private void registerFairyWing(Supplier<Cosmetic> cosmetic, Block log, Block leaf, BlockColorProvider tint)
+	{
+		addRendererMap(
+				cosmetic,
+				AccessoryCompound.create(
+					AccessoryBlockTexture.create(
+						e -> fairyWingsLog,
+						() -> log).untinted(),
+					AccessoryBlockTexture.create(
+						e -> fairyWingsLeaf, 
+						() -> leaf).tintFunc(tint)));
 	}
 }

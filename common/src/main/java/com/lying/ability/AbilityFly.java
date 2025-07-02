@@ -4,10 +4,10 @@ import static com.lying.reference.Reference.ModInfo.translate;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.ability.AbilityFly.ConfigFly;
@@ -114,8 +114,15 @@ public class AbilityFly extends Ability implements IComplexAbility<ConfigFly>, I
 	{
 		BUTTERFLY(VTCosmetics.WINGS_BUTTERFLY),
 		DRAGONFLY(VTCosmetics.WINGS_DRAGONFLY),
-//		FAIRY(VTCosmetics.WINGS_FAIRY),
-//		ENERGY(VTCosmetics.WINGS_ENERGY),
+		FAIRY_OAK(VTCosmetics.WINGS_FAIRY_OAK),
+		FAIRY_SPRUCE(VTCosmetics.WINGS_FAIRY_SPRUCE),
+		FAIRY_BIRCH(VTCosmetics.WINGS_FAIRY_BIRCH),
+		FAIRY_JUNGLE(VTCosmetics.WINGS_FAIRY_JUNGLE),
+		FAIRY_ACACIA(VTCosmetics.WINGS_FAIRY_ACACIA),
+		FAIRY_CHERRY(VTCosmetics.WINGS_FAIRY_CHERRY),
+		FAIRY_DARK_OAK(VTCosmetics.WINGS_FAIRY_DARK_OAK),
+		FAIRY_MANGROVE(VTCosmetics.WINGS_FAIRY_MANGROVE),
+		ENERGY(VTCosmetics.WINGS_ENERGY),
 		BEETLE(VTCosmetics.WINGS_BEETLE),
 		BIRD(VTCosmetics.WINGS_BIRD),
 		ANGEL(VTCosmetics.WINGS_ANGEL),

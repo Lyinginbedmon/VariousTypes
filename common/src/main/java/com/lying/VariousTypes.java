@@ -14,6 +14,7 @@ import com.lying.config.ServerConfig;
 import com.lying.init.VTAbilities;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
+import com.lying.init.VTEmissions;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTItems;
 import com.lying.init.VTParticleTypes;
@@ -62,6 +63,7 @@ public class VariousTypes
     	VTCosmetics.init();
     	VTAbilities.init();
     	VTTypes.init();
+    	VTEmissions.init();
     	VTSpeciesRegistry.init();
     	VTTemplateRegistry.init();
     	VTScreenHandlerTypes.init();

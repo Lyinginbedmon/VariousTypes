@@ -23,7 +23,7 @@ public class VTParticleTypes
 	private static int tally = 0;
 	
 	public static final RegistrySupplier<SimpleParticleType> SHOCKWAVE	= register("shockwave", true);
-	public static final RegistrySupplier<SimpleParticleType> RAGE		= register("rage", true);	// TODO Improve rage particle texture & parenting
+	public static final RegistrySupplier<SimpleParticleType> RAGE		= register("rage", true);	// TODO Improve rage particle texture
 	public static final RegistrySupplier<SimpleParticleType> REND		= register("rend", true);	// FIXME Add rend particle visuals
 	public static final RegistrySupplier<SimpleParticleType> LEAF		= register("leaf", true);
 	

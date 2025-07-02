@@ -8,6 +8,7 @@ import com.lying.client.init.VTKeybinds;
 import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
 import com.lying.client.particle.ParentedParticles;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
+import com.lying.client.renderer.EmitterEntityRenderer;
 import com.lying.client.renderer.ThrownBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
@@ -144,5 +145,6 @@ public class VariousTypesClient
 		EntityRendererRegistry.register(VTEntityTypes.ANIMATED_PLAYER, AnimatedPlayerEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ThrownBlockEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.THROWN_BLOCK, ThrownBlockEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.EMITTER, EmitterEntityRenderer::new);
 	}
 }

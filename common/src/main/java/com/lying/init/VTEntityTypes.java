@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import com.lying.VariousTypes;
 import com.lying.entity.AnimatedPlayerEntity;
+import com.lying.entity.EmitterEntity;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.entity.ThrownBlockEntity;
 import com.lying.reference.Reference;
@@ -19,7 +20,7 @@ public class VTEntityTypes
 {
 	public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Reference.ModInfo.MOD_ID, RegistryKeys.ENTITY_TYPE);
 	private static int tally;
-
+	
 	public static final RegistrySupplier<EntityType<AnimatedPlayerEntity>> ANIMATED_PLAYER	= register("animated_player", () -> 
 	{
 		EntityType.Builder<AnimatedPlayerEntity> builder = EntityType.Builder.<AnimatedPlayerEntity>create(AnimatedPlayerEntity::new, SpawnGroup.MISC).dimensions(0.6F, 1.8F);
@@ -38,7 +39,11 @@ public class VTEntityTypes
 		return builder.build("thrown_block");
 	});
 	
-	// TODO Implement particle & effect emitter entities
+	public static final RegistrySupplier<EntityType<EmitterEntity>> EMITTER				= register("emitter", () -> 
+	{
+		EntityType.Builder<EmitterEntity> builder = EntityType.Builder.create(EmitterEntity::new, SpawnGroup.MISC).dimensions(0.1F, 0.1F);
+		return builder.build("emitter");
+	});
 	
 	private static <T extends Entity> RegistrySupplier<EntityType<T>> register(String name, Supplier<EntityType<T>> entry)
 	{

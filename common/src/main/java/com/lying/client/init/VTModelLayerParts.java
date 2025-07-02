@@ -30,6 +30,7 @@ import com.lying.client.model.wings.WingsButterflyModel;
 import com.lying.client.model.wings.WingsDragonModel;
 import com.lying.client.model.wings.WingsDragonflyModel;
 import com.lying.client.model.wings.WingsElytraModel;
+import com.lying.client.model.wings.WingsFairyModel;
 import com.lying.client.model.wings.WingsSkeletonModel;
 import com.lying.client.model.wings.WingsWitchModel;
 import com.lying.reference.Reference;
@@ -57,6 +58,8 @@ public class VTModelLayerParts
 	public static final EntityModelLayer WINGS_DRAGON			= make("wings_dragon", WingsDragonModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_WITCH			= make("wings_witch", WingsWitchModel::createBodyLayer);
 	public static final EntityModelLayer WINGS_SKELETON			= make("wings_skeleton", WingsSkeletonModel::createBodyLayer);
+	public static final EntityModelLayer WINGS_FAIRY_LOG		= make("wings_fairy_log", WingsFairyModel::createLogLayer);
+	public static final EntityModelLayer WINGS_FAIRY_LEAF		= make("wings_fairy_leaf", WingsFairyModel::createLeafLayer);
 	
 	public static final EntityModelLayer NOSE_PIG				= make("nose_pig", SimpleNoseModel::createPigNose);
 	public static final EntityModelLayer NOSE_PIGLIN			= make("nose_piglin", SimpleNoseModel::createPiglinNose);
