@@ -61,4 +61,6 @@ public class VTCosmeticTypes
 	}
 	
 	public static Collection<Identifier> typeIds() { return TYPE_REGISTRY.keySet(); }
+	
+	public static Collection<CosmeticType> types() { return TYPE_REGISTRY.values().stream().map(Supplier::get).toList(); }
 }

@@ -342,10 +342,8 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 			AnimationState state = getAnimation(anim);
 			if(anim == pose)
 			{
-				if(state.isRunning())
-					continue;
-				// VariousTypes.LOGGER.info("# Started playing {} animation on {}", pose.name(), getName().getString());
-				state.startIfNotRunning(age);
+				if(!state.isRunning())
+					state.startIfNotRunning(age);
 			}
 			else if(state.isRunning())
 				state.stop();
@@ -355,7 +353,6 @@ public class PlayerEntityMixin extends LivingEntityMixin implements PlayerXPInte
 	public void setPoweredFlight(boolean bool)
 	{
 		if(isFlightPowered == bool) return;
-		
 		isFlightPowered = bool;
 		
 		if(!getWorld().isClient())

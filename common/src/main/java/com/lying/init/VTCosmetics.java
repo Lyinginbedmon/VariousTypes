@@ -11,8 +11,12 @@ import java.util.function.Supplier;
 import com.lying.VariousTypes;
 import com.lying.utility.Cosmetic;
 import com.lying.utility.CosmeticType;
+import com.lying.utility.PlayerPose;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 
 public class VTCosmetics
 {
@@ -29,14 +33,14 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
 	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	// Detached warp nacelles? Ultrakill? Compatible with halo!
-	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= wings("oak_fairy_wings");	// TODO Finalise model, leaf particles when flapping?
-	public static final Supplier<Cosmetic> WINGS_FAIRY_SPRUCE		= wings("spruce_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_BIRCH		= wings("birch_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_JUNGLE		= wings("jungle_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_ACACIA		= wings("acacia_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_CHERRY		= wings("cherry_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_DARK_OAK		= wings("dark_oak_fairy_wings");
-	public static final Supplier<Cosmetic> WINGS_FAIRY_MANGROVE		= wings("mangrove_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= fairyWings("oak_fairy_wings");	// TODO Leaf particles when flapping?
+	public static final Supplier<Cosmetic> WINGS_FAIRY_SPRUCE		= fairyWings("spruce_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_BIRCH		= fairyWings("birch_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_JUNGLE		= fairyWings("jungle_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_ACACIA		= fairyWings("acacia_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_CHERRY		= fairyWings("cherry_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_DARK_OAK		= fairyWings("dark_oak_fairy_wings");
+	public static final Supplier<Cosmetic> WINGS_FAIRY_MANGROVE		= fairyWings("mangrove_fairy_wings");
 	
 	public static final Supplier<Cosmetic> NOSE_PIG			= nose("pig_nose");
 	public static final Supplier<Cosmetic> NOSE_PIGLIN		= nose("piglin_nose");
@@ -49,7 +53,7 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> EARS_AXOLOTL		= ears("axolotl_gills");
 	public static final Supplier<Cosmetic> EARS_ELF			= ears("elf_ears");
 	public static final Supplier<Cosmetic> EARS_FOX			= ears("fox_ears");
-	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");	// TODO Fix modelling
+	public static final Supplier<Cosmetic> EARS_WOLF		= ears("wolf_ears");
 	public static final Supplier<Cosmetic> EARS_CAT			= ears("cat_ears");
 	public static final Supplier<Cosmetic> EARS_RABBIT		= ears("rabbit_ears");
 	public static final Supplier<Cosmetic> EARS_GOBLIN		= ears("goblin_ears");
@@ -99,6 +103,19 @@ public class VTCosmetics
 	private static Supplier<Cosmetic> tail(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.TAIL); }
 	private static Supplier<Cosmetic> icon(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.ICON); }
 	private static Supplier<Cosmetic> misc(String nameIn) { return register(prefix(nameIn), VTCosmeticTypes.MISC); }
+	
+	private static Supplier<Cosmetic> fairyWings(String nameIn)
+	{
+		return register(() -> new Cosmetic(prefix(nameIn), VTCosmeticTypes.WINGS)
+				{
+					public void onClientTick(LivingEntity host, World world, PlayerPose pose, Random rand)
+					{
+						if(pose != PlayerPose.FLYING_POWERED || rand.nextInt(10) > 0)
+							return;
+						VariousTypes.LOGGER.info(" # Particle flag");
+					}
+				});
+	}
 	
 	public static Supplier<Cosmetic> register(Identifier regName, Supplier<CosmeticType> type)
 	{

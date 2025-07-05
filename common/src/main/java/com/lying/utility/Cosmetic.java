@@ -14,9 +14,12 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.World;
 
 public class Cosmetic
 {
@@ -145,4 +148,6 @@ public class Cosmetic
 	public Optional<Integer> color() { return colour; }
 	
 	public Optional<Float> alpha() { return alpha; }
+	
+	public void onClientTick(LivingEntity host, World world, PlayerPose pose, Random rand) { }
 }

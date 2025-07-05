@@ -35,7 +35,7 @@ public abstract class SimpleTailModel<E extends LivingEntity> extends AbstractTa
 			ModelPartData modelPartData = modelData.getRoot();
 			ModelPartData body = modelPartData.getChild(EntityModelPartNames.BODY);
 			
-			body.addChild(TAIL, ModelPartBuilder.create().uv(0, 0).cuboid(-2.0F, 0.25F, -2.5F, 4.0F, 9.0F, 5.0F, Dilation.NONE), ModelTransform.of(0.0F, 10.5F, 1.75F, 1.5708F, 0.0F, 0.0F));
+			body.addChild(TAIL, ModelPartBuilder.create().uv(0, 0).cuboid(-2F, 0.25F, -2.5F, 4F, 9F, 5F, Dilation.NONE), ModelTransform.of(0F, 10.5F, 1.75F, 1.5708F, 0F, 0F));
 			
 			return TexturedModelData.of(modelData, 32, 16);
 		}
@@ -88,9 +88,9 @@ public abstract class SimpleTailModel<E extends LivingEntity> extends AbstractTa
 			ModelPartData modelPartData = modelData.getRoot();
 			ModelPartData body = modelPartData.getChild(EntityModelPartNames.BODY);
 			
-			body.addChild(TAIL, ModelPartBuilder.create().uv(0, 0).cuboid(-2.0F, 0.25F, -2.5F, 4.0F, 9.0F, 5.0F, Dilation.NONE), ModelTransform.of(0.0F, 10.5F, 1.75F, 1.5708F, 0.0F, 0.0F));
+			body.addChild(TAIL, ModelPartBuilder.create().uv(0, 0).cuboid(-1F, 0.25F, -1F, 2F, 8F, 2F, Dilation.NONE), ModelTransform.of(0F, 10.5F, 1.75F, 1.5708F, 0F, 0F));
 			
-			return TexturedModelData.of(modelData, 32, 16);
+			return TexturedModelData.of(modelData, 16, 16);
 		}
 		
 		protected void animateTail(AccessoryAnimationInterface anims, boolean isMoving, float limbAngle, float limbDistance, float age)

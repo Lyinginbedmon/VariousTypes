@@ -29,7 +29,9 @@ import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementActionables;
 import com.lying.component.element.ElementCosmetics;
 import com.lying.effect.DazzledStatusEffect;
+import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
 import com.lying.init.VTStatusEffects;
@@ -37,12 +39,16 @@ import com.lying.mixin.AccessorEntityRenderDispatcher;
 import com.lying.mixin.AccessorLivingEntityRenderer;
 import com.lying.reference.Reference;
 import com.lying.utility.Cosmetic;
+import com.lying.utility.CosmeticType;
+import com.lying.utility.PlayerPose;
+import com.lying.utility.VTUtils;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import dev.architectury.event.events.client.ClientTooltipEvent;
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.GameRenderer;
@@ -63,6 +69,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.world.World;
 
 public class ClientBus
 {
@@ -159,6 +166,16 @@ public class ClientBus
 				appendAccessoryFeatures((PlayerEntityRenderer)accessor.getModelRenderers().get(model));
 			
 			appendAccessoryFeatures((AnimatedPlayerEntityRenderer)accessor.getRenderers().get(VTEntityTypes.ANIMATED_PLAYER.get()));
+		});
+		
+		// Perform cosmetic visual effects
+		TickEvent.PLAYER_POST.register((player) -> 
+		{
+			World world = mc.world;
+			AccessoryAnimationInterface anim = ((AccessoryAnimationInterface)player); 
+			PlayerPose pose = anim.currentlyRunning();
+			for(CosmeticType type : VTCosmeticTypes.types())
+				VTUtils.getEntityCosmetics(player, type).stream().forEach(cosmetic -> cosmetic.onClientTick(player, world, pose, world.random));
 		});
 	}
 	
