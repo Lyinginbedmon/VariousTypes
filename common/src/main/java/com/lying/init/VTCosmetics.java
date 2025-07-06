@@ -33,7 +33,7 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
 	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	// Detached warp nacelles? Ultrakill? Compatible with halo!
-	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= fairyWings("oak_fairy_wings");	// TODO Leaf particles when flapping?
+	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= fairyWings("oak_fairy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_SPRUCE		= fairyWings("spruce_fairy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_BIRCH		= fairyWings("birch_fairy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_JUNGLE		= fairyWings("jungle_fairy_wings");
@@ -110,9 +110,8 @@ public class VTCosmetics
 				{
 					public void onClientTick(LivingEntity host, World world, PlayerPose pose, Random rand)
 					{
-						if(pose != PlayerPose.FLYING_POWERED || rand.nextInt(10) > 0)
-							return;
-						VariousTypes.LOGGER.info(" # Particle flag");
+						if(pose == PlayerPose.FLYING_POWERED && rand.nextInt(10) == 0)
+							world.addParticle(VTParticleTypes.TINTED_LEAF.get(), host.getX(), host.getY(), host.getZ(), 0, 0, 0);
 					}
 				});
 	}

@@ -172,6 +172,7 @@ public class ClientBus
 		TickEvent.PLAYER_POST.register((player) -> 
 		{
 			World world = mc.world;
+			if(world == null) return;
 			AccessoryAnimationInterface anim = ((AccessoryAnimationInterface)player); 
 			PlayerPose pose = anim.currentlyRunning();
 			for(CosmeticType type : VTCosmeticTypes.types())
