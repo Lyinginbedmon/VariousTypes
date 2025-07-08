@@ -49,7 +49,7 @@ public abstract class ActivatedAbility extends Ability
 			return true;
 		}
 		else if(owner.getType() == EntityType.PLAYER && isServerSide)
-			((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.failed", instance.displayName()), true);
+			((PlayerEntity)owner).sendMessage(translate("gui", "activated_ability.failed", instance.displayName(owner.getRegistryManager())), true);
 		return false;
 	}
 	
@@ -60,7 +60,7 @@ public abstract class ActivatedAbility extends Ability
 			return;
 		
 		ServerPlayerEntity player = (ServerPlayerEntity)owner;
-		player.sendMessage(translate("gui", "activated_ability.success", instance.displayName()), true);
+		player.sendMessage(translate("gui", "activated_ability.success", instance.displayName(owner.getRegistryManager())), true);
 		soundSettings.playSound(player, instance);
 	}
 	

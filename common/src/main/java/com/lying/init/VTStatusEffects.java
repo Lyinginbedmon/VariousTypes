@@ -6,6 +6,8 @@ import com.lying.VariousTypes;
 import com.lying.client.event.RenderEvents;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.effect.FatigueStatusEffect;
+import com.lying.effect.LethargicStatusEffect;
+import com.lying.effect.RageStatusEffect;
 import com.lying.effect.StealthStatusEffect;
 import com.lying.reference.Reference;
 
@@ -32,6 +34,8 @@ public class VTStatusEffects
 	public static final DeferredSupplier<StatusEffect> DAZZLED	= register("dazzled", DazzledStatusEffect::new);
 	public static final DeferredSupplier<StatusEffect> FATIGUE	= register("fatigue", FatigueStatusEffect::new);
 	public static final DeferredSupplier<StatusEffect> STEALTH	= register("stealth", StealthStatusEffect::new);
+	public static final DeferredSupplier<StatusEffect> RAGE		= register("rage", RageStatusEffect::new);
+	public static final DeferredSupplier<StatusEffect> LETHARGY	= register("lethargic", LethargicStatusEffect::new);
 	
 	private static RegistrySupplier<StatusEffect> register(String nameIn, Supplier<StatusEffect> supplierIn)
 	{

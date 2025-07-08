@@ -14,6 +14,7 @@ import dev.architectury.event.events.common.EntityEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -50,7 +51,7 @@ public abstract class AbilityOnMeleeHit extends Ability
 			super(regName, catIn);
 		}
 		
-		public Optional<Text> description(AbilityInstance instance)
+		public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 		{
 			return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToTime(getFireTicks(instance))));
 		}

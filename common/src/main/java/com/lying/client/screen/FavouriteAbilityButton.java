@@ -15,6 +15,7 @@ import com.lying.reference.Reference;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -52,18 +53,18 @@ public class FavouriteAbilityButton extends ButtonWidget
 		this.active = false;
 	}
 	
-	public void set(AbilityInstance inst)
+	public void set(AbilityInstance inst, DynamicRegistryManager manager)
 	{
 		contents = Optional.of(inst);
 		setTooltip(Tooltip.of(Text.empty()
-				.append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n").append(
+				.append(inst.displayName(manager).copy().formatted(Formatting.BOLD)).append("\n").append(
 				Text.translatable("gui.vartypes.clear_favourite").formatted(Formatting.GRAY, Formatting.ITALIC))));
 		this.active = contents.isPresent();
 	}
 	
-	public void setAbility(AbilityInstance inst)
+	public void setAbility(AbilityInstance inst, DynamicRegistryManager manager)
 	{
-		set(inst);
+		set(inst, manager);
 		SetFavouriteAbilityPacket.send(index, inst.mapName());
 	}
 	

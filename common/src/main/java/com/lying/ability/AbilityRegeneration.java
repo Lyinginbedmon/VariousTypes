@@ -25,6 +25,7 @@ import net.minecraft.entity.damage.DamageType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.DamageTypeTags;
 import net.minecraft.registry.tag.TagKey;
@@ -38,7 +39,7 @@ public class AbilityRegeneration extends Ability implements IComplexAbility<Conf
 		super(registryName, category);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigRegeneration values = ConfigRegeneration.fromNbt(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToTime(values.healRate), values.minimumFood));

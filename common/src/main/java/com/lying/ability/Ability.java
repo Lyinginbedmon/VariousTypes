@@ -25,6 +25,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -115,14 +116,14 @@ public class Ability
 	/** Sets the initial values of any necessary memory values */
 	protected NbtCompound initialiseNBT(NbtCompound data) { return data; }
 	
-	public Text displayName(AbilityInstance instance) { return translate("ability",registryName.getPath()); }
+	public Text displayName(AbilityInstance instance, DynamicRegistryManager manager) { return translate("ability",registryName.getPath()); }
 	
-	public Optional<Text> description(AbilityInstance instance) { return Optional.of(translate("ability", registryName.getPath()+".desc")); }
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager) { return Optional.of(translate("ability", registryName.getPath()+".desc")); }
 	
-	public final List<Text> tooltip(AbilityInstance instance)
+	public final List<Text> tooltip(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		List<Text> tooltip = Lists.newArrayList();
-		description(instance).ifPresent(text -> tooltip.add(text.copy()));
+		description(instance, manager).ifPresent(text -> tooltip.add(text.copy()));
 		addTooltipDetails(instance).forEach(detail -> tooltip.add(Text.literal("   ").append(detail.copy())));
 		return tooltip;
 	}

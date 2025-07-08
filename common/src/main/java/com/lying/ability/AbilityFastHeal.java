@@ -18,6 +18,7 @@ import dev.architectury.event.events.common.TickEvent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
@@ -30,7 +31,7 @@ public class AbilityFastHeal extends Ability implements IComplexAbility<ConfigFa
 		super(registryName, category);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigFastHeal values = ConfigFastHeal.fromNbt(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.healAmount, VTUtils.ticksToTime(values.healRate), values.minimumFood));

@@ -27,6 +27,7 @@ import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.OrderedText;
 import net.minecraft.text.Text;
@@ -35,6 +36,7 @@ import net.minecraft.util.Formatting;
 public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 {
 	public static final MinecraftClient mc = MinecraftClient.getInstance();
+	public final DynamicRegistryManager registryManager;
 	private Optional<AbilityInstance> abilityUnderMouse = Optional.empty();
 	
 	private ButtonWidget[] abilityButtons = new ButtonWidget[5];
@@ -51,6 +53,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 	public AbilityMenu(AbilityMenuHandler handler, PlayerInventory inventory, Text title)
 	{
 		super(handler, inventory, title);
+		registryManager = mc.player.getRegistryManager();
 		VariousTypes.getSheet(mc.player).ifPresent(sheet -> 
 		{
 			element = sheet.<ElementActionables>element(VTSheetElements.ACTIONABLES);
@@ -60,7 +63,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 				List<AbilityInstance> set = abilities(cat);
 				set.add(inst);
 				if(set.size() > 1)
-					Collections.sort(set, AbilityInstance.SORT_FUNC);
+					Collections.sort(set, AbilityInstance.sortFunc(registryManager));
 				abilities.put(cat, set);
 			});
 		});
@@ -151,7 +154,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 			for(int i=0; i<favouriteButtons.length; i++)
 			{
 				final int slot = i;
-				element.getFavourite(slot).ifPresent(id -> favouriteButtons[slot].setAbility(element.get(id)));
+				element.getFavourite(slot).ifPresent(id -> favouriteButtons[slot].setAbility(element.get(id), this.registryManager));
 			}
 		});
 		
@@ -184,9 +187,9 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 			else
 			{
 				AbilityInstance inst = currentSet.get(index);
-				button.setMessage(inst.displayName());
+				button.setMessage(inst.displayName(this.registryManager));
 				
-				MutableText text = inst.description().get().copy();
+				MutableText text = inst.description(this.registryManager).get().copy();
 				if(inst.ability().type() == AbilityType.TOGGLED)
 					text.append("\n").append(translate("gui", "toggle_"+(inst.memory().getBoolean("IsActive") ? "on" : "off"), AbilityType.TOGGLED.translate()).copy());
 				button.setTooltip(Tooltip.of(text));
@@ -240,7 +243,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 		abilityUnderMouse.ifPresent(inst -> 
 		{
 			List<OrderedText> lines = Lists.newArrayList();
-			lines.add(inst.displayName().copy().formatted(Formatting.BOLD).asOrderedText());
+			lines.add(inst.displayName(this.registryManager).copy().formatted(Formatting.BOLD).asOrderedText());
 			
 			boolean setFave = false;
 			for(ButtonWidget favourite : favouriteButtons)
@@ -275,7 +278,7 @@ public class AbilityMenu extends HandledScreen<AbilityMenuHandler>
 				for(FavouriteAbilityButton favourite : favouriteButtons)
 					if(favourite.isMouseOver(mouseX, mouseY))
 					{
-						favourite.setAbility(abilityUnderMouse.get());
+						favourite.setAbility(abilityUnderMouse.get(), this.registryManager);
 						abilityUnderMouse = Optional.empty();
 						return true;
 					}

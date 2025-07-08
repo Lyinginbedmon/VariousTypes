@@ -252,7 +252,7 @@ public class ElementActionables extends AbilitySet implements ISheetElement<Abil
 			return;
 		else if(!isAvailable(mapName))
 		{
-			owner.sendMessage(translate("gui", "activated_ability.failed", get(mapName).displayName()), true);
+			owner.sendMessage(translate("gui", "activated_ability.failed", get(mapName).displayName(owner.getRegistryManager())), true);
 			return;
 		}
 		

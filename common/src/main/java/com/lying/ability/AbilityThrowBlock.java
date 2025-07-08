@@ -17,6 +17,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
@@ -29,7 +30,7 @@ public class AbilityThrowBlock extends ActivatedAbility implements IComplexAbili
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigThrowBlock values = instanceToValues(instance);
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.state.getBlock().getName()));

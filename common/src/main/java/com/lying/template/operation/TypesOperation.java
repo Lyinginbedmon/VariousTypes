@@ -6,6 +6,7 @@ import com.lying.type.Type;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -46,7 +47,7 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.add_types", types.asNameList());
 		}
@@ -66,7 +67,7 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.lose_types", types.asNameList());
 		}
@@ -86,7 +87,7 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.set_types", types.display());
 		}
@@ -107,7 +108,7 @@ public abstract class TypesOperation extends ConfigurableOperation
 			super(nameIn, typesIn);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.set_supertypes", types.asNameList());
 		}

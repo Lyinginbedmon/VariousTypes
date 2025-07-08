@@ -14,6 +14,7 @@ import com.lying.ability.Ability.AbilitySource;
 import com.lying.ability.AbilityInstance;
 import com.lying.ability.AbilitySet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -38,17 +39,17 @@ public abstract class AbilityOperation extends ConfigurableOperation
 			add(inst);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			MutableText name = null;
 			if(abilities.isEmpty())
 				name = Text.empty();
 			else
 			{
-				name = abilities.get(0).displayName().copy();
+				name = abilities.get(0).displayName(manager).copy();
 				if(abilities.size() > 1)
 					for(int i=1; i<abilities.size(); i++)
-						name = name.append(", ").append(abilities.get(i).displayName());
+						name = name.append(", ").append(abilities.get(i).displayName(manager));
 			}
 			
 			return Text.translatable("operation.vartypes.add_ability", name);
@@ -140,7 +141,7 @@ public abstract class AbilityOperation extends ConfigurableOperation
 				mapNames.add(name);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.remove_ability", namesToDisplay());
 		}
@@ -190,7 +191,7 @@ public abstract class AbilityOperation extends ConfigurableOperation
 			super(nameIn, regNameIn);
 		}
 		
-		public Text describe()
+		public Text describe(DynamicRegistryManager manager)
 		{
 			return Text.translatable("operation.vartypes.remove_all_ability", namesToDisplay());
 		}

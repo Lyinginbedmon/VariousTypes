@@ -23,6 +23,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
@@ -55,12 +56,6 @@ public class AbilityInstance
 	public static final Codec<List<AbilityInstance>> LIST_CODEC = CODEC.listOf();
 	public static final Codec<List<AbilityInstance>> LIST_CODEC_VITALS = CODEC_VITALS.listOf();
 	
-	/** Comparator for sorting abilities alphabetically by their display name */
-	public static final Comparator<AbilityInstance> SORT_FUNC = (a,b) -> {
-		int comparison;
-		return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName().getString(), b.displayName().getString()) : comparison;
-		};
-	
 	private final Ability ability;
 	private final AbilitySource source;
 	private boolean locked = false;
@@ -91,6 +86,15 @@ public class AbilityInstance
 		memory.ifPresent(mem -> setMemory(mem));
 	}
 	
+	/** Comparator for sorting abilities alphabetically by their display name */
+	public static Comparator<AbilityInstance> sortFunc(DynamicRegistryManager manager)
+	{
+		return (a,b) -> {
+			int comparison;
+			return (comparison = AbilityType.compare(a.ability().type(), b.ability().type())) == 0 ? VTUtils.stringComparator(a.displayName(manager).getString(), b.displayName(manager).getString()) : comparison;
+			};
+	}
+	
 	public final void copyDetails(AbilityInstance source)
 	{
 		cooldown = source.cooldown;
@@ -117,23 +121,23 @@ public class AbilityInstance
 		return this;
 	}
 	
-	public Text displayName()
+	public Text displayName(DynamicRegistryManager manager)
 	{
 		if(display.isPresent())
 			return display.get().title();
-		return ability.displayName(this);
+		return ability.displayName(this, manager);
 	}
 	
-	public Optional<Text> description()
+	public Optional<Text> description(DynamicRegistryManager manager)
 	{
 		if(display.isPresent() && display.get().description().isPresent())
 			return display.get().description();
-		return ability.description(this);
+		return ability.description(this, manager);
 	}
 	
-	public List<Text> tooltip()
+	public List<Text> tooltip(DynamicRegistryManager manager)
 	{
-		return ability.tooltip(this);
+		return ability.tooltip(this, manager);
 	}
 	
 	protected Optional<Integer> cooldownMaybe() { return cooldown; }

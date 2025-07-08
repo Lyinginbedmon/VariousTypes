@@ -26,6 +26,7 @@ public class VTParticleTypes
 	public static final RegistrySupplier<SimpleParticleType> RAGE			= register("rage", true);	// TODO Improve rage particle texture
 	public static final RegistrySupplier<SimpleParticleType> REND			= register("rend", true);	// FIXME Add rend particle texturing
 	public static final RegistrySupplier<SimpleParticleType> LEAF			= register("leaf", true);
+	public static final RegistrySupplier<SimpleParticleType> BIOME_LEAF		= register("biome_leaf", true);
 	public static final RegistrySupplier<SimpleParticleType> TINTED_LEAF	= register("tinted_leaf", true);
 	
 	private static RegistrySupplier<SimpleParticleType> register(String nameIn, boolean alwaysShow)

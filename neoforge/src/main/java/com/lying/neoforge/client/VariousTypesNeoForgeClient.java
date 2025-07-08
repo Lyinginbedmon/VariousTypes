@@ -3,6 +3,7 @@ package com.lying.neoforge.client;
 import com.lying.VariousTypes;
 import com.lying.client.VariousTypesClient;
 import com.lying.client.init.VTModelLayerParts;
+import com.lying.client.particle.BiomeLeafParticle;
 import com.lying.client.particle.LeafParticle;
 import com.lying.client.particle.RageParticle;
 import com.lying.client.particle.ShockwaveParticle;
@@ -47,6 +48,7 @@ public class VariousTypesNeoForgeClient
     {
     	event.registerSpriteSet(VTParticleTypes.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
     	event.registerSpriteSet(VTParticleTypes.LEAF.get(), LeafParticle.Factory::new);
+    	event.registerSpriteSet(VTParticleTypes.BIOME_LEAF.get(), BiomeLeafParticle.Factory::new);
     	event.registerSpriteSet(VTParticleTypes.TINTED_LEAF.get(), TintedLeafParticle.Factory::new);
     	event.registerSpriteSet(VTParticleTypes.RAGE.get(), RageParticle.Factory::new);
     	event.registerSpriteSet(VTParticleTypes.REND.get(), SweepAttackParticle.Factory::new);

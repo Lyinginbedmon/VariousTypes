@@ -34,6 +34,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
 import net.minecraft.particle.ParticleEffect;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -154,15 +155,15 @@ public class VTUtils
 		return describe(type.displayName(), type.listID(), Optional.empty());
 	}
 	
-	public static Text describeAbility(AbilityInstance inst)
+	public static Text describeAbility(AbilityInstance inst, DynamicRegistryManager manager)
 	{
-		MutableText tooltip = Text.empty().append(inst.displayName().copy().formatted(Formatting.BOLD)).append("\n");
+		MutableText tooltip = Text.empty().append(inst.displayName(manager).copy().formatted(Formatting.BOLD)).append("\n");
 		if(inst.cooldown() > 0)
 			tooltip.append(Reference.ModInfo.translate("gui","ability_cooldown", ticksToTime(inst.cooldown()))).append("\n");
 		
-		inst.tooltip().forEach(line -> tooltip.append(line.copy().formatted(Formatting.ITALIC, Formatting.GRAY).append("\n")));
+		inst.tooltip(manager).forEach(line -> tooltip.append(line.copy().formatted(Formatting.ITALIC, Formatting.GRAY).append("\n")));
 		tooltip.append(Text.literal(inst.mapName().toString()).formatted(Formatting.DARK_GRAY));
-		return inst.displayName().copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
+		return inst.displayName(manager).copy().styled(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, tooltip)));
 	}
 	
 	/** Converts game ticks into human-readable time in hours, minutes, and seconds */

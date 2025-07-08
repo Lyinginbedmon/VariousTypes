@@ -87,6 +87,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -166,7 +167,7 @@ public class VTAbilities
 	});
 	public static final Supplier<Ability> DROPS				= register("drops", (id) -> new Ability(id, Category.UTILITY)
 	{
-		public Optional<Text> description(AbilityInstance instance)
+		public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 		{
 			return Optional.of(translate("ability", id.getPath()+".desc", getBag(instance.memory()).description()));
 		}
@@ -226,13 +227,13 @@ public class VTAbilities
 		protected void onToggledOn(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_on", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC), owner.getRegistryManager())));
 		}
 		
 		protected void onToggledOff(LivingEntity owner, AbilityInstance instance)
 		{
 			if(owner.getType() == EntityType.PLAYER)
-				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC))));
+				((PlayerEntity)owner).sendMessage(Reference.ModInfo.translate("gui", "ghostly_turned_off", VTUtils.describeAbility(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC), owner.getRegistryManager())));
 		}
 		
 		public Collection<AbilityInstance> getSubAbilities(AbilityInstance instance) { return isActive(instance) ? List.of(VTAbilities.INTANGIBLE.get().instance(AbilitySource.MISC)) : Collections.emptyList(); }
@@ -336,7 +337,6 @@ public class VTAbilities
 		 * Fury - Temporary mild damage buff and resistance, ends after configured duration OR if owner deals no damage after 5 seconds
 		 * Gaseous - Immune to all physical forms of damage, no collision with other entities
 		 * Life Drain - Similar to Blood Draw, but long cooldown and reduces target's max HP by the same amount
-		 * Flexible - Toggled, applies a configured scale modifier (up or down)
 		 * Mindeater - Melee-range attack on players that drains XP levels or kills outright
 		 * Mindreader - Toggled, detect all non-Mindless entities nearby similar to Sculksight and read any private messages they send (server config, admins always unaffected)
 		 * Null Field - Denies the use of activated abilities near you (including your own) while active, long cooldown when turned off

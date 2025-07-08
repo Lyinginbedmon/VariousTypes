@@ -78,7 +78,7 @@ public class VTUtilsClient
 		species.display().description().ifPresent(desc -> entries.add(desc.copy().formatted(Formatting.ITALIC, Formatting.GRAY)));
 		if(species.power() != 0)
 			entries.add(translate("gui", "power_value", species.power()).copy());
-		species.abilities().allNonHidden().forEach(inst -> entries.add(Text.literal(" * ").append(inst.displayName())));
+		species.abilities().allNonHidden().forEach(inst -> entries.add(Text.literal(" * ").append(inst.displayName(player.getRegistryManager()))));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(species.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);
@@ -99,7 +99,7 @@ public class VTUtilsClient
 		if(!template.operations().isEmpty())
 		{
 			entries.add(translate("gui", "operations").copy());
-			template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe().copy().formatted(Formatting.GRAY))));
+			template.operations().forEach(op -> entries.add(Text.literal(" * ").append(op.describe(player.getRegistryManager()).copy().formatted(Formatting.GRAY))));
 		}
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(template.registryName().toString()).copy().formatted(Formatting.DARK_GRAY));
@@ -109,11 +109,11 @@ public class VTUtilsClient
 	public static  MutableText[] abilityToDetail(AbilityInstance instance)
 	{
 		List<MutableText> entries = Lists.newArrayList();
-		entries.add(instance.displayName().copy().formatted(Formatting.BOLD));
+		entries.add(instance.displayName(player.getRegistryManager()).copy().formatted(Formatting.BOLD));
 		entries.add(instance.ability().type().translate().copy());
 		if(instance.cooldown() > 0)
 			entries.add(Reference.ModInfo.translate("gui","ability_cooldown", VTUtils.ticksToTime(instance.cooldown())).copy());
-		instance.tooltip().forEach(line -> entries.add(line.copy().formatted(Formatting.GRAY)));
+		instance.tooltip(player.getRegistryManager()).forEach(line -> entries.add(line.copy().formatted(Formatting.GRAY)));
 		if(client.options.advancedItemTooltips || player.isCreative())
 			entries.add(Text.literal(instance.mapName().toString()).copy().formatted(Formatting.DARK_GRAY));
 		return entries.toArray(new MutableText[0]);

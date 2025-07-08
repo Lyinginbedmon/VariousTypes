@@ -19,6 +19,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -36,7 +37,7 @@ public class AbilityPoison extends AbilityOnMeleeHit implements IComplexAbility<
 		return inst;
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigPoison values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 
@@ -57,7 +58,7 @@ public class AbilityPoison extends AbilityOnMeleeHit implements IComplexAbility<
 		protected static final Codec<ConfigPoison> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			StatusEffectInstance.CODEC.listOf().optionalFieldOf("Effects").forGetter(v -> Optional.of(v.effects)))
 				.apply(instance, ConfigPoison::new));
-			
+		
 		protected List<StatusEffectInstance> effects = Lists.newArrayList();
 		
 		public ConfigPoison(Optional<List<StatusEffectInstance>> listIn)

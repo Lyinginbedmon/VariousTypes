@@ -704,7 +704,7 @@ public class VTCommands
 						source.sendFeedback(() -> translate("command","get.abilities.success", player.getDisplayName(), abilities.size()), true);
 						
 						List<Text> entries = Lists.newArrayList();
-						abilities.abilities().forEach(inst -> entries.add(Text.literal(" * ").append(VTUtils.describeAbility(inst))));
+						abilities.abilities().forEach(inst -> entries.add(Text.literal(" * ").append(VTUtils.describeAbility(inst, player.getRegistryManager()))));
 						entries.sort((a,b) -> VTUtils.stringComparator(a.getString(), b.getString()));
 						entries.forEach(entry -> source.sendFeedback(() -> entry, false));
 					});
@@ -741,7 +741,7 @@ public class VTCommands
 						custAbilities.remove(inst.mapName());
 				
 				custAbilities.add(inst);
-				source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
+				source.sendFeedback(() -> translate("command", "custom_abilities.add.success", VTUtils.describeAbility(inst, player.getRegistryManager()), player.getDisplayName()), true);
 				return 15;
 			}
 			
@@ -762,7 +762,7 @@ public class VTCommands
 						ElementActionables actionables = sheetOpt.get().element(VTSheetElements.ACTIONABLES);
 						actionables.clearCooldown(registryId);
 					}
-					source.sendFeedback(() -> translate("command", "custom_abilities.remove.success", VTUtils.describeAbility(inst), player.getDisplayName()), true);
+					source.sendFeedback(() -> translate("command", "custom_abilities.remove.success", VTUtils.describeAbility(inst, player.getRegistryManager()), player.getDisplayName()), true);
 				}
 				catch(Exception e) { source.sendFeedback(() -> translate("command", "custom_abilities.remove.failed", registryId.toString(), player.getDisplayName()), true); }
 				return 15;

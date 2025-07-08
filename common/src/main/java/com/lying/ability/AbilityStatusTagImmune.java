@@ -12,6 +12,7 @@ import com.lying.utility.VTUtils;
 import dev.architectury.event.EventResult;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.text.Text;
@@ -24,7 +25,7 @@ public class AbilityStatusTagImmune extends Ability
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		return Optional.of(translate("ability",registryName().getPath()+".desc", VTUtils.tagListToString(getTags(instance.memory()), ", ")));
 	}

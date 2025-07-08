@@ -13,6 +13,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -49,7 +50,7 @@ public class AbilityLoSTeleport extends ActivatedAbility
 		this.soundSettings = new ActivationSoundSettings();
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		return Optional.of(translate("ability",registryName().getPath()+".desc", (int)range(instance.memory())));
 	}

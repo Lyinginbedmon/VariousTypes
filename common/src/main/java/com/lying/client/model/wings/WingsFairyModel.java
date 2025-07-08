@@ -105,7 +105,7 @@ public class WingsFairyModel<E extends LivingEntity> extends AbstractWingsModel<
 					updateAnimation(currentState, VTAnimations.FairyWings.WINGS_FAIRY_FLYING_IDLE, age);
 					break;
 				case PlayerPose.FLYING_POWERED:
-					updateAnimation(currentState, VTAnimations.BirdWings.WINGS_BIRD_FLYING_POWERED, age);
+					updateAnimation(currentState, VTAnimations.FairyWings.WINGS_BIRD_FLYING_POWERED, age);
 					break;
 				case PlayerPose.CROUCHING:
 					updateAnimation(currentState, VTAnimations.FairyWings.WINGS_FAIRY_CROUCH, age);

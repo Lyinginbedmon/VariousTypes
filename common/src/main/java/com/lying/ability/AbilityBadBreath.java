@@ -19,6 +19,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
@@ -29,7 +30,7 @@ public class AbilityBadBreath extends ActivatedAbility implements IComplexAbilit
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigBadBreath values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 

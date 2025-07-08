@@ -22,6 +22,7 @@ import net.minecraft.entity.player.HungerManager;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
@@ -47,7 +48,7 @@ public class AbilityPhotosynth extends Ability implements IComplexAbility<Config
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigPhotosynth values = instanceToValues(instance);
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.food, values.saturation, VTUtils.ticksToTime(values.rate)));

@@ -11,6 +11,7 @@ import com.lying.utility.VTUtils;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -23,7 +24,7 @@ public class AbilityPariah extends Ability
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		NbtList list = instance.memory().contains("Entities", NbtElement.LIST_TYPE) ? instance.memory().getList("Entities", NbtElement.STRING_TYPE) : new NbtList();
 		MutableText names = VTUtils.listToString(listToTypes(list), EntityType::getName, ", ");

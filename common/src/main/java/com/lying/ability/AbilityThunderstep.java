@@ -22,6 +22,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
@@ -36,7 +37,7 @@ public class AbilityThunderstep extends ActivatedAbility implements IComplexAbil
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigThunderstep values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc_"+(values.needsThundering ? "thunder" : "no_thunder"), 

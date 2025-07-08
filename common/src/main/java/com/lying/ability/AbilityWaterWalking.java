@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
@@ -28,7 +29,7 @@ public class AbilityWaterWalking extends Ability implements IBlockCollisionAbili
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.listToString(getFluidList(instance.memory()), tag -> Text.literal(tag.id().toString()), ", ")));
 	}

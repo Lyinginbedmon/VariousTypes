@@ -102,7 +102,7 @@ public class ClientBus
 			for(int i=0; i<favourites.size(); i++)
 			{
 				FavouriteAbilityButton f1 = new FavouriteAbilityButton(1, y + i * (buttonSize + buttonSpacing), buttonHeight, i, (button) -> {});
-				favourites.get(i).ifPresent(id -> f1.set(element.get(id)));
+				favourites.get(i).ifPresent(id -> f1.set(element.get(id), mc.player.getRegistryManager()));
 				f1.render(context, 0, 0, tickDelta);
 			}
 		}));

@@ -32,7 +32,7 @@ public class ModuleCustomAbilities extends AbstractSheetModule
 				throw NO_VALUE.create();
 			
 			source.sendFeedback(() -> translate("command","get.custom_abilities.success", owner.getDisplayName(), customAbilities.size()), true);
-			customAbilities.abilities().forEach(inst -> source.sendFeedback(() -> Text.literal(" * ").append(VTUtils.describeAbility(inst)), false));
+			customAbilities.abilities().forEach(inst -> source.sendFeedback(() -> Text.literal(" * ").append(VTUtils.describeAbility(inst, owner.getRegistryManager())), false));
 			return 15;
 		};
 	}

@@ -16,6 +16,7 @@ import com.lying.type.DummyType;
 import com.lying.type.Type.Tier;
 import com.lying.type.TypeSet;
 
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -97,7 +98,7 @@ public abstract class Operation
 	
 	public Identifier registryName() { return registryName; }
 	
-	public Text describe() { return Text.translatable("operation."+registryName.getNamespace()+"."+registryName.getPath()); }
+	public Text describe(DynamicRegistryManager manager) { return Text.translatable("operation."+registryName.getNamespace()+"."+registryName.getPath()); }
 	
 	public abstract JsonElement writeToJson(RegistryWrapper.WrapperLookup manager);
 	

@@ -19,6 +19,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.registry.tag.TagKey;
@@ -46,7 +47,7 @@ public class AbilityBurrow extends ToggledAbility implements IPhasingAbility
 		return VTAbilities.BURROW.get().instance(AbilitySource.MISC, nbt -> nbt.put("Blocks", list));
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		MutableText names = VTUtils.tagListToString(getBurrowables(instance.memory()), ", ");
 		return Optional.of(translate("ability",registryName().getPath()+".desc", names));

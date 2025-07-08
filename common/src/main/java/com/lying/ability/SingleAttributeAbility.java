@@ -12,6 +12,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -40,7 +41,7 @@ public abstract class SingleAttributeAbility extends Ability
 		this.modifierName = nameIn;
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		return Optional.of(translate("ability", registryName().getPath()+".desc", getAmount(instance.memory())));
 	}
@@ -72,7 +73,7 @@ public abstract class SingleAttributeAbility extends Ability
 		
 		public Text displayName(AbilityInstance instance) { return translate("ability", registryName().getPath()+(getAmount(instance.memory()) >= 0 ? ".bonus" : ".penalty")); }
 		
-		public Optional<Text> description(AbilityInstance instance)
+		public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 		{
 			int amount = getAmount(instance.memory());
 			return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".bonus" : ".penalty")+".desc", amount));
@@ -110,7 +111,7 @@ public abstract class SingleAttributeAbility extends Ability
 		
 		public Text displayName(AbilityInstance instance) { return translate("ability", registryName().getPath()+(getAmount(instance.memory()) >= 0 ? ".bonus" : ".penalty")); }
 		
-		public Optional<Text> description(AbilityInstance instance)
+		public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 		{
 			int amount = getAmount(instance.memory());
 			return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".bonus" : ".penalty")+".desc", (int)MathHelper.abs(amount)));
@@ -144,7 +145,7 @@ public abstract class SingleAttributeAbility extends Ability
 		
 		public Text displayName(AbilityInstance instance) { return translate("ability", registryName().getPath()+(getScale(instance.memory()) >= 0 ? ".increase" : ".decrease")); }
 		
-		public Optional<Text> description(AbilityInstance instance)
+		public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 		{
 			float amount = getScale(instance.memory());
 			return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".increase" : ".decrease")+".desc", (int)(Math.abs(amount * 100))));

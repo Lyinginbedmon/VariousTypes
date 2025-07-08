@@ -10,6 +10,7 @@ import com.lying.ability.AbilityBerserk.ConfigBerserk;
 import com.lying.component.CharacterSheet;
 import com.lying.init.VTParticleTypes;
 import com.lying.init.VTSoundEvents;
+import com.lying.init.VTStatusEffects;
 import com.lying.network.ParentedParticlePacket;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -18,11 +19,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -42,10 +46,16 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 				true);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigBerserk values = memoryToValues(instance.memory());
-		return Optional.of(translate("ability", registryName().getPath()+".desc", VTUtils.ticksToTime(values.buffTime), VTUtils.ticksToTime(values.debuffTime)));
+		StatusEffectInstance buff = values.getBuff(manager);
+		StatusEffectInstance debuff = values.getDebuff(manager);
+		return Optional.of(translate("ability", registryName().getPath()+".desc", 
+				Text.translatable(buff.getTranslationKey()),
+				VTUtils.ticksToTime(values.buffTime), 
+				Text.translatable(debuff.getTranslationKey()),
+				VTUtils.ticksToTime(values.debuffTime)));
 	}
 	
 	public int cooldownDefault() { return Reference.Values.TICKS_PER_MINUTE * 5; }
@@ -53,10 +63,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	protected void activate(LivingEntity owner, AbilityInstance instance)
 	{
 		startTicking(instance, owner);
-		
-		ConfigBerserk values = memoryToValues(instance.memory());
-		owner.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, values.buffTime, 1));
-		owner.addStatusEffect(new StatusEffectInstance(StatusEffects.ABSORPTION, values.buffTime, 8));
+		owner.addStatusEffect(memoryToValues(instance.memory()).getBuff(owner.getRegistryManager()));
 	}
 	
 	public boolean canTrigger(LivingEntity owner, AbilityInstance instance) { return !shouldTick(owner, instance); }
@@ -72,9 +79,7 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 		{
 			case 0:
 				ITickingAbility.tryPutOnCooldown(instance, owner);
-				
-				owner.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, values.debuffTime));
-				owner.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, values.debuffTime));
+				owner.addStatusEffect(values.getDebuff(owner.getRegistryManager()));
 				break;
 			case 1:
 			default:
@@ -120,21 +125,41 @@ public class AbilityBerserk extends ActivatedAbility implements ITickingAbility,
 	public static class ConfigBerserk
 	{
 		protected static final Codec<ConfigBerserk> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-				Codec.INT.optionalFieldOf("BuffTime").forGetter(ConfigBerserk::buffTime), 
-				Codec.INT.optionalFieldOf("DebuffTime").forGetter(ConfigBerserk::debuffTime))
+				Registries.STATUS_EFFECT.getEntryCodec().optionalFieldOf("Buff").forGetter(c -> c.buff),
+				Codec.INT.optionalFieldOf("BuffTime").forGetter(c -> Optional.of(c.buffTime)),
+				Registries.STATUS_EFFECT.getEntryCodec().optionalFieldOf("Debuff").forGetter(c -> c.debuff), 
+				Codec.INT.optionalFieldOf("DebuffTime").forGetter(c -> Optional.of(c.debuffTime)))
 					.apply(instance, ConfigBerserk::new));
 		
 		protected int buffTime = 12 * Reference.Values.TICKS_PER_SECOND;
 		protected int debuffTime = 15 * Reference.Values.TICKS_PER_SECOND;
 		
-		public ConfigBerserk(Optional<Integer> rateIn, Optional<Integer> amountIn)
+		protected Optional<RegistryEntry<StatusEffect>> buff = Optional.empty(), debuff = Optional.empty();
+		
+		public ConfigBerserk(Optional<RegistryEntry<StatusEffect>> buffIn, Optional<Integer> buffTimeIn, Optional<RegistryEntry<StatusEffect>> debuffIn, Optional<Integer> debuffTimeIn)
 		{
-			rateIn.ifPresent(val -> buffTime = val);
-			amountIn.ifPresent(val -> debuffTime = val);
+			buffTimeIn.ifPresent(val -> buffTime = val);
+			debuffTimeIn.ifPresent(val -> debuffTime = val);
 		}
 		
 		protected Optional<Integer> buffTime(){ return Optional.of(buffTime); }
 		protected Optional<Integer> debuffTime(){ return Optional.of(debuffTime); }
+		
+		public StatusEffectInstance getBuff(DynamicRegistryManager manager)
+		{
+			return 
+				buff.isPresent() ? 
+					new StatusEffectInstance(buff.get(), buffTime) : 
+					new StatusEffectInstance(VTStatusEffects.getEntry(manager, VTStatusEffects.RAGE), buffTime);
+		}
+		
+		public StatusEffectInstance getDebuff(DynamicRegistryManager manager)
+		{
+			return 
+				debuff.isPresent() ? 
+					new StatusEffectInstance(debuff.get(), debuffTime) : 
+					new StatusEffectInstance(VTStatusEffects.getEntry(manager, VTStatusEffects.LETHARGY), debuffTime);
+		}
 		
 		public static ConfigBerserk fromNbt(NbtCompound nbt)
 		{

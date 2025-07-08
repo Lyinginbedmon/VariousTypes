@@ -10,6 +10,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -61,7 +62,7 @@ public class AbilityFlexible extends ToggledAbility
 	
 	public Text displayName(AbilityInstance instance) { return translate("ability", registryName().getPath()+(getScale(instance.memory()) >= 0 ? ".bonus" : ".penalty")); }
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		float amount = getScale(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+(amount >= 0 ? ".bonus" : ".penalty")+".desc", (int)(Math.abs(amount * 100))));

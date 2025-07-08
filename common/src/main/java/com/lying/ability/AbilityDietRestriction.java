@@ -23,6 +23,7 @@ import dev.architectury.event.EventResult;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.registry.tag.TagKey;
@@ -36,7 +37,7 @@ public class AbilityDietRestriction extends Ability implements IComplexAbility<C
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigDiet values = memoryToValues(instance.memory());
 		boolean allows = values.allows();

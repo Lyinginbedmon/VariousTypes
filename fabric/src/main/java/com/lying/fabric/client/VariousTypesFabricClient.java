@@ -2,6 +2,7 @@ package com.lying.fabric.client;
 
 import com.lying.client.VariousTypesClient;
 import com.lying.client.init.VTModelLayerParts;
+import com.lying.client.particle.BiomeLeafParticle;
 import com.lying.client.particle.LeafParticle;
 import com.lying.client.particle.RageParticle;
 import com.lying.client.particle.ShockwaveParticle;
@@ -30,6 +31,7 @@ public final class VariousTypesFabricClient implements ClientModInitializer
 		ParticleFactoryRegistry registry = ParticleFactoryRegistry.getInstance();
 		registry.register(VTParticleTypes.SHOCKWAVE.get(), ShockwaveParticle.Factory::new);
 		registry.register(VTParticleTypes.LEAF.get(), LeafParticle.Factory::new);
+		registry.register(VTParticleTypes.BIOME_LEAF.get(), BiomeLeafParticle.Factory::new);
 		registry.register(VTParticleTypes.TINTED_LEAF.get(), TintedLeafParticle.Factory::new);
 		registry.register(VTParticleTypes.RAGE.get(), RageParticle.Factory::new);
 		registry.register(VTParticleTypes.REND.get(), SweepAttackParticle.Factory::new);

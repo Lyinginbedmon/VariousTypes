@@ -15,6 +15,7 @@ import com.lying.utility.PlayerPose;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
@@ -110,8 +111,15 @@ public class VTCosmetics
 				{
 					public void onClientTick(LivingEntity host, World world, PlayerPose pose, Random rand)
 					{
-						if(pose == PlayerPose.FLYING_POWERED && rand.nextInt(10) == 0)
-							world.addParticle(VTParticleTypes.TINTED_LEAF.get(), host.getX(), host.getY(), host.getZ(), 0, 0, 0);
+						if(pose == PlayerPose.FLYING_POWERED && rand.nextInt(7) == 0)
+						{
+							Vec3d forward = Vec3d.fromPolar(host.getPitch(), host.getYaw());
+							Vec3d pos = host.getPos().add(forward.multiply(0.6D));
+							Vec3d right = forward.rotateY((float)Math.toRadians(90D)).multiply(0.6D);
+							
+							world.addParticle(VTParticleTypes.BIOME_LEAF.get(), pos.getX() + right.getX(), pos.getY() + right.getY(), pos.getZ() + right.getZ(), 0, 0, 0);
+							world.addParticle(VTParticleTypes.BIOME_LEAF.get(), pos.getX() - right.getX(), pos.getY() - right.getY(), pos.getZ() - right.getZ(), 0, 0, 0);
+						}
 					}
 				});
 	}

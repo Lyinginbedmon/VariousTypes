@@ -31,6 +31,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -55,7 +56,7 @@ public class AbilityQuake extends ActivatedAbility implements ITickingAbility, I
 		this.soundSettings = new ActivationSoundSettings(i -> VTSoundEvents.QUAKE_ACTIVATE.get(), 1F, true);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigQuake values = instanceToValues(instance);
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.maxRange + 1));

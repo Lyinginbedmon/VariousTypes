@@ -18,6 +18,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -36,7 +37,7 @@ public class AbilityDamageGear extends AbilityOnMeleeHit implements IComplexAbil
 			affectedSlots.add(slot);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigDamageGear values = ConfigDamageGear.fromNbt(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", values.describe()));

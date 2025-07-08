@@ -15,6 +15,7 @@ import com.lying.type.ActionHandler;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.registry.tag.TagKey;
@@ -31,7 +32,7 @@ public abstract class AbilityBreathing extends Ability
 		this.applyFunc = func;
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		return Optional.of(translate("ability", registryName().getPath()+".desc", getFluid(instance).id().toString()));
 	}

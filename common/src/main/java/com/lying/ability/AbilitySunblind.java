@@ -19,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +31,7 @@ public class AbilitySunblind extends Ability implements IComplexAbility<ConfigSu
 		super(regName, catIn);
 	}
 	
-	public Optional<Text> description(AbilityInstance instance)
+	public Optional<Text> description(AbilityInstance instance, DynamicRegistryManager manager)
 	{
 		ConfigSunblind values = memoryToValues(instance.memory());
 		return Optional.of(translate("ability", registryName().getPath()+".desc", 

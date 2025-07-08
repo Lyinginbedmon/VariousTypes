@@ -48,6 +48,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
@@ -58,6 +59,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 {
 	public static final MinecraftClient mc = MinecraftClient.getInstance();
 	public static final PlayerEntity PLAYER = mc.player;
+	public final DynamicRegistryManager registryManager;
 	
 	private Optional<DetailObject> detailObject = Optional.empty();
 	private int scrollAmount = 0;
@@ -85,6 +87,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 	protected CharacterSheetDisplayScreen(CharacterSheet sheetIn, T handler, PlayerInventory inventory, Text title)
 	{
 		super(handler, inventory, title);
+		registryManager = PLAYER.getRegistryManager();
 		setCharacterSheet(sheetIn);
 	}
 	
@@ -115,7 +118,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			List<AbilityInstance> set = abilities(cat);
 			set.add(inst);
 			if(set.size() > 1)
-				Collections.sort(set, AbilityInstance.SORT_FUNC);
+				Collections.sort(set, AbilityInstance.sortFunc(registryManager));
 			abilities.put(cat, set);
 		});
 		
@@ -307,7 +310,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 			if(index >= abilities(currentCategory).size())
 				button.setMessage(Text.empty());
 			else
-				button.setMessage(abilities(currentCategory).get(index).displayName());
+				button.setMessage(abilities(currentCategory).get(index).displayName(this.registryManager));
 		}
 		
 		int catY = 0;
@@ -433,7 +436,7 @@ public abstract class CharacterSheetDisplayScreen<T extends ScreenHandler> exten
 		type.abilities().forEach(inst -> 
 		{
 			if(!inst.ability().isHidden(inst))
-				entries.add(Text.literal(" * ").append(inst.displayName()));
+				entries.add(Text.literal(" * ").append(inst.displayName(this.registryManager)));
 		});
 		if(client.options.advancedItemTooltips || PLAYER.isCreative())
 			entries.add(Text.literal(type.listID().toString()).copy().formatted(Formatting.DARK_GRAY));
