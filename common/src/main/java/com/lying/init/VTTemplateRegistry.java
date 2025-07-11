@@ -45,7 +45,7 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 	private void add(Template template)
 	{
 		TEMPLATES.put(template.registryName(), template);
-		VariousTypes.LOGGER.info(" #  Loaded template "+template.registryName().toString());
+		VariousTypes.LOGGER.info(" #  Loaded template {}", template.registryName().toString());
 	}
 	
 	public Optional<Template> get(Identifier registryName)
@@ -88,7 +88,7 @@ public class VTTemplateRegistry implements ReloadListener<Map<Identifier, JsonOb
 				{
 					objects.put(registryID, JsonHelper.deserialize(GSON, (Reader)file.getReader(), JsonObject.class));
 				}
-				catch(Exception e) { VariousTypes.LOGGER.error("Error while loading template "+fileName.toString()); }
+				catch(Exception e) { VariousTypes.LOGGER.error("Error while loading template {}", fileName.toString()); }
 			});
 			return objects;
 		});

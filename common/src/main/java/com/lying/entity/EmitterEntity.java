@@ -6,6 +6,7 @@ import com.lying.init.VTEntityTypes;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.DataTracker.Builder;
 import net.minecraft.entity.data.TrackedData;
@@ -25,6 +26,7 @@ public class EmitterEntity extends Entity
 	public EmitterEntity(EntityType<? extends EmitterEntity> type, World world)
 	{
 		super(type, world);
+		setNoGravity(true);	// No gravity by default but can be enabled to fall
 	}
 	
 	public static EmitterEntity create(Vec3d position, ServerWorld world, Emission emission)
@@ -52,6 +54,8 @@ public class EmitterEntity extends Entity
 		nbt.putInt("TicksEmitting", getAge());
 		nbt.put("Emission", emission.toNbt());
 	}
+	
+	protected double getGravity() { return LivingEntity.GRAVITY; }
 	
 	public int getAge() { return getDataTracker().get(TICKS_EMITTING).intValue(); }
 	

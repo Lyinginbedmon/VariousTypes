@@ -12,6 +12,7 @@ import com.lying.command.VTCommands;
 import com.lying.component.CharacterSheet;
 import com.lying.config.ServerConfig;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTBlocks;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
 import com.lying.init.VTEmissions;
@@ -57,6 +58,7 @@ public class VariousTypes
     	VTSheetElements.init();
     	VTSheetModules.init();
     	
+    	VTBlocks.init();
     	VTStatusEffects.init();
     	VTEntityTypes.init();
     	VTCosmeticTypes.init();

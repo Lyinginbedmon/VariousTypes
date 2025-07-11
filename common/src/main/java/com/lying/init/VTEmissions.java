@@ -12,6 +12,7 @@ import com.google.common.base.Supplier;
 import com.lying.VariousTypes;
 import com.lying.emission.Emission;
 import com.lying.emission.ShockwaveEmission;
+import com.lying.emission.SmokescreenEmission;
 import com.lying.entity.EmitterEntity;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
@@ -26,6 +27,7 @@ public class VTEmissions
 	private static final Map<Identifier, Supplier<? extends Emission>> EMISSION_REGISTRY = new HashMap<>();
 	
 	public static final Supplier<ShockwaveEmission> SHOCKWAVE	= register(prefix("shockwave"), ShockwaveEmission::new);
+	public static final Supplier<SmokescreenEmission> SMOKESCREEN	= register(prefix("smokescreen"), SmokescreenEmission::new);
 	
 	public static final Supplier<Emission> SMOKE	= register(prefix("smoke"), id -> new Emission(id)
 	{

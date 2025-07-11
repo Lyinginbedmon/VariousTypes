@@ -46,7 +46,7 @@ public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObj
 	private void add(Species species)
 	{
 		SPECIES.put(species.registryName(), species);
-		VariousTypes.LOGGER.info(" #  Loaded species "+species.registryName().toString());
+		VariousTypes.LOGGER.info(" #  Loaded species {}", species.registryName().toString());
 	}
 	
 	public Optional<Species> get(Identifier registryName)
@@ -89,7 +89,7 @@ public class VTSpeciesRegistry implements ReloadListener<Map<Identifier, JsonObj
 				{
 					objects.put(registryID, JsonHelper.deserialize(GSON, (Reader)file.getReader(), JsonObject.class));
 				}
-				catch(Exception e) { VariousTypes.LOGGER.error("Error while loading species "+fileName.toString()); }
+				catch(Exception e) { VariousTypes.LOGGER.error("Error while loading species {}", fileName.toString()); }
 			});
 			return objects;
 		});

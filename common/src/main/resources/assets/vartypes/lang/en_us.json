@@ -1,9 +1,13 @@
 {
 	"itemGroup.vartypes.item_group": "Various Types",
+	// Items
 	"item.vartypes.character_sheet": "Character Sheet",
+	// Blocks
+	"block.vartypes.smoke": "Smoke",
 	// Entities
 	"entity.vartypes.thrown_block_type": "%s",
 	"entity.vartypes.emitter": "Emitter",
+	"entity.vartypes.thick_smoke_cloud": "Cloud of thick smoke",
 	// Status effects
 	"effect.vartypes.fatigue": "Fatigue",
 	"effect.vartypes.dazzled": "Dazzled",

@@ -33,7 +33,7 @@ public class VTCosmetics
 	public static final Supplier<Cosmetic> WINGS_BAT		= wings("bat_wings");
 	public static final Supplier<Cosmetic> WINGS_DRAGON		= wings("dragon_wings");
 	public static final Supplier<Cosmetic> WINGS_SKELETON	= wings("skeleton_wings");
-	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");	// Detached warp nacelles? Ultrakill? Compatible with halo!
+	public static final Supplier<Cosmetic> WINGS_ENERGY		= wings("energy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_OAK			= fairyWings("oak_fairy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_SPRUCE		= fairyWings("spruce_fairy_wings");
 	public static final Supplier<Cosmetic> WINGS_FAIRY_BIRCH		= fairyWings("birch_fairy_wings");
@@ -145,7 +145,7 @@ public class VTCosmetics
 	
 	public static void init()
 	{
-		VariousTypes.LOGGER.info(" # Initialised "+COSMETICS_REGISTRY.size()+" cosmetics");
+		VariousTypes.LOGGER.info(" # Initialised {} cosmetics", COSMETICS_REGISTRY.size());
 		Map<CosmeticType, Integer> tallies = new HashMap<>();
 		COSMETICS_REGISTRY.values().forEach(cos -> tallies.put(cos.get().type(), tallies.getOrDefault(cos.get().type(), 0) + 1));
 		tallies.entrySet().stream().sorted((a,b) -> a.getValue() < b.getValue() ? -1 : a.getValue() > b.getValue() ? 1 : 0).forEach(entry -> VariousTypes.LOGGER.info(" # - {} {}", entry.getValue(), entry.getKey().registryName().getPath()));

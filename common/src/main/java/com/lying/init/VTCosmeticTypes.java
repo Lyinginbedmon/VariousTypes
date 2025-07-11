@@ -57,7 +57,7 @@ public class VTCosmeticTypes
 	
 	public static void init()
 	{
-		VariousTypes.LOGGER.info(" # Initialised "+TYPE_REGISTRY.size()+" cosmetic types");
+		VariousTypes.LOGGER.info(" # Initialised {} cosmetic types", TYPE_REGISTRY.size());
 	}
 	
 	public static Collection<Identifier> typeIds() { return TYPE_REGISTRY.keySet(); }

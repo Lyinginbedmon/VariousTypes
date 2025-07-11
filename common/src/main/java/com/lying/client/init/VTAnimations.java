@@ -1603,6 +1603,105 @@ public class VTAnimations
 			.build();
 	}
 	
+	public static class EnergyWings extends WingAnimations
+	{
+		public static final Animation WINGS_ENERGY_IDLE = Animation.Builder.create(0.1F).looping()
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.3201F, -12.3914F, -1.6575F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.3201F, 12.3914F, 1.6575F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation WINGS_ENERGY_FLYING_IDLE = Animation.Builder.create(13.0435F).looping()
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, -82.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.1F, AnimationHelper.createRotationalVector(-3.0156F, -77.5115F, -2.0131F), Transformation.Interpolations.LINEAR),
+				new Keyframe(6.8F, AnimationHelper.createRotationalVector(0.0F, -82.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(10.2F, AnimationHelper.createRotationalVector(3.7429F, -84.9964F, -1.25F), Transformation.Interpolations.LINEAR),
+				new Keyframe(13.0F, AnimationHelper.createRotationalVector(0.0F, -82.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(-2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(0.0F, 82.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(3.1F, AnimationHelper.createRotationalVector(-3.0156F, 77.5115F, 2.0131F), Transformation.Interpolations.LINEAR),
+				new Keyframe(6.8F, AnimationHelper.createRotationalVector(0.0F, 82.5F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(10.2F, AnimationHelper.createRotationalVector(3.6418F, 84.9966F, 1.2163F), Transformation.Interpolations.LINEAR),
+				new Keyframe(13.0F, AnimationHelper.createRotationalVector(0.0F, 82.5F, 0.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation WINGS_ENERGY_FLYING_POWERED = Animation.Builder.create(1.0F).looping()
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-27.3609F, -78.415F, -17.8715F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(-28.9099F, -78.5178F, -18.8324F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.0F, AnimationHelper.createRotationalVector(-27.3609F, -78.415F, -17.8715F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(-2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-27.3609F, 78.415F, 17.8715F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.5F, AnimationHelper.createRotationalVector(-28.9099F, 78.5178F, 18.8324F), Transformation.Interpolations.LINEAR),
+				new Keyframe(1.0F, AnimationHelper.createRotationalVector(-27.3609F, 78.415F, 17.8715F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+		
+		public static final Animation WINGS_ENERGY_CROUCH = Animation.Builder.create(10.0F)
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.3201F, -12.3914F, -1.6575F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.1667F, AnimationHelper.createRotationalVector(-34.6829F, -50.153F, -10.5355F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.9167F, AnimationHelper.createRotationalVector(-31.637F, -45.965F, -14.627F), Transformation.Interpolations.LINEAR),
+				new Keyframe(7.7083F, AnimationHelper.createRotationalVector(-38.5244F, -54.17F, -5.6755F), Transformation.Interpolations.LINEAR),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-34.6829F, -50.153F, -10.5355F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.1667F, AnimationHelper.createTranslationalVector(-2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(RIGHT_RADIUS, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.ROTATE, 
+				new Keyframe(0.0F, AnimationHelper.createRotationalVector(-82.3201F, 12.3914F, 1.6575F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.1667F, AnimationHelper.createRotationalVector(-34.6829F, 50.153F, 10.5355F), Transformation.Interpolations.LINEAR),
+				new Keyframe(2.9167F, AnimationHelper.createRotationalVector(-31.637F, 45.965F, 14.627F), Transformation.Interpolations.LINEAR),
+				new Keyframe(7.7083F, AnimationHelper.createRotationalVector(-38.5244F, 54.17F, 5.6755F), Transformation.Interpolations.LINEAR),
+				new Keyframe(10.0F, AnimationHelper.createRotationalVector(-34.6829F, 50.153F, 10.5355F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_HUMERUS, new Transformation(Transformation.Targets.TRANSLATE, 
+				new Keyframe(0.0F, AnimationHelper.createTranslationalVector(0.0F, 0.0F, -1.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.1667F, AnimationHelper.createTranslationalVector(2.0F, 0.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.addBoneAnimation(LEFT_RADIUS, new Transformation(Transformation.Targets.SCALE, 
+				new Keyframe(0.0F, AnimationHelper.createScalingVector(0.0F, 0.0F, 0.0F), Transformation.Interpolations.LINEAR),
+				new Keyframe(0.25F, AnimationHelper.createScalingVector(1.0F, 1.0F, 1.0F), Transformation.Interpolations.LINEAR)
+			))
+			.build();
+	}
+	
 	public static class DragonWings extends WingAnimations
 	{
 		protected static final String RIGHT_CLAW = WingsDragonModel.RIGHT_CLAW;

@@ -64,7 +64,7 @@ public class VTSheetElements
 	
 	public static void init()
 	{
-		VariousTypes.LOGGER.info(" # Initialised "+ELEMENTS.size()+" sheet elements");
+		VariousTypes.LOGGER.info(" # Initialised {} sheet elements", ELEMENTS.size());
 		
 		List<SheetElement<?>> elements = Lists.newArrayList();
 		elements.addAll(ELEMENTS.values());
@@ -88,7 +88,7 @@ public class VTSheetElements
 		}
 		
 		VariousTypes.LOGGER.info(" # Build order:");
-		SORTED_LIST.forEach(el -> VariousTypes.LOGGER.info(" # - "+el.registryName.toString()));
+		SORTED_LIST.forEach(el -> VariousTypes.LOGGER.info(" # - {}", el.registryName.toString()));
 	}
 	
 	@Nullable

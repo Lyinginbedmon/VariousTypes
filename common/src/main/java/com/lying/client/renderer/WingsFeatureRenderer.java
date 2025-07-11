@@ -10,6 +10,7 @@ import com.lying.client.model.wings.WingsButterflyModel;
 import com.lying.client.model.wings.WingsDragonModel;
 import com.lying.client.model.wings.WingsDragonflyModel;
 import com.lying.client.model.wings.WingsElytraModel;
+import com.lying.client.model.wings.WingsEnergyModel;
 import com.lying.client.model.wings.WingsFairyModel;
 import com.lying.client.model.wings.WingsSkeletonModel;
 import com.lying.client.model.wings.WingsWitchModel;
@@ -17,6 +18,7 @@ import com.lying.client.renderer.accessory.AccessoryBasic;
 import com.lying.client.renderer.accessory.AccessoryBlockTexture;
 import com.lying.client.renderer.accessory.AccessoryCompound;
 import com.lying.client.renderer.accessory.AccessoryEndPortal;
+import com.lying.client.renderer.accessory.AccessoryGlowing;
 import com.lying.client.renderer.accessory.AccessoryTranslucent;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTCosmetics;
@@ -44,6 +46,7 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		witchWings, 
 		dragonWings, 
 		skeletonWings,
+		energyWings,
 		fairyWingsLog, fairyWingsLeaf;
 	
 	public WingsFeatureRenderer(FeatureRendererContext<E, M> context)
@@ -62,6 +65,7 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 		skeletonWings = new WingsSkeletonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_SKELETON));
 		beetleWings = new WingsBeetleModel<>(loader.getModelPart(VTModelLayerParts.WINGS_BEETLE));
 		dragonWings = new WingsDragonModel<>(loader.getModelPart(VTModelLayerParts.WINGS_DRAGON));
+		energyWings = new WingsEnergyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_ENERGY));
 		fairyWingsLog = new WingsFairyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_FAIRY_LOG));
 		fairyWingsLeaf = new WingsFairyModel<>(loader.getModelPart(VTModelLayerParts.WINGS_FAIRY_LEAF));
 	}
@@ -134,6 +138,16 @@ public class WingsFeatureRenderer<E extends LivingEntity, M extends EntityModel<
 					AccessoryBasic.create(
 						e -> dragonWings,
 						texture("wings/dragon_overlay.png")).untinted()));
+		addRendererMap(
+				VTCosmetics.WINGS_ENERGY,
+				AccessoryCompound.create(
+					AccessoryBasic.create(
+							e -> energyWings, 
+							texture("wings/energy_overlay.png")).untinted(),
+					AccessoryGlowing.create(
+							e -> energyWings, 
+							texture("wings/energy_glow.png"), 
+							texture("wings/energy_glow_tinted.png"))));
 		
 		BlockColorProvider leafColor = (state, world, pos, tintIndex) -> world != null && pos != null ? BiomeColors.getFoliageColor(world, pos) : FoliageColors.getDefaultColor();
 		BlockColorProvider spruceColor = (state, world, pos, tintIndex) -> FoliageColors.getSpruceColor();

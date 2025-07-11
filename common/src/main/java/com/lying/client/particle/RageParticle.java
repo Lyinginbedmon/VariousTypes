@@ -98,7 +98,6 @@ public class RageParticle extends SpriteBillboardParticle
 		public Particle createParticle(SimpleParticleType particleType, ClientWorld clientWorld, double x, double y, double z, double velX, double velY, double velZ)
 		{
 			RageParticle particle = new RageParticle(clientWorld, x, y, z, velX, velY, velZ, spriteProvider);
-//			particleType.getParentUuid().ifPresent(id -> particle.parentId = Optional.of(id));
 			return particle;
 		}
 	}
