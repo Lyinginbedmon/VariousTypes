@@ -21,6 +21,7 @@ import com.lying.client.renderer.IconFeatureRenderer;
 import com.lying.client.renderer.MiscFeatureRenderer;
 import com.lying.client.renderer.NoseFeatureRenderer;
 import com.lying.client.renderer.ParentedParticlesFeatureRenderer;
+import com.lying.client.renderer.SmokeCloudEntityRenderer;
 import com.lying.client.renderer.TailFeatureRenderer;
 import com.lying.client.renderer.WingsFeatureRenderer;
 import com.lying.client.screen.FavouriteAbilityButton;
@@ -31,6 +32,7 @@ import com.lying.component.element.ElementCosmetics;
 import com.lying.effect.DazzledStatusEffect;
 import com.lying.entity.AccessoryAnimationInterface;
 import com.lying.init.VTAbilities;
+import com.lying.init.VTBlocks;
 import com.lying.init.VTCosmeticTypes;
 import com.lying.init.VTEntityTypes;
 import com.lying.init.VTSheetElements;
@@ -58,6 +60,7 @@ import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.PlayerEntityRenderer;
 import net.minecraft.client.render.entity.feature.FeatureRendererContext;
 import net.minecraft.client.render.entity.model.EntityModel;
+import net.minecraft.client.texture.Sprite;
 import net.minecraft.client.util.SkinTextures;
 import net.minecraft.client.util.SkinTextures.Model;
 import net.minecraft.client.util.math.MatrixStack;
@@ -69,6 +72,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 public class ClientBus
@@ -107,10 +111,34 @@ public class ClientBus
 			}
 		}));
 		
-		// Dazzled vignette
 		RenderEvents.BEFORE_HUD_RENDER_EVENT.register((mc, player, sheetOpt, tickDelta, context) -> 
 		{
-			if(player == null || mc.options.hudHidden)
+			if(player == null)
+				return;
+			
+			int screenWidth = context.getScaledWindowWidth();
+			int screenHeight = context.getScaledWindowHeight();
+			
+			// Smoke blinding
+			if(!mc.world.getEntitiesByType(
+					VTEntityTypes.THICK_SMOKE_CLOUD.get(), 
+					Box.from(mc.gameRenderer.getCamera().getPos()).expand(50, 10, 50), 
+					e -> SmokeCloudEntityRenderer.shouldBlindPlayer(e)).isEmpty())
+			{
+				Sprite sprite = mc.getBlockRenderManager().getModels().getModelParticleSprite(VTBlocks.SMOKE.get().getDefaultState());
+				RenderSystem.disableDepthTest();
+				RenderSystem.depthMask(false);
+				RenderSystem.enableBlend();
+				context.drawSprite(0, 0, -100, screenWidth, screenHeight, sprite, 1F, 1F, 1F, 1F);
+				RenderSystem.disableBlend();
+				RenderSystem.depthMask(true);
+				RenderSystem.enableDepthTest();
+				context.setShaderColor(1F, 1F, 1F, 1F);
+				return;
+			}
+			
+			// Dazzled vignette
+			if(mc.options.hudHidden)
 				return;
 			
 			RegistryEntry<StatusEffect> effect = VTStatusEffects.getEntry(player.getRegistryManager(), VTStatusEffects.DAZZLED);
@@ -121,7 +149,7 @@ public class ClientBus
 			RenderSystem.depthMask(false);
 			RenderSystem.enableBlend();
 			context.setShaderColor(1F, 1F, 1F, player.getStatusEffect(effect).getFadeFactor(player, tickDelta));
-			context.drawTexture(DazzledStatusEffect.VIGNETTE, 0, 0, -100, 0F, 0F, context.getScaledWindowWidth(), context.getScaledWindowHeight(), context.getScaledWindowWidth(), context.getScaledWindowHeight());
+			context.drawTexture(DazzledStatusEffect.VIGNETTE, 0, 0, -100, 0F, 0F, screenWidth, screenHeight, screenWidth, screenHeight);
 			RenderSystem.disableBlend();
 			RenderSystem.depthMask(true);
 			RenderSystem.enableDepthTest();

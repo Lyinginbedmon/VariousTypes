@@ -18,6 +18,8 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.shape.VoxelShape;
@@ -28,12 +30,25 @@ import net.minecraft.world.World;
 public class FloodFill
 {
 	private static final Codec<FloodFill> CODEC = Row.CODEC.listOf().xmap(FloodFill::fromRows, FloodFill::toRows);
+	
+	/** Map of radii to the set of positions at the outer edge at that radius */
 	private final Map<Integer, List<BlockPos>> fill = new HashMap<>();
+	private final List<BlockPos> 
+		allPositions = Lists.newArrayList(),
+		extPositions = Lists.newArrayList();
+	
+	private BlockPos min = null, max = null;
+	private int maxRadius = 0;
 	
 	private static FloodFill fromRows(List<FloodFill.Row> rows)
 	{
 		FloodFill floodFill = new FloodFill();
-		rows.forEach(r -> floodFill.fill.put(r.radius, r.points));
+		
+		rows.forEach(row -> 
+			row.points.forEach(p -> 
+				floodFill.add(p, row.radius)));
+		
+		floodFill.calculateExteriors();
 		return floodFill;
 	}
 	
@@ -44,34 +59,88 @@ public class FloodFill
 	
 	private void add(BlockPos pos, int dist)
 	{
-		List<BlockPos> points = get(dist);
-		if(!points.contains(pos))
+		maxRadius = Math.max(dist, maxRadius);
+		recordPosition(pos, dist);
+		adjustBounds(pos);
+	}
+	
+	private void recordPosition(BlockPos pos, int dist)
+	{
+		List<BlockPos> pointsAt = fill.getOrDefault(dist, Lists.newArrayList());
+		if(!pointsAt.contains(pos))
 		{
-			points.add(pos);
-			fill.put(dist, points);
+			pointsAt.add(pos);
+			fill.put(dist, pointsAt);
+		}
+		
+		if(!allPositions.contains(pos))
+			allPositions.add(pos);
+	}
+	
+	private void adjustBounds(BlockPos pos)
+	{
+		if(min == null || max == null)
+			min = max = pos;
+		else
+		{
+			if(pos.getX() < min.getX())
+				min = new BlockPos(pos.getX(), min.getY(), min.getZ());
+			else if(pos.getX() > max.getX())
+				max = new BlockPos(pos.getX(), max.getY(), max.getZ());
+			
+			if(pos.getY() < min.getY())
+				min = min.withY(pos.getY());
+			else if(pos.getY() > max.getY())
+				max = max.withY(pos.getY());
+			
+			if(pos.getZ() < min.getZ())
+				min = new BlockPos(min.getX(), min.getY(), pos.getZ());
+			else if(pos.getZ() > max.getZ())
+				max = new BlockPos(max.getX(), max.getY(), pos.getZ());
 		}
 	}
 	
-	public boolean isEmpty(int distance) { return !fill.containsKey(distance) || get(distance).isEmpty(); }
+	public Box bounds() { return Box.enclosing(min, max); }
 	
-	public boolean isEmpty() { return fill.isEmpty() || fill.values().stream().allMatch(List::isEmpty); }
+	public boolean isEmpty(int distance) { return !fill.containsKey(distance) || getAt(distance).isEmpty(); }
 	
-	public int size()
-	{
-		int tally = 0;
-		for(List<BlockPos> points : fill.values())
-			tally += points.size();
-		return tally;
-	}
+	public boolean isEmpty() { return allPositions.isEmpty() || fill.isEmpty() || fill.values().stream().allMatch(List::isEmpty); }
+	
+	public int size() { return allPositions.size(); }
 	
 	public boolean contains(BlockPos pos)
 	{
-		return fill.values().stream().anyMatch(range -> range.stream().anyMatch(point -> point.equals(pos)));
+		return getAll().contains(pos);
 	}
 	
-	public List<BlockPos> get(int distance)
+	/** Returns all positions in the entire cloud */
+	public List<BlockPos> getAll() { return allPositions; }
+	
+	/** Returns all positions at the given distance from the origin point */
+	public List<BlockPos> getAt(int distance)
 	{
-		return fill.getOrDefault(distance, Lists.newArrayList());
+		return fill.getOrDefault(distance, List.of());
+	}
+	
+	/** Returns all positions on the boundary of the cloud */
+	public List<BlockPos> getAllExteriors() { return extPositions; }
+	
+	/** Returns all exterior positions at the given distance */
+	public List<BlockPos> getExteriorsAt(int distance)
+	{
+		List<BlockPos> atDist = getAt(distance);
+		return atDist.isEmpty() ? List.of() : extPositions.stream().filter(atDist::contains).toList();
+	}
+	
+	private void calculateExteriors()
+	{
+		extPositions.clear();
+		extPositions.addAll(allPositions.stream().filter(p -> isExteriorPoint(p, allPositions)).toList());
+	}
+	
+	private static boolean isExteriorPoint(BlockPos point, final List<BlockPos> points)
+	{
+		return List.of(Direction.values()).stream().anyMatch(f -> !points.contains(point.offset(f)));
 	}
 	
 	public NbtElement toNbt()
@@ -157,7 +226,7 @@ public class FloodFill
 				{
 					posToDist.put(point, steps);
 					
-					for(BlockPos p : calculateAccessibleNeighbours(point, world, entity).stream().filter(p -> p.isWithinDistance(origin, maxRadius)).toList())
+					for(BlockPos p : calculateAccessibleNeighbours(point, world, entity).stream().filter(p -> Math.sqrt(p.getSquaredDistance(origin)) <= maxRadius).toList())
 						if(!check.contains(p) && (!posToDist.containsKey(p) || posToDist.get(p) < steps))
 						{
 							nextSet.removeIf(p::equals);

@@ -79,7 +79,7 @@ public class SmokescreenEmission extends Emission
 		
 		float progress = 1F - ((float)radius / (float)maxRadius);
 		int duration = (int)(progress * this.duration);
-		floodFill.get(radius).stream()
+		floodFill.getAt(radius).stream()
 			.forEach(e -> spawnSmoke(e, world, duration));
 		
 		prevRadius = radius;

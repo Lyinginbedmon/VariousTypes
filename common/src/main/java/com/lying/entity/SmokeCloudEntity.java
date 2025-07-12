@@ -6,6 +6,8 @@ import com.lying.emission.SmokescreenEmission;
 import com.lying.utility.FloodFill;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityDimensions;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.DataTracker.Builder;
@@ -14,6 +16,7 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
@@ -35,8 +38,8 @@ public class SmokeCloudEntity extends Entity
 	
 	protected void initDataTracker(Builder builder)
 	{
-		builder.add(FILL, new NbtCompound());
 		builder.add(MAX_SIZE, 4);
+		builder.add(FILL, new NbtCompound());
 		builder.add(SIZE, 0);
 		builder.add(AGE, 0);
 	}
@@ -44,10 +47,11 @@ public class SmokeCloudEntity extends Entity
 	protected void readCustomDataFromNbt(NbtCompound nbt)
 	{
 		getDataTracker().set(AGE, nbt.getInt("Lifetime"));
-		if(nbt.contains("Radius"))
-			setRadius(nbt.getInt("Radius"));
 		if(nbt.contains("MaxRadius"))
 			getDataTracker().set(MAX_SIZE, nbt.getInt("MaxRadius"));
+		
+		if(nbt.contains("Radius"))
+			setRadius(nbt.getInt("Radius"));
 		if(nbt.contains("AffectedArea", NbtElement.COMPOUND_TYPE))
 			getDataTracker().set(FILL, nbt.getCompound("AffectedArea"));
 	}
@@ -56,7 +60,8 @@ public class SmokeCloudEntity extends Entity
 	{
 		nbt.putInt("Lifetime", getDataTracker().get(AGE).intValue());
 		nbt.putInt("MaxRadius", getDataTracker().get(MAX_SIZE).intValue());
-		nbt.putInt("Radius", getRadius());
+		
+		nbt.putInt("Radius", getDataTracker().get(SIZE));
 		NbtCompound fill = getDataTracker().get(FILL);
 		if(!fill.isEmpty())
 			nbt.put("AffectedArea", fill);
@@ -64,6 +69,9 @@ public class SmokeCloudEntity extends Entity
 	
 	public Optional<FloodFill> getAffectedArea()
 	{
+		if(fillCache != null)
+			return Optional.of(fillCache);
+		
 		NbtCompound nbt = getDataTracker().get(FILL);
 		if(nbt.isEmpty() || !nbt.contains("Map"))
 			return Optional.empty();
@@ -74,55 +82,75 @@ public class SmokeCloudEntity extends Entity
 			fill = FloodFill.fromNbt(nbt.get("Map"));
 		}
 		catch(Exception e) { }
-		return fill == null ? Optional.empty() : Optional.of(fill);
+		
+		if(fill != null)
+			return Optional.of(fillCache = fill);
+		else
+			return Optional.empty();
 	}
 	
-	private void setAffectedArea(NbtElement fill)
+	public void onTrackedDataSet(TrackedData<?> data)
 	{
-		NbtCompound nbt = new NbtCompound();
-		nbt.put("Map", fill);
-		getDataTracker().set(FILL, nbt);
+		if(FILL.equals(data))
+			fillCache = null;
+		else if(SIZE.equals(data))
+			calculateDimensions();
 	}
 	
-	public int getRadius() { return getDataTracker().get(SIZE).intValue(); }
+	public int getMaxRadius() { return getDataTracker().get(MAX_SIZE).intValue(); }
 	
 	public void tick()
 	{
 		super.tick();
-		if(getWorld().isClient()) return;
+		if(getWorld().isClient())
+			return;
 		
 		int age = getDataTracker().get(AGE);
 		getDataTracker().set(AGE, ++age);
 		
-		int maxRadius = getMaxRadius();
-		
-		if(fillCache == null)
-		{
-			Optional<FloodFill> fill = getAffectedArea();
-			if(fill.isEmpty())
-			{
-				FloodFill.Search search = new FloodFill.Search(getBlockPos(), maxRadius);
-				search.doFloodFill((ServerWorld)getWorld(), this);
-				fillCache = search.results();
-				setAffectedArea(fillCache.toNbt());
-			}
-			else
-				fillCache = fill.get();
-		}
-		
 		if(age%RATE_OF_EXPANSION == 0)
-			updateRadius(age, maxRadius);
+			updateRadius(age, getMaxRadius());
 	}
 	
 	protected void updateRadius(int age, int maxRadius)
 	{
-		int radius = getRadius();
+		int radius = getDataTracker().get(SIZE).intValue();
 		int newRadius = (int)MathHelper.clamp(Math.floorDiv(age, RATE_OF_EXPANSION), 0, maxRadius);
 		if(radius != newRadius)
 			setRadius(newRadius);
 	}
 	
-	protected void setRadius(int radius) { getDataTracker().set(SIZE, radius); }
+	protected void setRadius(int radius)
+	{
+		if(!getWorld().isClient())
+		{
+			FloodFill.Search search = new FloodFill.Search(getBlockPos(), radius);
+			search.doFloodFill((ServerWorld)getWorld(), this);
+			setAffectedArea(search.results());
+		}
+		
+		getDataTracker().set(SIZE, radius);
+		calculateDimensions();
+	}
 	
-	public int getMaxRadius() { return getDataTracker().get(MAX_SIZE).intValue(); }
+	private void setAffectedArea(FloodFill fill)
+	{
+		fillCache = fill;
+		NbtCompound nbt = new NbtCompound();
+		nbt.put("Map", fill.toNbt());
+		getDataTracker().set(FILL, nbt);
+	}
+	
+	public void calculateDimensions()
+	{
+		double x = getX(), y = getY(), z = getZ();
+		super.calculateDimensions();
+		setPosition(x, y, z);
+	}
+	
+	public EntityDimensions getDimensions(EntityPose pose)
+	{
+		float radius = Math.max(1F, getDataTracker().get(SIZE).floatValue());
+		return EntityDimensions.fixed(radius * 2F, radius );
+	}
 }
