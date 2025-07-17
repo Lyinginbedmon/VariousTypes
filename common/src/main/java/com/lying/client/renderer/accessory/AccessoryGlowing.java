@@ -11,9 +11,11 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
 
-// FIXME Set light value
 public class AccessoryGlowing<E extends LivingEntity, T extends EntityModel<E>> extends AccessoryBasic<E, T>
 {
+	// FIXME Set light value
+	private int brightness = 0xF00000;
+	
 	protected AccessoryGlowing(Function<E, EntityModel<E>> modelIn, Identifier glowTex)
 	{
 		this(modelIn, glowTex, glowTex);
@@ -35,9 +37,15 @@ public class AccessoryGlowing<E extends LivingEntity, T extends EntityModel<E>> 
 		return new AccessoryGlowing<E,T>(modelIn, glowTex, tintedGlowTex);
 	}
 	
+	public AccessoryGlowing<E,T> brightness(int val)
+	{
+		this.brightness = val;
+		return this;
+	}
+	
 	protected void doRender(MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, E entity, float partialTicks, boolean tinted, float r, float g, float b)
 	{
 		VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.getEntityTranslucentEmissive(texture(entity, tinted)));
-		model.render(matrixStack, vertexConsumer, 0xF00000, OverlayTexture.DEFAULT_UV, r, g, b, 1F);
+		model.render(matrixStack, vertexConsumer, brightness, OverlayTexture.DEFAULT_UV, r, g, b, 1F);
 	}
 }

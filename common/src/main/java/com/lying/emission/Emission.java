@@ -2,6 +2,8 @@ package com.lying.emission;
 
 import java.util.Optional;
 
+import org.jetbrains.annotations.Nullable;
+
 import com.lying.VariousTypes;
 import com.lying.entity.EmitterEntity;
 import com.lying.init.VTEmissions;
@@ -50,6 +52,7 @@ public abstract class Emission
 		return (NbtCompound)CODEC.encodeStart(NbtOps.INSTANCE, this).getOrThrow();
 	}
 	
+	@Nullable
 	public static Emission fromNbt(NbtCompound nbt)
 	{
 		return CODEC.parse(NbtOps.INSTANCE, nbt).resultOrPartial(VariousTypes.LOGGER::error).orElse(null);

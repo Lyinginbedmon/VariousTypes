@@ -8,6 +8,7 @@
 	"entity.vartypes.thrown_block_type": "%s",
 	"entity.vartypes.emitter": "Emitter",
 	"entity.vartypes.thick_smoke_cloud": "Cloud of thick smoke",
+	"entity.vartypes.portal": "Portal",
 	// Status effects
 	"effect.vartypes.fatigue": "Fatigue",
 	"effect.vartypes.dazzled": "Dazzled",

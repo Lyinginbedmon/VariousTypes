@@ -5,9 +5,9 @@ import java.util.function.Supplier;
 import com.lying.VariousTypes;
 import com.lying.entity.AnimatedPlayerEntity;
 import com.lying.entity.EmitterEntity;
+import com.lying.entity.PortalEntity;
 import com.lying.entity.ShakenBlockEntity;
 import com.lying.entity.SmokeCloudEntity;
-import com.lying.entity.SmokeEntity;
 import com.lying.entity.ThrownBlockEntity;
 import com.lying.reference.Reference;
 
@@ -47,16 +47,16 @@ public class VTEntityTypes
 		return builder.build("emitter");
 	});
 	
-	public static final RegistrySupplier<EntityType<SmokeEntity>> THICK_SMOKE			= register("thick_smoke", () ->
-	{
-		EntityType.Builder<SmokeEntity> builder = EntityType.Builder.create(SmokeEntity::new, SpawnGroup.MISC).dimensions(1F, 1F);
-		return builder.build("thick_smoke");
-	});
-	
 	public static final RegistrySupplier<EntityType<SmokeCloudEntity>> THICK_SMOKE_CLOUD	= register("thick_smoke_cloud", () -> 
 	{
 		EntityType.Builder<SmokeCloudEntity> builder = EntityType.Builder.create(SmokeCloudEntity::new, SpawnGroup.MISC).dimensions(1F, 1F);
 		return builder.build("thick_smoke_cloud");
+	});
+	
+	public static final RegistrySupplier<EntityType<PortalEntity>> PORTAL			= register("portal", () -> 
+	{
+		EntityType.Builder<PortalEntity> builder = EntityType.Builder.create(PortalEntity::new, SpawnGroup.MISC).dimensions(1F, 2F);
+		return builder.build("portal");
 	});
 	
 	private static <T extends Entity> RegistrySupplier<EntityType<T>> register(String name, Supplier<EntityType<T>> entry)

@@ -3,6 +3,7 @@ package com.lying.utility;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public class FloodFill
 	private static final Codec<FloodFill> CODEC = Row.CODEC.listOf().xmap(FloodFill::fromRows, FloodFill::toRows);
 	
 	/** Map of radii to the set of positions at the outer edge at that radius */
-	private final Map<Integer, List<BlockPos>> fill = new HashMap<>();
+	private final Map<Integer, List<BlockPos>> radiusMap = new HashMap<>();
 	private final List<BlockPos> 
 		allPositions = Lists.newArrayList(),
 		extPositions = Lists.newArrayList();
@@ -54,7 +55,7 @@ public class FloodFill
 	
 	private List<FloodFill.Row> toRows()
 	{
-		return fill.entrySet().stream().map(e -> new Row(e.getKey(), e.getValue())).toList();
+		return radiusMap.entrySet().stream().map(e -> new Row(e.getKey(), e.getValue())).toList();
 	}
 	
 	private void add(BlockPos pos, int dist)
@@ -64,13 +65,42 @@ public class FloodFill
 		adjustBounds(pos);
 	}
 	
+	public FloodFill exclude(FloodFill otherFill)
+	{
+		otherFill.getAllExteriors().forEach(this::remove);
+		return this;
+	}
+	
+	private void remove(BlockPos pos)
+	{
+		if(!allPositions.contains(pos))
+			return;
+		
+		allPositions.remove(pos);
+		extPositions.remove(pos);
+		int radius = getRadius(pos);
+		if(radius < 0)
+			return;
+		List<BlockPos> set = radiusMap.get(radius);
+		set.remove(pos);
+		radiusMap.put(radius, set);
+	}
+	
+	public int getRadius(BlockPos pos)
+	{
+		for(Entry<Integer, List<BlockPos>> entry : radiusMap.entrySet())
+			if(entry.getValue().contains(pos))
+				return entry.getKey();
+		return -1;
+	}
+	
 	private void recordPosition(BlockPos pos, int dist)
 	{
-		List<BlockPos> pointsAt = fill.getOrDefault(dist, Lists.newArrayList());
+		List<BlockPos> pointsAt = radiusMap.getOrDefault(dist, Lists.newArrayList());
 		if(!pointsAt.contains(pos))
 		{
 			pointsAt.add(pos);
-			fill.put(dist, pointsAt);
+			radiusMap.put(dist, pointsAt);
 		}
 		
 		if(!allPositions.contains(pos))
@@ -102,9 +132,9 @@ public class FloodFill
 	
 	public Box bounds() { return Box.enclosing(min, max); }
 	
-	public boolean isEmpty(int distance) { return !fill.containsKey(distance) || getAt(distance).isEmpty(); }
+	public boolean isEmpty(int distance) { return !radiusMap.containsKey(distance) || getAt(distance).isEmpty(); }
 	
-	public boolean isEmpty() { return allPositions.isEmpty() || fill.isEmpty() || fill.values().stream().allMatch(List::isEmpty); }
+	public boolean isEmpty() { return allPositions.isEmpty() || radiusMap.isEmpty() || radiusMap.values().stream().allMatch(List::isEmpty); }
 	
 	public int size() { return allPositions.size(); }
 	
@@ -113,13 +143,18 @@ public class FloodFill
 		return getAll().contains(pos);
 	}
 	
+	public boolean contains(Vec3d pos)
+	{
+		return getAll().stream().anyMatch(p -> Box.enclosing(p, p).contains(pos));
+	}
+	
 	/** Returns all positions in the entire cloud */
 	public List<BlockPos> getAll() { return allPositions; }
 	
 	/** Returns all positions at the given distance from the origin point */
 	public List<BlockPos> getAt(int distance)
 	{
-		return fill.getOrDefault(distance, List.of());
+		return radiusMap.getOrDefault(distance, List.of());
 	}
 	
 	/** Returns all positions on the boundary of the cloud */
@@ -195,47 +230,49 @@ public class FloodFill
 		{
 			this(origin, maxRadius, (to, from, world, entity) -> 
 			{
-				BlockState toState = world.getBlockState(to);
-				VoxelShape toShape = toState.getCollisionShape(world, to);
-				if(toShape == VoxelShapes.fullCube())
-					return false;
-				else if(toShape.isEmpty())
+				if(to.getSquaredDistance(from) <= 1D)
 				{
-					BlockState fromState = world.getBlockState(from);
-					VoxelShape fromShape = fromState.getCollisionShape(world, from);
-					if(fromShape.isEmpty())
-						return true;
+					BlockState toState = world.getBlockState(to);
+					VoxelShape toShape = toState.getCollisionShape(world, to);
+					if(toShape == VoxelShapes.fullCube())
+						return false;
+					else if(toShape.isEmpty())
+					{
+						BlockState fromState = world.getBlockState(from);
+						VoxelShape fromShape = fromState.getCollisionShape(world, from);
+						if(fromShape.isEmpty())
+							return true;
+					}
 				}
 				
-				Vec3d core = new Vec3d(from.getX() + 0.5D, from.getY() + 0.5D, from.getZ() + 0.5D);
+				Vec3d coreA = new Vec3d(from.getX() + 0.5D, from.getY() + 0.5D, from.getZ() + 0.5D);
 				Vec3d coreB = new Vec3d(to.getX() + 0.5D, to.getY() + 0.5D, to.getZ() + 0.5D);
-				BlockHitResult hitResult = world.raycast(new RaycastContext(core, coreB, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
+				BlockHitResult hitResult = world.raycast(new RaycastContext(coreA, coreB, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
 				return hitResult.getType() == HitResult.Type.MISS;
 			});
 		}
 		
 		public void doFloodFill(World world, Entity entity)
 		{
-			List<BlockPos> check = Lists.newArrayList();
-			check.add(origin);
+			List<BlockPos> checkSet = Lists.newArrayList();
+			checkSet.add(origin);
 			int steps = maxRadius;
-			while(!check.isEmpty() && --steps > 0)
+			while(!checkSet.isEmpty() && steps-- > 0)
 			{
 				List<BlockPos> nextSet = Lists.newArrayList();
-				for(BlockPos point : check)
+				for(BlockPos point : checkSet)
 				{
 					posToDist.put(point, steps);
 					
-					for(BlockPos p : calculateAccessibleNeighbours(point, world, entity).stream().filter(p -> Math.sqrt(p.getSquaredDistance(origin)) <= maxRadius).toList())
-						if(!check.contains(p) && (!posToDist.containsKey(p) || posToDist.get(p) < steps))
-						{
-							nextSet.removeIf(p::equals);
-							nextSet.add(p);
-						}
+					for(BlockPos move : calculateAccessibleNeighbours(point, world, entity).stream().filter(p -> Math.sqrt(p.getSquaredDistance(origin)) <= maxRadius).toList())
+						if(
+							!(nextSet.contains(move) || checkSet.contains(move)) && 
+							(!posToDist.containsKey(move) || posToDist.get(move) < steps))
+								nextSet.add(move);
 				}
 				
-				check.clear();
-				check.addAll(nextSet);
+				checkSet.clear();
+				checkSet.addAll(nextSet);
 			}
 		}
 		
@@ -248,20 +285,7 @@ public class FloodFill
 		
 		public List<BlockPos> calculateAccessibleNeighbours(BlockPos position, World world, Entity entity)
 		{
-			Vec3d core = new Vec3d(position.getX() + 0.5D, position.getY() + 0.5D, position.getZ() + 0.5D);
-			List<BlockPos> points = Lists.newArrayList();
-			for(Vec3i move : MOVES)
-			{
-				BlockPos neighbour = position.add(move);
-				if(checker.test(neighbour, position, world, entity))
-					points.add(neighbour);
-				
-				Vec3d coreB = new Vec3d(neighbour.getX() + 0.5D, neighbour.getY() + 0.5D, neighbour.getZ() + 0.5D);
-				BlockHitResult hitResult = world.raycast(new RaycastContext(core, coreB, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, entity));
-				if(hitResult.getType() == HitResult.Type.MISS)
-					points.add(neighbour);
-			}
-			return points;
+			return MOVES.stream().map(position::add).filter(n -> checker.test(n, position, world, entity)).toList();
 		}
 		
 		@FunctionalInterface

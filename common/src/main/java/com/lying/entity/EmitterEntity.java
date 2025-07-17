@@ -52,7 +52,8 @@ public class EmitterEntity extends Entity
 	protected void writeCustomDataToNbt(NbtCompound nbt)
 	{
 		nbt.putInt("TicksEmitting", getAge());
-		nbt.put("Emission", emission.toNbt());
+		if(emission != null)
+			nbt.put("Emission", emission.toNbt());
 	}
 	
 	protected double getGravity() { return LivingEntity.GRAVITY; }
@@ -65,7 +66,7 @@ public class EmitterEntity extends Entity
 		if(getEntityWorld().isClient()) return;
 		
 		int ticksEmitting = getAge();
-		if(emission.shouldTick(ticksEmitting))
+		if(emission != null && emission.shouldTick(ticksEmitting))
 		{
 			emission.tick(getPos(), (ServerWorld)getWorld(), ticksEmitting, this);
 			getDataTracker().set(TICKS_EMITTING, ++ticksEmitting);

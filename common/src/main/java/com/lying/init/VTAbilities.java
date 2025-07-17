@@ -44,6 +44,7 @@ import com.lying.ability.AbilityOresight;
 import com.lying.ability.AbilityPariah;
 import com.lying.ability.AbilityPhotosynth;
 import com.lying.ability.AbilityPoison;
+import com.lying.ability.AbilityPortals;
 import com.lying.ability.AbilityQuake;
 import com.lying.ability.AbilityRegeneration;
 import com.lying.ability.AbilitySculksight;
@@ -261,6 +262,7 @@ public class VTAbilities
 	public static final Supplier<Ability> MITHRIDATIC		= register("mithridatic", (id) -> new AbilityStatusTagImmune(id, Category.DEFENSE));
 	public static final Supplier<Ability> NAT_ARMOUR		= register("natural_armour", (id) -> new SingleAttributeAbility.Armour(id, Category.DEFENSE));
 	public static final Supplier<Ability> NIGHT_VISION		= register("night_vision", (id) -> new AbilityNightVision(id, Category.UTILITY));
+	public static final Supplier<Ability> OMENPATH			= register("omenpath", AbilityPortals.ToHomeDim::new);
 	public static final Supplier<Ability> OMNISCIENT		= register("omniscient", (id) -> new PassiveNoXP.Omniscient(id, Category.UTILITY));
 	public static final Supplier<Ability> ORESIGHT			= register("oresight", (id) -> new AbilityOresight(id, Category.UTILITY));
 	public static final Supplier<Ability> PARIAH			= register("pariah", (id) -> new AbilityPariah(id, Category.UTILITY));

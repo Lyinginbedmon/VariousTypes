@@ -9,8 +9,8 @@ import com.lying.client.init.VTPlayerSpecialRenderingRegistry;
 import com.lying.client.particle.ParentedParticles;
 import com.lying.client.renderer.AnimatedPlayerEntityRenderer;
 import com.lying.client.renderer.EmitterEntityRenderer;
+import com.lying.client.renderer.PortalEntityRenderer;
 import com.lying.client.renderer.SmokeCloudEntityRenderer;
-import com.lying.client.renderer.SmokeEntityRenderer;
 import com.lying.client.renderer.ThrownBlockEntityRenderer;
 import com.lying.client.screen.AbilityMenu;
 import com.lying.client.screen.CharacterCreationEditScreen;
@@ -148,7 +148,7 @@ public class VariousTypesClient
 		EntityRendererRegistry.register(VTEntityTypes.SHAKEN_BLOCK, ThrownBlockEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.THROWN_BLOCK, ThrownBlockEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.EMITTER, EmitterEntityRenderer::new);
-		EntityRendererRegistry.register(VTEntityTypes.THICK_SMOKE, SmokeEntityRenderer::new);
 		EntityRendererRegistry.register(VTEntityTypes.THICK_SMOKE_CLOUD, SmokeCloudEntityRenderer::new);
+		EntityRendererRegistry.register(VTEntityTypes.PORTAL, PortalEntityRenderer::new);
 	}
 }
