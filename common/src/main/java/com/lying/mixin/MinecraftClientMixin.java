@@ -8,7 +8,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.lying.client.VariousTypesClient;
-import com.lying.client.renderer.IconSpriteManager;
+import com.lying.client.texture.IconSpriteManager;
+import com.lying.client.texture.PortalSpriteManager;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
@@ -25,6 +26,7 @@ public class MinecraftClientMixin
 	private void vt$Constructor(RunArgs args, final CallbackInfo ci)
 	{
 		IconSpriteManager.init(getTextureManager());
+		PortalSpriteManager.init(getTextureManager());
 	}
 	
 	@Inject(method = "hasOutline(Lnet/minecraft/entity/Entity;)Z", at = @At("RETURN"), cancellable = true)

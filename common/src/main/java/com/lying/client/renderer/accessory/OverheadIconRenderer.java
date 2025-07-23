@@ -6,7 +6,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import com.lying.client.renderer.IconSpriteManager;
+import com.lying.client.texture.IconSpriteManager;
 import com.lying.client.utility.ModelTransformHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 

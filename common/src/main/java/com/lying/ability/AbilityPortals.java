@@ -12,6 +12,7 @@ import com.lying.entity.PortalEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class AbilityPortals extends ActivatedAbility
@@ -37,7 +38,12 @@ public abstract class AbilityPortals extends ActivatedAbility
 		protected void activate(LivingEntity owner, AbilityInstance instance)
 		{
 			ServerWorld currentWorld = (ServerWorld)owner.getWorld();
+			
 			BlockPos currentPos = owner.getBlockPos();
+			double range = 8F;
+			HitResult trace = owner.raycast(range, 1F, true);
+			if(trace.getType() != HitResult.Type.MISS)
+				currentPos = BlockPos.ofFloored(trace.getPos().getX(), trace.getPos().getY(), trace.getPos().getZ());
 			
 			Optional<CharacterSheet> sheetOpt = VariousTypes.getSheet(owner);
 			if(sheetOpt.isEmpty())

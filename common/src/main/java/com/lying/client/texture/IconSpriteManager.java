@@ -1,4 +1,4 @@
-package com.lying.client.renderer;
+package com.lying.client.texture;
 
 import static com.lying.reference.Reference.ModInfo.prefix;
 

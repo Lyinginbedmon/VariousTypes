@@ -271,6 +271,8 @@
 	"ability.vartypes.luddite.desc": "Your strikes wear away at your opponents weaponry, randomly dealing [%s] damage.",
 	"ability.vartypes.cosmetics": "Cosmetics",
 	"ability.vartypes.cosmetics.desc": "Provides one or more visible cosmetics.",
+	"ability.vartypes.omenpath": "Omenpath",
+	"ability.vartypes.omenpath.desc": "You tear open a portal to the equivalent location in your home dimension",
 	// Commands
 	"command.vartypes.failed_generic": "Command failed",
 	"command.vartypes.failed_list_empty": "Current datapack has no options to display",
@@ -342,6 +344,8 @@
 	"gui.vartypes.templates": "%s templates",
 	"gui.vartypes.activated_ability.success": "Used [%s]",
 	"gui.vartypes.activated_ability.failed": "You can't use %s right now",
+	"gui.vartypes.toggled_ability.activated": "Activated [%s]",
+	"gui.vartypes.toggled_ability.deactivated": "Deactivated [%s]",
 	"gui.vartypes.ability_cooldown": "Cooldown: %s",
 	"gui.vartypes.hours": "%sh",
 	"gui.vartypes.minutes": "%sm",
@@ -372,6 +376,10 @@
 	"gui.vartypes.faeskin_penalty": "Your hands sting from holding it",
 	"gui.vartypes.wing_style": "Style: %s",
 	"gui.vartypes.colour": "Colour: %s",
+	"gui.vartypes.portal.blank": "Blank",
+	"gui.vartypes.portal.dim_only": "%s",
+	"gui.vartypes.portal.dest_only": "%s",
+	"gui.vartypes.portal.dest_and_dim": "%s in %s",
 	// Enums
 	"wings.vartypes.butterfly": "Butterfly",
 	"wings.vartypes.dragonfly": "Dragonfly",
