@@ -13,6 +13,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.lying.VariousTypes;
 import com.lying.init.VTEntityTypes;
+import com.lying.init.VTSoundEvents;
 import com.lying.reference.Reference;
 import com.lying.utility.VTUtils;
 import com.mojang.serialization.Codec;
@@ -62,8 +63,17 @@ import net.minecraft.world.dimension.DimensionType;
 
 public class PortalEntity extends Entity
 {
+	/** Where the portal leads */
 	public static final TrackedData<NbtCompound> DEST	= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.NBT_COMPOUND);
+	/** How long, in ticks, the portal has existed */
 	public static final TrackedData<Integer> LIFETIME	= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	/** The portal's predefined lifespan before despawning */
+	public static final TrackedData<Integer> LIFESPAN	= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.INTEGER);
+	/** The world time at which the portal must despawn */
+	public static final TrackedData<Long> EXPIRATION	= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.LONG);
+	/** The world time when the portal was first updated */
+	public static final TrackedData<Long> SPAWN_TIME	= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.LONG);
+	/** The phase of opening the portal */
 	public static final TrackedData<String> PHASE		= DataTracker.registerData(PortalEntity.class, TrackedDataHandlerRegistry.STRING);
 	
 	public PortalEntity(EntityType<? extends PortalEntity> type, World world)
@@ -134,25 +144,47 @@ public class PortalEntity extends Entity
 	
 	protected void initDataTracker(Builder builder)
 	{
+		builder.add(SPAWN_TIME, -1L);
 		builder.add(DEST, new NbtCompound());
 		builder.add(LIFETIME, 0);
-		builder.add(PHASE, "");
+		builder.add(LIFESPAN, -1);
+		builder.add(EXPIRATION, -1L);
+		builder.add(PHASE, Phase.CRACK0.asString());
 	}
 	
 	protected void readCustomDataFromNbt(NbtCompound nbt)
 	{
-		setLifetime(nbt.getInt("Lifetime"));
-		if(nbt.contains("Phase", NbtElement.STRING_TYPE))
-			getDataTracker().set(PHASE, nbt.getString("Phase"));
+		getDataTracker().set(SPAWN_TIME, nbt.getLong("Spawned"));
+		getDataTracker().set(LIFETIME, nbt.getInt("Lifetime"));
+		getDataTracker().set(PHASE, nbt.getString("Phase"));
+		
 		if(nbt.contains("Destination", NbtElement.COMPOUND_TYPE))
 			getDataTracker().set(DEST, nbt.getCompound("Destination"));
+		
+		if(nbt.contains("Lifespan", NbtElement.INT_TYPE))
+			getDataTracker().set(LIFESPAN, nbt.getInt("Lifespan"));
+		else
+			getDataTracker().set(LIFESPAN, -1);
+		
+		if(nbt.contains("Expiration", NbtElement.LONG_TYPE))
+			getDataTracker().set(EXPIRATION, nbt.getLong("Expiration"));
+		else
+			getDataTracker().set(EXPIRATION, -1L);
 	}
 	
 	protected void writeCustomDataToNbt(NbtCompound nbt)
 	{
+		nbt.putLong("Spawned", getDataTracker().get(SPAWN_TIME).longValue());
 		nbt.putInt("Lifetime", getLifetime());
 		nbt.putString("Phase", getDataTracker().get(PHASE));
+		
 		getDestination().ifPresent(dest -> nbt.put("Destination", dest.toNbt()));
+		
+		if(getLifespan() > 0)
+			nbt.putInt("Lifespan", getLifespan());
+		
+		if(getExpiration() > 0)
+			nbt.putLong("Expiration", getExpiration());
 	}
 	
 	public Optional<Destination> getDestination()
@@ -191,8 +223,12 @@ public class PortalEntity extends Entity
 		if(getWorld().isClient())
 			return;
 		
+		if(getDataTracker().get(SPAWN_TIME).longValue() < 0)
+			getDataTracker().set(SPAWN_TIME, getWorld().getTime());
+		
 		updateLifetime();
 		updateTeleporting();
+		handleExpiration();
 	}
 	
 	private void updateLifetime()
@@ -243,9 +279,80 @@ public class PortalEntity extends Entity
 		});
 	}
 	
+	private void handleExpiration()
+	{
+		int lifespan = getLifespan();
+		if(lifespan > 0 && getLifetime() >= lifespan)
+		{
+			expire();
+			return;
+		}
+		
+		long expiry = getExpiration();
+		if(expiry > 0 && expiry <= getWorld().getTime())
+		{
+			expire();
+			return;
+		}
+	}
+	
+	public float getDuration()
+	{
+		int lifespan = getLifespan();
+		if(lifespan > 0)
+			return (float)lifespan;
+		
+		long expiry = getExpiration();
+		if(expiry > 0)
+		{
+			long start = getDataTracker().get(SPAWN_TIME).longValue();
+			return (float)(expiry - start);
+		}
+		
+		return Float.MAX_VALUE;
+	}
+	
+	public float getLifetimeProgress()
+	{
+		int lifespan = getLifespan();
+		if(lifespan > 0)
+			return (float)getLifetime() / (float)lifespan;
+		
+		long expiry = getExpiration();
+		if(expiry > 0)
+		{
+			long time = getWorld().getTime();
+			long start = getDataTracker().get(SPAWN_TIME).longValue();
+			
+			return (float)(time - start) / (float)(expiry - start);
+		}
+		
+		return 0.5F;
+	}
+	
+	public void expire()
+	{
+		if(!getWorld().isClient())
+		{
+			for(int i=4; i>0; --i)
+				VTUtils.spawnParticles((ServerWorld)getWorld(), ParticleTypes.POOF, getPos().add(0D, getHeight() * 0.5D, 0D), Vec3d.ZERO);
+			
+			playSound(VTSoundEvents.PORTAL_CLOSE.get(), 0.5F, random.nextFloat() * 0.4F + 0.8F);
+		}
+		discard();
+	}
+	
 	public int getLifetime() { return getDataTracker().get(LIFETIME).intValue(); }
 	
 	public void setLifetime(int age) { getDataTracker().set(LIFETIME, age); }
+	
+	public int getLifespan() { return getDataTracker().get(LIFESPAN).intValue(); }
+	
+	public void setLifespan(int ticks) { getDataTracker().set(LIFESPAN, ticks); }
+	
+	public long getExpiration() { return getDataTracker().get(EXPIRATION).longValue(); }
+	
+	public void setExpiration(long time) { getDataTracker().set(EXPIRATION, time); }
 	
 	private List<Entity> findTeleportTargets()
 	{
@@ -259,7 +366,7 @@ public class PortalEntity extends Entity
 	private void removeForEmpty()
 	{
 		VariousTypes.LOGGER.warn("Portal entity at {} removed due to having no destination", getBlockPos().toShortString());
-		discard();
+		expire();
 	}
 	
 	public PistonBehavior getPistonBehavior() { return PistonBehavior.IGNORE; }
@@ -447,10 +554,10 @@ public class PortalEntity extends Entity
 	
 	public static enum Phase implements StringIdentifiable
 	{
-		CRACK0("crack_0", glassFX(8), () -> SoundEvents.BLOCK_GLASS_BREAK, 0F),
-		CRACK1("crack_1", glassFX(16), () -> SoundEvents.BLOCK_GLASS_BREAK, 15F),
-		CRACK2("crack_2", glassFX(24), () -> SoundEvents.BLOCK_GLASS_BREAK, 25F),
-		OPEN("portal", openFX(), () -> SoundEvents.BLOCK_END_PORTAL_SPAWN, r -> 0.5F + r.nextFloat() * 0.5F, 30F);
+		CRACK0("crack_0", glassFX(8), VTSoundEvents.PORTAL_CRACKLE, 0F),
+		CRACK1("crack_1", glassFX(16), VTSoundEvents.PORTAL_CRACKLE, 15F),
+		CRACK2("crack_2", glassFX(24), VTSoundEvents.PORTAL_CRACKLE, 25F),
+		OPEN("portal", openFX(), VTSoundEvents.PORTAL_OPEN, r -> 0.5F + r.nextFloat() * 0.5F, 30F);
 		
 		@FunctionalInterface
 		private static interface PhaseFX

@@ -2,12 +2,11 @@ package com.lying.ability;
 
 import java.util.Optional;
 
-import org.apache.commons.lang3.function.Consumers;
-
 import com.lying.VariousTypes;
 import com.lying.component.CharacterSheet;
 import com.lying.component.element.ElementHome;
 import com.lying.entity.PortalEntity;
+import com.lying.reference.Reference;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -49,8 +48,9 @@ public abstract class AbilityPortals extends ActivatedAbility
 			if(sheetOpt.isEmpty())
 				return;
 			
-			ServerWorld homeWorld = currentWorld.getServer().getWorld(ElementHome.get(sheetOpt.get())); 
-			PortalEntity.createLinked(currentWorld, homeWorld, currentPos, Optional.empty(), Consumers.nop());
+			long expiry = currentWorld.getTime() + Reference.Values.TICKS_PER_MINUTE;
+			ServerWorld homeWorld = currentWorld.getServer().getWorld(ElementHome.get(sheetOpt.get()));
+			PortalEntity.createLinked(currentWorld, homeWorld, currentPos, Optional.empty(), portal -> portal.setExpiration(expiry));
 		}
 	}
 }

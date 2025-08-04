@@ -56,6 +56,32 @@
 			"vartypes:photosynth_heal_3"
 		]
 	},
+	"portal_crackle": {
+		"subtitle": "sound.vartypes.portal_crackle",
+		"sounds": [
+			"vartypes:portal_crackle_0",
+			"vartypes:portal_crackle_1",
+			"vartypes:portal_crackle_2"
+		]
+	},
+	"portal_open": {
+		"subtitle": "sound.vartypes.portal_open",
+		"sounds": [
+			"vartypes:portal_open_0",
+			"vartypes:portal_open_1",
+			"vartypes:portal_open_2"
+		]
+	},
+	"portal_close": {
+		"subtitle": "sound.vartypes.portal_close",
+		"sounds": [
+			"vartypes:portal_close_0",
+			"vartypes:portal_close_1",
+			"vartypes:portal_close_2",
+			"vartypes:portal_close_3",
+			"vartypes:portal_close_4"
+		]
+	},
 	"quake_activated": {
 		"subtitle": "sound.vartypes.quake_activated",
 		"sounds": [
